@@ -15,3 +15,11 @@ coursePortal
     
 
 3. Production server is up and running at "courseportal.eecs.umich.edu". 
+
+
+Please feel free to upload any resources you would like to share at coursePortal and build it up. 
+
+
+
+
+
