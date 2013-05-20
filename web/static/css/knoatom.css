@@ -1,0 +1,6 @@
+/* Makes the modal window a bit bigger for showing expositions through an iframe. See expos.html */
+body .modal {
+    max-height: 650px;
+    height: auto;
+    margin: -15% auto auto auto;
+}
