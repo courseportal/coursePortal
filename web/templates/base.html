@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title|default:"KnoAtom" }}</title>
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-modal.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-button.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-dropdown.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-tab.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
+<link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/bootstrap-responsive.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/bootstrap-wysihtml5.css" rel="stylesheet">
+{% block head %}
+{% endblock %}
+</head>
+<body>
+
+<div class="container">
+
+<div class="row">
+<div class="span12">
+<ul class="breadcrumb">
+<li>
+<a href="/">KnoAtom</a> |
+</li>
+{% for b in breadcrumbs %}
+<li class="{% if forloop.last %}active{% endif %}">
+<a href="{{ b.url }}">{{ b.title }}</a>
+{% if not forloop.last %}<span class="divider">/</span>{% endif %}
+</li>
+{% endfor %}
+</ul>
+</div> <!-- end .span12 -->
+</div> <!-- end .row -->
+
+<div class="row">
+<div class="span3">
+<div class="well">
+{% block navigation %}
+<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+<li class="nav-header">Categories</li>
+{% for c in parent_categories %}
+<li class="divider"></li>
+<li class="{% if c.id == parent_category.id %}open{% endif %} {% if c.id == selected_category.id %}active{% endif %}">
+<a href="{% url 'category' c.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i> {{ c }}</a>
+<ul class="nav nav-list">
+{% for sc in c.child.all %}
+<li class="{% if sc.id == selected_category.id %}active{% endif %}">
+<a href="{% url 'category' sc.id%}">{{ sc }}</a>
+</li>
+{% endfor %}
+</ul>
+</li>
+{% endfor %}
+<!-- meta -->
+<li class="divider"></li>
+<li class="nav-header">Meta</li>
+{% if user.is_authenticated %}
+<li><a href="{% url 'account' %}">{{ user }}</a></li>
+<li><a href="{% url 'submit' %}">Submit New Content</a></li>
+<li><a href="{% url 'logout' %}">Logout</a></li>
+{% else %}
+<li><a href="{% url 'login' %}">Login</a></li>
+<li><a href="{% url 'register' %}">Register</a></li>
+{% endif %}
+</ul>
+{% endblock %}
+</div> <!-- end .well -->
+</div> <!-- end .span3 -->
+<div class="span9">
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% block content %}
+{% endblock %}
+</div> <!-- end .span9 -->
+</div> <!-- end .row -->
+
+<div class="row">
+<div class="span12">
+<div id="footer">
+<p>Copyright &copy; 2012</p>
+</div> <!-- end #footer -->
+</div> <!-- end .span12 -->
+</div> <!-- end .row -->
+</div> <!-- end .container -->
+
+<div class="modal fade" id="global_modal" >
+<div class="modal-header">
+<a class="close" data-dismiss="modal">x</a><h3>Video Preview</h3>
+</div>
+<div class="modal-body">
+<!-- empty, for now -->
+</div>
+</div> <!-- end #global_modal -->
+
+<div class="modal fade" id="expo_modal" >
+<div class="modal-header">
+<a class="close" data-dismiss="modal">x</a><h3>Exposition viewer</h3>
+</div>
+<div class="modal-body">
+<!-- empty, for now -->
+</div>
+</div> <!-- end #expo_modal -->
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
+</body>
+</html>

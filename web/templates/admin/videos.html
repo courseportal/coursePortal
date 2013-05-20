@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+<h2>All Videos</h2>
+</div>
+<p>Click on the categories below to view the video rankings in each category</p>
+{% load my_filters %}
+<ul class="nav nav-tabs">
+{% for k in top_ranked_videos %}
+<li class="{% if forloop.first %}active{% endif %}"><a href="#{{ k.vote_category }}" data-toggle="tab">{{ k.vote_category }}</a></li>
+{% endfor %}
+</ul>
+
+<div class="tab-content">
+{% for k in top_ranked_videos %}
+<div class="tab-pane {% if forloop.first %}active{% endif %}" id="{{ k.vote_category }}">
+{% for v in k.submissions %}
+<p><a href="{% url post v.id %}">{{ v }}</a> <small>({{ v.average_rating|floatformat:2 }})</small></p>
+{% endfor %}
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}
