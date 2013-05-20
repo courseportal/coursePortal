@@ -1,5 +1,7 @@
 # Knoatom
 
+Github test
+
 ## Pre-requisites
 
 * mysql database (you're on your own for this one)
