@@ -1,0 +1,23 @@
+{% if not expositions %}
+No expositions exist for this category yet!
+{% endif %}
+{% for e in expositions %}
+<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">{{ e.title }}</a>
+<br />
+{% endfor %}
+
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />
+<script type="text/javascript">
+    $('textarea').addClass('span6').wysihtml5();
+    $('.expo_link').each(function() {
+        $(this).click(function() {
+            $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+$(this).attr('data-href')+'">Loading...</iframe>'); 
+            $('#expo_modal').modal('toggle').css({
+                width:'auto',
+                'margin-left':function(){
+                    return -($(this).width()/2);
+                }
+            });
+        })
+    });
+</script>

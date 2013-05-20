@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if not content %}
+<div class="page-header">
+<h2>Batch Add Users</h2>
+</div>
+
+<form class="form-horizontal" action="{% url batch_add %}" method="post">
+{% csrf_token %}
+
+{% include "form_template.html" with form=form %}
+
+<div class="form-actions">
+<input class="btn btn-primary" type="submit" value="Submit" />
+<input class="btn" type="reset" value="Clear" />
+</div>
+</form>
+
+{% endif %}
+
+{% include "home/content.html" %}
+
+{% endblock %}
+

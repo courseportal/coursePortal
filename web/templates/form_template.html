@@ -1,0 +1,20 @@
+{% if form.non_field_errors %}
+<div class="alert alert-warning">{{ form.non_field_errors }}</div>
+{% endif %}
+{% for field in form.hidden_fields %}
+{{ field }}
+{% endfor %}
+{% for field in form.visible_fields %}
+<div class="control-group {% if field.errors %}error{% endif %}">
+<label class="control-label" for="{{ field.html_name }}">{{ field.label }}</label>
+<div class="controls">
+{{ field }}
+{% if field.errors %}
+<span class="help-inline">{{ field.errors }}</span>
+{% endif %}
+{% if field.help_text %}
+<p class="help-block">{{ field.help_text }}</p>
+{% endif %}
+</div>
+</div>
+{% endfor %}
