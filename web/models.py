@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
     prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     parent = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child")
     class Meta:
