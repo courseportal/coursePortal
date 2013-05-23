@@ -45,30 +45,13 @@
 <div class="well">
 {% block navigation %}
 <ul class="nav nav-list" style="padding-left:0;padding-right:0;">
-<li class="nav-header">Categories</li>
-{% for c in parent_categories %}
-<li class="divider"></li>
-<li class="{% if c.id == parent_category.id %}open{% endif %} {% if c.id == selected_category.id %}active{% endif %}">
-<a href="{% url "category" class_id.id c.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i> {{ c }}</a>
-<ul class="nav nav-list">
-{% for sc in child_categories %}
-{% for child in c.child.all %}
-    {% if sc.id == child.id %} 
-<li class="{% if sc.id == selected_category.id %}active{% endif %}">
-<a href="{% url "category" class_id.id sc.id %}">{{ sc }}</a>
-</li>
-     {% endif %} 
-{% endfor %}
-{% endfor %}
-</ul>
-</li>
-{% endfor %}
-<!-- meta -->
-<li class="divider"></li>
+
+<!-- Deleted category part here -->
+    
 <li class="nav-header">Meta</li>
 {% if user.is_authenticated %}
 <li><a href="{% url 'account' %}">{{ user }}</a></li>
-<li><a href="{% url 'submit' class_id.id %}">Submit New Content</a></li>
+<!-- Deleted submit part here -->
 <li><a href="{% url 'logout' %}">Logout</a></li>
 {% else %}
 <li><a href="{% url 'login' %}">Login</a></li>

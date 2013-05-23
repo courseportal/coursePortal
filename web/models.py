@@ -2,11 +2,11 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     parent = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child")
-
     class Meta:
         ordering = ['name']
         verbose_name_plural = "Categories"
@@ -18,6 +18,7 @@ class Exposition(models.Model):
     title = models.CharField(max_length=100) # title of the article or website
     link = models.CharField(max_length=100) # A URL to the location of the exposition
     cat = models.ForeignKey(Category)
+
 
     class Meta:
         ordering = ['title']
@@ -57,3 +58,13 @@ class Vote(models.Model):
 
     def __unicode__(self):
         return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
+
+class Class(models.Model):
+    name = models.CharField(max_length=100)
+    allowed_users = models.ManyToManyField(User, related_name = 'can_edit')
+    categories = models.ManyToManyField(Category, blank=True)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Classes"

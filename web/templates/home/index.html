@@ -1,18 +1,15 @@
-{% extends "base.html" %}
+{% extends "Base_index.html" %}
 
 {% block content %}
 
-{% if not content %}
-<div class="page-header">
-<h1>KnoAtom</h1>
-</div>
-{% if top_ranked_videos %}
-{% include "home/top_ratings.html" %}
+{% if class_list %}
+	<ul>
+	{% for class in class_list %}
+		<li><a href="{% url "classes" class.id %}">{{ class.name }}</a></li>
+	{% endfor %}
+	<ul>
 {% else %}
-<p>Click on a category on the left to get started!</p>
+	<p>No classes are available.</p>
 {% endif %}
-{% endif %}
-
-{% include "home/content.html" %}
 
 {% endblock %}

@@ -5,9 +5,10 @@ from django.db.models import Q
 from django.forms.util import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
+from django.shortcuts import get_object_or_404
 import json
 from web.forms.submission import SubmissionForm
-from web.models import Category, Submission
+from web.models import Category, Submission, Class
 
 class PlainErrorList(ErrorList):
     def __unicode__(self):
@@ -17,7 +18,10 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 @login_required()
-def index(request, sid):
+def index(request, pk, sid):
+    
+    class_id = get_object_or_404(Class, pk=pk)
+    
     if request.method == 'POST':
         form = SubmissionForm(request.POST, error_class=PlainErrorList)
         if sid:
@@ -29,7 +33,7 @@ def index(request, sid):
                 sub.tags = form.cleaned_data['tags']
                 sub.save()
                 messages.success(request, 'Successfully saved.')
-                return HttpResponseRedirect(reverse('submit', args=[sid]))
+                return HttpResponseRedirect(reverse('submit', args=[class_id.id, sid]))
             messages.warning(request, 'Error saving. Fields might be invalid.')
         else:
             if form.is_valid():
@@ -40,7 +44,7 @@ def index(request, sid):
                 s.save()
                 s.tags = form.cleaned_data['tags']
                 s.save()
-                return HttpResponseRedirect(reverse('post', args=[s.id]))
+                return HttpResponseRedirect(reverse('post', args=[class_id.id, s.id]))
             messages.warning(request, 'Error submitting.')
     else:
         if sid:
@@ -57,14 +61,15 @@ def index(request, sid):
         else:
             form = SubmissionForm(error_class=PlainErrorList)
 
-    if sid: form_action = reverse('submit', args=[sid])
-    else: form_action = reverse('submit')
+    if sid: form_action = reverse('submit', args=[class_id.id, sid])
+    else: form_action = reverse('submit', args=[class_id.id])
 
     t = loader.get_template('submit.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
         'form': form,
         'parent_categories': Category.objects.filter(parent=None),
+        'class_id': class_id,
     })
     return HttpResponse(t.render(c))
 

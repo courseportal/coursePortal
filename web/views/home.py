@@ -2,21 +2,30 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Avg
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.template import RequestContext, loader
+from django.template import RequestContext, loader, Context
+from django.shortcuts import get_object_or_404
 import json
-from web.models import Category, Submission, VoteCategory
+from web.models import Category, Submission, VoteCategory, Class
+from itertools import chain
 
-def category(request, cat):
+def index(request):
+    template = loader.get_template('home/index.html')
+    class_list = Class.objects.order_by('-name')
+    context = RequestContext(request, {'class_list': class_list,
+    })
+    return HttpResponse(template.render(context))
+
+def category(request, pk, cat):
     """
     - Generates the view for a specific category
     - Creates the breadcrumbs for the page
     """
-    try:
-        category = Category.objects.get(id=cat)
-    except Category.DoesNotExist:
-        raise Http404
+    class_id = get_object_or_404(Class, pk=pk)
+    category = get_object_or_404(class_id.categories, id=cat)
+    categories_in_class = class_id.categories.all()
+    
     parents = category.parent.all()
-    breadcrumbs = [{'url': reverse('home'), 'title': 'Home'}]
+    breadcrumbs = [{'url': reverse('classes', args=[class_id.id]), 'title': class_id.name}]
 
     if len(parents) == 0:
         parent = category
@@ -24,9 +33,9 @@ def category(request, cat):
     else:
         parent = parents[0]
         content = Submission.objects.filter( Q(tags=category) ).distinct()
-        breadcrumbs.append({'url': reverse('category', args=[parent.id]), 'title': parent})
+        breadcrumbs.append({'url': reverse('category', args=[class_id.id, parent.id]), 'title': parent})
 
-    breadcrumbs.append({'url': reverse('category', args=[category.id]), 'title': category})
+    breadcrumbs.append({'url': reverse('category', args=[class_id.id, category.id]), 'title': category})
 
     # un-json-fy the videos
     for c in content:
@@ -42,24 +51,27 @@ def category(request, cat):
 
 
     expositions = category.exposition_set.all()
-    t = loader.get_template('home/index.html')
+    t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
         'parent_category': parent,
-        'parent_categories': Category.objects.filter(parent=None),
+        'parent_categories': Category.objects.filter(parent=None, class__id=pk),
         'selected_category': category,
         'vote_categories': VoteCategory.objects.all(),
+        'class_id':class_id,
+        'categories_in_class':categories_in_class,
     })
     return HttpResponse(t.render(c))
 
-def index(request):
+def classes(request, pk):
     """
     - Generates the home page
     - Generates a list of the most popular videos for each category of rating
     - Use memcached to save the popular video rankings to save a lot of time
     """
+    class_id = get_object_or_404(Class, pk=pk)
     
     # get the highest ranked submissions
     top_ranked_videos = cache.get('top_ranked_videos')
@@ -73,28 +85,44 @@ def index(request):
             })
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
-    t = loader.get_template('home/index.html')
+    #Selecting parents
+    parent_categories = Category.objects.filter(parent=None, class__id=pk)
+    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
+    parent_of_child = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
+            #print(parent_of_child)
+    for z in parent_of_child:
+        y = z
+        for z in parent_of_child:
+            if y != z:
+                print(y)
+                print('\t')
+    t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
-        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-        'parent_categories': Category.objects.filter(parent=None),
+        'breadcrumbs': [{'url':reverse('classes', args=[class_id.id]), 'title': class_id.name}],
+        'parent_categories': parent_categories,
+        'child_categories': child_categories,
+        'parent_of_child': parent_of_child,
         'top_ranked_videos': top_ranked_videos,
         'vote_categories': VoteCategory.objects.all(),
+        'class_id':class_id,
     })
     return HttpResponse(t.render(c))
 
-def post(request, sid):
+def post(request, pk, sid):
     """
     - Generates the view for the specific post (submission) from `sid`
     - Creates the appropriate breadcrumbs for the categories
     """
+    class_id = get_object_or_404(Class, pk=pk)
     s = Submission.objects.get(id=sid)
-    s.video = [v for v in json.loads(s.video)]
-    breadcrumbs = [{'url': reverse('home'), 'title': 'Home'}]
-
+    print(s.video)
+    if s.video:
+        s.video = [v for v in json.loads(s.video)]
+    breadcrumbs = [{'url': reverse('classes', args=[class_id.id]), 'title': class_id.name}]
     parent_categories = s.tags.filter(parent=None)
     if len(parent_categories) >= 1:
         parent = parent_categories[0]
-        breadcrumbs.append({'url': reverse('category', args=[parent.id]), 'title': parent})
+        breadcrumbs.append({'url': reverse('category', args=[class_id.id,parent.id]), 'title': parent})
     else: parent = None
 
     categories = s.tags.filter( ~Q(parent=None) )
@@ -106,12 +134,12 @@ def post(request, sid):
         c = category.parent.all()
         if len(c) > 0:
             c = category.parent.all()[0]
-            breadcrumbs.append({'url': reverse('category', args=[c.id]), 'title': c})
+            breadcrumbs.append({'url': reverse('category', args=[class_id.id,c.id]), 'title': c})
                 
     if category:
-        breadcrumbs.append({'url': reverse('category', args=[category.id]), 'title': category})
+        breadcrumbs.append({'url': reverse('category', args=[class_id.id,category.id]), 'title': category})
 
-    t = loader.get_template('home/index.html')
+    t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': [s],
@@ -119,5 +147,6 @@ def post(request, sid):
         'parent_categories': Category.objects.filter(parent=None),
         'selected_category': category,
         'vote_categories': VoteCategory.objects.all(),
+        'class_id':class_id,
     })
     return HttpResponse(t.render(c))

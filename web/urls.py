@@ -13,10 +13,11 @@ urlpatterns = patterns('',
 
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 
-    url(r'^submit/(\d+)?/?$', 'web.views.submission.index', name='submit'),
+    url(r'^(?P<pk>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
 
-    url(r'^post/(\d+)/?$', 'web.views.home.post', name='post'),
-    url(r'^category/(\d+)/?$', 'web.views.home.category', name='category'),
+    url(r'^(?P<pk>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+    url(r'^(?P<pk>\d+)/category/(?P<cat>\d+)/?$', 'web.views.home.category', name='category'),
+    url(r'^(?P<pk>\d+)/$', 'web.views.home.classes', name='classes'),
     url(r'^$', 'web.views.home.index', name='home'),
 
     url(r'^mu-25b8a55c-a9fee579-723dcc44-9782bfc2$', 'web.views.blitz.index'),

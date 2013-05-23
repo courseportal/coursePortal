@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_index.html" %}
 
 {% block content %}
 
@@ -21,7 +21,7 @@
 
 <div class="tab-pane active" id="1">
 <h3>Change Password</h3>
-<form class="form-horizontal" action="{% url account %}" method="post">
+<form class="form-horizontal" action="{% url "account" %}" method="post">
 {% csrf_token %}
 {% include "form_template.html" with form=password_form %}
 <div class="form-actions">
@@ -33,7 +33,7 @@
 
 <div class="tab-pane" id="2">
 <h3>Change Display Name</h3>
-<form class="form-horizontal" action="{% url account %}" method="post">
+<form class="form-horizontal" action="{% url "account" %}" method="post">
 {% csrf_token %}
 {% include "form_template.html" with form=username_form %}
 <div class="form-actions">
@@ -59,7 +59,7 @@
 </div>
 <div class="modal-body">
 <p>We don't want to see you go! But, if you insist, type in "KnoAtom" into the box below, and we'll delete your account.</p>
-<form class="form-horizontal" action="{% url account %}" method="post">
+<form class="form-horizontal" action="{% url "account" %}" method="post">
 {% csrf_token %}
 {% include "form_template.html" with form=delete_account_form %}
 </div> <!-- .modal-body -->
