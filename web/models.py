@@ -39,6 +39,13 @@ class Submission(models.Model):
     def __unicode__(self):
         return self.title
 
+class LectureNote(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
+    date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
+    file = models.FileField(upload_to = settings.FILE_PATH)
+
 class VoteCategory(models.Model):
     name = models.CharField(max_length=100)
 

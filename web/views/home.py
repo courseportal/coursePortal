@@ -62,14 +62,10 @@ def category(request, pk, cat):
     #Adding new parent_of_child_categories to current class
     parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
     for z in parent_of_child_categories:
-        #class_of_parent = z.class_set.all()
-        #print(class_of_parent)
-        print(class_id.name)
         add_parent_to_class = class_id.categories.add(z)
+        class_id.save();
         class_of_parent = z.class_set.all()
-        for c in class_of_parent:
-            print(c.name)
-            print('aaaaaaa')
+        print(class_of_parent)
 
     expositions = category.exposition_set.all()
     t = loader.get_template('home/classes.html')
