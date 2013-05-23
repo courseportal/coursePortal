@@ -61,8 +61,9 @@ class Vote(models.Model):
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, related_name = 'can_edit')
+    allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
     categories = models.ManyToManyField(Category, blank=True)
+    author = models.ForeignKey(User, related_name = 'author')
     def __unicode__(self):
         return self.name
     class Meta:
