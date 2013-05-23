@@ -21,6 +21,7 @@ def category(request, pk, cat):
     - Creates the breadcrumbs for the page
     """
     class_id = get_object_or_404(Class, pk=pk)
+    
     category = get_object_or_404(class_id.categories, id=cat)
     categories_in_class = class_id.categories.all()
     
@@ -48,7 +49,27 @@ def category(request, pk, cat):
             if ratings.count() > 0:
                 for r in ratings:
                     c.user_rating[int(r.v_category.id)] = int(r.rating)
+    
+    #Selecting parents
+    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
+    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
+    L = list()
+    for item in parent_categories:
+        if L.count(item) == 0:
+            L.append(item)
+# print(L)
 
+    #Adding new parent_of_child_categories to current class
+    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
+    for z in parent_of_child_categories:
+        #class_of_parent = z.class_set.all()
+        #print(class_of_parent)
+        print(class_id.name)
+        add_parent_to_class = class_id.categories.add(z)
+        class_of_parent = z.class_set.all()
+        for c in class_of_parent:
+            print(c.name)
+            print('aaaaaaa')
 
     expositions = category.exposition_set.all()
     t = loader.get_template('home/classes.html')
@@ -57,13 +78,15 @@ def category(request, pk, cat):
         'content': content,
         'expositions': expositions,
         'parent_category': parent,
-        'parent_categories': Category.objects.filter(parent=None, class__id=pk),
+        'parent_categories': L,
+        'child_categories': child_categories,
         'selected_category': category,
         'vote_categories': VoteCategory.objects.all(),
         'class_id':class_id,
         'categories_in_class':categories_in_class,
     })
     return HttpResponse(t.render(c))
+
 
 def classes(request, pk):
     """
@@ -86,22 +109,19 @@ def classes(request, pk):
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
     #Selecting parents
-    parent_categories = Category.objects.filter(parent=None, class__id=pk)
     child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
-    parent_of_child = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
-            #print(parent_of_child)
-    for z in parent_of_child:
-        y = z
-        for z in parent_of_child:
-            if y != z:
-                print(y)
-                print('\t')
+    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
+    L = list()
+    for item in parent_categories:
+        if L.count(item) == 0:
+            L.append(item)
+#print(L)
+
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url':reverse('classes', args=[class_id.id]), 'title': class_id.name}],
-        'parent_categories': parent_categories,
+        'parent_categories': L,
         'child_categories': child_categories,
-        'parent_of_child': parent_of_child,
         'top_ranked_videos': top_ranked_videos,
         'vote_categories': VoteCategory.objects.all(),
         'class_id':class_id,
