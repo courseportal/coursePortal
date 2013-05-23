@@ -12,6 +12,7 @@ class Choice(models.Model):
     solution = models.TextField()
 
 class Question(models.Model):
+    #assignment = models.ForeignKey(Assignment)
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
@@ -44,3 +45,6 @@ class QuestionVariable(models.Model):
 
 class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
+
+    def __unicode__(self):
+        return self.title
