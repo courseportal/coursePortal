@@ -59,17 +59,15 @@ def category(request, pk, cat):
             L.append(item)
 # print(L)
 
-    #Adding new parent_of_child_categories to current class
-    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
-    for z in parent_of_child_categories:
-        #class_of_parent = z.class_set.all()
-        #print(class_of_parent)
-        print(class_id.name)
-        add_parent_to_class = class_id.categories.add(z)
-        class_of_parent = z.class_set.all()
-        for c in class_of_parent:
-            print(c.name)
-            print('aaaaaaa')
+##    #Adding new parent_of_child_categories to current class
+##    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
+##    for z in parent_of_child_categories:
+##        class_of_parent = z.class_set.all()
+##        
+##        for c in class_of_parent:
+##            print(c.name)
+##            print('\n')
+#   add_parent_to_class = Class.objects.create(name=c.name,allowed_users='tyan', categories=z)
 
     expositions = category.exposition_set.all()
     t = loader.get_template('home/classes.html')
@@ -116,6 +114,8 @@ def classes(request, pk):
         if L.count(item) == 0:
             L.append(item)
 #print(L)
+
+    
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db.models.loading import get_models
+
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
@@ -28,7 +29,27 @@ class ExposInline(admin.StackedInline):
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
 
+    def save_model(self, request, obj, form, change):
+        for parent in obj.parent.all():
+            for parent_parent in parent.parent.all():
+                if parent_parent != None:
+                    obj.parent.add(parent_parent)
+                    obj.parent.remove(parent)
+                    obj.save()
+                    
+    def clean_parent(self):
+        print("\n\n\nHi\n\n\n")
+
+
 class ClassAdmin(admin.ModelAdmin):
+
+    def save_model(self, request, obj, form, change):
+        for child in child_categories.all():
+            for parent in child.parent.all():
+                if parent != None:
+                    class_id.categories.add(parent)
+                    class_id.save()
+    
     def has_change_permission(self, request, obj=None):
         if obj==None:
             return True
