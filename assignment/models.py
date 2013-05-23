@@ -41,3 +41,6 @@ class QuestionVariable(models.Model):
 
     def getValue(self):
         return random.randint(self.lowerBound, self.upperBound)
+
+class Assignment(models.Model):
+    title = models.CharField(max_length=100, default = '')
