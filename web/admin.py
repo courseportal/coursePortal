@@ -46,10 +46,10 @@ class ClassAdmin(admin.ModelAdmin):
         obj.save()
     
     def save_model(self, request, obj, form, change):
-        super(ClassAdmin, self).save_model(request, obj, form, change)
         if not change:
             obj.author = request.user
             obj.save()
+        super(ClassAdmin, self).save_model(request, obj, form, change)
     
     def has_change_permission(self, request, obj=None):
         if obj==None:
