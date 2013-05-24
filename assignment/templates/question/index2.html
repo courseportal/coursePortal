@@ -1,9 +1,0 @@
-{% if question_list %}
-    <ul>
-    {% for question in question_list %}
-        <li><a href="/assignment/question/{{ question.id }}/">{{ question.title }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No questions!</p>
-{% endif %}
