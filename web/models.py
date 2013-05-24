@@ -37,7 +37,7 @@ class Submission(models.Model):
     tags = models.ManyToManyField(Category)
 
     def __unicode__(self):
-        return self.title
+        return self.title  
 
 class VoteCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -69,6 +69,17 @@ class Class(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name_plural = "Classes"
+
+#Lecture Note
+class LectureNote(models.Model):
+    file = models.FileField(upload_to = 'file')
+    owner = models.ForeignKey(User)
+    classBelong = models.ForeignKey(Class, related_name = 'classBelong')
+    filename = models.CharField(max_length=200)
+#content = models.TextField()
+#date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
+#date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
+
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)

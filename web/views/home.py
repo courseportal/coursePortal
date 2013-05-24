@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
-from web.models import Category, Submission, VoteCategory, Class
+from web.models import Category, Submission, VoteCategory, Class, LectureNote
 from itertools import chain
 
 def index(request):
@@ -59,22 +59,24 @@ def category(request, pk, cat):
             L.append(item)
 # print(L)
 
-##    #Adding new parent_of_child_categories to current class
-##    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
-##    for z in parent_of_child_categories:
-##        class_of_parent = z.class_set.all()
-##        
-##        for c in class_of_parent:
-##            print(c.name)
-##            print('\n')
-#   add_parent_to_class = Class.objects.create(name=c.name,allowed_users='tyan', categories=z)
+    #Adding new parent_of_child_categories to current class
+    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
+    for z in parent_of_child_categories:
+        add_parent_to_class = class_id.categories.add(z)
+        class_id.save();
+        class_of_parent = z.class_set.all()
+        print(class_of_parent)
 
     expositions = category.exposition_set.all()
+    lectureNotes = LectureNote.objects.filter(classBelong = class_id)
+    for e in lectureNotes:
+        print(e.file)
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
+        'lectureNotes': lectureNotes,
         'parent_category': parent,
         'parent_categories': L,
         'child_categories': child_categories,
@@ -114,8 +116,6 @@ def classes(request, pk):
         if L.count(item) == 0:
             L.append(item)
 #print(L)
-
-    
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
@@ -159,12 +159,21 @@ def post(request, pk, sid):
     if category:
         breadcrumbs.append({'url': reverse('category', args=[class_id.id,category.id]), 'title': category})
 
+    #Selecting parents
+    child_cats = Category.objects.filter(class__id=pk).exclude(parent=None)
+    parent_cats = Category.objects.filter(Q(child__in=child_cats)|Q(parent=None, class__id=pk))
+    L = list()
+    for item in parent_cats:
+        if L.count(item) == 0:
+            L.append(item)
+
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': [s],
         'parent_category': parent,
-        'parent_categories': Category.objects.filter(parent=None),
+        'parent_categories': L,
+        'child_categories': child_cats,
         'selected_category': category,
         'vote_categories': VoteCategory.objects.all(),
         'class_id':class_id,

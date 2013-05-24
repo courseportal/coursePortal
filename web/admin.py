@@ -13,33 +13,43 @@ class ExposInline(admin.StackedInline):
 
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
-    
-    def save_model(self, request, obj, form, change):
+
+    #This is a dirty hack, but it works, a more elegant solution should
+    #be implemented in the future.  This works because this function is called
+    #after django overwrites the m2m field, unlike save_model, so I just put the
+    #code in here.
+    def log_change(self, request, obj, message):
+        super(CategoryAdmin, self).log_change(request, obj, message)
         for parent in obj.parent.all():
             for parent_parent in parent.parent.all():
                 if parent_parent != None:
                     obj.parent.add(parent_parent)
                     obj.parent.remove(parent)
-                    obj.save()
+        obj.save()
 
-        super(CategoryAdmin, self).save_model(request, obj, form, change)
-
-
+    
 class ClassAdmin(admin.ModelAdmin):
     exclude = ('author',)
+
     
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.author = request.user
-            obj.save()
-        child_categories = obj.categories.filter(parent=None)
+    #This is a dirty hack, but it works, a more elegant solution should
+    #be implemented in the future.  This works because this function is called
+    #after django overwrites the m2m field, unlike save_model, so I just put the
+    #code in here.
+    def log_change(self, request, obj, message):
+        super(ClassAdmin, self).log_change(request, obj, message)
+        child_categories = obj.categories.exclude(parent=None)
         for child in child_categories.all():
             for parent in child.parent.all():
                 if parent != None:
                     obj.categories.add(parent)
-                    obj.save()
-
+        obj.save()
+    
+    def save_model(self, request, obj, form, change):
         super(ClassAdmin, self).save_model(request, obj, form, change)
+        if not change:
+            obj.author = request.user
+            obj.save()
     
     def has_change_permission(self, request, obj=None):
         if obj==None:
@@ -61,10 +71,14 @@ class ClassAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
-
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
+#admin.site.register(Question, QuestionAdmin)
+#admin.site.register(QuestionChoice, QuestionChoiceAdmin)
+#admin.site.register(Assignment)
+admin.site.register(LectureNote)
+

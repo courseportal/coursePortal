@@ -23,3 +23,6 @@ class SubmissionForm(forms.Form):
     content = forms.CharField(widget=forms.Textarea, required=True)
     video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
     tags = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.SelectMultiple(attrs={'size':'8'}), help_text='Please select relevant tags for your submission.')
+
+class LectureNoteForm(forms.Form):
+    file = forms.FileField(label='Select a file',help_text='max. 42 megabytes')
