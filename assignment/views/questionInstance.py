@@ -3,16 +3,18 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from assignment.models import *
 from math import *
+from random import shuffle
 
 
 def detail(request, id):
     found = False
+    #search for an already generated instance
     for q in QuestionInstance.objects.all():
         if q.template_id == int(id) and q.user_id == request.user.id:
             found = True
             question = q
             break
-    
+    #otherwise generate a question instance
     if not(found):
         template = Question.objects.get(pk=id)
         question = instanceQuestion(template, request.user)
@@ -48,16 +50,20 @@ def instanceQuestion(template, user):
         reg = '$'+v.name
         text = text.replace(reg, str(vars()[v.name]))
 
+    #create question instance
     instance = QuestionInstance(title = template.title, solution=solution, text=text, user=user, template=template)
     instance.save()
     
     #choices formatted here
-    for c in choices_list:
-        c.solution = c.solution.replace('<br>', '\n')
-        exec c.solution
-        choice = Choice(solution=answer,question=instance)
+    if len(choices_list):
+        for c in choices_list:
+            c.solution = c.solution.replace('<br>', '\n')
+            exec c.solution
+            choice = Choice(solution=answer,question=instance)
+            choice.save()
+        #add solution to list of choices, shuffle choices
+        choice = Choice(solution=solution,question=instance)
         choice.save()
-    choice = Choice(solution=solution,question=instance)
-    choice.save()
-
+        shuffle(instance.choices.all())
+    
     return instance

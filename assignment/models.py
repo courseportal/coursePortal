@@ -15,7 +15,6 @@ class Question(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
-    numChoices = models.IntegerField()
 
     def __unicode__(self):
         return self.title
@@ -33,6 +32,7 @@ class QuestionVariable(models.Model):
     VARIABLE_TYPES = (
         ('custom', 'Custom'),
         ('int', 'Integer'),
+        ('double', 'Double'),
     )
     varType = models.CharField(max_length=15, choices=VARIABLE_TYPES, default='custom')
     lowerBound = models.FloatField(default=0)
@@ -42,7 +42,11 @@ class QuestionVariable(models.Model):
         return self.name
 
     def getValue(self):
-        return random.randint(self.lowerBound, self.upperBound)
+        random.seed(datetime.now())
+        if (self.varType == 'int'):
+            return random.randint(self.lowerBound, self.upperBound)
+        elif (self.varType == 'double'):
+            return random.uniform(self.lowerBound, self.upperBound)
 
 
 class QuestionInstance(models.Model):
