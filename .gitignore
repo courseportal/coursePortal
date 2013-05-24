@@ -2,4 +2,6 @@ settings.py
 *.pyc
 *.sw
 */migrations/*
+update.bat
 .DS_Store
+*~

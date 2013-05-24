@@ -3,15 +3,15 @@ from django.contrib.auth.models import User
 from django.db import models
 import random
 
-class QuestionInstance(models.Model):
-    title = models.CharField(max_length=200)
-    solution = models.TextField()
-    text = models.TextField()
+class Assignment(models.Model):
+    title = models.CharField(max_length=100, default = '')
 
-class Choice(models.Model):
-    solution = models.TextField()
+    def __unicode__(self):
+        return self.title
+
 
 class Question(models.Model):
+    assignment = models.ForeignKey(Assignment, related_name='questions', default=None)
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
@@ -23,6 +23,8 @@ class Question(models.Model):
 class QuestionChoice(models.Model):
     solution = models.TextField()
     question = models.ForeignKey(Question, related_name='choices')
+    def __unicode__(self):
+        return self.solution
 
 #consider ditching all of this for a simple name field (and make him do the randomization work)
 class QuestionVariable(models.Model):
@@ -42,5 +44,18 @@ class QuestionVariable(models.Model):
     def getValue(self):
         return random.randint(self.lowerBound, self.upperBound)
 
-class Assignment(models.Model):
-    title = models.CharField(max_length=100, default = '')
+
+class QuestionInstance(models.Model):
+    title = models.CharField(max_length=200)
+    solution = models.TextField()
+    text = models.TextField()
+    user = models.ForeignKey(User, related_name = 'questions', default = None)
+    template = models.ForeignKey(Question, related_name = 'instances')
+    def __unicode__(self):
+        return self.user.first_name
+
+class Choice(models.Model):
+    solution = models.TextField()
+    question = models.ForeignKey(QuestionInstance, related_name = 'choices')
+    def __unicode__(self):
+        return self.solution
