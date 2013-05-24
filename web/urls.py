@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
@@ -18,7 +19,11 @@ urlpatterns = patterns('',
     url(r'^question/?$', 'web.views.question.index', name='question'),
 
     url(r'^(?P<pk>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
-
+                    
+    #LectureNote
+    url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.LectureSubmit.display',name='LectureNoteDisplay'),
+    url(r'^(?P<pk>\d+)/submit/LectureNoteUpload/?$', 'web.views.LectureSubmit.index', name='LectureNoteUpload'),
+                       
     url(r'^(?P<pk>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
     url(r'^(?P<pk>\d+)/category/(?P<cat>\d+)/?$', 'web.views.home.category', name='category'),
     url(r'^(?P<pk>\d+)/$', 'web.views.home.classes', name='classes'),

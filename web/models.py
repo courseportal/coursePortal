@@ -37,14 +37,7 @@ class Submission(models.Model):
     tags = models.ManyToManyField(Category)
 
     def __unicode__(self):
-        return self.title
-
-class LectureNote(models.Model):
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
-    date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-    file = models.FileField(upload_to = settings.FILE_PATH)
+        return self.title  
 
 class VoteCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -68,13 +61,25 @@ class Vote(models.Model):
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, related_name = 'can_edit')
+    allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
     categories = models.ManyToManyField(Category, blank=True)
+    author = models.ForeignKey(User, related_name = 'author')
     def __unicode__(self):
         return self.name
     class Meta:
         ordering = ['name']
         verbose_name_plural = "Classes"
+
+#Lecture Note
+class LectureNote(models.Model):
+    file = models.FileField(upload_to = 'file')
+    owner = models.ForeignKey(User)
+    classBelong = models.ForeignKey(Class, related_name = 'classBelong')
+    filename = models.CharField(max_length=200)
+#content = models.TextField()
+#date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
+#date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
+
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)

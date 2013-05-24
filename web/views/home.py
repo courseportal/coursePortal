@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
-from web.models import Category, Submission, VoteCategory, Class
+from web.models import Category, Submission, VoteCategory, Class, LectureNote
 from itertools import chain
 
 def index(request):
@@ -68,11 +68,15 @@ def category(request, pk, cat):
         print(class_of_parent)
 
     expositions = category.exposition_set.all()
+    lectureNotes = LectureNote.objects.filter(classBelong = class_id)
+    for e in lectureNotes:
+        print(e.file)
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
+        'lectureNotes': lectureNotes,
         'parent_category': parent,
         'parent_categories': L,
         'child_categories': child_categories,
