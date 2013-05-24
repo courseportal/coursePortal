@@ -64,12 +64,23 @@ def index(request, pk, sid):
     if sid: form_action = reverse('submit', args=[class_id.id, sid])
     else: form_action = reverse('submit', args=[class_id.id])
 
+    #Selecting parents
+    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
+    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
+    L = list()
+    for item in parent_categories:
+        if L.count(item) == 0:
+            L.append(item)
+#print(L)
+
     t = loader.get_template('submit.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
         'form': form,
         'parent_categories': Category.objects.filter(parent=None),
         'class_id': class_id,
+        'child_categories': child_categories,
+        'parent_categories': L,
     })
     return HttpResponse(t.render(c))
 

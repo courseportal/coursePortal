@@ -30,7 +30,7 @@ def category(request, pk, cat):
 
     if len(parents) == 0:
         parent = category
-        content = Submission.objects.filter( Q(tags=category) | Q(tags__in=category.child.distinct()) ).distinct()
+        content = Submission.objects.filter( Q(tags=category) | Q(tags__in=category.child.filter(class__id=pk).distinct()) ).distinct()
     else:
         parent = parents[0]
         content = Submission.objects.filter( Q(tags=category) ).distinct()
@@ -159,12 +159,21 @@ def post(request, pk, sid):
     if category:
         breadcrumbs.append({'url': reverse('category', args=[class_id.id,category.id]), 'title': category})
 
+    #Selecting parents
+    child_cats = Category.objects.filter(class__id=pk).exclude(parent=None)
+    parent_cats = Category.objects.filter(Q(child__in=child_cats)|Q(parent=None, class__id=pk))
+    L = list()
+    for item in parent_cats:
+        if L.count(item) == 0:
+            L.append(item)
+    
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': [s],
         'parent_category': parent,
-        'parent_categories': Category.objects.filter(parent=None),
+        'parent_categories': L,
+        'child_categories': child_cats,
         'selected_category': category,
         'vote_categories': VoteCategory.objects.all(),
         'class_id':class_id,
