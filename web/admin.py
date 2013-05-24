@@ -37,6 +37,7 @@ class ClassAdmin(admin.ModelAdmin):
     #after django overwrites the m2m field, unlike save_model, so I just put the
     #code in here.
     def log_change(self, request, obj, message):
+        print("\n\n\nHi\n\n\n")
         super(ClassAdmin, self).log_change(request, obj, message)
         child_categories = obj.categories.exclude(parent=None)
         for child in child_categories.all():
@@ -71,14 +72,11 @@ class ClassAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
-#admin.site.register(Question, QuestionAdmin)
-#admin.site.register(QuestionChoice, QuestionChoiceAdmin)
-#admin.site.register(Assignment)
 admin.site.register(LectureNote)
-
