@@ -71,10 +71,14 @@ class ClassAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
-
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
+#admin.site.register(Question, QuestionAdmin)
+#admin.site.register(QuestionChoice, QuestionChoiceAdmin)
+#admin.site.register(Assignment)
+admin.site.register(LectureNote)
+

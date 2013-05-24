@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
-from web.models import Category, Submission, VoteCategory, Class
+from web.models import Category, Submission, VoteCategory, Class, LectureNote
 from itertools import chain
 
 def index(request):
@@ -30,7 +30,7 @@ def category(request, pk, cat):
 
     if len(parents) == 0:
         parent = category
-        content = Submission.objects.filter( Q(tags=category) | Q(tags__in=category.child.filter(class__id=pk).distinct()) ).distinct()
+        content = Submission.objects.filter( Q(tags=category) | Q(tags__in=category.child.distinct()) ).distinct()
     else:
         parent = parents[0]
         content = Submission.objects.filter( Q(tags=category) ).distinct()
@@ -59,22 +59,24 @@ def category(request, pk, cat):
             L.append(item)
 # print(L)
 
-##    #Adding new parent_of_child_categories to current class
-##    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
-##    for z in parent_of_child_categories:
-##        class_of_parent = z.class_set.all()
-##        
-##        for c in class_of_parent:
-##            print(c.name)
-##            print('\n')
-#   add_parent_to_class = Class.objects.create(name=c.name,allowed_users='tyan', categories=z)
+    #Adding new parent_of_child_categories to current class
+    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
+    for z in parent_of_child_categories:
+        add_parent_to_class = class_id.categories.add(z)
+        class_id.save();
+        class_of_parent = z.class_set.all()
+        print(class_of_parent)
 
     expositions = category.exposition_set.all()
+    lectureNotes = LectureNote.objects.filter(classBelong = class_id)
+    for e in lectureNotes:
+        print(e.file)
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
+        'lectureNotes': lectureNotes,
         'parent_category': parent,
         'parent_categories': L,
         'child_categories': child_categories,
@@ -114,8 +116,6 @@ def classes(request, pk):
         if L.count(item) == 0:
             L.append(item)
 #print(L)
-
-    
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
@@ -166,7 +166,7 @@ def post(request, pk, sid):
     for item in parent_cats:
         if L.count(item) == 0:
             L.append(item)
-    
+
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
