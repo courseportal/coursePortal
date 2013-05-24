@@ -1,0 +1,9 @@
+{% if assignment_list %}
+    <ul>
+    {% for assignment in assignment_list %}
+        <li><a href="/assignment/{{ assignment.id }}/">{{ assignment.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No assignments!</p>
+{% endif %}

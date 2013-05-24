@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+{{text | safe}}
+<br>
+<br>
+choices:
+<br>
+<form action=" ">
+{% for c in choices %}
+	{% if c.solution == answer%}
+		<input type="radio" name="choice" value=1>{{c}}<br>
+	{% else %}
+		<input type="radio" name="choice" value=0>{{c}}<br>
+	{% endif %}
+	
+{% endfor %}
+</form>
+</body>
+</html>

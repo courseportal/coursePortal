@@ -1,0 +1,10 @@
+<p>{{ assigned.title }}</p>
+{% if question_list %}
+    <ul>
+    {% for question in question_list %}
+    <li><a href="{% url "question_instance" question.id %}">{{ question.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No questions in this assignment.</p>
+{% endif %}

@@ -1,8 +1,10 @@
 from django.conf.urls import *
-from assignment import views
 
 urlpatterns = patterns('',
-    url(r'', 'assignment.views.index', name='question'),
-    url(r'^question/(?P<id>\d+)/?$', 'assignment.views.detail', name='question_detail'),
-    url(r'^question/?$', 'assignment.views.index', name='question'),
+    url(r'[0-9]+/question/(?P<id>\d+)/?$', 'assignment.views.questionInstance.detail', name='question_instance'),
+    url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
+    url(r'question/?$', 'assignment.views.question.index', name='question'),
+    
+    url(r'(?P<id>\d+)/?$', 'assignment.views.assign.detail', name='assignment_detail'),
+    url(r'', 'assignment.views.assign.index', name='assignment'), 
 )
