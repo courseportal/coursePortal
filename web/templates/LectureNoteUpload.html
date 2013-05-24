@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<h2>Create New Submission</h2>
+
+<form class="form-horizontal" action="{{ . }}" method="post">
+{% csrf_token %}
+
+{% include "form_template.html" with form=form %}
+
+<div class="form-actions">
+<input class="btn btn-primary" type="submit" value="Submit" />
+</div>
+</form>
+
+{% endblock %}
+
