@@ -9,7 +9,7 @@ class ExposInline(admin.StackedInline):
     model = Exposition
     extra = 3
 
-#changes
+
 
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
