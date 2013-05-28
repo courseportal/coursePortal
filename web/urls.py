@@ -14,9 +14,6 @@ urlpatterns = patterns('',
 
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 
-    #questions
-    url(r'^question/(?P<id>\d+)/?$', 'web.views.question.detail', name='question_detail'),
-    url(r'^question/?$', 'web.views.question.index', name='question'),
 
     url(r'^class/(?P<class_id>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
                     

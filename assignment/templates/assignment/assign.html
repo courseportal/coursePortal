@@ -1,0 +1,16 @@
+{% if assignments %}
+<form name="input" action="{% url 'instantiate'%}" method = "post">
+	{% csrf_token %}
+	Assignment:<br> 
+	{% for a in assignments %}
+		<input type="radio" name="assignment" value={{a.pk}}>{{a.title}}<br>
+	{%endfor%}
+	Assigned to:<br>
+	{% for u in users %}
+		<input type="checkbox" name="users" value={{u.id}}>{{u}} <br>
+	{% endfor %}
+	<input type="submit" value="Submit">
+<form>
+{% else %}
+	<p>No assignment templates exist! Make these on the admin page.</p>
+{% endif %}

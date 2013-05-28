@@ -1,3 +1,6 @@
+{% if user.is_staff or user.is_superuser %}
+	<li><a href="{% url 'assign' %}">Assign something</a></li>
+{% endif %}
 {% if assignment_list %}
     <ul>
     {% for assignment in assignment_list %}
