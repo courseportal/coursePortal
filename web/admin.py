@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.db.models.loading import get_models
 from django.db.models import Q
-
-for m in get_models():
-    exec "from %s import %s" % (m.__module__, m.__name__)
+from web.models import *
 
 class ExposInline(admin.StackedInline):
     model = Exposition
@@ -77,8 +75,5 @@ admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
-#admin.site.register(Question, QuestionAdmin)
-#admin.site.register(QuestionChoice, QuestionChoiceAdmin)
-#admin.site.register(Assignment)
 admin.site.register(LectureNote)
 

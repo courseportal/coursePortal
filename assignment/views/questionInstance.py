@@ -17,17 +17,17 @@ def detail(request, id):
     #otherwise generate a question instance
     if not(found):
         template = Question.objects.get(pk=id)
-        question = instanceQuestion(template, request.user)
+        question = instantiateQuestion(template, request.user)
 
     context = {
         'text': question.text,
         'answer': question.solution,
-        'choices': question.choices.all(),
+        'choices': question.choiceInstances.all(),
     }
     
     return render(request, 'question/instance.html', context)
 
-def instanceQuestion(template, user):
+def instantiateQuestion(template, user):
     choices_list = template.choices.all()
     variables_list = template.variables.all()
 
@@ -59,11 +59,11 @@ def instanceQuestion(template, user):
         for c in choices_list:
             c.solution = c.solution.replace('<br>', '\n')
             exec c.solution
-            choice = Choice(solution=answer,question=instance)
+            choice = ChoiceInstance(solution=answer,question=instance)
             choice.save()
         #add solution to list of choices, shuffle choices
-        choice = Choice(solution=solution,question=instance)
+        choice = ChoiceInstance(solution=solution,question=instance)
         choice.save()
-        shuffle(instance.choices.all())
+        shuffle(instance.choiceInstances.all())
     
     return instance
