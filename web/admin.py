@@ -9,6 +9,14 @@ class ExposInline(admin.StackedInline):
     model = Exposition
     extra = 3
 
+class LectureNoteAdmin(admin.ModelAdmin):
+    exclude = ('owner',)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.owner = request.user
+            obj.save()
+        super(LectureNoteAdmin, self).save_model(request, obj, form, change)
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -36,8 +44,10 @@ class ClassAdmin(admin.ModelAdmin):
     #be implemented in the future.  This works because this function is called
     #after django overwrites the m2m field, unlike save_model, so I just put the
     #code in here.
+
+    
+    
     def log_change(self, request, obj, message):
-        print("\n\n\nHi\n\n\n")
         super(ClassAdmin, self).log_change(request, obj, message)
         child_categories = obj.categories.exclude(parent=None)
         for child in child_categories.all():
@@ -79,4 +89,4 @@ admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
-admin.site.register(LectureNote)
+admin.site.register(LectureNote, LectureNoteAdmin)
