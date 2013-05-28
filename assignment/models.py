@@ -15,12 +15,11 @@ class Question(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
-    numChoices = models.IntegerField()
-
+    numChoices = models.IntegerField(default = 0)
     def __unicode__(self):
         return self.title
 
-class QuestionChoice(models.Model):
+class Choice(models.Model):
     solution = models.TextField()
     question = models.ForeignKey(Question, related_name='choices')
     def __unicode__(self):
@@ -33,6 +32,7 @@ class QuestionVariable(models.Model):
     VARIABLE_TYPES = (
         ('custom', 'Custom'),
         ('int', 'Integer'),
+        ('double', 'Double'),
     )
     varType = models.CharField(max_length=15, choices=VARIABLE_TYPES, default='custom')
     lowerBound = models.FloatField(default=0)
@@ -42,20 +42,31 @@ class QuestionVariable(models.Model):
         return self.name
 
     def getValue(self):
-        return random.randint(self.lowerBound, self.upperBound)
+        random.seed(datetime.now())
+        if (self.varType == 'int'):
+            return random.randint(self.lowerBound, self.upperBound)
+        elif (self.varType == 'double'):
+            return random.uniform(self.lowerBound, self.upperBound)
+
+class AssignmentInstance(models.Model):
+    title = models.CharField(max_length=100)
+    user = models.ForeignKey(User, related_name = 'assignmentInstances')
+    template = models.ForeignKey(Assignment, related_name = 'instances')
+
+    def __unicode__(self):
+        return self.title
 
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)
     solution = models.TextField()
     text = models.TextField()
-    user = models.ForeignKey(User, related_name = 'questions', default = None)
-    template = models.ForeignKey(Question, related_name = 'instances')
+    assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.user.first_name
 
-class Choice(models.Model):
+class ChoiceInstance(models.Model):
     solution = models.TextField()
-    question = models.ForeignKey(QuestionInstance, related_name = 'choices')
+    question = models.ForeignKey(QuestionInstance, related_name = 'choiceInstances')
     def __unicode__(self):
         return self.solution

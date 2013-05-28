@@ -7,14 +7,17 @@
 choices:
 <br>
 <form action=" ">
-{% for c in choices %}
-	{% if c.solution == answer%}
-		<input type="radio" name="choice" value=1>{{c}}<br>
-	{% else %}
-		<input type="radio" name="choice" value=0>{{c}}<br>
-	{% endif %}
-	
-{% endfor %}
+{% if choices %}
+	{% for c in choices %}
+		{% if c.solution == answer%}
+			<input type="radio" name="choice" value={{c}}>{{c}}<br>
+		{% else %}
+			<input type="radio" name="choice" value={{c}}>{{c}}<br>
+		{% endif %}
+	{% endfor %}
+{% else %}
+	<input type="text">
+{% endif %}
 </form>
 </body>
 </html>

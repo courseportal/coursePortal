@@ -3,7 +3,7 @@
 <div class="span9">
 <div class="page-header" style="padding-bottom:5px;">
 <h2>
-<a style="color:black;" href="{% url 'post' class_id.id c.id %}">{{ c }}</a>
+<a style="color:black;" href="{% url 'post' current_class.id c.id %}">{{ c }}</a>
 {% if c.owner.is_staff %}
 <small>by KnoAtom Staff</small>
 {% else %}
@@ -12,7 +12,7 @@
 </h2>
 {% if user.is_staff or user.is_superuser or c.owner == user %}
 <div class="edit">
-<p><a href="{% url 'submit' class_id.id c.id %}">Edit</a></p>
+<p><a href="{% url 'submit' current_class.id c.id %}">Edit</a></p>
 </div>
 {% endif %}
 {% if user.is_authenticated %}
@@ -54,7 +54,7 @@
 <div class="well">
 Tags: 
 {% for t in c.tags.all %}
-<a href="{% url 'category' class_id.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
+<a href="{% url 'category' current_class.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
 {% endfor %}
 </div> <!-- end .well -->
 </div> <!-- end .span9 -->

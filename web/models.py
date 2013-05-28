@@ -2,6 +2,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Class(models.Model):
     name = models.CharField(max_length=100)
     allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
@@ -14,51 +15,36 @@ class Class(models.Model):
 
 class Atom(models.Model):
     name = models.CharField(max_length=200)
-  #  catBelong = models.ForeignKey(Category, related_name = 'catBelong')
+    #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     class Meta:
         ordering = ['name']
-        verbose_name_plural = "Atoms"
 
     def __unicode__(self):
         return self.name
-        
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
-    classBelong = models.ForeignKey(Class)
-    child_category = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_category")
-    child_atom = models.ManyToManyField(Atom, blank=True, symmetrical=False)
+    parent_class = models.ForeignKey(Class)
+    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
+    child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
     class Meta:
         ordering = ['name']
         verbose_name_plural = "Categories"
 
     def __unicode__(self):
         return self.name
-        
-
+    
 class Exposition(models.Model):
     title = models.CharField(max_length=100) # title of the article or website
     link = models.CharField(max_length=100) # A URL to the location of the exposition
     atom = models.ForeignKey(Atom)
+
 
     class Meta:
         ordering = ['title']
 
     def __unicode__(self):
         return self.title
-        
-                
-class LectureNote(models.Model):
-    filename = models.CharField(max_length=200)
-    file = models.FileField(upload_to = 'file')
-    owner = models.ForeignKey(User)
-    atom = models.ForeignKey(Atom)
-    def __unicode__(self):
-        return self.filename
-    class Meta:
-        ordering = ['filename']
-        verbose_name_plural = "LectureNotes"
-        
 
 class Submission(models.Model):
     owner = models.ForeignKey(User)
@@ -68,11 +54,10 @@ class Submission(models.Model):
     video = models.CharField(max_length=400, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
     date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-    tags = models.ManyToManyField(Category)
+    tags = models.ManyToManyField(Atom)
 
     def __unicode__(self):
         return self.title  
-   
 
 class VoteCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -94,61 +79,16 @@ class Vote(models.Model):
     def __unicode__(self):
         return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#################################################################################
-class QuestionInstance(models.Model):
-    title = models.CharField(max_length=200)
-    solution = models.TextField()
-    text = models.TextField()
-
-class Choice(models.Model):
-    solution = models.TextField()
-
-class Question(models.Model):
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    solution = models.TextField() #solution script location
-    numChoices = models.IntegerField()
+#Lecture Note
+class LectureNote(models.Model):
+    file = models.FileField(upload_to = 'file')
+    owner = models.ForeignKey(User)
+    classBelong = models.ForeignKey(Class, related_name = 'classBelong')
+    filename = models.CharField(max_length=200)
+#content = models.TextField()
+#date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
+#date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
 
     def __unicode__(self):
-        return self.title
+        return self.filename
 
-class QuestionChoice(models.Model):
-    solution = models.TextField()
-    question = models.ForeignKey(Question, related_name='choices')
-
-#consider ditching all of this for a simple name field (and make him do the randomization work)
-class QuestionVariable(models.Model):
-    question = models.ForeignKey(Question, related_name='variables')
-    name = models.CharField(max_length=100)
-    VARIABLE_TYPES = (
-        ('custom', 'Custom'),
-        ('int', 'Integer'),
-    )
-    varType = models.CharField(max_length=15, choices=VARIABLE_TYPES, default='custom')
-    lowerBound = models.FloatField(default=0)
-    upperBound = models.FloatField(default=0)    
-
-    def __unicode__(self):
-        return self.name
-
-    def getValue(self):
-        return random.randint(self.lowerBound, self.upperBound)

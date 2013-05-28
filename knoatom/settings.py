@@ -1,4 +1,5 @@
 # Django settings for knoatom-web project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -49,7 +50,7 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = '/Users/mynocturne/coursePortal/knoatom-static/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'knoatom-static/media/').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.

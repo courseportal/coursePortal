@@ -4,7 +4,7 @@ for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
 class ChoicesInline(admin.TabularInline):
-    model = QuestionChoice
+    model = Choice
     extra = 0
 
 class VarsInline(admin.TabularInline):
@@ -22,5 +22,5 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(QuestionChoice, QuestionChoiceAdmin)
+admin.site.register(Choice, QuestionChoiceAdmin)
 admin.site.register(Assignment)

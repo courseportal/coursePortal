@@ -2,7 +2,26 @@
 {% if question_list %}
     <ul>
     {% for question in question_list %}
-    <li><a href="{% url "question_instance" question.id %}">{{ question.title }}</a></li>
+    <body>
+		{{question.text | safe}}
+		<br>
+		<br>
+		<form action=" ">
+			{% if question.choiceInstances.all %}
+				choices:
+				<br>
+				{% for c in question.choiceInstances.all %}
+					<input type="radio" name="choice" value={{c}}>{{c}}<br>
+				{% endfor %}
+			{% else %}
+				answer:
+				<br>
+				<input type="text">
+			{% endif %}
+		</form>
+		</body>
+		<br>
+		<br>
     {% endfor %}
     </ul>
 {% else %}
