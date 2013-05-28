@@ -69,7 +69,6 @@ def index(request):
         'password_form': password_form,
         'username_form': username_form,
         'delete_account_form': delete_account_form,
-        'parent_categories': Category.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
@@ -98,7 +97,6 @@ def forgot_password(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
-        'parent_categories': Category.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
@@ -130,7 +128,6 @@ def login(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
-        'parent_categories': Category.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
@@ -169,7 +166,6 @@ def register(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('register'), 'title': 'Register'}],
         'register_form': form,
-        'parent_categories': Category.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
