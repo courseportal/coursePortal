@@ -3,21 +3,41 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Class(models.Model):
+    name = models.CharField(max_length=100)
+    allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
+    author = models.ForeignKey(User, related_name = 'author')
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Classes"
+
+class Atom(models.Model):
+    name = models.CharField(max_length=200)
+    #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
-    prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
-    parent = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="child")
+    parent_class = models.ForeignKey(Class)
+    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
+    child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
     class Meta:
         ordering = ['name']
         verbose_name_plural = "Categories"
 
     def __unicode__(self):
         return self.name
-
+    
 class Exposition(models.Model):
     title = models.CharField(max_length=100) # title of the article or website
     link = models.CharField(max_length=100) # A URL to the location of the exposition
-    cat = models.ForeignKey(Category)
+    atom = models.ForeignKey(Atom)
 
 
     class Meta:
@@ -34,7 +54,7 @@ class Submission(models.Model):
     video = models.CharField(max_length=400, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
     date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-    tags = models.ManyToManyField(Category)
+    tags = models.ManyToManyField(Atom)
 
     def __unicode__(self):
         return self.title  
@@ -58,17 +78,6 @@ class Vote(models.Model):
 
     def __unicode__(self):
         return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
-
-class Class(models.Model):
-    name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
-    categories = models.ManyToManyField(Category, blank=True)
-    author = models.ForeignKey(User, related_name = 'author')
-    def __unicode__(self):
-        return self.name
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = "Classes"
 
 #Lecture Note
 class LectureNote(models.Model):

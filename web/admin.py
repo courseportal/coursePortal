@@ -18,43 +18,45 @@ class LectureNoteAdmin(admin.ModelAdmin):
             obj.save()
         super(LectureNoteAdmin, self).save_model(request, obj, form, change)
 
-
-class CategoryAdmin(admin.ModelAdmin):
+class AtomAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
 
-    #This is a dirty hack, but it works, a more elegant solution should
-    #be implemented in the future.  This works because this function is called
-    #after django overwrites the m2m field, unlike save_model, so I just put the
-    #code in here.
-    def log_change(self, request, obj, message):
-        super(CategoryAdmin, self).log_change(request, obj, message)
-        for parent in obj.parent.all():
-            for parent_parent in parent.parent.all():
-                if parent_parent != None:
-                    obj.parent.add(parent_parent)
-                    obj.parent.remove(parent)
-        obj.save()
+##class CategoryAdmin(admin.ModelAdmin):
+##    inlines = [ExposInline]
+##
+##    #This is a dirty hack, but it works, a more elegant solution should
+##    #be implemented in the future.  This works because this function is called
+##    #after django overwrites the m2m field, unlike save_model, so I just put the
+##    #code in here.
+##    def log_change(self, request, obj, message):
+##        super(CategoryAdmin, self).log_change(request, obj, message)
+##        for parent in obj.parent.all():
+##            for parent_parent in parent.parent.all():
+##                if parent_parent != None:
+##                    obj.parent.add(parent_parent)
+##                    obj.parent.remove(parent)
+##        obj.save()
 
     
 class ClassAdmin(admin.ModelAdmin):
     exclude = ('author',)
 
     
-    #This is a dirty hack, but it works, a more elegant solution should
-    #be implemented in the future.  This works because this function is called
-    #after django overwrites the m2m field, unlike save_model, so I just put the
-    #code in here.
-
-    
-    
-    def log_change(self, request, obj, message):
-        super(ClassAdmin, self).log_change(request, obj, message)
-        child_categories = obj.categories.exclude(parent=None)
-        for child in child_categories.all():
-            for parent in child.parent.all():
-                if parent != None:
-                    obj.categories.add(parent)
-        obj.save()
+##    #This is a dirty hack, but it works, a more elegant solution should
+##    #be implemented in the future.  This works because this function is called
+##    #after django overwrites the m2m field, unlike save_model, so I just put the
+##    #code in here.
+##
+##    
+##    
+##    def log_change(self, request, obj, message):
+##        super(ClassAdmin, self).log_change(request, obj, message)
+##        child_categories = obj.categories.exclude(parent=None)
+##        for child in child_categories.all():
+##            for parent in child.parent.all():
+##                if parent != None:
+##                    obj.categories.add(parent)
+##        obj.save()
     
     def save_model(self, request, obj, form, change):
         if not change:
@@ -83,7 +85,8 @@ class ClassAdmin(admin.ModelAdmin):
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
 
-admin.site.register(Category, CategoryAdmin)
+admin.site.register(Category)
+admin.site.register(Atom, AtomAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
 admin.site.register(Vote)
