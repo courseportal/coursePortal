@@ -50,15 +50,18 @@ class QuestionVariable(models.Model):
 
 class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
+    user = models.ForeignKey(User, related_name = 'assignmentInstances')
+    template = models.ForeignKey(Assignment, related_name = 'instances')
+
+    def __unicode__(self):
+        return self.title
 
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)
     solution = models.TextField()
     text = models.TextField()
-    user = models.ForeignKey(User, related_name = 'questions', default = None)
-    template = models.ForeignKey(Question, related_name = 'instances')
-    #assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
+    assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.user.first_name
 
