@@ -7,6 +7,14 @@ class ExposInline(admin.StackedInline):
     model = Exposition
     extra = 3
 
+class LectureNoteAdmin(admin.ModelAdmin):
+    exclude = ('owner',)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.owner = request.user
+            obj.save()
+        super(LectureNoteAdmin, self).save_model(request, obj, form, change)
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -34,6 +42,9 @@ class ClassAdmin(admin.ModelAdmin):
     #be implemented in the future.  This works because this function is called
     #after django overwrites the m2m field, unlike save_model, so I just put the
     #code in here.
+
+    
+    
     def log_change(self, request, obj, message):
         super(ClassAdmin, self).log_change(request, obj, message)
         child_categories = obj.categories.exclude(parent=None)
@@ -44,10 +55,10 @@ class ClassAdmin(admin.ModelAdmin):
         obj.save()
     
     def save_model(self, request, obj, form, change):
-        super(ClassAdmin, self).save_model(request, obj, form, change)
         if not change:
             obj.author = request.user
             obj.save()
+        super(ClassAdmin, self).save_model(request, obj, form, change)
     
     def has_change_permission(self, request, obj=None):
         if obj==None:
@@ -69,6 +80,7 @@ class ClassAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
@@ -76,4 +88,4 @@ admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
 admin.site.register(LectureNote)
-
+admin.site.register(LectureNote, LectureNoteAdmin)

@@ -80,5 +80,7 @@ class LectureNote(models.Model):
 #date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
 #date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
 
+    def __unicode__(self):
+        return self.filename
 
 
