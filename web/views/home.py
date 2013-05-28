@@ -15,17 +15,24 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
+
 def category(request, pk, cat):
-    """
-    - Generates the view for a specific category
-    - Creates the breadcrumbs for the page
-    """
+    
+    print(pk)
+    print(cat)
+    #- Generates the view for a specific category
+    #- Creates the breadcrumbs for the page
+    
     class_id = get_object_or_404(Class, pk=pk)
     
-    category = get_object_or_404(class_id.categories, id=cat)
-    categories_in_class = class_id.categories.all()
+    category = get_object_or_404(class_id.category_set, id=cat)
     
-    parents = category.parent.all()
+    categories_in_class = class_id.category_set.all()
+    
+    parents = categories_in_class.filter(parent_category = None)
+    
+    parents = category.parent_category.all()
+    
     breadcrumbs = [{'url': reverse('classes', args=[class_id.id]), 'title': class_id.name}]
 
     if len(parents) == 0:
@@ -51,16 +58,14 @@ def category(request, pk, cat):
                     c.user_rating[int(r.v_category.id)] = int(r.rating)
     
     #Selecting parents
-    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
-    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
-    L = list()
-    for item in parent_categories:
-        if L.count(item) == 0:
-            L.append(item)
-# print(L)
+    categories_in_class = Category.objects.filter(classBelong__id=pk)
+    parent_categories = categories_in_class.filter(parent_category = None)
+    
+    for p in parent_categories:
+    	print (p.name)
 
     #Adding new parent_of_child_categories to current class
-    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
+    parent_of_child_categories = Category.objects.filter(child_category__in=parent_categories.child_category).exclude(class__id=pk)
     for z in parent_of_child_categories:
         add_parent_to_class = class_id.categories.add(z)
         class_id.save();
@@ -109,19 +114,18 @@ def classes(request, pk):
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
     #Selecting parents
-    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
-    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
-    L = list()
-    for item in parent_categories:
-        if L.count(item) == 0:
-            L.append(item)
-#print(L)
+    categories_in_class = Category.objects.filter(classBelong__id=pk)
+    parent_categories = categories_in_class.filter(parent_category = None)
+    
+    for p in parent_categories:
+    	print (p.name)
+   
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url':reverse('classes', args=[class_id.id]), 'title': class_id.name}],
-        'parent_categories': L,
-        'child_categories': child_categories,
+        'parent_categories': parent_categories,
+        'categories_in_class': categories_in_class,
         'top_ranked_videos': top_ranked_videos,
         'vote_categories': VoteCategory.objects.all(),
         'class_id':class_id,
