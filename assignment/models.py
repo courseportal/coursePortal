@@ -2,7 +2,6 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ModelForm, Textarea
-from custom_widgets import QuestionWidget
 import random
 
 class Assignment(models.Model):
@@ -21,13 +20,6 @@ class Question(models.Model):
     def __unicode__(self):
         return self.title
 
-class QuestionForm(ModelForm):
-    model = Question
-    fields =  '__all__'
-    class Meta:
-        widgets = {
-            'solution': QuestionWidget,
-        }
 
 class Choice(models.Model):
     solution = models.TextField()
