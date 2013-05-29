@@ -1,5 +1,5 @@
 <li class="divider"></li>
-<li class="{% for cat in selected_categories %}{% if node.id == cat.id %}open{% endif %}{% endfor %}">
+<li class="{% for cat in selected_categories %}{% if node.id == cat.id and not is_post %}open{% endif %}{% endfor %}">
     <a href="{% url "category" current_class.id node.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{ node }}</a>
     <ul class="nav nav-list">
         {% for atom in node.child_atoms.all %}

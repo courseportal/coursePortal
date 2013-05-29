@@ -5,7 +5,8 @@ from django.db import models
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, blank=True, related_name = 'allowed_users')
+    allowed_users = models.ManyToManyField(User, blank=True)
+    students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
     def __unicode__(self):
         return self.name

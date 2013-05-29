@@ -1,4 +1,5 @@
-{% if selected_category %}
+{% if not is_post %}
+{% if selected_atom or selected_category %}
 <h3>
 <ul class = "nav nav-tabs">
 <li class = "active"><a href="#1" data-toggle="tab">Videos</a></li>
@@ -6,6 +7,7 @@
 <li class = ""><a href = "#3" data-toggle="tab">Notes</a></li>
 </ul>
 </h3>
+{% endif %}
 {% endif %}
 
 {% load my_filters %}

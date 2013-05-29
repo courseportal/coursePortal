@@ -1,0 +1,81 @@
+{% extends "base_index.html" %}
+{% block content %}
+<script type="text/javascript">
+    document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js' type='text/javascript'>\<\/script>");
+</script>
+
+<!-- Skin CSS file -->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.9.0/build/assets/skins/sam/skin.css">
+<!-- Utility Dependencies -->
+<script src="http://yui.yahooapis.com/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script src="http://yui.yahooapis.com/2.9.0/build/element/element-min.js"></script> 
+<!-- Needed for Menus, Buttons and Overlays used in the Toolbar -->
+<script src="http://yui.yahooapis.com/2.9.0/build/container/container_core-min.js"></script>
+<script src="http://yui.yahooapis.com/2.9.0/build/menu/menu-min.js"></script>
+<script src="http://yui.yahooapis.com/2.9.0/build/button/button-min.js"></script>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.10.1/build/cssfonts/cssfonts-min.css">
+<!-- Source file for Rich Text Editor-->
+<script src="http://yui.yahooapis.com/2.9.0/build/editor/editor-min.js"></script>
+ 
+
+<html>
+<body class="yui-skin-sam">
+	<div class="row">
+		<div class="span4">
+			<div id="textdiv">
+				TEXT:<br/>
+				<textarea name="text" id="text"></textarea>
+			</div>
+		</div>
+		<div class="span4">
+			<div id="solutiondiv">
+				SOLUTIONS:<br/>
+				<textarea name="solution" id="solution"></textarea>
+			</div>
+			<div id="choice">
+				CHOICES:<br/>
+			</div>
+			<div>
+				<button type="button" onclick="add_choice()">Add solution choice</button>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script>
+	count = 1;
+	function add_choice(){
+		choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
+		choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
+		$('#choice').append(choiceDivName);
+		render_YUI('choice'+count);
+		count++;
+	}
+</script>
+
+<script>
+	function render_YUI(div){
+		var myEditor = new YAHOO.widget.Editor(div, {
+		    height: '100px',
+		    width: $('#div').width(),
+		    dompath: false,
+		    animate: true,
+		    toolbar: {
+		        buttons: [
+		            { group: 'textstyle', label: 'Font Style',
+		                buttons: [
+		                    { type: 'push', label: 'Bold', value: 'bold' },
+		                    { type: 'push', label: 'Italic', value: 'italic' },
+		                    { type: 'push', label: 'Underline', value: 'underline' },
+		                    { type: 'separator' },
+		                ]
+		            }
+		        ]
+		    }
+		});
+		myEditor.render();
+	}
+	render_YUI('solution');
+	render_YUI('text');
+</script>
+{% endblock %}
