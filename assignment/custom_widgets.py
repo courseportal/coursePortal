@@ -1,7 +1,6 @@
-import django.newforms as forms
 from string import Template
 from django.utils.safestring import mark_safe
-
+from django.forms.widgets import Widget
 from django.template import Context, loader
 from django.shortcuts import render
 
@@ -34,9 +33,9 @@ from django.shortcuts import render
 #             self.input_type = attrs.pop('type', self.input_type)
 #         super(TextInput, self).__init__(attrs)
 
-class QuestionWidget(forms.TextInput):
+class QuestionWidget(Widget):
 	def render(self, name, value, attrs=None):
 		template = loader.get_template('question/test.html')
 		return mark_safe(render_to_string(template))
-    tpl = Template(u"""<h1>There would be a colour widget here, for value $colour</h1>""")
-    return mark_safe(tpl.substitute(colour=value))
+   	# tpl = Template(u"""<h1>There would be a colour widget here, for value $colour</h1>""")
+   	# return mark_safe(tpl.substitute(colour=value))
