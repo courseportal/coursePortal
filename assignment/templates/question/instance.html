@@ -1,23 +1,27 @@
-<!DOCTYPE html>
+{% extends "assignment/index.html" %}
+{% block content%}
+<div class="row">
+	<h2><div class="span3 offset2">{{question_selected.title}}</div></h2>
+</div>
 <html>
 <body>
 {{text | safe}}
 <br>
 <br>
-choices:
-<br>
 <form action=" ">
 {% if choices %}
+	choices:
+	<br>
 	{% for c in choices %}
-		{% if c.solution == answer%}
-			<input type="radio" name="choice" value={{c}}>{{c}}<br>
-		{% else %}
-			<input type="radio" name="choice" value={{c}}>{{c}}<br>
-		{% endif %}
+		<input type="radio" name="choice" value={{c}}>{{c}}<br>
 	{% endfor %}
 {% else %}
+	answer:
+	<br>
 	<input type="text">
 {% endif %}
 </form>
 </body>
 </html>
+{% endblock %}
+

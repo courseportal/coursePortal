@@ -1,12 +1,33 @@
+{% extends "base_index.html" %}
+
+{% block navigation %}
+<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
 {% if user.is_staff or user.is_superuser %}
-	<li><a href="{% url 'assign' %}">Assign something</a></li>
+	<li class="nav-header">Administrative</li>
+	<a href="{% url "assign" %}">Assign something</a>
+	<li class="divider"></li>
 {% endif %}
-{% if assignment_list %}
-    <ul>
-    {% for assignment in assignment_list %}
-        <li><a href="/assignment/{{ assignment.id }}/">{{ assignment.title }}</a></li>
-    {% endfor %}
-    </ul>
+<li class="nav-header">Assignments</li>
+{% for a in assignment_list %}
+	<li class="{% if a.id == assignment_selected.id %}open{% endif %}">
+	<a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
+	<ul class="nav nav-list">
+	{% for q in a.questions.all %}
+		<li class="{% if q.id == question_selected.id %}active{% endif %}">
+		<a href="{% url "question_instance" a.id q.id %}">{{ q }}</a>
+		</li>
+	{% endfor %}
+	</ul>
+	<li class="divider"></li>
+{% endfor %}
+
+<li class="nav-header">Meta</li>
+{% if user.is_authenticated %}
+<li><a href="{% url 'account' %}">{{ user }}</a></li>
+<li><a href="{% url 'logout' %}">Logout</a></li>
 {% else %}
-    <p>No assignments!</p>
+<li><a href="{% url 'login' %}">Login</a></li>
+<li><a href="{% url 'register' %}">Register</a></li>
 {% endif %}
+</ul>
+{% endblock %}

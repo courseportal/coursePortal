@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import *
@@ -7,15 +8,21 @@ from random import shuffle
 
 def index(request):
     assignment_list = request.user.assignmentInstances.all()
-    context = {'assignment_list': assignment_list, 'user': request.user}
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
+    context = {'assignment_list': assignment_list, 'user': request.user, 'breadcrumbs':breadcrumbs}
+
     return render(request, 'assignment/index.html', context)
 
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)
     question_list = assignment.questions.all()
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
+    breadcrumbs.append({'url': reverse('assignment_detail', args=[assignment.id]), 'title': assignment})
     context = {
+        'assignment_list': request.user.assignmentInstances.all(),
+        'assignment_selected': assignment,
         'question_list': question_list,
-        'assigned':assignment,
+        'breadcrumbs': breadcrumbs,
     }
     return render(request, 'assignment/detail.html', context)
 

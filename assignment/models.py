@@ -63,7 +63,7 @@ class QuestionInstance(models.Model):
     text = models.TextField()
     assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
-        return self.user.first_name
+        return self.title
 
 class ChoiceInstance(models.Model):
     solution = models.TextField()

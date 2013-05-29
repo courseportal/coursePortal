@@ -1,7 +1,15 @@
-<p>{{ assigned.title }}</p>
+{% extends "assignment/index.html" %}
+{% block content %}
+<div class="row">
+	<h1><div class="span4 offset3">{{ assignment_selected.title }}</div></h1>
+</div>
+
 {% if question_list %}
     <ul>
     {% for question in question_list %}
+    <div class="row">
+    <h4><div class="span6">{{question.title}}</div></h4>
+	</div>
     <body>
 		{{question.text | safe}}
 		<br>
@@ -27,3 +35,4 @@
 {% else %}
     <p>No questions in this assignment.</p>
 {% endif %}
+{% endblock %}
