@@ -1,0 +1,20 @@
+<li class="divider"></li>
+<li class="{% for cat in selected_categories %}{% if node.id == cat.id %}open{% endif %}{% endfor %}">
+    <a href="{% url "category" current_class.id node.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{ node }}</a>
+    <ul class="nav nav-list">
+        {% for atom in node.child_atoms.all %}
+        <li class="{% if atom.id == selected_atom.id %}active{% endif %}">
+            <a href="{% url "atom" current_class.id node.id atom.id %}">{{ atom }}</a>
+        </li>
+        {% endfor %}
+        {% if node.child_categories != None %}
+            {% for child in node.child_categories.all %}
+                {% with node=child template_name="tree_view.html" %}
+                    {% include template_name %}
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+        
+        
+    </ul>
+</li>

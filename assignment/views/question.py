@@ -47,3 +47,6 @@ def detail(request, id):
 	}
 
 	return render(request, 'question/question.html', context)
+
+def test(request):
+	return render(request, 'question/test.html')

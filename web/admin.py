@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.db.models.loading import get_models
 from django.db.models import Q
-from web.models import *
+from django import forms
+
+for m in get_models():
+    exec "from %s import %s" % (m.__module__, m.__name__)
 
 class ExposInline(admin.StackedInline):
     model = Exposition
@@ -16,44 +19,39 @@ class LectureNoteAdmin(admin.ModelAdmin):
             obj.save()
         super(LectureNoteAdmin, self).save_model(request, obj, form, change)
 
-
-class CategoryAdmin(admin.ModelAdmin):
+class AtomAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
 
-    #This is a dirty hack, but it works, a more elegant solution should
-    #be implemented in the future.  This works because this function is called
-    #after django overwrites the m2m field, unlike save_model, so I just put the
-    #code in here.
-    def log_change(self, request, obj, message):
-        super(CategoryAdmin, self).log_change(request, obj, message)
-        for parent in obj.parent.all():
-            for parent_parent in parent.parent.all():
-                if parent_parent != None:
-                    obj.parent.add(parent_parent)
-                    obj.parent.remove(parent)
-        obj.save()
+
+class CategoryAdmin(admin.ModelAdmin):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "child_category":
+            kwargs["queryset"] = Category.objects.filter(classBelong__author=request.user)
+        return super(CategoryAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+        
+    def queryset(self, request):
+    	#form = CategoryAdminForm(request.user)
+        qs = super(CategoryAdmin, self).queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(Q(classBelong__allowed_users = request.user) | Q(classBelong__author = request.user))
+
+
+class CategoryInline(admin.StackedInline):
+	model = Category
+	extra = 3
+	
+	#def formfield_for_manytomany(self, db_field, request, **kwargs):
+    #	if db_field.name == "child_category":
+       # 	kwargs["queryset"] = Category.objects.filter(classBelong__author=request.user)
+    #	return super(CategoryInline, self).formfield_for_manytomany(db_field, request, **kwargs)		
+
 
     
 class ClassAdmin(admin.ModelAdmin):
     exclude = ('author',)
+    inlines = [CategoryInline]
 
-    
-    #This is a dirty hack, but it works, a more elegant solution should
-    #be implemented in the future.  This works because this function is called
-    #after django overwrites the m2m field, unlike save_model, so I just put the
-    #code in here.
-
-    
-    
-    def log_change(self, request, obj, message):
-        super(ClassAdmin, self).log_change(request, obj, message)
-        child_categories = obj.categories.exclude(parent=None)
-        for child in child_categories.all():
-            for parent in child.parent.all():
-                if parent != None:
-                    obj.categories.add(parent)
-        obj.save()
-    
     def save_model(self, request, obj, form, change):
         if not change:
             obj.author = request.user
@@ -80,11 +78,12 @@ class ClassAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(Q(allowed_users = request.user) | Q(author = request.user))
 
-
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Atom, AtomAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
 admin.site.register(Class, ClassAdmin)
 admin.site.register(LectureNote, LectureNoteAdmin)
+
