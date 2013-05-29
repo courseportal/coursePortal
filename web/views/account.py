@@ -155,7 +155,7 @@ def register(request):
                 user.save()
                 m = hashlib.md5()
                 m.update(user.email + str(user.date_joined).split('.')[0])
-                send_mail('KnoAtom Registration', 'You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management', 'knoatom-webmaster@umich.edu', [user.email])
+                send_mail(subject = 'KnoAtom Registration', message = 'You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management', from_email = 'knoatom.webmaster@umich.edu', recipient_list = [user.email], fail_silently = False)
                 messages.success(request, 'You have been registered. Please login to continue.')
                 return HttpResponseRedirect(reverse('login'))
         messages.warning(request, 'Could not register you. Try again.')

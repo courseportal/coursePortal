@@ -28,7 +28,7 @@ class SubmissionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         class_id = kwargs.pop("class_id")
         super(SubmissionForm, self).__init__(*args, **kwargs)
-        self.fields['tags'].queryset = Atom.objects.filter(category__parent_class = class_id)
+        self.fields['tags'].queryset = Atom.objects.filter(category__parent_class = class_id).distinct()
 
         
 
