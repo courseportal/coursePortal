@@ -53,10 +53,13 @@
         <li class="nav-header">Administrative</li>
         <li><a href="{% url "assign" %}">Assign something</a></li>
         <li><a href="/admin/assignment">Edit assignments</a></li>
+
         {% endif %}
+        {% if user.is_student %}
         <li class="{% if grade_check == 1 %}active{%endif%}">
             <a href="{% url "grades" %}">View grades</a></li>
         <li class="divider"></li>
+        {% endif %}
         
         <li class="nav-header">Assignments</li>
         {% for a in assignment_list %}

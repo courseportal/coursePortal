@@ -5,6 +5,7 @@ from django.shortcuts import render
 from assignment.models import *
 from django.contrib.auth.models import User
 from random import shuffle
+from math import *
 
 def index(request):
     assignment_list = request.user.assignmentInstances.all()
