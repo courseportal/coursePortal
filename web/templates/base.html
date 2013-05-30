@@ -27,15 +27,15 @@
 <div class="row">
 <div class="span12">
 <ul class="breadcrumb">
-<li>
-<a href="/">KnoAtom</a> |
-</li>
-{% for b in breadcrumbs %}
-<li class="{% if forloop.last %}active{% endif %}">
-<a href="{{ b.url }}">{{ b.title }}</a>
-{% if not forloop.last %}<span class="divider">/</span>{% endif %}
-</li>
-{% endfor %}
+    <li>
+    <a href="/">KnoAtom</a> |
+    </li>
+    {% for b in breadcrumbs %}
+        <li class="{% if forloop.last %}active{% endif %}">
+        <a href="{{ b.url }}">{{ b.title }}</a>
+        {% if not forloop.last %}<span class="divider">/</span>{% endif %}
+        </li>
+    {% endfor %}
 </ul>
 </div> <!-- end .span12 -->
 </div> <!-- end .row -->
@@ -44,53 +44,57 @@
 <div class="span3">
 <div class="well">
 {% block navigation %}
-<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
-<li class="nav-header">Navigation</li>
-    <li><a href="{% url 'class_index' %}">Class Index</a></li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'assignment' %}">Assignments</a></li>
-{% endif %}
-    
-<li class="divider"></li>
-    
-{% if top_level_categories %}
-<li class="nav-header">Categories</li>
+    <ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+        <li class="nav-header">Navigation</li>
+        <li><a href="{% url "home" %}">Home</a></li>
+        <li><a href="{% url 'class_index' %}">Class Index</a></li>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'assignment' %}">Assignments</a></li>
+        {% endif %}
+        
+        <li class="divider"></li>
+        {% if top_level_categories %}
+            <li class="nav-header">Categories</li>
 
-{% for node in top_level_categories %}
-    {% include "tree_view.html" %}
-{% endfor %}
-    
-<!-- meta -->
-<li class="divider"></li>
-    
-{% elif top_level_base_categories %}
-<li class="nav-header">Categories</li>
-    
-{% for node in top_level_base_categories %}
-    {% include "tree_view.html" %}
-{% endfor %}
-    
-<!-- meta -->
-<li class="divider"></li>
-{% endif %}
-<li class="nav-header">Meta</li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'account' %}">{{ user }}</a></li>
-{% if current_class %}
-<li><a href="{% url 'submit' current_class.id %}">Submit New Content</a></li>
-{% endif %}
-<li><a href="{% url 'logout' %}">Logout</a></li>
-{% else %}
-<li><a href="{% url 'login' %}">Login</a></li>
-<li><a href="{% url 'register' %}">Register</a></li>
-{% endif %}
-</ul>
+            {% for node in top_level_categories %}
+                {% include "tree_view.html" %}
+            {% endfor %}
+        
+            <!-- meta -->
+            <li class="divider"></li>
+            
+        {% elif top_level_base_categories %}
+            <li class="nav-header">Categories</li>
+            
+            {% for node in top_level_base_categories %}
+                {% include "tree_view.html" %}
+            {% endfor %}
+                
+            <!-- meta -->
+            <li class="divider"></li>
+                
+        {% else %}
+            {% include "assignment_nav.html" %}
+            <!-- meta -->
+            <li class="divider"></li>
+        {% endif %}
+
+        <li class="nav-header">Meta</li>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'account' %}">{{ user }}</a></li>
+            <li><a href="{% url 'submit' %}">Submit New Content</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+        {% endif %}
+    </ul>
 {% endblock %}
 </div> <!-- end .well -->
 </div> <!-- end .span3 -->
 <div class="span9">
 {% for message in messages %}
-<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
 {% endfor %}
 {% block content %}
 {% endblock %}

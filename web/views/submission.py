@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404
 import json
 from web.forms.submission import SubmissionForm
-from web.models import Category, Submission, Class
+from web.models import Category, Submission, Class, BaseCategory
 
 class PlainErrorList(ErrorList):
     def __unicode__(self):
@@ -18,26 +18,13 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 @login_required()
-def index(request, class_id, sid):
-    
-    #Get class we are in
-    current_class = get_object_or_404(Class, id=class_id)
-    
-    #Get categories that are in the current_class
-    categories_in_class = Category.objects.filter(parent_class=current_class.id)
+def index(request, sid):
+      
     #Get the "top level" categories
-    top_level_categories = categories_in_class.filter(parent_categories=None)
-    
-##    #Selecting parents
-##    child_categories = Category.objects.filter(class__id=class_id).exclude(parent=None)
-##    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
-##    L = list()
-##    for item in parent_categories:
-##        if L.count(item) == 0:
-##            L.append(item)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
     
     if request.method == 'POST':
-        form = SubmissionForm(request.POST, error_class=PlainErrorList, class_id = current_class.id)
+        form = SubmissionForm(request.POST, error_class=PlainErrorList)
         if sid:
             if form.is_valid():
                 sub = Submission.objects.get(pk=sid)
@@ -47,7 +34,7 @@ def index(request, class_id, sid):
                 sub.tags = form.cleaned_data['tags']
                 sub.save()
                 messages.success(request, 'Successfully saved.')
-                return HttpResponseRedirect(reverse('submit', args=[current_class.id, sid]))
+                return HttpResponseRedirect(reverse('submit', args=[sid]))
             messages.warning(request, 'Error saving. Fields might be invalid.')
         else:
             if form.is_valid():
@@ -58,7 +45,7 @@ def index(request, class_id, sid):
                 s.save()
                 s.tags = form.cleaned_data['tags']
                 s.save()
-                return HttpResponseRedirect(reverse('post', args=[current_class.id, s.id]))
+                return HttpResponseRedirect(reverse('post', args=[s.id]))
             messages.warning(request, 'Error submitting.')
     else:
         if sid:
@@ -71,19 +58,18 @@ def index(request, class_id, sid):
                 'video': video,
                 'tags': sub.tags.all(),
             }
-            form = SubmissionForm(initial=i_data, error_class=PlainErrorList, class_id = current_class.id)
+            form = SubmissionForm(initial=i_data, error_class=PlainErrorList)
         else:
-            form = SubmissionForm(error_class=PlainErrorList, class_id = current_class.id)
+            form = SubmissionForm(error_class=PlainErrorList)
 
-    if sid: form_action = reverse('submit', args=[current_class.id, sid])
-    else: form_action = reverse('submit', args=[current_class.id])
+    if sid: form_action = reverse('submit', args=[sid])
+    else: form_action = reverse('submit')
     
 
     t = loader.get_template('submit.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
         'form': form,
-        'current_class': current_class,
         #'child_categories': child_categories,
         #'parent_categories': L,
     })
