@@ -1,0 +1,18 @@
+{% extends "assignment/index.html" %}
+
+{% block content %}
+<table class="table">
+<tr>
+	<th>Assignment</th>
+	<th>Student score</th>
+	<th>Max Possible</th>
+</tr>
+{%for a in assignment_list%}
+<tr>
+	<td>{{a.title}}</td>
+	<td>{{a.score}}</td>
+	<td>{{a.max_score}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import *
@@ -7,24 +8,32 @@ from random import shuffle
 
 def index(request):
     assignment_list = request.user.assignmentInstances.all()
-    context = {'assignment_list': assignment_list, 'user': request.user}
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
+    context = {'assignment_list': assignment_list, 'user': request.user, 'breadcrumbs':breadcrumbs}
+
     return render(request, 'assignment/index.html', context)
 
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)
     question_list = assignment.questions.all()
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
+    breadcrumbs.append({'url': reverse('assignment_detail', args=[assignment.id]), 'title': assignment})
     context = {
+        'assignment_list': request.user.assignmentInstances.all(),
+        'assignment_selected': assignment,
         'question_list': question_list,
-        'assigned':assignment,
+        'breadcrumbs': breadcrumbs,
     }
     return render(request, 'assignment/detail.html', context)
 
 def assign(request):
     user_list = User.objects.all()
-    assignment_list = Assignment.objects.all()
+    assignments = Assignment.objects.all()
+    assignment_list = AssignmentInstance.objects.all()
     context = {
         'users': user_list,
-        'assignments': assignment_list,
+        'assignments': assignments,
+        'assignment_list': assignment_list,
     }
     return render(request, 'assignment/assign.html', context)
 
@@ -59,7 +68,8 @@ def instantiate(request):
                 text = text.replace(reg, str(vars()[variable.name]))
 
             #create question instance
-            question_instance = QuestionInstance(title = question.title, solution=solution, text=text, assignmentInstance=instance)
+            question_instance = QuestionInstance(title = question.title, solution=solution, text=text, assignmentInstance=instance, value=question.value)
+            instance.max_score+=question_instance.value;
             question_instance.save()
             
             #choices formatted here
@@ -72,5 +82,28 @@ def instantiate(request):
                 #add solution to list of choices, shuffle choices
                 choice_instance = ChoiceInstance(solution=solution,question=question_instance)
                 choice_instance.save()
+            instance.save()
 
     return render(request, 'assignment/instantiate.html')
+
+
+def grades(request):
+    assignment_list = request.user.assignmentInstances.all()
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
+    breadcrumbs.append({'url': reverse('grades'), 'title': 'grades'})
+    context = {
+        'assignment_list': assignment_list,
+        'breadcrumbs': breadcrumbs,
+        'grade_check': True
+    }
+
+    return render(request, 'assignment/grades.html', context)
+
+def eval(request):
+    question = QuestionInstance.objects.get(pk=request.POST['question'])
+    assignment = question.assignmentInstance
+    answer = request.POST['choice']
+    if answer==question.solution:
+        assignment.score += question.value
+        assignment.save();
+    return index(request)

@@ -1,11 +1,40 @@
+{% extends "assignment/index.html" %}
+{% block content %}
+<script>
+function validateAssign()
+{
+	var radio=document.forms["input"]["assignment"];
+	var checkbox=document.forms["input"]["users"];
+  	if(checkCheck(radio)==false){
+  		alert("Select an assignment template!");
+  		return false;
+  	}
+  	check1=false;
+	for(i=0; i<checkbox.length; i++)
+	{
+		if(checkbox [i].checked)check1=true;
+	}
+	if(check1==false){
+		alert("Select at least 1 student!");
+		return false;
+	}
+	return true;
+}
+function checkCheck(form){
+	for(i=0; i<form.length; i++){
+		if(form [i].checked) return true;
+	}
+	return false;
+}
+</script>
 {% if assignments %}
-<form name="input" action="{% url 'instantiate'%}" method = "post">
+<form name="input" action="{% url 'instantiate'%}" onsubmit="return validateAssign()" method = "post">
 	{% csrf_token %}
-	Assignment:<br> 
+	<strong>Assignment:</strong><br> 
 	{% for a in assignments %}
 		<input type="radio" name="assignment" value={{a.pk}}>{{a.title}}<br>
 	{%endfor%}
-	Assigned to:<br>
+	<br><strong>Assigned to:</strong><br>
 	{% for u in users %}
 		<input type="checkbox" name="users" value={{u.id}}>{{u}} <br>
 	{% endfor %}
@@ -14,3 +43,5 @@
 {% else %}
 	<p>No assignment templates exist! Make these on the admin page.</p>
 {% endif %}
+{% endblock %}
+

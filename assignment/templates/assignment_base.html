@@ -43,49 +43,45 @@
 <div class="row">
 <div class="span3">
 <div class="well">
-{% block navigation %}
-<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
-<li class="nav-header">Navigation</li>
-    <li><a href="{% url 'class_index' %}">Class Index</a></li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'assignment' %}">Assignments</a></li>
-{% endif %}
-    
-<li class="divider"></li>
-    
-{% if top_level_categories %}
-<li class="nav-header">Categories</li>
-
-{% for node in top_level_categories %}
-    {% include "tree_view.html" %}
-{% endfor %}
-    
-<!-- meta -->
-<li class="divider"></li>
-    
-{% elif top_level_base_categories %}
-<li class="nav-header">Categories</li>
-    
-{% for node in top_level_base_categories %}
-    {% include "tree_view.html" %}
-{% endfor %}
-    
-<!-- meta -->
-<li class="divider"></li>
-{% endif %}
-<li class="nav-header">Meta</li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'account' %}">{{ user }}</a></li>
-{% if current_class %}
-<li><a href="{% url 'submit' current_class.id %}">Submit New Content</a></li>
-{% endif %}
-<li><a href="{% url 'logout' %}">Logout</a></li>
-{% else %}
-<li><a href="{% url 'login' %}">Login</a></li>
-<li><a href="{% url 'register' %}">Register</a></li>
-{% endif %}
-</ul>
-{% endblock %}
+    {% block navigation %}
+    <ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+        <ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+            <li class="nav-header">Navigation</li>
+            <li><a href="{% url 'class_index' %}">Class Index</a></li>
+            <li class="divider"></li>
+        {% if user.is_staff or user.is_superuser %}
+        <li class="nav-header">Administrative</li>
+        <li><a href="{% url "assign" %}">Assign something</a></li>
+        <li><a href="/admin/assignment">Edit assignments</a></li>
+        {% endif %}
+        <li class="{% if grade_check == 1 %}active{%endif%}">
+            <a href="{% url "grades" %}">View grades</a></li>
+        <li class="divider"></li>
+        
+        <li class="nav-header">Assignments</li>
+        {% for a in assignment_list %}
+        <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
+            <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
+            <ul class="nav nav-list">
+                {% for q in a.questions.all %}
+                <li class="{% if q.id == question_selected.id %}active{% endif %}">
+                    <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <li class="divider"></li>
+            {% endfor %}
+            
+            <li class="nav-header">Meta</li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'account' %}">{{ user }}</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+    </ul>
+    {% endblock %}
 </div> <!-- end .well -->
 </div> <!-- end .span3 -->
 <div class="span9">
