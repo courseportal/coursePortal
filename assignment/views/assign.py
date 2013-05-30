@@ -28,10 +28,12 @@ def detail(request, id):
 
 def assign(request):
     user_list = User.objects.all()
-    assignment_list = Assignment.objects.all()
+    assignments = Assignment.objects.all()
+    assignment_list = AssignmentInstance.objects.all()
     context = {
         'users': user_list,
-        'assignments': assignment_list,
+        'assignments': assignments,
+        'assignment_list': assignment_list,
     }
     return render(request, 'assignment/assign.html', context)
 
