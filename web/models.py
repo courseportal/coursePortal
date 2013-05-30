@@ -14,8 +14,20 @@ class Class(models.Model):
         ordering = ['name']
         verbose_name_plural = "Classes"
 
+class BaseCategory(models.Model):
+    name = models.CharField(max_length=200)
+    child_base_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_base_categories")
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Base Categories"
+
+    def __unicode__(self):
+        return self.name
+
 class Atom(models.Model):
     name = models.CharField(max_length=200)
+    base_category = models.ForeignKey(BaseCategory)
     #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     class Meta:
         ordering = ['name']
