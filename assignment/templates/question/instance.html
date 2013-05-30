@@ -1,25 +1,32 @@
 {% extends "assignment/index.html" %}
 {% block content%}
 <div class="row">
-	<h2><div class="span3 offset2">{{question_selected.title}}</div></h2>
+	<h1><div class="span3 offset3">{{question_selected.title}}</div></h2>
 </div>
 <html>
 <body>
 {{text | safe}}
 <br>
 <br>
-<form action=" ">
+
+<form name="input" action="{% url "eval"%}" method = "post">
+{% csrf_token %}
 {% if choices %}
-	choices:
+	<strong>Choices:</strong>
 	<br>
+	<label class="radio">
 	{% for c in choices %}
 		<input type="radio" name="choice" value={{c}}>{{c}}<br>
 	{% endfor %}
+	</label>
 {% else %}
-	answer:
+	<strong>Answer:</strong>
 	<br>
-	<input type="text">
+	<input type="text" name="choice" placeholder="Type something">
+	<br>
 {% endif %}
+<input type="hidden" name="question" value={{question_selected.id}}>
+<button type="submit" class="btn">Submit</button>
 </form>
 </body>
 </html>

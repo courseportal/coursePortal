@@ -15,7 +15,7 @@ class Question(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
-    numChoices = models.IntegerField(default = 0)
+    value = models.FloatField(default = 1.0)
     def __unicode__(self):
         return self.title
 
@@ -52,7 +52,8 @@ class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, related_name = 'assignmentInstances')
     template = models.ForeignKey(Assignment, related_name = 'instances')
-
+    score = models.FloatField(default = 0)
+    max_score = models.FloatField(default = 0)
     def __unicode__(self):
         return self.title
 
@@ -61,6 +62,7 @@ class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)
     solution = models.TextField()
     text = models.TextField()
+    value = models.FloatField(default = 1.0)
     assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.title
