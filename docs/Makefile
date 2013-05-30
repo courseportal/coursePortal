@@ -179,7 +179,7 @@ pseudoxml:
 BUILDDIR      = ./
 
 html:
-\t checkout gh-pages
-\t$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)
-\t@echo
-\t@echo \"Build finished. The HTML pages are in $(BUILDDIR)\"
+	git checkout gh-pages
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)
+	@echo
+	@echo \"Build finished. The HTML pages are in $(BUILDDIR)\"
