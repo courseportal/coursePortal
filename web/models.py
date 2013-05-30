@@ -16,7 +16,7 @@ class Class(models.Model):
 
 class BaseCategory(models.Model):
     name = models.CharField(max_length=200)
-    child_base_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_base_categories")
+    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 
     class Meta:
         ordering = ['name']
@@ -27,7 +27,7 @@ class BaseCategory(models.Model):
 
 class Atom(models.Model):
     name = models.CharField(max_length=200)
-    base_category = models.ForeignKey(BaseCategory)
+    base_category = models.ForeignKey(BaseCategory, related_name = "child_atoms")
     #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     class Meta:
         ordering = ['name']
@@ -38,7 +38,7 @@ class Atom(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=200)
     parent_class = models.ForeignKey(Class)
-    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories", null=True)
+    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
     child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
     class Meta:
         ordering = ['name']

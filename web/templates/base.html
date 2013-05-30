@@ -45,6 +45,10 @@
 <div class="well">
 {% block navigation %}
 <ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+<li class="nav-header">Navigation</li>
+    <li><a href="{% url 'class_index' %}">Class Index</a></li>
+<li class="divider"></li>
+{% if top_level_categories %}
 <li class="nav-header">Categories</li>
 
 {% for node in top_level_categories %}
@@ -53,10 +57,23 @@
     
 <!-- meta -->
 <li class="divider"></li>
+    
+{% elif top_level_base_categories %}
+<li class="nav-header">Categories</li>
+    
+{% for node in top_level_base_categories %}
+    {% include "tree_view.html" %}
+{% endfor %}
+    
+<!-- meta -->
+<li class="divider"></li>
+{% endif %}
 <li class="nav-header">Meta</li>
 {% if user.is_authenticated %}
 <li><a href="{% url 'account' %}">{{ user }}</a></li>
+{% if current_class %}
 <li><a href="{% url 'submit' current_class.id %}">Submit New Content</a></li>
+{% endif %}
 <li><a href="{% url 'logout' %}">Logout</a></li>
 {% else %}
 <li><a href="{% url 'login' %}">Login</a></li>

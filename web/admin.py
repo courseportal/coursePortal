@@ -190,6 +190,7 @@ class ClassAdmin(admin.ModelAdmin):
             form.base_fields["allowed_users"].queryset=potential_user
         return form
 
+admin.site.register(BaseCategory)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Atom, AtomAdmin)
 admin.site.register(Exposition)
