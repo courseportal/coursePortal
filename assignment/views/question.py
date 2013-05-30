@@ -50,3 +50,6 @@ def detail(request, id):
 
 def test(request):
 	return render(request, 'question/test.html')
+
+def create(request):
+	return HttpResponse(request)

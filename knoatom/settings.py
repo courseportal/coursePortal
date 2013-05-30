@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'south',
+    'south',
     'web',
     'assignment',
     'django_wysiwyg',
