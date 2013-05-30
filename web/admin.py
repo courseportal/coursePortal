@@ -67,7 +67,7 @@ class CategoryAdminForm(forms.ModelForm):
                     c = c +" \" " + item.name + " \" "
                 raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
                 return cleaned_data
-          
+        return cleaned_data
 
 
 class CategoryAdmin(admin.ModelAdmin):
