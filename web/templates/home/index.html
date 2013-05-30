@@ -1,4 +1,4 @@
-{% extends "Base_index.html" %}
+{% extends "Base.html" %}
 
 {% block content %}
 
@@ -12,23 +12,4 @@
 	<p>No classes are available.</p>
 {% endif %}
 
-{% endblock %}
-
-{% block navigation %}
-
-<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
-<li class="nav-header">Links</li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'assignment' %}">Assignments</a></li>
-{% endif %}
-
-<li class="nav-header">Meta</li>
-{% if user.is_authenticated %}
-<li><a href="{% url 'account' %}">{{ user }}</a></li>
-<!-- Deleted submit part here -->
-<li><a href="{% url 'logout' %}">Logout</a></li>
-{% else %}
-<li><a href="{% url 'login' %}">Login</a></li>
-<li><a href="{% url 'register' %}">Register</a></li>
-{% endif %}
 {% endblock %}
