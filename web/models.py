@@ -38,7 +38,7 @@ class Atom(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=200)
     parent_class = models.ForeignKey(Class)
-    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
+    child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories", null=True)
     child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
     class Meta:
         ordering = ['name']

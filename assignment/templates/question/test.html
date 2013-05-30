@@ -1,3 +1,5 @@
+{% extends "base_index.html" %}
+{% block content %}
 <script type="text/javascript">
     document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js' type='text/javascript'>\<\/script>");
 </script>
@@ -18,17 +20,25 @@
 
 <html>
 <body class="yui-skin-sam">
-	hello there!  this is a test.  you are being TESTED.
-	<div class="solution">
-		SOLUTIONS:<br/>
-		<textarea name="msgpost" id="msgpost" cols="50" rows="10">
-		</textarea>
-	</div>
-	<div class="choice">
-		CHOICES:<br/>
-	</div>
-	<div>
-		<button type="button" onclick="add_choice()">Add solution choice</button>
+	<div class="row">
+		<div class="span4">
+			<div id="textdiv">
+				TEXT:<br/>
+				<textarea name="text" id="text"></textarea>
+			</div>
+		</div>
+		<div class="span4">
+			<div id="solutiondiv">
+				SOLUTIONS:<br/>
+				<textarea name="solution" id="solution"></textarea>
+			</div>
+			<div id="choice">
+				CHOICES:<br/>
+			</div>
+			<div>
+				<button type="button" onclick="add_choice()">Add solution choice</button>
+			</div>
+		</div>
 	</div>
 </body>
 
@@ -37,7 +47,7 @@
 	function add_choice(){
 		choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
 		choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
-		$('.choice').append(choiceDivName);
+		$('#choice').append(choiceDivName);
 		render_YUI('choice'+count);
 		count++;
 	}
@@ -47,7 +57,7 @@
 	function render_YUI(div){
 		var myEditor = new YAHOO.widget.Editor(div, {
 		    height: '100px',
-		    width: '400px',
+		    width: $('#div').width(),
 		    dompath: false,
 		    animate: true,
 		    toolbar: {
@@ -58,23 +68,6 @@
 		                    { type: 'push', label: 'Italic', value: 'italic' },
 		                    { type: 'push', label: 'Underline', value: 'underline' },
 		                    { type: 'separator' },
-		                    { type: 'select', label: 'Arial', value: 'fontname', disabled: true,
-		                        menu: [
-		                            { text: 'Arial', checked: true },
-		                            { text: 'Arial Black' },
-		                            { text: 'Comic Sans MS' },
-		                            { text: 'Courier New' },
-		                            { text: 'Lucida Console' },
-		                            { text: 'Tahoma' },
-		                            { text: 'Times New Roman' },
-		                            { text: 'Trebuchet MS' },
-		                            { text: 'Verdana' }
-		                        ]
-		                    },
-		                    { type: 'spin', label: '13', value: 'fontsize', range: [ 9, 75 ], disabled: true},
-		                    { type: 'separator' },
-		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
 		                ]
 		            }
 		        ]
@@ -82,5 +75,7 @@
 		});
 		myEditor.render();
 	}
-	render_YUI('msgpost');
+	render_YUI('solution');
+	render_YUI('text');
 </script>
+{% endblock %}

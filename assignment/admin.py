@@ -16,9 +16,9 @@ class QuestionChoiceAdmin(admin.ModelAdmin):
     add_form_template = 'question/admin/change_form.html'
 
 class QuestionAdmin(admin.ModelAdmin):
-    add_form_template = 'question/admin/change_form.html'
-    change_form_template = 'question/admin/change_form.html'
-    inlines = [VarsInline, ChoicesInline]
+	 add_form_template = 'question/admin/change_form.html'
+	 change_form_template = 'question/admin/change_form.html'
+	 inlines = [VarsInline, ChoicesInline]
 
 
 admin.site.register(Question, QuestionAdmin)
