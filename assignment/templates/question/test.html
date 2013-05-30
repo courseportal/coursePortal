@@ -1,81 +1,79 @@
 {% extends "base_index.html" %}
 {% block content %}
-<script type="text/javascript">
-    document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js' type='text/javascript'>\<\/script>");
-</script>
-
-<!-- Skin CSS file -->
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.9.0/build/assets/skins/sam/skin.css">
-<!-- Utility Dependencies -->
+<!-- YUI -->
+<link rel="stylesheet"type="text/css" href="http://yui.yahooapis.com/2.9.0/build/assets/skins/sam/skin.css">
 <script src="http://yui.yahooapis.com/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
 <script src="http://yui.yahooapis.com/2.9.0/build/element/element-min.js"></script> 
-<!-- Needed for Menus, Buttons and Overlays used in the Toolbar -->
 <script src="http://yui.yahooapis.com/2.9.0/build/container/container_core-min.js"></script>
 <script src="http://yui.yahooapis.com/2.9.0/build/menu/menu-min.js"></script>
 <script src="http://yui.yahooapis.com/2.9.0/build/button/button-min.js"></script>
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.10.1/build/cssfonts/cssfonts-min.css">
-<!-- Source file for Rich Text Editor-->
+<link rel="stylesheet"type="text/css"href="http://yui.yahooapis.com/3.10.1/build/cssfonts/cssfonts-min.css">
 <script src="http://yui.yahooapis.com/2.9.0/build/editor/editor-min.js"></script>
  
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/test.js"></script>
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/yui_no_toolbar.css">
+
 
 <html>
+
 <body class="yui-skin-sam">
-	<div class="row">
-		<div class="span4">
-			<div id="textdiv">
-				TEXT:<br/>
-				<textarea name="text" id="text"></textarea>
-			</div>
+	<ul class="nav nav-tabs">
+ 		<li class="dropdown">
+ 			<a class="dropdown-toggle" data-toggle="dropdown" href="#">Question Type<b class="caret"></b></a>
+    		<ul class="dropdown-menu">
+    			 <li><a tabindex="-1" href="#">Action</a></li>
+			    <li><a tabindex="-1" href="#">Another action</a></li>
+			    <li><a tabindex="-1" href="#">Something else here</a></li>
+			    <li class="divider"></li>
+			    <li><a tabindex="-1" href="#">Separated link</a></li>
+      		<!-- links -->
+    		</ul>
+  		</li>
+  		<li><a href="#">
+	</ul>
+
+	<form action="/assignment/question/create" method="post" id="questionForm">
+	{% csrf_token %}
+	<div class="row-fluid">
+		<div id="solutiondiv" class="span5">
+			SOLUTION:<br/>
+			<textarea name="solution" id="solution"></textarea>
 		</div>
-		<div class="span4">
-			<div id="solutiondiv">
-				SOLUTIONS:<br/>
-				<textarea name="solution" id="solution"></textarea>
-			</div>
-			<div id="choice">
+		<div class="span5 offset1">
+			<button type="button" data-toggle="collapse" data-target="#choicediv">
+	  			Add/Show Choices
+			</button>
+			<div id="choicediv" class="collapse">
 				CHOICES:<br/>
-			</div>
-			<div>
-				<button type="button" onclick="add_choice()">Add solution choice</button>
+				<div id="choicelistdiv"></div>
+				<button type="button" onclick="add_choice()">
+					Add solution choice
+				</button>
 			</div>
 		</div>
 	</div>
+	<hr>
+	<div class="row-fluid">
+		<div id="textdiv" class="span5">
+			TEXT:<br/>
+			<textarea name="text" id="text"></textarea>
+		</div>
+		<div class="span5 offset1">
+			<button type="button" data-toggle="collapse" data-target="#alttextdiv">
+	  			Show alternate texts
+			</button>
+			<div id="alttextdiv" class="collapse">
+				ALTERNATE TEXT:
+				<div id="alttextlistdiv"></div>
+				<button type="button" onclick="add_text()">
+					Add alternate text
+				</button>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<button type="button" onclick="save_YUI()">submit</button>
+	</form>
 </body>
-
-<script>
-	count = 1;
-	function add_choice(){
-		choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
-		choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
-		$('#choice').append(choiceDivName);
-		render_YUI('choice'+count);
-		count++;
-	}
-</script>
-
-<script>
-	function render_YUI(div){
-		var myEditor = new YAHOO.widget.Editor(div, {
-		    height: '100px',
-		    width: $('#div').width(),
-		    dompath: false,
-		    animate: true,
-		    toolbar: {
-		        buttons: [
-		            { group: 'textstyle', label: 'Font Style',
-		                buttons: [
-		                    { type: 'push', label: 'Bold', value: 'bold' },
-		                    { type: 'push', label: 'Italic', value: 'italic' },
-		                    { type: 'push', label: 'Underline', value: 'underline' },
-		                    { type: 'separator' },
-		                ]
-		            }
-		        ]
-		    }
-		});
-		myEditor.render();
-	}
-	render_YUI('solution');
-	render_YUI('text');
-</script>
 {% endblock %}

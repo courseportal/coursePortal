@@ -4,6 +4,7 @@ urlpatterns = patterns('',
     url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.questionInstance.detail', name='question_instance'),
 	url(r'question/test/?$', 'assignment.views.question.test', name='question_test'),
     url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
+    url(r'question/create/?$', 'assignment.views.question.create', name='question'),
     url(r'question/?$', 'assignment.views.question.index', name='question'),
     
     url(r'eval/?$', 'assignment.views.assign.eval', name='eval'),
