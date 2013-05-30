@@ -9,12 +9,7 @@ function validateAssign()
   		alert("Select an assignment template!");
   		return false;
   	}
-  	check1=false;
-	for(i=0; i<checkbox.length; i++)
-	{
-		if(checkbox [i].checked)check1=true;
-	}
-	if(check1==false){
+	if(checkCheck(checkBox) == false){
 		alert("Select at least 1 student!");
 		return false;
 	}
