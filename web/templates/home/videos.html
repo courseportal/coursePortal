@@ -54,7 +54,7 @@
 <div class="well">
 Tags: 
 {% for t in c.tags.all %}
-<a href="{% url 'category' current_class.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
+<a href="{% url 'atom' current_class.id selected_category.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
 {% endfor %}
 </div> <!-- end .well -->
 </div> <!-- end .span9 -->

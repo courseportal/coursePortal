@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'south',
+    #'south',
     'web',
     'assignment',
     'django_wysiwyg',
@@ -154,7 +154,9 @@ LOGGING = {
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'knoatom.webmaster@gmail.com'
+EMAIL_HOST_PASSWORD = 'djangogrubsalad'
 
 LOGIN_URL = '/login'
 

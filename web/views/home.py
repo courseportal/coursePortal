@@ -15,77 +15,19 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
-##def category(request, pk, cat):
-##    """
-##    - Generates the view for a specific category
-##    - Creates the breadcrumbs for the page
-##    """
-##    current_class = get_object_or_404(Class, pk=pk)
-##    #Get category we are in
-##    category = get_object_or_404(Category.objects, id=cat)
-##    categories_in_class = Category.objects.get(parent_class=current_class.id)
-##    parents = category.parent.all()
-##    breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-##
-##    if len(parents) == 0:
-##        parent = category
-##        content = Submission.objects.filter( Q(tags=category) | Q(tags__in=category.child.distinct()) ).distinct()
-##    else:
-##        parent = parents[0]
-##        content = Submission.objects.filter( Q(tags=category) ).distinct()
-##        breadcrumbs.append({'url': reverse('category', args=[current_class.id, parent.id]), 'title': parent})
-##
-##    breadcrumbs.append({'url': reverse('category', args=[current_class.id, category.id]), 'title': category})
-##
-##    # un-json-fy the videos
-##    for c in content:
-##        if c.video: c.video = [v for v in json.loads(c.video)]
-##
-##    if request.user.is_authenticated():
-##        for c in content:
-##            ratings = c.votes.filter(user=request.user)
-##            c.user_rating = {}
-##            if ratings.count() > 0:
-##                for r in ratings:
-##                    c.user_rating[int(r.v_category.id)] = int(r.rating)
-##    
-##    #Selecting parents
-##    child_categories = Category.objects.filter(class__id=pk).exclude(parent=None)
-##    parent_categories = Category.objects.filter(Q(child__in=child_categories)|Q(parent=None, class__id=pk))
-##    L = list()
-##    for item in parent_categories:
-##        if L.count(item) == 0:
-##            L.append(item)
-### print(L)
-##
-##    #Adding new parent_of_child_categories to current class
-##    parent_of_child_categories = Category.objects.filter(child__in=child_categories).exclude(class__id=pk)
-##    for z in parent_of_child_categories:
-##        add_parent_to_class = current_class.categories.add(z)
-##        current_class.save();
-##        class_of_parent = z.class_set.all()
-##        print(class_of_parent)
-##
-##    expositions = category.exposition_set.all()
-##    lectureNotes = LectureNote.objects.filter(classBelong = current_class)
-##    for e in lectureNotes:
-##        print(e.file)
-##    t = loader.get_template('home/classes.html')
-##    c = RequestContext(request, {
-##        'breadcrumbs': breadcrumbs,
-##        'content': content,
-##        'expositions': expositions,
-##        'lectureNotes': lectureNotes,
-##        'parent_category': parent,
-##        'parent_categories': L,
-##        'child_categories': child_categories,
-##        'selected_category': category,
-##        'vote_categories': VoteCategory.objects.all(),
-##        'current_class':current_class,
-##        'categories_in_class':categories_in_class,
-##    })
-##    return HttpResponse(t.render(c))
-##
+def get_content_for_category(current_category, content_list, is_exposition):
+    for atom in current_category.child_atoms.all():
+        if is_exposition:
+            content = atom.exposition_set.all()
+        else:
+            content = Submission.objects.filter(tags = atom).distinct()
+        for c in content:
+            if content_list.count(c) == 0:
+                content_list.append(c)
+    for child in current_category.child_categories.all():
+        get_content_for_category(child, content_list, is_exposition)
+    return content_list
+    
 
 def category(request, class_id, cat_id):
     """
@@ -102,7 +44,7 @@ def category(request, class_id, cat_id):
     #Get the "top level" categories
     top_level_categories = categories_in_class.filter(parent_categories=None)
     
-    #Get list of parent categories
+    #Get list of parent categories, not perfect, improvements can be made
     parent_categories = list()
     parent_categories.append(current_category)
     tmp_categories = current_category.parent_categories.all()
@@ -111,31 +53,45 @@ def category(request, class_id, cat_id):
         print(tmp_categories[0])
         tmp_categories = tmp_categories[0].parent_categories.all()
 
+    #Setting breadcrumbs, not perfect, improvements can be made
     breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
     for i in range(1, len(parent_categories)+1):
-        breadcrumbs.append({'url' : reverse('classes', args=[current_class.id]), 'title': parent_categories[-i]})
-        
-    # get the highest ranked submissions
-    top_ranked_videos = cache.get('top_ranked_videos')
-    if not top_ranked_videos:
-        top_ranked_videos = []
-        for category in VoteCategory.objects.all():
-            # for now, calculate an average for each video
-            top_ranked_videos.append({
-                'vote_category': category, 
-                'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
-            })
-        cache.set('top_ranked_videos', top_ranked_videos, 60*10)
+        breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
+    breadcrumbs.append({'url': reverse('category', args=[current_class.id, current_category.id]), 'title': category})
 
+    #Get collection of videos from all atoms in this category or sub-categories
+    content = get_content_for_category(current_category, list(), False)
+    
+
+
+    # un-json-fy the videos
+    for c in content:
+        if c.video: c.video = [v for v in json.loads(c.video)]
+
+    if request.user.is_authenticated():
+        for c in content:
+            ratings = c.votes.filter(user=request.user)
+            c.user_rating = {}
+            if ratings.count() > 0:
+                for r in ratings:
+                    c.user_rating[int(r.v_category.id)] = int(r.rating)
+
+    expositions = get_content_for_category(current_category, list(), True)
+    lectureNotes = LectureNote.objects.filter(classBelong = current_class)
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
+        'content': content,
+        'expositions': expositions,
+        'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
-        'top_ranked_videos': top_ranked_videos,
+        'selected_category': current_category,
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
+        'categories_in_class':categories_in_class,
+        'is_post' : False,
     })
     return HttpResponse(t.render(c))
 
@@ -170,18 +126,12 @@ def atom(request, class_id, cat_id, atom_id):
             
     breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
     for i in range(1, len(parent_categories)+1):
-        breadcrumbs.append({'url' : reverse('classes', args=[current_class.id]), 'title': parent_categories[-i]})
+        breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
     breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
 
     
-    content = Submission.objects.filter( Q(tags=current_category) ).distinct()
-##    if len(parents) == 0:
-##        parent = current_category
-##        content = Submission.objects.filter( Q(tags=current_category) | Q(tags__in=current_category.child_categories.distinct()) ).distinct()
-##    else:
-##        parent = parents[0]
-##        content = Submission.objects.filter( Q(tags=current_category) ).distinct()
-##        breadcrumbs.append({'url': reverse('category', args=[current_class.id, parent.id]), 'title': parent})
+    content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
+
 
     # un-json-fy the videos
     for c in content:
@@ -208,10 +158,12 @@ def atom(request, class_id, cat_id, atom_id):
         'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
+        'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
         'categories_in_class':categories_in_class,
+        'is_post': False,
     })
     return HttpResponse(t.render(c))
 
@@ -249,6 +201,7 @@ def classes(request, class_id):
         'top_ranked_videos': top_ranked_videos,
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
+        'is_post': False,
     })
     return HttpResponse(t.render(c))
 
@@ -283,9 +236,9 @@ def post(request, class_id, sid):
 
 
     breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-    for i in range(1, len(parent_categories)+1):
-        breadcrumbs.append({'url' : reverse('classes', args=[current_class.id]), 'title': parent_categories[-i]})
-    breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
+
+    breadcrumbs.append({'url' : reverse('post', args=[current_class.id, s.id]), 'title': s})
+
 ##    if len(parent_categories) >= 1:
 ##        parent = parent_categories[0]
 ##        breadcrumbs.append({'url': reverse('category', args=[current_class.id,parent.id]), 'title': parent})
@@ -312,8 +265,10 @@ def post(request, class_id, sid):
         'content': [s],
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
+        'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
+        'is_post': True,
     })
     return HttpResponse(t.render(c))
