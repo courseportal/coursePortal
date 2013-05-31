@@ -129,13 +129,6 @@ Following these steps will fully setup your machine to run knoatom.  This guide 
 
 		git clone https://github.com/courseportal/coursePortal.git
 		
-	Next you need to add your ``<venv_name>`` file to ``.gitignore`` so that it doesn't get committed to version control::
-	
-		(<venv_name>)$ cd coursePortal
-		(<venv_name>)$ echo "<venv_name> >> .gitignore"
-		(<venv_name>)$ git add .gitignore
-		(<venv_name>)$ git commit -m "Updated .gitignore"
-		
 	.. note::
 	
 		More detailed instructions on how to use git can be found **HERE (LINK THIS!!!)**.
