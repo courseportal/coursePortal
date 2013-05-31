@@ -69,7 +69,11 @@
 {% for node in top_level_base_categories %}
     {% include "tree_view.html" %}
 {% endfor %}
-    
+
+<!-- meta -->
+<li class="divider"></li>
+{% else %}
+	{% include "assignment_nav.html" %}
 <!-- meta -->
 <li class="divider"></li>
 {% endif %}

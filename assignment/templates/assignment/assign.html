@@ -1,4 +1,4 @@
-{% extends "assignment/index.html" %}
+{% extends "base.html" %}
 {% block content %}
 <script>
 function validateAssign()
@@ -9,21 +9,23 @@ function validateAssign()
   		alert("Select an assignment template!");
   		return false;
   	}
-	if(checkCheck(checkBox) == false){
+	if(checkCheck(checkbox) == false){
 		alert("Select at least 1 student!");
 		return false;
 	}
-	return true;
 }
-function checkCheck(form){
-	for(i=0; i<form.length; i++){
-		if(form [i].checked) return true;
+function checkCheck(toCheck){
+	if(toCheck.length){
+		for(i=0; i<toCheck.length; i++){
+			if(toCheck [i].checked) return true;
+		}
+		return false;
 	}
-	return false;
+	return toCheck.checked
 }
 </script>
 {% if assignments %}
-<form name="input" action="{% url 'instantiate'%}" onsubmit="return validateAssign()" method = "post">
+<form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">
 	{% csrf_token %}
 	<strong>Assignment:</strong><br> 
 	{% for a in assignments %}
@@ -33,7 +35,7 @@ function checkCheck(form){
 	{% for u in users %}
 		<input type="checkbox" name="users" value={{u.id}}>{{u}} <br>
 	{% endfor %}
-	<input type="submit" value="Submit">
+	<button type="submit" class="btn">Submit</button>
 <form>
 {% else %}
 	<p>No assignment templates exist! Make these on the admin page.</p>

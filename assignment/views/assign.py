@@ -12,7 +12,7 @@ def index(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
     context = {'assignment_list': assignment_list, 'user': request.user, 'breadcrumbs':breadcrumbs}
 
-    return render(request, 'assignment/index.html', context)
+    return render(request, 'base.html', context)
 
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)
@@ -20,6 +20,7 @@ def detail(request, id):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
     breadcrumbs.append({'url': reverse('assignment_detail', args=[assignment.id]), 'title': assignment})
     context = {
+        'user':request.user,
         'assignment_list': request.user.assignmentInstances.all(),
         'assignment_selected': assignment,
         'question_list': question_list,
@@ -31,8 +32,12 @@ def assign(request):
     user_list = User.objects.all()
     assignments = Assignment.objects.all()
     assignment_list = AssignmentInstance.objects.all()
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
+    breadcrumbs.append({'url':reverse('assign'), 'title':'assign'})
     context = {
+        'user': request.user,
         'users': user_list,
+        'breadcrumbs': breadcrumbs,
         'assignments': assignments,
         'assignment_list': assignment_list,
     }
@@ -41,6 +46,7 @@ def assign(request):
 def instantiate(request):
     assignment = Assignment.objects.get(pk=request.POST['assignment'])
     users = User.objects.all().filter(pk=request.POST['users'])
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
 
     for u in users:
         instance = AssignmentInstance(title=assignment.title, user=u, template=assignment)
@@ -84,27 +90,5 @@ def instantiate(request):
                 choice_instance = ChoiceInstance(solution=solution,question=question_instance)
                 choice_instance.save()
             instance.save()
-
-    return render(request, 'assignment/instantiate.html')
-
-
-def grades(request):
-    assignment_list = request.user.assignmentInstances.all()
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
-    breadcrumbs.append({'url': reverse('grades'), 'title': 'grades'})
-    context = {
-        'assignment_list': assignment_list,
-        'breadcrumbs': breadcrumbs,
-        'grade_check': True
-    }
-
-    return render(request, 'assignment/grades.html', context)
-
-def eval(request):
-    question = QuestionInstance.objects.get(pk=request.POST['question'])
-    assignment = question.assignmentInstance
-    answer = request.POST['choice']
-    if answer==question.solution:
-        assignment.score += question.value
-        assignment.save();
-    return index(request)
+    context = {'breadcrumbs':breadcrumbs,}
+    return render(request, 'assignment/instantiate.html', context)
