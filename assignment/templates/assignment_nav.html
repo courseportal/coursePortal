@@ -1,0 +1,22 @@
+{% if user.is_staff or user.is_superuser %}
+<li class="nav-header">Administrative</li>
+<li><a href="{% url "assign" %}">Assign something</a></li>
+<li><a href="/admin/assignment">Edit assignments</a></li>
+{% endif %}
+<li class="{% if grade_check == 1 %}active{%endif%}">
+    <a href="{% url "grades" %}">View grades</a></li>
+<li class="divider"></li>
+
+<li class="nav-header">Assignments</li>
+{% for a in assignment_list %}
+<li class="{% if a.id == assignment_selected.id %}open{% endif %}">
+    <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
+    <ul class="nav nav-list">
+        {% for q in a.questions.all %}
+        <li class="{% if q.id == question_selected.id %}active{% endif %}">
+            <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <li class="divider"></li>
+    {% endfor %}
