@@ -29,4 +29,5 @@ def eval(request):
     if answer==question.solution:
         assignment.score += question.value
         assignment.save();
+    question.delete();
     return index(request)

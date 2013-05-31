@@ -25,18 +25,20 @@
             <a href="{% url "grades" %}">View grades</a></li>
 
         <li class="{% if assignment_selected %}open{%endif%}">
-            <i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</li>
+            <a href="{% url "assignment"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
         <ul class="nav nav-list">
-        {% for a in assignment_list %}
-            <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
-            <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
-            <ul class="nav nav-list">
-                {% for q in a.questions.all %}
-                <li class="{% if q.id == question_selected.id %}active{% endif %}">
-                    <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a></li>
-                </li>
-                {% endfor %}
-            </ul>
+        {% for a in user.assignmentInstances.all %}
+            {% if a.questions.all %}
+                <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
+                <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
+                <ul class="nav nav-list">
+                    {% for q in a.questions.all %}
+                    <li class="{% if q.id == question_selected.id %}active{% endif %}">
+                        <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a></li>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endfor %}
         </ul>
 
