@@ -179,16 +179,16 @@ pseudoxml:
 #Homemade
 GH_PAGES_SOURCES = docs/
 
+test:
+	
+
 gh-pages:
 	git checkout gh-pages
-	cd ..				# It puts us into the nonexistant docs folder
-	rm -rf build _sources_static
-	git checkout master $(GH_PAGES_SOURCES)
-	git reset HEAD
-	cd docs				# Have to go back into docs/ to use Makefile
+	cd ..; rm -rf build _sources_static
+	cd ..; git checkout master $(GH_PAGES_SOURCES)
+	cd ..; git reset HEAD
 	make html
-	cd ..
-	rm -rf $(GH_PAGES_SOURCES)
-	git add -A
-	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+	cd ..; rm -rf $(GH_PAGES_SOURCES)
+	cd ..; git add -A
+	cd ..; git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 
