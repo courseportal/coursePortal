@@ -177,11 +177,11 @@ pseudoxml:
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
 #Homemade
-GH_PAGES_SOURCES = docs/source docs/Makefile
+GH_PAGES_SOURCES = docs/
 
 gh-pages:
 	git checkout gh-pages  #Need to get into main folder before we checkout
-	cd ..; rm -rf build _sources_static
+	cd ..; rm -rf build _sources _static
 	cd ..; git checkout master $(GH_PAGES_SOURCES)
 	cd ..; git reset HEAD
 	make html
