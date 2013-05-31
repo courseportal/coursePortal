@@ -5,3 +5,5 @@ settings.py
 update.bat
 .DS_Store
 *~
+docs/html/*
+docs/doctrees/*
