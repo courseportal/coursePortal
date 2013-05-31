@@ -1,3 +1,24 @@
+<script>
+function validate(){
+	x= document.forms["input"]["choice"];
+	if(checkCheck(x) == false){
+		alert("You need to provide an answer!");
+		return false;
+	}
+	return true;
+}
+
+function checkCheck(toCheck){
+	if(toCheck.length){
+		for(i=0; i<toCheck.length; i++){
+			if(toCheck [i].checked) return true;
+		}
+		return false;
+	}
+	return toCheck.checked
+}
+</script>
+
 {% extends "base.html" %}
 {% block content%}
 <div class="row">
@@ -9,7 +30,7 @@
 <br>
 <br>
 
-<form name="input" action="{% url "eval"%}" method = "post">
+<form name="input" onsubmit="validate()" action="{% url "eval"%}" method = "post">
 {% csrf_token %}
 {% if choices %}
 	<strong>Choices:</strong>

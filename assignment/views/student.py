@@ -4,6 +4,7 @@ from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import *
 from django.contrib.auth.models import User
+from assign import index
 from random import shuffle
 from math import *
 

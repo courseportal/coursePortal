@@ -19,12 +19,13 @@
         <li class="divider"></li>
 {% endif %}
 
-{% if user.is_active %}
+{% if user.is_active and user.is_authenticated %}
         <li class "nav-header">Student Affairs</li>
         <li class="{% if grade_check == 1 %}active{%endif%}">
             <a href="{% url "grades" %}">View grades</a></li>
 
-        <li><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</li>
+        <li class="{% if assignment_selected %}open{%endif%}">
+            <i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</li>
         <ul class="nav nav-list">
         {% for a in assignment_list %}
             <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
