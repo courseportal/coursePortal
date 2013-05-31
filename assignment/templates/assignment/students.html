@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+	<h1><div class="span3 offset3">Students Enrolled</div></h1>
+</div>
+{% for c in class_list %}
+	<h3>{{c}}:</h3>
+	{% for s in c.students.all %}
+		{% if s.is_active and not s.is_staff %}
+			<li>{{s}}</li>
+		{%endif%}
+	{%endfor%}
+{%endfor%}
+{% endblock %}

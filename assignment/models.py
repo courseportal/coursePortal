@@ -4,15 +4,8 @@ from django.db import models
 from django.forms import ModelForm, Textarea
 import random
 
-class Assignment(models.Model):
-    title = models.CharField(max_length=100, default = '')
-
-    def __unicode__(self):
-        return self.title
-
 
 class Question(models.Model):
-    assignment = models.ForeignKey(Assignment, related_name='questions', default=None)
     title = models.CharField(max_length=200)
     text = models.TextField()
     solution = models.TextField() #solution script location
@@ -20,6 +13,12 @@ class Question(models.Model):
     def __unicode__(self):
         return self.title
 
+class Assignment(models.Model):
+    title = models.CharField(max_length=100, default = '')
+    questions = models.ManyToManyField(Question)
+    users = models.ManyToManyField(User, related_name='templates', blank=True, null=True)
+    def __unicode__(self):
+        return self.title
 
 class Choice(models.Model):
     solution = models.TextField()

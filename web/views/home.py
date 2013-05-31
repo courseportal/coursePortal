@@ -353,17 +353,13 @@ def classes(request, class_id):
     })
     return HttpResponse(t.render(c))
 
-def post(request, class_id, sid):
+def post(request, sid):
     """
     - Generates the view for the specific post (submission) from `sid`
     - Creates the appropriate breadcrumbs for the categories
     """
-    #Get the class that we are in
-    current_class = get_object_or_404(Class, id=class_id)
-    #Get categories that are in the current_class
-    categories_in_class = Category.objects.filter(parent_class=current_class.id)
     #Get the "top level" categories
-    top_level_categories = categories_in_class.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
     
     s = Submission.objects.get(id=sid)
     
@@ -371,14 +367,11 @@ def post(request, class_id, sid):
         s.video = [v for v in json.loads(s.video)]
 
     current_atom = s.tags.all()[0]
-    current_category = current_atom.category_set.filter(parent_class = current_class.id)[0]
+    current_category = current_atom.base_category
     
-    parent_categories = get_parent_categories(current_category, list(), current_class)
-
-
-    breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-
-    breadcrumbs.append({'url' : reverse('post', args=[current_class.id, s.id]), 'title': s})
+    parent_categories = get_parent_categories(current_category, list())
+    breadcrumbs = []
+    breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
 
 ##    if len(parent_categories) >= 1:
 ##        parent = parent_categories[0]
@@ -409,7 +402,6 @@ def post(request, class_id, sid):
         'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
-        'current_class':current_class,
         'is_post': True,
     })
     return HttpResponse(t.render(c))
