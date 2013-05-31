@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../../knoatom-docs
+BUILDDIR      = ./
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -176,4 +176,18 @@ pseudoxml:
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
-GH_PAGES_SOURCES = source Makefile
+#Homemade
+GH_PAGES_SOURCES = docs/
+
+gh-pages:
+	git checkout gh-pages
+	cd ..				# It puts us into the nonexistant docs folder
+	rm -rf build _sources_static
+	git checkout master $(GH_PAGES_SOURCE)
+	git reset HEAD
+	cd docs				# Have to go back into docs/ to use Makefile
+	make html
+	rm -rf $(GH_PAGES_SOURCES)
+	git add -A
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+
