@@ -50,18 +50,146 @@
           <div class="body">
             
   <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="knoatom">
-<h2>Knoatom<a class="headerlink" href="#knoatom" title="Permalink to this headline">¶</a></h2>
-<p>Something</p>
-<div class="section" id="pre-requisites">
-<h3>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline">¶</a></h3>
-<p>Another Thing</p>
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>This document will provide detailed instructions on how to install knoatom onto your computer and get the site fully functional.</p>
+<div class="section" id="step-by-step-installation-guide">
+<h2>Step-by-Step Installation Guide<a class="headerlink" href="#step-by-step-installation-guide" title="Permalink to this headline">¶</a></h2>
+<p>Following these steps will fully setup your machine to run knoatom.  This guide is written for Mac/linux, so the installation on windows might vary.</p>
+<ol class="arabic">
+<li><p class="first">The first step is to install <tt class="docutils literal"><span class="pre">pip</span></tt>.  <tt class="docutils literal"><span class="pre">pip</span></tt> allows you to easily install other python packages.</p>
+<ol class="loweralpha">
+<li><p class="first">Download and instal setuptools from <a class="reference external" href="https://pypi.python.org/pypi/setuptools">here</a> following the instructions.</p>
+</li>
+<li><p class="first">Install <tt class="docutils literal"><span class="pre">pip</span></tt>:</p>
+<div class="highlight-python"><pre>$ easy_install pip</pre>
 </div>
-<div class="section" id="initial-setup">
-<h3>Initial Setup<a class="headerlink" href="#initial-setup" title="Permalink to this headline">¶</a></h3>
-<p>Yet another thing</p>
+</li>
+</ol>
+</li>
+<li><p class="first">Next we will install MySQL and setup knoatom&#8217;s database.  First download the MySQL disk image (<tt class="docutils literal"><span class="pre">mysql-5.6.11-osx10.7-x86.dmg</span></tt>) from their <a class="reference external" href="http://dev.mysql.com/downloads/mysql/">website</a> and follow the instructions to install it.</p>
+<p>Now we need to create the database used for knoatom.  First <tt class="docutils literal"><span class="pre">cd</span></tt> into <tt class="docutils literal"><span class="pre">local</span></tt> and run MySQL:</p>
+<div class="highlight-python"><pre>$ cd /usr/local/mysql
+$ ./mysql -u root</pre>
 </div>
+<p>The MySQL command line should now be displayed in your terminal.  Next type the following MySQL commands:</p>
+<div class="highlight-python"><pre>mysql&gt; CREATE DATABASE knoatom;
+mysql&gt; GRANT USAGE ON *.* TO knoatom@localhost identified by password;
+mysql&gt; GRANT ALL PRIVILEGS ON knoatom.* TO knoatom@localhost;</pre>
+</div>
+<p>Now you can exit MySQL if you want by entering <tt class="docutils literal"><span class="pre">^D</span></tt>.</p>
+</li>
+<li><p class="first">The next thing you should install is <tt class="docutils literal"><span class="pre">virtualenv</span></tt> and <tt class="docutils literal"><span class="pre">virtualenvwrapper</span></tt>.  While this isn&#8217;t neccessary, it prevents conflicts and keeps your working enviroment isolated. Install them using these commands:</p>
+<div class="highlight-python"><pre>$ pip install virtualenv
+$ pip install virtualenvwrapper</pre>
+</div>
+<p>Now you need to setup <tt class="docutils literal"><span class="pre">virtualenvwrapper</span></tt>. You need to edit one of [<tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt> / <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> / <tt class="docutils literal"><span class="pre">~/.profile</span></tt> / ect.] depending on which one you see in your <tt class="docutils literal"><span class="pre">~/</span></tt> directory (e.g. vim <tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt> or your favorite editor).  Add the following three lines to your shell startup file:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.envs
+<span class="nb">export </span><span class="nv">PROJECT_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/Projects
+<span class="nb">source</span> /Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenvwrapper.sh
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The third line might not be that, it is whever pip installed virtualenvwrapper, so <tt class="docutils literal"><span class="pre">/path/to/virtualenvwrapper.sh</span></tt>.</p>
+</div>
+<p>Then reload the startup file, (e.g. run `` source ~/.bash_prifle``)</p>
+<p>After you have installed and setup <tt class="docutils literal"><span class="pre">virtualenv</span></tt> you must cd into your working directory and run the these commands to start using your virtual environment:</p>
+<div class="highlight-python"><pre>$ mkvirtualenv &lt;venv_name&gt;
+$ workon &lt;venv_name&gt;</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can run <tt class="docutils literal"><span class="pre">deactivate</span></tt> to leave the virtual environment and return to your normal environment.  Full documentation can be found on their <a class="reference external" href="http://virtualenvwrapper.readthedocs.org/en/latest/">site</a>.</p>
+<p class="last">You can pick anything as your <tt class="docutils literal"><span class="pre">&lt;venv_name&gt;</span></tt>.</p>
+</div>
+</li>
+<li><p class="first">Now here comes the hardest part, installing mysql-python.  It is important that if you are going to use virtualenv that you are in your virtual environment.  Your command line prompt should look like <tt class="docutils literal"><span class="pre">(&lt;venv_name&gt;)$</span></tt>.  Follow these steps <strong>exactly</strong> and you probably won&#8217;t have any problems.</p>
+<ol class="loweralpha">
+<li><p class="first">Download <a class="reference external" href="ttp://sourceforge.net/projects/mysql-python/files/mysql-python/1.2.2/">MySQL-python-1.2.3.tar.gz</a>.</p>
+</li>
+<li><p class="first">Extract the package (Just click on it).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">cd</span></tt> into the extracted folder and edit <tt class="docutils literal"><span class="pre">setup_posix.py</span></tt>.  Change</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mysql_config</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="s">&quot;mysql_config&quot;</span>
+</pre></div>
+</div>
+<p>to</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mysql_config</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="s">&quot;/usr/local/mysql/bin/mysql_config&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The next thing you need to do is change your <tt class="docutils literal"><span class="pre">mysql_config</span></tt> file:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ cd /usr/local/mysql/bin/mysql_config</pre>
+</div>
+<p>Now change lines 119 and 120 from</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nv">cflags</span><span class="o">=</span><span class="s2">&quot;-I$pkgincludedir  -Wall -Wno-null-conversion -Wno-unused-private-field -Os -g -fno-strict-aliasing -DDBUG_OFF -arch x86_64 &quot;</span> <span class="c">#note: end space!</span>
+<span class="nv">cxxflags</span><span class="o">=</span><span class="s2">&quot;-I$pkgincludedir  -Wall -Wno-null-conversion -Wno-unused-private-field -Os -g -fno-strict-aliasing -DDBUG_OFF -arch x86_64 &quot;</span> <span class="c">#note: end space!</span>
+</pre></div>
+</div>
+<p>to</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nv">cflags</span><span class="o">=</span><span class="s2">&quot;-I$pkgincludedir  -Wall -Os -g -fno-strict-aliasing -DDBUG_OFF -arch x86_64 &quot;</span> <span class="c">#note: end space!</span>
+<span class="nv">cxxflags</span><span class="o">=</span><span class="s2">&quot;-I$pkgincludedir  -Os -g -fno-strict-aliasing -DDBUG_OFF -arch x86_64 &quot;</span> <span class="c">#note: end space!</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a sybmolic link:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ sudo ln -s /usr/local/mysql/lib /usr/local/mysql/lib/mysql</pre>
+</div>
+</li>
+<li><p class="first">Clean the package (<tt class="docutils literal"><span class="pre">cd</span></tt> back into <tt class="docutils literal"><span class="pre">MySQL-python-1.2.3</span></tt>):</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ sudo python setup.py clean</pre>
+</div>
+</li>
+<li><p class="first">The last thing you need to do is build and install:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ sudo python setup.py build
+(&lt;venv_name&gt;)$ sudo python setup.py install</pre>
+</div>
+</li>
+</ol>
+</li>
+<li><p class="first">Install django into your virtual environment, which is very simple using pip:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ pip install django</pre>
+</div>
+</li>
+<li><p class="first">Install all of the required apps for knoatom:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ pip install python-memcached
+(&lt;venv_name&gt;)$ pip install south
+(&lt;venv_name&gt;)$ pip install django_wysiwyg
+(&lt;venv_name&gt;)$ pip install sphinx</pre>
+</div>
+</li>
+<li><p class="first">Now you need to clone the source code from the repository.  The first thing you need to do is ask someone to add you to the orginization on gitHub so you can use the repository.  Then <tt class="docutils literal"><span class="pre">cd</span></tt> into your working directory and use the following command:</p>
+<div class="highlight-python"><pre>git clone https://github.com/courseportal/coursePortal.git</pre>
+</div>
+<p>Next you need to add your <tt class="docutils literal"><span class="pre">&lt;venv_name&gt;</span></tt> file to <tt class="docutils literal"><span class="pre">.gitignore</span></tt> so that it doesn&#8217;t get committed to version control:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ cd coursePortal
+(&lt;venv_name&gt;)$ echo "&lt;venv_name&gt; &gt;&gt; .gitignore"
+(&lt;venv_name&gt;)$ git add .gitignore
+(&lt;venv_name&gt;)$ git commit -m "Updated .gitignore"</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">More detailed instructions on how to use git can be found <strong>HERE (LINK THIS!!!)</strong>.</p>
+</div>
+</li>
+<li><p class="first">Sync your database and set it up for south migration using the folloing command:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./south.pl -setup -migrate web assignment</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can see what commands that runs by adding the <tt class="docutils literal"><span class="pre">-print</span> <span class="pre">tag</span></tt>.  Detailed documentation on how to use <tt class="docutils literal"><span class="pre">south.pl</span></tt> can be found <strong>HERE (LINK THIS!!!)</strong>.</p>
+</div>
+</li>
+<li><p class="first">If there is a current fixture in <tt class="docutils literal"><span class="pre">web/fixtures/</span></tt> then you can load it using the following command:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py loaddata web/fixtures/&lt;fixture_name&gt;.json</pre>
+</div>
+</li>
+<li><p class="first">Everything should be working now, check that it is by running the command:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py runserver</pre>
+</div>
+<p>and make sure everything is working</p>
+</li>
+</ol>
 </div>
 </div>
 
@@ -74,11 +202,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#knoatom">Knoatom</a><ul>
-<li><a class="reference internal" href="#pre-requisites">Pre-requisites</a></li>
-<li><a class="reference internal" href="#initial-setup">Initial Setup</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#step-by-step-installation-guide">Step-by-Step Installation Guide</a></li>
 </ul>
 </li>
 </ul>
