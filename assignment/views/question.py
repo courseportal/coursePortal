@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import Question, QuestionVariable
+from django.utils import simplejson
 from math import *
 
 def index(request):
@@ -52,4 +53,5 @@ def test(request):
 	return render(request, 'question/test.html')
 
 def create(request):
-	return HttpResponse(request)
+	questionObject = simplejson.loads(request.REQUEST['questiondata'])
+	return HttpResponse(request.REQUEST['questiondata'])
