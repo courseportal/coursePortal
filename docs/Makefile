@@ -183,7 +183,7 @@ gh-pages:
 	git checkout gh-pages
 	cd ..				# It puts us into the nonexistant docs folder
 	rm -rf build _sources_static
-	git checkout master $(GH_PAGES_SOURCE)
+	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
 	cd docs				# Have to go back into docs/ to use Makefile
 	make html
