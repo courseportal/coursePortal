@@ -73,3 +73,9 @@ class ChoiceInstance(models.Model):
     question = models.ForeignKey(QuestionInstance, related_name = 'choiceInstances')
     def __unicode__(self):
         return self.solution
+
+class TestQuestion(models.Model):
+    name = models.CharField(max_length=200)
+    data = models.TextField()
+    def __unicode__(self):
+        return self.name

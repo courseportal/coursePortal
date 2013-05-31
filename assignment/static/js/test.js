@@ -43,9 +43,13 @@ render_YUI('solution', solutions);
 render_YUI('text', texts);
 
 function save_YUI(){
-	question = {};
-	question.solutions = [];
-	question.texts = [];
+	question = {
+		title: '',
+		solutions: [],
+		texts: []
+	};
+	$('#questionname').val($('#title').val());
+	question.title = $('#title').val();
 	for (var i = 0; i < solutions.length; i++) {
   		question.solutions.push(solutions[i].saveHTML());
   	}
