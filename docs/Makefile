@@ -184,7 +184,7 @@ gh-pages:
 	cd ..; rm -rf build _sources _static
 	cd ..; git checkout master $(GH_PAGES_SOURCES)
 	cd ..; git reset HEAD
-	make html
+	cd ../docs; make html
 	cd ..; mv -fv docs/html/* ./
 	cd ..; rm -rf $(GH_PAGES_SOURCES)
 	cd ..; git add -A
