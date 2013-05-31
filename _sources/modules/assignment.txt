@@ -1,8 +1,8 @@
 .. _assignment:
 
-========================
-assignment Documentation
-========================
+============================
+``assignment`` Documentation
+============================
 
 .. automodule::  assignment
 
