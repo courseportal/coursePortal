@@ -28,4 +28,4 @@ admin.py
 --------
 
 .. automodule:: web.forms.admin
-	:members
+	:members:
