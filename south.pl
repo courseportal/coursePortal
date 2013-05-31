@@ -32,48 +32,48 @@ $echo = "";
 
 foreach $argnum (0 .. $#ARGV)
 {
-if (@ARGV[$argnum] eq "-print")
-{
-$echo = "echo ";
-splice(@ARGV, $argnum, 1);
-last;
-}
+    if (@ARGV[$argnum] eq "-print")
+    {
+        $echo = "echo ";
+        splice(@ARGV, $argnum, 1);
+        last;
+    }
 }
 
 foreach $argnum (0 .. $#ARGV)
 {
-if (@ARGV[$argnum] eq "-setup")
-{
-splice(@ARGV, $argnum, 1);
-$command_0 = "$echo" . "./manage.py syncdb";
-print `$command_0`;
-for $arg (0 .. $#ARGV)
-{
-next if (@ARGV[$arg] =~ /^-/); #Skip all tags (beginning w/ '-')
-
-$command_1 = "$echo" . "./manage.py schemamigration " . "@ARGV[$arg]" . " --initial";
-$command_2 = "$echo" . "./manage.py migrate " . "@ARGV[$arg]" . " --fake";
-print `$command_1`;
-print `$command_2`;
-}
-last;
-}
-if (@ARGV[$argnum] ne "-migrate")
-{
-last;
-}
+    if (@ARGV[$argnum] eq "-setup")
+    {
+        splice(@ARGV, $argnum, 1);
+        $command_0 = "$echo" . "./manage.py syncdb";
+        print `$command_0`;
+        for $arg (0 .. $#ARGV)
+        {
+            next if (@ARGV[$arg] =~ /^-/); #Skip all tags (beginning w/ '-')
+            
+            $command_1 = "$echo" . "./manage.py schemamigration " . "@ARGV[$arg]" . " --initial";
+            $command_2 = "$echo" . "./manage.py migrate " . "@ARGV[$arg]" . " --fake";
+            print `$command_1`;
+            print `$command_2`;
+        }
+        last;
+    }
+    if (@ARGV[$argnum] ne "-migrate")
+    {
+        last;
+    }
 }
 
 if (@ARGV[0] eq "-migrate")
 {
-splice(@ARGV, 0, 1);
-for $arg (0 .. $#ARGV)
-{
-next if (@ARGV[$arg] =~ /^-/); #Skip all tags (beginning w/ '-')
-
-$command_1 = "$echo" . "./manage.py schemamigration " . "@ARGV[$arg]" . " --auto";
-$command_2 = "$echo" . "./manage.py migrate " . "@ARGV[$arg]";
-print `$command_1`;
-print `$command_2`;
-}
+    splice(@ARGV, 0, 1);
+    for $arg (0 .. $#ARGV)
+    {
+        next if (@ARGV[$arg] =~ /^-/); #Skip all tags (beginning w/ '-')
+        
+        $command_1 = "$echo" . "./manage.py schemamigration " . "@ARGV[$arg]" . " --auto";
+        $command_2 = "$echo" . "./manage.py migrate " . "@ARGV[$arg]";
+        print `$command_1`;
+        print `$command_2`;
+    }
 }

@@ -15,16 +15,22 @@ urlpatterns = patterns('',
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 
 
-    url(r'^class/(?P<class_id>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
+    #url(r'^class/(?P<class_id>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
+    url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
                     
     #LectureNote
     url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.LectureSubmit.display',name='LectureNoteDisplay'),
     url(r'^class/(?P<class_id>\d+)/submit/LectureNoteUpload/?$', 'web.views.LectureSubmit.index', name='LectureNoteUpload'),
                        
-    url(r'^class/(?P<class_id>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+    #url(r'^class/(?P<class_id>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+    url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='atom'),
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/$', 'web.views.home.category', name = 'category'),
     url(r'^class/(?P<class_id>\d+)/$', 'web.views.home.classes', name='classes'),
+    url(r'^class-index/$', 'web.views.home.class_index', name='class_index'),
+    url(r'^category/(?P<cat_id>\d+)/$', 'web.views.home.base_category', name='base_category'),
+    url(r'^category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/$', 'web.views.home.base_atom', name="base_atom"),
     url(r'^$', 'web.views.home.index', name='home'),
 
     url(r'^mu-25b8a55c-a9fee579-723dcc44-9782bfc2$', 'web.views.blitz.index'),

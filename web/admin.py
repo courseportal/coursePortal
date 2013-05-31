@@ -58,7 +58,7 @@ class CategoryAdminForm(forms.ModelForm):
                 raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
                 return cleaned_data
         return cleaned_data
-                  
+
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -181,6 +181,7 @@ class ClassAdmin(admin.ModelAdmin):
             form.base_fields["allowed_users"].queryset=potential_user
         return form
 
+admin.site.register(BaseCategory)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Atom, AtomAdmin)
 admin.site.register(Exposition)
