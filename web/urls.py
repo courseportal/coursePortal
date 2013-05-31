@@ -19,8 +19,8 @@ urlpatterns = patterns('',
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
                     
     #LectureNote
-    url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.LectureSubmit.display',name='LectureNoteDisplay'),
-    url(r'^class/(?P<class_id>\d+)/submit/LectureNoteUpload/?$', 'web.views.LectureSubmit.index', name='LectureNoteUpload'),
+    url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.lecturesubmit.display',name='LectureNoteDisplay'),
+    url(r'^class/(?P<class_id>\d+)/submit/LectureNoteUpload/?$', 'web.views.lecturesubmit.index', name='LectureNoteUpload'),
                        
     #url(r'^class/(?P<class_id>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),

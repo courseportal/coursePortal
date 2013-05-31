@@ -49,9 +49,9 @@ Following these steps will fully setup your machine to run knoatom.  This guide 
 		
 	.. note::
 		
-		The third line might not be that, it is whever pip installed virtualenvwrapper, so ``/path/to/virtualenvwrapper.sh``.
+		If there is no file at ``/Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenvwrapper.sh`` then your pip installs to a different location.  You need to find  ``/path/to/virtualenvwrapper.sh``.
 		
-	Then reload the startup file, (e.g. run `` source ~/.bash_prifle``)
+	Then reload the startup file, (e.g. run ``source ~/.bash_prifle``)
 	
 		
 		

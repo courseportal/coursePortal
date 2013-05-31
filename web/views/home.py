@@ -52,7 +52,15 @@ def index(request):
     return HttpResponse(template.render(context))
 
 
-def get_content_for_category(current_category, content_list, is_exposition):
+def get_content_for_category(current_category, is_exposition, content_list=list()):
+    """
+    This function returns the content for a category. Don't set ``content_list``.
+    
+    When calling this function set current_category for the category you want to get content for and set is_exposition.  If ``is_exposition==True`` then we return the expositions for this category, otherwise we return the submissions.  Do not set ``content_list``, this is used for recursion.
+    
+    We define content "in this category" if the content belongs to an atom that is in ``current_category`` or any of its sub-categories.  To acchieve this we use recurssion.
+    
+    """
     for atom in current_category.child_atoms.all():
         if is_exposition:
             content = atom.exposition_set.all()
@@ -62,10 +70,20 @@ def get_content_for_category(current_category, content_list, is_exposition):
             if content_list.count(c) == 0:
                 content_list.append(c)
     for child in current_category.child_categories.all():
-        get_content_for_category(child, content_list, is_exposition)
+        get_content_for_category(child, content_list, is_exposition) #recurse
     return content_list
 
-def get_parent_categories(current_category, parent_categories, current_class=None):
+def get_parent_categories(current_category, current_class=None, parent_categories=list()):
+    """
+    This function gets all of the parent categories for ``current_category``.
+    
+    When calling this function leave ``parent_categories`` unset, this argument is used for recursion.  If ``current_class`` is not set then it will filter the parent_categories list to only include categories that are in ``current_class``, otherwise it will return all parent categories.
+    
+    .. warning::
+        
+        If there are loops in your categories this will result in infinite loops, but you shouldn't be able to create categories in the admin site that result in infinite loops.
+    
+    """
     parent_categories.append(current_category)
     if current_class:
         tmp_categories = current_category.parent_categories.filter(parent_class=current_class.id)
@@ -99,7 +117,7 @@ def base_category(request, cat_id):
 ##        parent_categories.append(tmp_categories[0])
 ##        print(tmp_categories[0])
 ##        tmp_categories = tmp_categories[0].parent_categories.all()
-    parent_categories = get_parent_categories(current_category, list())
+    parent_categories = get_parent_categories(current_category)
 
     #Setting breadcrumbs, not perfect, improvements can be made
     breadcrumbs = []
@@ -107,7 +125,7 @@ def base_category(request, cat_id):
         breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
 
     #Get collection of videos from all atoms in this category or sub-categories
-    content = get_content_for_category(current_category, list(), False)
+    content = get_content_for_category(current_category,False)
 
     # un-json-fy the videos
     for c in content:
@@ -121,7 +139,7 @@ def base_category(request, cat_id):
                 for r in ratings:
                     c.user_rating[int(r.v_category.id)] = int(r.rating)
 
-    expositions = get_content_for_category(current_category, list(), True)
+    expositions = get_content_for_category(current_category,True)
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
@@ -149,7 +167,7 @@ def base_atom(request, cat_id, atom_id):
     #Get the "top level" categories
     top_level_base_categories = BaseCategory.objects.filter(parent_categories=None) #check that this works
 
-    parent_categories = get_parent_categories(current_category, list())
+    parent_categories = get_parent_categories(current_category)
 
     breadcrumbs = []
     for i in range(1, len(parent_categories)+1):
@@ -206,7 +224,7 @@ def category(request, class_id, cat_id):
     #Get the "top level" categories
     top_level_categories = categories_in_class.filter(parent_categories=None)
     
-    parent_categories = get_parent_categories(current_category, list(), current_class)
+    parent_categories = get_parent_categories(current_category, current_class)
 
     #Setting breadcrumbs, not perfect, improvements can be made
     breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
@@ -214,7 +232,7 @@ def category(request, class_id, cat_id):
         breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
 
     #Get collection of videos from all atoms in this category or sub-categories
-    content = get_content_for_category(current_category, list(), False)
+    content = get_content_for_category(current_category,False)
     
 
 
@@ -230,7 +248,7 @@ def category(request, class_id, cat_id):
                 for r in ratings:
                     c.user_rating[int(r.v_category.id)] = int(r.rating)
 
-    expositions = get_content_for_category(current_category, list(), True)
+    expositions = get_content_for_category(current_category,True)
     lectureNotes = LectureNote.objects.filter(classBelong = current_class)
 
     t = loader.get_template('home/classes.html')
@@ -270,7 +288,7 @@ def atom(request, class_id, cat_id, atom_id):
     top_level_categories = categories_in_class.filter(parent_categories=None) #check that this works
 
     #Get list of parent categories, not perfect, improvements can be made
-    parent_categories = get_parent_categories(current_category, list(), current_class)
+    parent_categories = get_parent_categories(current_category, current_class)
 
 
     breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
@@ -369,7 +387,7 @@ def post(request, sid):
     current_atom = s.tags.all()[0]
     current_category = current_atom.base_category
     
-    parent_categories = get_parent_categories(current_category, list())
+    parent_categories = get_parent_categories(current_category)
     breadcrumbs = []
     breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
 
