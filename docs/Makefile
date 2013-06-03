@@ -181,7 +181,7 @@ GH_PAGES_SOURCES = docs/ web/ assignment/ knoatom/
 
 gh-pages:
 	git checkout gh-pages  #Need to get into main folder before we checkout
-	cd ..; rm -rf build _sources _static
+	cd ..; rm -rf ./*
 	cd ..; git checkout master $(GH_PAGES_SOURCES)
 	cd ..; git reset HEAD
 	cd ../docs; make html
