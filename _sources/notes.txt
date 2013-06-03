@@ -11,3 +11,4 @@ Index:
 	
 	notes/meeting_notes
 	notes/log_nick
+	notes/course_description_nick

@@ -71,12 +71,6 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="assignment.models.Choice">
-<em class="property">class </em><tt class="descclassname">assignment.models.</tt><tt class="descname">Choice</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/assignment/models.html#Choice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#assignment.models.Choice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Choice(id, solution, question_id)</p>
-</dd></dl>
-
-<dl class="class">
 <dt id="assignment.models.ChoiceInstance">
 <em class="property">class </em><tt class="descclassname">assignment.models.</tt><tt class="descname">ChoiceInstance</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/assignment/models.html#ChoiceInstance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#assignment.models.ChoiceInstance" title="Permalink to this definition">¶</a></dt>
 <dd><p>ChoiceInstance(id, solution, question_id)</p>
@@ -85,7 +79,7 @@
 <dl class="class">
 <dt id="assignment.models.Question">
 <em class="property">class </em><tt class="descclassname">assignment.models.</tt><tt class="descname">Question</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/assignment/models.html#Question"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#assignment.models.Question" title="Permalink to this definition">¶</a></dt>
-<dd><p>Question(id, title, text, solution, value)</p>
+<dd><p>Question(id, title, data)</p>
 </dd></dl>
 
 <dl class="class">
@@ -94,23 +88,21 @@
 <dd><p>QuestionInstance(id, title, solution, text, value, assignmentInstance_id)</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="assignment.models.QuestionVariable">
-<em class="property">class </em><tt class="descclassname">assignment.models.</tt><tt class="descname">QuestionVariable</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/assignment/models.html#QuestionVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#assignment.models.QuestionVariable" title="Permalink to this definition">¶</a></dt>
-<dd><p>QuestionVariable(id, question_id, name, varType, lowerBound, upperBound)</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="assignment.models.TestQuestion">
-<em class="property">class </em><tt class="descclassname">assignment.models.</tt><tt class="descname">TestQuestion</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/assignment/models.html#TestQuestion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#assignment.models.TestQuestion" title="Permalink to this definition">¶</a></dt>
-<dd><p>TestQuestion(id, name, data)</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-assignment.views">
 <span id="views"></span><span id="assignment-views"></span><h2>Views<a class="headerlink" href="#module-assignment.views" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="module-assignment.views.assign">
 <span id="assign-py"></span><h3>assign.py<a class="headerlink" href="#module-assignment.views.assign" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="assignment.views.assign.getrandbits">
+<tt class="descclassname">assignment.views.assign.</tt><tt class="descname">getrandbits</tt><big>(</big><em>k</em><big>)</big> &rarr; x.  Generates a long int with k random bits.<a class="headerlink" href="#assignment.views.assign.getrandbits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="assignment.views.assign.random">
+<tt class="descclassname">assignment.views.assign.</tt><tt class="descname">random</tt><big>(</big><big>)</big> &rarr; x in the interval [0, 1).<a class="headerlink" href="#assignment.views.assign.random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-assignment.views.question">
 <span id="question-py"></span><h3>question.py<a class="headerlink" href="#module-assignment.views.question" title="Permalink to this headline">¶</a></h3>
