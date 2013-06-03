@@ -1,3 +1,4 @@
+{% if user.is_authenticated %}
 {% if user.is_staff or user.is_superuser %}
         <li class="nav-header">Administrative</li>
         <li><a href="{% url "assign" %}">Assign something</a></li>
@@ -15,11 +16,11 @@
             <li><a href="/admin/assignment/assignment/{{t.id}}">{{t}}</a></li>
         {%endfor%}
         </ul>
-        <li><a href="/admin/assignment/question/add">Add Question</a></li>
+        <li><a href="{% url "add_question" %}">Add Question</a></li>
         <li class="divider"></li>
 {% endif %}
 
-{% if user.is_active and user.is_authenticated %}
+{% if user.is_active %}
         <li class "nav-header">Student Affairs</li>
         <li class="{% if grade_check == 1 %}active{%endif%}">
             <a href="{% url "grades" %}">View grades</a></li>
@@ -41,5 +42,5 @@
             {% endif %}
         {% endfor %}
         </ul>
-
+{% endif %}
 {% endif %}

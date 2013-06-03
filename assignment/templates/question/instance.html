@@ -33,7 +33,7 @@ function checkCheck(toCheck){
 <br>
 <br>
 
-<form name="input" action="{% url "eval"%}" onsubmit="return validate()" method = "post">
+<form name="input" action="{% url "eval"%}"  method = "post">
 {% csrf_token %}
 {% if choices %}
 	<strong>Choices:</strong>

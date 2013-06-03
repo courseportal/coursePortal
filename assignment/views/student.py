@@ -11,8 +11,8 @@ from math import *
 
 def grades(request):
     assignment_list = request.user.assignmentInstances.all()
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
-    breadcrumbs.append({'url': reverse('grades'), 'title': 'grades'})
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url': reverse('grades'), 'title': 'Grades'})
     context = {
         'user': request.user,
         'assignment_list': assignment_list,
