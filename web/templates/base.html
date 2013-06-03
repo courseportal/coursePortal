@@ -56,39 +56,39 @@
         {% if top_level_categories %}
             <li class="nav-header">Categories</li>
 
-            {% for node in top_level_categories %}
-                {% include "tree_view.html" %}
-            {% endfor %}
-        
-            <!-- meta -->
-            <li class="divider"></li>
-            
-        {% elif top_level_base_categories %}
-            <li class="nav-header">Categories</li>
-            
-            {% for node in top_level_base_categories %}
-                {% include "tree_view.html" %}
-            {% endfor %}
-                
-            <!-- meta -->
-            <li class="divider"></li>
-                
-        {% else %}
-            {% include "assignment_nav.html" %}
-            <!-- meta -->
-            <li class="divider"></li>
-        {% endif %}
+    {% for node in top_level_categories %}
+        {% include "tree_view.html" %}
+    {% endfor %}
 
-        <li class="nav-header">Meta</li>
-        {% if user.is_authenticated %}
-            <li><a href="{% url 'account' %}">{{ user }}</a></li>
-            <li><a href="{% url 'submit' %}">Submit New Content</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-        {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'register' %}">Register</a></li>
-        {% endif %}
-    </ul>
+    <!-- meta -->
+    <li class="divider"></li>
+    
+{% elif top_level_base_categories %}
+    <li class="nav-header">Categories</li>
+    
+    {% for node in top_level_base_categories %}
+        {% include "tree_view.html" %}
+    {% endfor %}
+        
+    <!-- meta -->
+    <li class="divider"></li>
+        
+{% else %}
+    {% include "assignment_nav.html" %}
+    <!-- meta -->
+    <li class="divider"></li>
+{% endif %}
+
+<li class="nav-header">Meta</li>
+{% if user.is_authenticated %}
+    <li><a href="{% url 'account' %}">{{ user }}</a></li>
+    <li><a href="{% url 'submit' %}">Submit New Content</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+{% else %}
+    <li><a href="{% url 'login' %}">Login</a></li>
+    <li><a href="{% url 'register' %}">Register</a></li>
+{% endif %}
+</ul>
 {% endblock %}
 </div> <!-- end .well -->
 </div> <!-- end .span3 -->

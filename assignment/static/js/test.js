@@ -1,21 +1,22 @@
 
 count = 1;
-YUI_list = []
+solutions = [];
+texts = [];
 function add_text(){
 	newdiv = '<textarea name="temp" id="temp"></textarea>';
 	newdiv = newdiv.replace(/temp/g, 'text'+count);
 	$('#alttextlistdiv').append(newdiv);
-	render_YUI('text'+count,'60px');
+	render_YUI('text'+count, texts, '60px');
 	count++;
 }
 function add_choice(){
 	choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
 	choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
 	$('#choicelistdiv').append(choiceDivName);
-	render_YUI('choice'+count,'40px');
+	render_YUI('choice'+count, solutions, '40px');
 	count++;
 }
-function render_YUI(div, textheight){
+function render_YUI(div, group, textheight){
 	textheight = textheight || "100px";
 	var myEditor = new YAHOO.widget.Editor(div, {
 	    height: textheight,
@@ -36,19 +37,25 @@ function render_YUI(div, textheight){
 	    }
 	});
 	myEditor.render();
-	YUI_list.push(myEditor);
+	group.push(myEditor);
 }
-function hide_YUI_toolbar(div){
-	$('#'+div+'_toolbar').css({
-		'display':'none'
-	});
-}
-render_YUI('solution');
-render_YUI('text');
+render_YUI('solution', solutions);
+render_YUI('text', texts);
 
 function save_YUI(){
-	for (var i = 0; i < YUI_list.length; i++) {
-  		YUI_list[i].saveHTML();
+	question = {
+		title: '',
+		solutions: [],
+		texts: []
+	};
+	$('#questionname').val($('#title').val());
+	question.title = $('#title').val();
+	for (var i = 0; i < solutions.length; i++) {
+  		question.solutions.push(solutions[i].saveHTML());
   	}
+  	for (var i = 0; i < texts.length; i++) {
+  		question.texts.push(texts[i].saveHTML());
+  	}
+  	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }

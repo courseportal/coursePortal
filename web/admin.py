@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.db.models.loading import get_models
 from django.db.models import Q
 from django import forms
+from django.forms.models import BaseModelFormSet, modelformset_factory, BaseInlineFormSet
+from django.forms.formsets import formset_factory
+from sets import Set
 
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
@@ -24,41 +27,28 @@ class AtomAdmin(admin.ModelAdmin):
 
 
 class CategoryAdminForm(forms.ModelForm):
-    
+  
     def clean(self):
         cleaned_data = super(CategoryAdminForm, self).clean()
-        #get the name of the potential_parent_category
         potential_parent_category_name = cleaned_data.get("name")
-        #get the objects of the potential_child_category
         potential_child_category = cleaned_data.get("child_categories")
         temp = potential_child_category
         if potential_parent_category_name and potential_child_category:
-            # get the object of the potential_parent_category
             potential_parent_category = Category.objects.filter(name = potential_parent_category_name)
-            #for item in potential_parent_category:
-                #print(item.name)                           ################
-            # save the potiential_conflict
             potential_conflict_category = potential_child_category.filter(child_categories__in = potential_parent_category)
-            print(not potential_conflict_category.all())   ################
             while (not potential_conflict_category):
                 for item in potential_child_category.all():
-                    print("child name is:"+item.name)       ################
-                    print("\n")                             ################
                     potential_child_category = item.child_categories
-                    print(potential_child_category.all())         ################
-                    for item in potential_child_category.all():
-                        print("child of child name is: " + item.name)   #############
-                        print("\n")                                     #############
                     potential_conflict_category = potential_child_category.filter(child_categories__in = potential_parent_category)
                     if potential_conflict_category:
-                        print("I am here")                              #############
+                        print("There is a conflict!!!")                         
                         c = ""
-                        for item in temp: #potential_conflict_category:
+                        for item in temp:
                             c = c +" \" " + item.name + " \" "
                         raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
                         return cleaned_data
                 if (not potential_child_category.all()):
-                    print("11111")                                      ##############
+                    print("Returned Correctly!!!")
                     return cleaned_data
             if potential_conflict_category:
                 print("I have the direct inverse relation!")
@@ -68,6 +58,7 @@ class CategoryAdminForm(forms.ModelForm):
                 raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
                 return cleaned_data
         return cleaned_data
+
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -93,65 +84,65 @@ class CategoryAdmin(admin.ModelAdmin):
         return qs.filter(Q(parent_class__allowed_users = request.user) | Q(parent_class__author = request.user))
 
 
-class CategoryInlineForm(forms.ModelForm):
-    
+def TestChild(potential_parent, potential_child, CategoryDict):
+    """
+    Recursive funtion to test potential loop in CategoryInlineFormSet
+    """
+    if potential_parent == potential_child:
+        return False
+    else:
+        if potential_child in CategoryDict.keys():
+            for temp_child in CategoryDict[potential_child]:
+                if TestChild(potential_parent, temp_child, CategoryDict) == False:
+                    return False
+    return True
+
+
+
+class CategoryInlineFormSet(BaseInlineFormSet):
     def clean(self):
-        cleaned_data = super(CategoryInlineForm, self).clean()
-        #get the name of the potential_parent_category
-        potential_parent_category_name = cleaned_data.get("name")
-        potential_parent_category = Category.objects.filter(name = potential_parent_category_name)
-        #get the objects of the potential_child_category
-        #print(potential_parent_category)                       #######################
-        potential_child_category = cleaned_data.get("child_categories")
-        temp = potential_child_category
-        potential_conflict_category = potential_child_category.filter(child_categories__in = potential_parent_category)
-        while (not potential_conflict_category.all()):
-            for item in potential_child_category.all():
-                #print("direct potential child "+item.name)     #######################
-                #print(potential_parent_category)               #######################
-                potential_child_category = item.child_categories
-                #for item in potential_child_category.all():
-                    #print("potential child of child " + item.name)      ######################
-                #print(not potential_child_category.all())
-                if (not potential_child_category.all()):
-                    print("*********11111*********no potential_child_of_child_category exist!!!*************")     ##############
-                    return cleaned_data
-                potential_conflict_category = potential_child_category.filter(child_categories__in=potential_parent_category)
-                if potential_conflict_category:
-                    print("********there is a conflict with potential_child_of_child_category!!!!***********")                         #######################
-                    c = ""
-                    for item in temp:
-                        c = c +" \" " + item.name + " \" "
-                    raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
-                    return cleaned_data
-            if (not potential_child_category.all()):
-                print("*********22222*********no potential_child_of_child_category exist!!!*************")
-                return cleaned_data
-        if potential_conflict_category:
-            print("I have the direct inverse relation!")
-            c = ""
-            for item in potential_conflict_category:
-                c = c +" \" " + item.name + " \" "
-            raise forms.ValidationError("Current category has already been a child category of "+ c + " !")
-            return cleaned_data
-        return cleaned_data
+        super(CategoryInlineFormSet, self).clean()
+        CategoryDict = {}
+        for form in self.forms:
+            potential_parent_name = form.cleaned_data.get("name")
+            potential_parent_object = Category.objects.filter(name = potential_parent_name)
+            for p_p_o in potential_parent_object.all():
+                potential_parent = str(p_p_o.name.split('Category:',1))
+            potential_children = form.cleaned_data.get("child_categories")
+            if potential_children:
+                S=set()
+                for item in potential_children.all():
+                    potential_child = str(item.name.split('Category:',1))
+                    for group in CategoryDict.values():
+                        for g in group:
+                            if potential_parent == g:
+                                temp_child = potential_child
+                                temp_parent = potential_parent
+                                if not TestChild(temp_parent, temp_child, CategoryDict):
+                                   raise forms.ValidationError("There is a loop between "+ temp_child +" and " + temp_parent+" !") 
+                    S.add(potential_child)
+                    CategoryDict[potential_parent] = S
+                
+            
 
 
 class CategoryInline(admin.StackedInline):
     model = Category
-    form = CategoryInlineForm
-    extra = 3
-    
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "child_categories":
-            kwargs["queryset"] = Category.objects.filter(parent_class__author=request.user)
-        return super(CategoryInline, self).formfield_for_manytomany(db_field, request, **kwargs)
-
+    formset = CategoryInlineFormSet
+    extra = 2
 
     
 class ClassAdmin(admin.ModelAdmin):
     exclude = ('author',)
     inlines = [CategoryInline]
+        
+    def get_formsets(self, request, obj=None):
+        print("get_formsets is called, but not be put in use yet!!")
+        for inline in self.get_inline_instances(request, obj):
+            # hide MyInline in the add view
+            if isinstance(inline, CategoryInline) and obj is None:
+                continue
+            yield inline.get_formset(request, obj)
 
     def save_model(self, request, obj, form, change):
         if not change:
