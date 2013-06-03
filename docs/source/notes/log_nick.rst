@@ -14,6 +14,8 @@ Week of June 3-7
 
 This week I want to mess around with the orginazational system a little bit to reflect what we discussed in the :ref:`Meeting on 5/7/2013<meeting_notes_5_31_2013>`.
 
+I also want to work on implementing a forum with one "board" for each atom
+
 I also want to start writing documentation for the whole project and start breaking up web into multiple smaller apps so that the project will scale well.
 
 Week of May 27-31
@@ -45,5 +47,5 @@ Then I started working on documentation:
 	*	I downloaded sphinx and started figuring out how the automatic documentation process works.
 	*	I wrote an extremely detailed installation guide for mac so that future people added to the project have a good guide for installation
 	*	I set up the documentation structure for the project so that all docstrings are automatically added to the documentation.
-	*	I set up gh-pages and made an auto-update script to have our documentation hosted on `Github Pages<http://courseportal.github.io/coursePortal/>`_.
+	*	I set up gh-pages and made an auto-update script to have our documentation hosted on `github Pages <http://courseportal.github.io/coursePortal/>`_.
 	*	Started documenting what I have been working on
