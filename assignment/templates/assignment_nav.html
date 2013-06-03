@@ -15,7 +15,7 @@
             <li><a href="/admin/assignment/assignment/{{t.id}}">{{t}}</a></li>
         {%endfor%}
         </ul>
-        <li><a href="/admin/assignment/question/add">Add Question</a></li>
+        <li><a href="{% url "add_question" %}">Add Question</a></li>
         <li class="divider"></li>
 {% endif %}
 

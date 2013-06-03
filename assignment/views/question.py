@@ -1,97 +1,59 @@
 from django.http import HttpResponse
 from django.template import Context, loader
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from assignment.models import *
 from django.utils import simplejson as json
 from random import *
 from math import *
+from string import Template
 
 def index(request):
 	question_list = Question.objects.all()
 	context = {'question_list': question_list}
 	return render(request, 'question/index.html', context)
 
-def detail(request, id):
+def detail(request, id, newly_added):
 	question = Question.objects.get(pk=id)
-	choices_list = question.choices.all()
-	variables_list = question.variables.all()
-
-	for v in variables_list:
-		if not v.varType == 'custom':
-			vars()[v.name] = v.getValue()
-
-	question.solution = question.solution.replace('<br>', '\n')
-	question.solution = question.solution.replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	exec question.solution
+	q = json.loads(question.data)
+	for integer_index in range(len(q['solutions'])):
+		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
+		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	exec q['solutions'][0]
 	solution = answer
 
-	#question text formatted here
-	variables = [] #init two-ple of variable names and values
-	text = question.text
-	for v in variables_list:
-		variables.append(vars()[v.name])
+	#q text formatted here
+	shuffle(q['texts'])
+	text = q['texts'][0]
 
-	for v in variables_list:
-		template = '$'+v.name
-		text = text.replace(template, str(vars()[v.name]))
+	local_dict = dict(locals())
+	text = Template(text).substitute(local_dict)
 
-	#choices formatted here
+	# #choices formatted here
 	choices = []
-	for c in choices_list:
-		c.solution = c.solution.replace('<br>', '\n')
-		exec c.solution
+	q['solutions'].pop(0)
+	for choice in q['solutions']:
+		exec choice
 		choices.append(answer)
 
 	context = {
 		'text': text,
 		'answer': solution,
 		'choices': choices,
+		'newly_added': newly_added,
 	}
 
 	return render(request, 'question/question.html', context)
 
-def test(request):
-	return render(request, 'question/test.html')
-
-def testindex(request):
-	question_list = TestQuestion.objects.all()
-	context = {'question_list': question_list}
-	return render(request, 'question/testindex.html', context)
-
-def testdetail(request, id):
-	question = TestQuestion.objects.get(pk=id)
-	q = json.loads(question.data)
-	q['solutions'][0] = q['solutions'][0].replace('<br>', '\n')
-	q['solutions'][0] = q['solutions'][0].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	exec q['solutions'][0]
-	solution = answer
-
-	#q text formatted here
-	text = q['texts'][0]
-	
-	local_dict = dict(locals())
-	for v in local_dict:
-		replace = '$'+v
-		text = text.replace(replace, str(locals()[v]))
-
-	# #choices formatted here
-	# choices = []
-	# for c in choices_list:
-	# 	c.solution = c.solution.replace('<br>', '\n')
-	# 	exec c.solution
-	# 	choices.append(answer)
-
-	context = {
-		'text': text,
-		'answer': solution,
-		# 'choices': choices,
-	}
-
-	return render(request, 'question/question.html', context)
+def addQ(request):
+	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+	breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
+	context = {'breadcrumbs':breadcrumbs}
+	return render(request, 'question/addQ.html', context)
 
 def create(request):
-	q = TestQuestion()
-	q.name = request.REQUEST['questionname']
+	q = Question()
+	q.title = request.REQUEST['questionname']
 	q.data = request.REQUEST['questiondata']
 	q.save()
-	return HttpResponse(request.REQUEST['questiondata'])
+	return detail(request, q.id, True)
