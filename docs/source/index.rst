@@ -15,6 +15,7 @@ Contents:
    deployment
    architecture
    code_index
+   notes
 
 
 
