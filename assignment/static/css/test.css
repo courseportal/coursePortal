@@ -1,0 +1,10 @@
+
+
+.soln {
+	padding: 0px 0px 10px 0px;
+}
+
+.solnDiv .CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  height: 40px;
+}
