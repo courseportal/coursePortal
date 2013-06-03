@@ -43,7 +43,7 @@ Ian
 Web
 ---
 
-1)	Heirachial system is good, hybrid is better.  When you click on a category you should show a list of all sub-atoms in a tab as well as another tab for the content.
+1)	Hierarchial system is good, hybrid is better.  When you click on a category you should show a list of all sub-atoms in a tab as well as another tab for the content.
 
 2)	Make sure that the safe-guards for category are in place for base-category
 
