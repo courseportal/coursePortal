@@ -52,6 +52,63 @@
             
   <div class="section" id="nick-s-development-log">
 <span id="log-nick"></span><h1>Nick&#8217;s Development Log<a class="headerlink" href="#nick-s-development-log" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#week-of-june-3-7" id="id1">Week of June 3-7</a></li>
+<li><a class="reference internal" href="#week-of-may-27-31" id="id2">Week of May 27-31</a></li>
+</ul>
+</div>
+<p>This is where I will keep a log of what I&#8217;m working on, problems I&#8217;m having, or just notes in general.</p>
+<div class="section" id="week-of-june-3-7">
+<h2><a class="toc-backref" href="#id1">Week of June 3-7</a><a class="headerlink" href="#week-of-june-3-7" title="Permalink to this headline">¶</a></h2>
+<p>This week I want to mess around with the orginazational system a little bit to reflect what we discussed in the <a class="reference internal" href="meeting_notes.html#meeting-notes-5-31-2013"><em>Meeting on 5/7/2013</em></a>.</p>
+<p>I also want to start writing documentation for the whole project and start breaking up web into multiple smaller apps so that the project will scale well.</p>
+</div>
+<div class="section" id="week-of-may-27-31">
+<h2><a class="toc-backref" href="#id2">Week of May 27-31</a><a class="headerlink" href="#week-of-may-27-31" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>This week I mainly worked on overhauling the atom orginazational system:</dt>
+<dd><ul class="first last">
+<li><p class="first">First I seperated Categories from Atoms.</p>
+<ul class="simple">
+<li>Atoms contain all of the information</li>
+<li>Categories only provide the structure</li>
+</ul>
+</li>
+<li><p class="first">I then changed the way the Navigation bar was displayed on screen.  Initially it could only display &#8220;2 levels&#8221; of hierarchy.  Now it recurses in the template from the top of the Category tree to all of the &#8220;top level categories&#8221; children.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This introduced a problem where infinite recursion could happen if there are loops in the Category system which Taoran has solved in the admin page.</p>
+</div>
+</li>
+<li><p class="first">Then I added a Base_Category Foreign Key to Atom so that every atom must be attributed with a default category which we use to display the Atoms outside of the class view.</p>
+</li>
+<li><p class="first">I changed the home page from a class list view to a view of the base categories and the videos in the atoms, much like the class view exept that all atoms are shown, not just the ones in that particular class.</p>
+</li>
+<li><p class="first">I changed the class list view to its own URL and added a link to it in the Navigation Bar.</p>
+</li>
+<li><p class="first">I changed the &#8220;Submit New Content&#8221; feature from being class instanced to being outside the class view and it submits content site-wide:</p>
+<ul class="simple">
+<li>Changed the URL from /class/submit, /class/post, ... to /submit, /post, ...</li>
+<li>Changed everything that links to it because the URL takes 1 less argument now</li>
+</ul>
+</li>
+<li><p class="first">Then I tried to remove everything that I can from base.html so it can be used site wide because having more than one copy of base.html that we use in different places that is slightly modified is a pain and hard to keep updated.</p>
+</li>
+</ul>
+</dd>
+<dt>Then I started working on documentation:</dt>
+<dd><ul class="first last simple">
+<li>I downloaded sphinx and started figuring out how the automatic documentation process works.</li>
+<li>I wrote an extremely detailed installation guide for mac so that future people added to the project have a good guide for installation</li>
+<li>I set up the documentation structure for the project so that all docstrings are automatically added to the documentation.</li>
+<li>I set up gh-pages and made an auto-update script to have our documentation hosted on <a href="#id3"><span class="problematic" id="id4">`Github Pages&lt;http://courseportal.github.io/coursePortal/&gt;`_</span></a>.</li>
+<li>Started documenting what I have been working on</li>
+</ul>
+</dd>
+</dl>
+</div>
 </div>
 
 
@@ -60,6 +117,15 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Nick&#8217;s Development Log</a><ul>
+<li><a class="reference internal" href="#week-of-june-3-7">Week of June 3-7</a></li>
+<li><a class="reference internal" href="#week-of-may-27-31">Week of May 27-31</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="meeting_notes.html"
                         title="previous chapter">Meeting Notes</a></p>
