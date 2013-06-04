@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, RequestContext
 import random, string, re
 from web.forms.admin import *
-from web.models import Category, User, VoteCategory, Submission
+from web.models import AtomCategory, User, VoteCategory, Submission
 
 @login_required()
 def batch_add(request):
@@ -42,7 +42,7 @@ def batch_add(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('batch_add'), 'title': 'Batch Add'}],
         'form': form,
-        'parent_categories': Category.objects.filter(parent=None),
+        'parent_categories': AtomCategory.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
@@ -63,6 +63,6 @@ def list_videos(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('list_videos'), 'title': 'All Videos'}],
         'top_ranked_videos': top_ranked_videos,
-        'parent_categories': Category.objects.filter(parent=None),
+        'parent_categories': AtomCategory.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))

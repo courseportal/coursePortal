@@ -225,7 +225,7 @@ def category(request, class_id, cat_id):
     #Get the class that we are in
     current_class = get_object_or_404(Class, id=class_id)
     #Get categories that are in the current_class
-    categories_in_class = Category.objects.filter(parent_class=current_class.id)
+    categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
     #Get the "top level" categories
     top_level_categories = categories_in_class.filter(parent_categories=None)
     
@@ -286,7 +286,7 @@ def atom(request, class_id, cat_id, atom_id):
     #Get class we are in
     current_class = get_object_or_404(Class, id=class_id)
     #Get categories that are in the current_class
-    categories_in_class = Category.objects.filter(parent_class=current_class.id)
+    categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
     #Get the "top level" categories
     top_level_categories = categories_in_class.filter(parent_categories=None) #check that this works
 
@@ -346,7 +346,7 @@ def classes(request, class_id):
     #Get the class that we are in
     current_class = get_object_or_404(Class, id=class_id)
     #Get categories that are in the current_class
-    categories_in_class = Category.objects.filter(parent_class=current_class.id)
+    categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
     #Get the "top level" categories
     top_level_categories = categories_in_class.filter(parent_categories=None)
     

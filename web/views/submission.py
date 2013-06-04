@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404
 import json
 from web.forms.submission import SubmissionForm
-from web.models import Category, Submission, Class, BaseCategory
+from web.models import AtomCategory, Submission, Class, BaseCategory
 
 class PlainErrorList(ErrorList):
     """

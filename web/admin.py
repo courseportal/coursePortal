@@ -26,7 +26,7 @@ class AtomAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
 
 
-class CategoryAdminForm(forms.ModelForm):
+class AtomCategoryAdminForm(forms.ModelForm):
   
     def clean(self):
         cleaned_data = super(CategoryAdminForm, self).clean()
@@ -34,7 +34,7 @@ class CategoryAdminForm(forms.ModelForm):
         potential_child_category = cleaned_data.get("child_categories")
         temp = potential_child_category
         if potential_parent_category_name and potential_child_category:
-            potential_parent_category = Category.objects.filter(name = potential_parent_category_name)
+            potential_parent_category = AtomCategory.objects.filter(name = potential_parent_category_name)
             potential_conflict_category = potential_child_category.filter(child_categories__in = potential_parent_category)
             while (not potential_conflict_category):
                 for item in potential_child_category.all():
@@ -61,8 +61,8 @@ class CategoryAdminForm(forms.ModelForm):
 
 
 
-class CategoryAdmin(admin.ModelAdmin):
-    form = CategoryAdminForm
+class AtomCategoryAdmin(admin.ModelAdmin):
+    form = AtomCategoryAdminForm
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if request.path != "/admin/web/category/add/":
             if db_field.name == "child_categories":
@@ -72,7 +72,7 @@ class CategoryAdmin(admin.ModelAdmin):
                 temp2 = request.path.split(temp0,1)[1]
                 category_id = int(temp2.split(temp1,1)[0])
                 #erase the current category from form field "child_categories" 
-                kwargs["queryset"] = Category.objects.filter(parent_class__author=request.user).exclude(pk = category_id)
+                kwargs["queryset"] = AtomCategory.objects.filter(parent_class__author=request.user).exclude(pk = category_id)
             return super(CategoryAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
         return super(CategoryAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
@@ -84,28 +84,28 @@ class CategoryAdmin(admin.ModelAdmin):
         return qs.filter(Q(parent_class__allowed_users = request.user) | Q(parent_class__author = request.user))
 
 
-def TestChild(potential_parent, potential_child, CategoryDict):
+def TestChild(potential_parent, potential_child, AtomCategoryDict):
     """
-    Recursive funtion to test potential loop in CategoryInlineFormSet
+    Recursive funtion to test potential loop in AtomCategoryInlineFormSet
     """
     if potential_parent == potential_child:
         return False
     else:
-        if potential_child in CategoryDict.keys():
-            for temp_child in CategoryDict[potential_child]:
-                if TestChild(potential_parent, temp_child, CategoryDict) == False:
+        if potential_child in AtomCategoryDict.keys():
+            for temp_child in AtomCategoryDict[potential_child]:
+                if TestChild(potential_parent, temp_child, AtomCategoryDict) == False:
                     return False
     return True
 
 
 
-class CategoryInlineFormSet(BaseInlineFormSet):
+class AtomCategoryInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super(CategoryInlineFormSet, self).clean()
-        CategoryDict = {}
+        AtomCategoryDict = {}
         for form in self.forms:
             potential_parent_name = form.cleaned_data.get("name")
-            potential_parent_object = Category.objects.filter(name = potential_parent_name)
+            potential_parent_object = AtomCategory.objects.filter(name = potential_parent_name)
             for p_p_o in potential_parent_object.all():
                 potential_parent = str(p_p_o.name.split('Category:',1))
             potential_children = form.cleaned_data.get("child_categories")
@@ -113,34 +113,34 @@ class CategoryInlineFormSet(BaseInlineFormSet):
                 S=set()
                 for item in potential_children.all():
                     potential_child = str(item.name.split('Category:',1))
-                    for group in CategoryDict.values():
+                    for group in AtomCategoryDict.values():
                         for g in group:
                             if potential_parent == g:
                                 temp_child = potential_child
                                 temp_parent = potential_parent
-                                if not TestChild(temp_parent, temp_child, CategoryDict):
+                                if not TestChild(temp_parent, temp_child, AtomCategoryDict):
                                    raise forms.ValidationError("There is a loop between "+ temp_child +" and " + temp_parent+" !") 
                     S.add(potential_child)
-                    CategoryDict[potential_parent] = S
+                    AtomCategoryDict[potential_parent] = S
                 
             
 
 
-class CategoryInline(admin.StackedInline):
-    model = Category
-    formset = CategoryInlineFormSet
+class AtomCategoryInline(admin.StackedInline):
+    model = AtomCategory
+    formset = AtomCategoryInlineFormSet
     extra = 2
 
     
 class ClassAdmin(admin.ModelAdmin):
     exclude = ('author',)
-    inlines = [CategoryInline]
+    inlines = [AtomCategoryInline]
         
     def get_formsets(self, request, obj=None):
         print("get_formsets is called, but not be put in use yet!!")
         for inline in self.get_inline_instances(request, obj):
             # hide MyInline in the add view
-            if isinstance(inline, CategoryInline) and obj is None:
+            if isinstance(inline, AtomCategoryInline) and obj is None:
                 continue
             yield inline.get_formset(request, obj)
 
@@ -182,7 +182,7 @@ class ClassAdmin(admin.ModelAdmin):
         return form
 
 admin.site.register(BaseCategory)
-admin.site.register(Category, CategoryAdmin)
+admin.site.register(AtomCategory, AtomCategoryAdmin)
 admin.site.register(Atom, AtomAdmin)
 admin.site.register(Exposition)
 admin.site.register(Submission)

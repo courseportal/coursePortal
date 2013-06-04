@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render_to_response
 import json
 from web.forms.submission import LectureNoteForm
-from web.models import Category, LectureNote, Class
+from web.models import AtomCategory, LectureNote, Class
 from knoatom.settings import MEDIA_ROOT
 
 
@@ -50,7 +50,7 @@ def index(request, pk):
     c = RequestContext(request, {
                    'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
                    'form': form,
-                   'parent_categories': Category.objects.filter(parent=None),
+                   'parent_categories': AtomCategory.objects.filter(parent=None),
                    'class_id': class_id,
                    })
     return HttpResponse(t.render(c))
