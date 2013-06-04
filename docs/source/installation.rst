@@ -75,6 +75,7 @@ After you have installed and setup ``virtualenv`` you must cd into your working 
 	You can pick anything as your ``<venv_name>``.
 	
 MySQL-Python
+------------
 
 Now here comes the hardest part, installing mysql-python.  It is important that if you are going to use virtualenv that you are in your virtual environment.  Your command line prompt should look like ``(<venv_name>)$``.  Follow these steps **exactly** and you probably won't have any problems.
 	
