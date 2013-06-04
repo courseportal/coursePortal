@@ -1,4 +1,15 @@
 
+CodeMirrorSettings = {
+	mode: 'python',
+	tabSize: 2,
+	lineNumbers: true,
+	indentWithTabs: true,
+	theme: 'monokai'
+};
+// render_YUI('solution', solutions);
+// render_YUI('text', texts);
+CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
+
 count = 1;
 solutions = [];
 texts = [];
@@ -10,12 +21,13 @@ function add_text(){
 	count++;
 }
 function add_choice(){
-	choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
-	choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
-	$('#choicelistdiv').append(choiceDivName);
-	render_YUI('choice'+count, solutions, '40px');
+	newDiv = '<div id="temp" class="soln"></div>';
+	newDiv = newDiv.replace(/temp/g, 'soln'+count);
+	$('#solnDiv').append(newDiv);
+	CodeMirror($('#soln'+count).get(0), CodeMirrorSettings);
 	count++;
 }
+
 function render_YUI(div, group, textheight){
 	textheight = textheight || "100px";
 	var myEditor = new YAHOO.widget.Editor(div, {
@@ -39,8 +51,9 @@ function render_YUI(div, group, textheight){
 	myEditor.render();
 	group.push(myEditor);
 }
-render_YUI('solution', solutions);
+
 render_YUI('text', texts);
+
 
 function save_YUI(){
 	question = {
