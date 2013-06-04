@@ -5,6 +5,8 @@
 <li class = "active"><a href="#1" data-toggle="tab">Videos</a></li>
 <li class = ""><a href = "#2" data-toggle="tab">Expositions</a><li>
 <li class = ""><a href = "#3" data-toggle="tab">Notes</a></li>
+<li class = ""><a href = "#4" data-toggle="tab">Atoms Display</a></li>
+
 </ul>
 </h3>
 {% endif %}
@@ -22,6 +24,12 @@
 
 <div class="tab-pane", id="3">
 {% include "home/lectureNote.html"%}
+</div>
+    
+<div class="tab-pane", id="4">
+    <div class="row-fluid">
+        {% include "home/atomDisplay.html" %}
+    </div>
 </div>
 
 </div>

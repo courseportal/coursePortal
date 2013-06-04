@@ -1,6 +1,8 @@
 # Django settings for knoatom-web project.
 import os
 
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -120,6 +122,12 @@ INSTALLED_APPS = (
                   'django.contrib.messages',
                   'django.contrib.staticfiles',
                   'south',
+                  #'djangobb_forum',
+                  #'registration',
+                  #'pagination',
+                  #'django_authopenid',
+                  'haystack',
+                  #'django_messages',
                   'web',
                   'assignment',
                   'django_wysiwyg',
@@ -185,5 +193,25 @@ TEMPLATE_CONTEXT_PROCESSORS = (
                                "django.core.context_processors.media",
                                "django.core.context_processors.static",
                                "django.core.context_processors.tz",
-                               "django.contrib.messages.context_processors.messages"
+                               "django.contrib.messages.context_processors.messages",
+                               #"django_authopenid.context_processors.authopenid",
+                               #"django_messages.context_processors.inbox",
+                               #"djangobb_forum.context_processors.forum_settings",
+                               #"django.core.context_processors.request",
                                )
+
+# Haystack settings
+#HAYSTACK_SITECONF = 'search_sites'
+#HAYSTACK_SEARCH_ENGINE = 'whoosh'
+#HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_ROOT, 'djangobb_index')
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8000/solr/default',
+        'TIMEOUT': 60 * 5,
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
+    }
+}

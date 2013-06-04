@@ -2,12 +2,18 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 
+STATUS_CHOICES = (
+    ('A', 'Active'),
+    ('N', 'Not active'),
+
+)
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
     allowed_users = models.ManyToManyField(User, blank=True)
     students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
     def __unicode__(self):
         return self.name
     class Meta:
@@ -64,7 +70,7 @@ class Submission(models.Model):
     date = models.DateTimeField(auto_now_add=True, blank=True)
     title = models.CharField(max_length=200)
     content = models.TextField()
-    video = models.CharField(max_length=400, blank=True)
+    video = models.CharField(max_length=400, blank=True, help_text ="Please enter an 11 character YouTube VIDEO_ID   or  enter [\"VIDEO_ID\"] directly. (e.g. http://www.youtube.com/watch?v=VIDEO_ID) ")
     date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
     date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
     tags = models.ManyToManyField(Atom)

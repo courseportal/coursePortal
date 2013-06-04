@@ -80,6 +80,20 @@ def get_parent_categories(current_category, parent_categories, current_class=Non
             tmp_categories = tmp_categories[0].parent_categories.all()
     return parent_categories
 
+
+def findChildAtom(current_category, atom_list):
+    for c_a in current_category.child_atoms.all():
+        atom_list.append(c_a)
+    for c_c in current_category.child_categories.all():
+        for c in c_c.child_atoms.all():
+            atom_list.append(c)
+        current_category=c_c.child_categories.all()
+        if current_category:
+            for a in current_category.all():
+                findChildAtom(a, atom_list)
+    return atom_list
+
+
 def base_category(request, cat_id):
     """
     - Generates the category page
@@ -123,6 +137,17 @@ def base_category(request, cat_id):
 
     expositions = get_content_for_category(current_category, list(), True)
 
+    #get all the atoms in and under the current category
+    atom_list = list()
+    temp_atom_list = findChildAtom(current_category,list())
+    for item in temp_atom_list:
+        if atom_list.count(item)==0:
+            atom_list.append(item)
+    length = int(len(atom_list))/3+1
+    list_1 = atom_list[0:length]
+    list_2 = atom_list[length:length*2]
+    list_3 = atom_list[length*2:]
+
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
@@ -132,6 +157,9 @@ def base_category(request, cat_id):
         'top_level_base_categories': top_level_base_categories,
         'selected_categories': parent_categories,
         'selected_category': current_category,
+        'atom_list_1': list_1,
+        'atom_list_2': list_2,
+        'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
         'is_post' : False,
     })
@@ -280,6 +308,8 @@ def atom(request, class_id, cat_id, atom_id):
 
     
     content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
+    for c in content:
+        print(c.video)
 
 
     # un-json-fy the videos
