@@ -105,7 +105,7 @@ class Forum(models.Model):
     headline = models.TextField(_('Headline'), blank=True, null=True)
 
     class Meta(object):
-        ordering = ['position']
+        ordering = ['position', 'name']
         verbose_name = _('Forum')
         verbose_name_plural = _('Forums')
 
