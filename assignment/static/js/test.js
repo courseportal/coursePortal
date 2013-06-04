@@ -63,8 +63,8 @@ function save_YUI(){
 	};
 	$('#questionname').val($('#title').val());
 	question.title = $('#title').val();
-	for (var i = 0; i < solutions.length; i++) {
-  		question.solutions.push(solutions[i].saveHTML());
+	for (var i = 0; i < document.forms["input"]["solutions"].length; i++) {
+  		question.solutions.push(document.forms["input"]["solutions"][i]);
   	}
   	for (var i = 0; i < texts.length; i++) {
   		question.texts.push(texts[i].saveHTML());

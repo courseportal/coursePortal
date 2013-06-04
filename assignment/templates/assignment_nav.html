@@ -20,7 +20,7 @@
         <li class="divider"></li>
 {% endif %}
 
-{% if user.is_active and not user.is_staff %}
+{% if user.is_active %}
         <li class "nav-header">Student Affairs</li>
         <li class="{% if grade_check == 1 %}active{%endif%}">
             <a href="{% url "grades" %}">View grades</a></li>
