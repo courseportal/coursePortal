@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+{% if newly_added %}
+	Question successfully created! Here is a sample instance:<br>
+{% endif %}
 {{text | safe}}
 <br>
 <br>
@@ -10,3 +15,4 @@ choices:
 {% for c in choices %}
 	{{c}}   
 {% endfor %}
+{% endblock %}

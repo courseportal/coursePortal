@@ -1,4 +1,28 @@
-{% extends "assignment/index.html" %}
+<script>
+function validate(){
+	x= document.forms["input"]["choice"];
+	if(checkCheck(x) == false){
+		alert("You need to provide an answer!");
+		return false;
+	}
+	return true;
+}
+
+function checkCheck(toCheck){
+	if(toCheck.type == "checkbox" || toCheck.type == "radio"){
+		if(toCheck.length){
+			for(i=0; i<toCheck.length; i++){
+				if(toCheck [i].checked) return true;
+			}
+			return false;
+		}
+		else return toCheck.checked;
+	}
+	else return toCheck.value!=null && toCheck.value!='';
+}
+</script>
+
+{% extends "base.html" %}
 {% block content%}
 <div class="row">
 	<h1><div class="span3 offset3">{{question_selected.title}}</div></h2>
@@ -9,7 +33,7 @@
 <br>
 <br>
 
-<form name="input" action="{% url "eval"%}" method = "post">
+<form name="input" action="{% url "eval"%}"  method = "post">
 {% csrf_token %}
 {% if choices %}
 	<strong>Choices:</strong>

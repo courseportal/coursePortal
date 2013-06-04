@@ -27,6 +27,9 @@ DATABASES = {
 }
 }
 
+# For PYBB
+#PYBB_TEMPLATE = 'forum_base.html'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -100,6 +103,7 @@ MIDDLEWARE_CLASSES = (
                       'django.middleware.csrf.CsrfViewMiddleware',
                       'django.contrib.auth.middleware.AuthenticationMiddleware',
                       'django.contrib.messages.middleware.MessageMiddleware',
+                      'pybb.middleware.PybbMiddleware',
                       )
 
 ROOT_URLCONF = 'knoatom.urls'
@@ -126,7 +130,7 @@ INSTALLED_APPS = (
                   #'registration',
                   #'pagination',
                   #'django_authopenid',
-                  'haystack',
+                  #'haystack',
                   #'django_messages',
                   'web',
                   'assignment',
@@ -135,6 +139,10 @@ INSTALLED_APPS = (
                   'django.contrib.admin',
                   # Uncomment the next line to enable admin documentation:
                   # 'django.contrib.admindocs',
+                  
+                  # For PYBBM
+                  'pybb',
+                  'sorl.thumbnail'
                   )
 
 
@@ -187,31 +195,12 @@ CACHES = {
 ALLOWED_HOSTS = ['localhost']
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-                               "django.contrib.auth.context_processors.auth",
-                               "django.core.context_processors.debug",
-                               "django.core.context_processors.i18n",
-                               "django.core.context_processors.media",
-                               "django.core.context_processors.static",
-                               "django.core.context_processors.tz",
-                               "django.contrib.messages.context_processors.messages",
-                               #"django_authopenid.context_processors.authopenid",
-                               #"django_messages.context_processors.inbox",
-                               #"djangobb_forum.context_processors.forum_settings",
-                               #"django.core.context_processors.request",
-                               )
-
-# Haystack settings
-#HAYSTACK_SITECONF = 'search_sites'
-#HAYSTACK_SEARCH_ENGINE = 'whoosh'
-#HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_ROOT, 'djangobb_index')
-
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8000/solr/default',
-        'TIMEOUT': 60 * 5,
-        'INCLUDE_SPELLING': True,
-        'BATCH_SIZE': 100,
-        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
-    }
-}
+   "django.contrib.auth.context_processors.auth",
+   "django.core.context_processors.debug",
+   "django.core.context_processors.i18n",
+   "django.core.context_processors.media",
+   "django.core.context_processors.static",
+   "django.core.context_processors.tz",
+   "django.contrib.messages.context_processors.messages",
+   'pybb.context_processors.processor',
+)

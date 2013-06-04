@@ -1,21 +1,42 @@
 
-count = 1;
-YUI_list = []
-function add_text(){
-	newdiv = '<textarea name="temp" id="temp"></textarea>';
-	newdiv = newdiv.replace(/temp/g, 'text'+count);
-	$('#alttextlistdiv').append(newdiv);
-	render_YUI('text'+count,'60px');
-	count++;
-}
+CodeMirrorSettings = {
+	mode: 'python',
+	tabSize: 2,
+	lineNumbers: true,
+	indentWithTabs: true,
+	theme: 'monokai'
+};
+// render_YUI('solution', solutions);
+// render_YUI('text', texts);
+
+code = CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
+solutions = [];
+// text = render_YUI('text');
+
+tinymce.init({
+   selector: "textarea#text",
+   force_p_newlines : false
+});
+
+// function add_text(){
+// 	newdiv = '<textarea name="temp" id="temp"></textarea>';
+// 	newdiv = newdiv.replace(/temp/g, 'text'+count);
+// 	$('#alttextlistdiv').append(newdiv);
+// 	render_YUI('text'+count, texts, '60px');
+// 	count++;
+// }
+
+solnIndex = 0;
+
 function add_choice(){
-	choiceDivName = '<textarea name="temp" id="temp"> </textarea>';
-	choiceDivName = choiceDivName.replace(/temp/g, 'choice'+count);
-	$('#choicelistdiv').append(choiceDivName);
-	render_YUI('choice'+count,'40px');
-	count++;
+	newDiv = '<div id="temp" class="soln"></div>';
+	newDiv = newDiv.replace(/temp/g, 'soln'+solnIndex);
+	$('#solnDiv').append(newDiv);
+	solutions.push(CodeMirror($('#soln'+solnIndex).get(0), CodeMirrorSettings));
+	solnIndex++;
 }
-function render_YUI(div, textheight){
+
+function render_YUI(div, group, textheight){
 	textheight = textheight || "100px";
 	var myEditor = new YAHOO.widget.Editor(div, {
 	    height: textheight,
@@ -36,19 +57,26 @@ function render_YUI(div, textheight){
 	    }
 	});
 	myEditor.render();
-	YUI_list.push(myEditor);
+	return myEditor;
 }
-function hide_YUI_toolbar(div){
-	$('#'+div+'_toolbar').css({
-		'display':'none'
-	});
-}
-render_YUI('solution');
-render_YUI('text');
 
-function save_YUI(){
-	for (var i = 0; i < YUI_list.length; i++) {
-  		YUI_list[i].saveHTML();
+function save(){
+	//empty object
+	question = {
+		title: '',
+		code: '',
+		solutions: [],
+		text: ''
+	};
+
+	question.title = $('#title').val();
+	question.code = code.getValue();
+	for (var i = 0; i < solutions.length; i++) {
+  		question.solutions.push(solutions[i].getValue());
   	}
+  	question.text = tinymce.activeEditor.getContent({format : 'raw'});
+
+	$('#questionname').val($('#title').val());
+  	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }

@@ -9,11 +9,13 @@ Welcome to knoatom's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    installation
    deployment
    architecture
+   code_index
+   notes
 
 
 
