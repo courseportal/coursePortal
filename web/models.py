@@ -35,7 +35,7 @@ class Atom(models.Model):
     def __unicode__(self):
         return self.name
 
-class Category(models.Model):
+class AtomCategory(models.Model):
     name = models.CharField(max_length=200)
     parent_class = models.ForeignKey(Class)
     child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")

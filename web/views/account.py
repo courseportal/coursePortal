@@ -12,7 +12,7 @@ import hashlib
 import logging
 import random, string
 from web.forms.account import *
-from web.models import Category
+from web.models import AtomCategory
 
 @login_required()
 def index(request):

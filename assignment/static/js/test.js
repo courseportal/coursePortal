@@ -8,24 +8,32 @@ CodeMirrorSettings = {
 };
 // render_YUI('solution', solutions);
 // render_YUI('text', texts);
-CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
 
-count = 1;
+code = CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
 solutions = [];
-texts = [];
-function add_text(){
-	newdiv = '<textarea name="temp" id="temp"></textarea>';
-	newdiv = newdiv.replace(/temp/g, 'text'+count);
-	$('#alttextlistdiv').append(newdiv);
-	render_YUI('text'+count, texts, '60px');
-	count++;
-}
+// text = render_YUI('text');
+
+tinymce.init({
+   selector: "textarea#text",
+   force_p_newlines : false
+});
+
+// function add_text(){
+// 	newdiv = '<textarea name="temp" id="temp"></textarea>';
+// 	newdiv = newdiv.replace(/temp/g, 'text'+count);
+// 	$('#alttextlistdiv').append(newdiv);
+// 	render_YUI('text'+count, texts, '60px');
+// 	count++;
+// }
+
+solnIndex = 0;
+
 function add_choice(){
 	newDiv = '<div id="temp" class="soln"></div>';
-	newDiv = newDiv.replace(/temp/g, 'soln'+count);
+	newDiv = newDiv.replace(/temp/g, 'soln'+solnIndex);
 	$('#solnDiv').append(newDiv);
-	CodeMirror($('#soln'+count).get(0), CodeMirrorSettings);
-	count++;
+	solutions.push(CodeMirror($('#soln'+solnIndex).get(0), CodeMirrorSettings));
+	solnIndex++;
 }
 
 function render_YUI(div, group, textheight){
@@ -49,26 +57,26 @@ function render_YUI(div, group, textheight){
 	    }
 	});
 	myEditor.render();
-	group.push(myEditor);
+	return myEditor;
 }
 
-render_YUI('text', texts);
-
-
-function save_YUI(){
+function save(){
+	//empty object
 	question = {
 		title: '',
+		code: '',
 		solutions: [],
-		texts: []
+		text: ''
 	};
-	$('#questionname').val($('#title').val());
+
 	question.title = $('#title').val();
-	for (var i = 0; i < document.forms["input"]["solutions"].length; i++) {
-  		question.solutions.push(document.forms["input"]["solutions"][i]);
+	question.code = code.getValue();
+	for (var i = 0; i < solutions.length; i++) {
+  		question.solutions.push(solutions[i].getValue());
   	}
-  	for (var i = 0; i < texts.length; i++) {
-  		question.texts.push(texts[i].saveHTML());
-  	}
+  	question.text = tinymce.activeEditor.getContent({format : 'raw'});
+
+	$('#questionname').val($('#title').val());
   	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }
