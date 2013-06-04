@@ -58,8 +58,9 @@
 <div class="section" id="step-by-step-installation-guide">
 <h2>Step-by-Step Installation Guide<a class="headerlink" href="#step-by-step-installation-guide" title="Permalink to this headline">¶</a></h2>
 <p>Following these steps will fully setup your machine to run knoatom.  This guide is written for Mac/linux, so the installation on windows might vary.</p>
-<ol class="arabic">
-<li><p class="first">The first step is to install <tt class="docutils literal"><span class="pre">pip</span></tt>.  <tt class="docutils literal"><span class="pre">pip</span></tt> allows you to easily install other python packages.</p>
+<div class="section" id="pip">
+<h3>Pip<a class="headerlink" href="#pip" title="Permalink to this headline">¶</a></h3>
+<p>The first step is to install <tt class="docutils literal"><span class="pre">pip</span></tt>.  <tt class="docutils literal"><span class="pre">pip</span></tt> allows you to easily install other python packages.</p>
 <ol class="loweralpha">
 <li><p class="first">Download and instal setuptools from <a class="reference external" href="https://pypi.python.org/pypi/setuptools">here</a> following the instructions.</p>
 </li>
@@ -68,8 +69,10 @@
 </div>
 </li>
 </ol>
-</li>
-<li><p class="first">Next we will install MySQL and setup knoatom&#8217;s database.  First download the MySQL disk image (<tt class="docutils literal"><span class="pre">mysql-5.6.11-osx10.7-x86.dmg</span></tt>) from their <a class="reference external" href="http://dev.mysql.com/downloads/mysql/">website</a> and follow the instructions to install it.</p>
+</div>
+<div class="section" id="mysql">
+<h3>MySQL<a class="headerlink" href="#mysql" title="Permalink to this headline">¶</a></h3>
+<p>Next we will install MySQL and setup knoatom&#8217;s database.  First download the MySQL disk image (<tt class="docutils literal"><span class="pre">mysql-5.6.11-osx10.7-x86.dmg</span></tt>) from their <a class="reference external" href="http://dev.mysql.com/downloads/mysql/">website</a> and follow the instructions to install it.</p>
 <p>Now we need to create the database used for knoatom.  First <tt class="docutils literal"><span class="pre">cd</span></tt> into <tt class="docutils literal"><span class="pre">local</span></tt> and run MySQL:</p>
 <div class="highlight-python"><pre>$ cd /usr/local/mysql
 $ ./mysql -u root</pre>
@@ -80,8 +83,10 @@ mysql&gt; GRANT USAGE ON *.* TO knoatom@localhost identified by password;
 mysql&gt; GRANT ALL PRIVILEGS ON knoatom.* TO knoatom@localhost;</pre>
 </div>
 <p>Now you can exit MySQL if you want by entering <tt class="docutils literal"><span class="pre">^D</span></tt>.</p>
-</li>
-<li><p class="first">The next thing you should install is <tt class="docutils literal"><span class="pre">virtualenv</span></tt> and <tt class="docutils literal"><span class="pre">virtualenvwrapper</span></tt>.  While this isn&#8217;t neccessary, it prevents conflicts and keeps your working enviroment isolated. Install them using these commands:</p>
+</div>
+<div class="section" id="virtualenv">
+<h3>Virtualenv<a class="headerlink" href="#virtualenv" title="Permalink to this headline">¶</a></h3>
+<p>The next thing you should install is <tt class="docutils literal"><span class="pre">virtualenv</span></tt> and <tt class="docutils literal"><span class="pre">virtualenvwrapper</span></tt>.  While this isn&#8217;t neccessary, it prevents conflicts and keeps your working enviroment isolated. Install them using these commands:</p>
 <div class="highlight-python"><pre>$ pip install virtualenv
 $ pip install virtualenvwrapper</pre>
 </div>
@@ -105,8 +110,10 @@ $ workon &lt;venv_name&gt;</pre>
 <p>You can run <tt class="docutils literal"><span class="pre">deactivate</span></tt> to leave the virtual environment and return to your normal environment.  Full documentation can be found on their <a class="reference external" href="http://virtualenvwrapper.readthedocs.org/en/latest/">site</a>.</p>
 <p class="last">You can pick anything as your <tt class="docutils literal"><span class="pre">&lt;venv_name&gt;</span></tt>.</p>
 </div>
-</li>
-<li><p class="first">Now here comes the hardest part, installing mysql-python.  It is important that if you are going to use virtualenv that you are in your virtual environment.  Your command line prompt should look like <tt class="docutils literal"><span class="pre">(&lt;venv_name&gt;)$</span></tt>.  Follow these steps <strong>exactly</strong> and you probably won&#8217;t have any problems.</p>
+</div>
+<div class="section" id="mysql-python">
+<h3>MySQL-Python<a class="headerlink" href="#mysql-python" title="Permalink to this headline">¶</a></h3>
+<p>Now here comes the hardest part, installing mysql-python.  It is important that if you are going to use virtualenv that you are in your virtual environment.  Your command line prompt should look like <tt class="docutils literal"><span class="pre">(&lt;venv_name&gt;)$</span></tt>.  Follow these steps <strong>exactly</strong> and you probably won&#8217;t have any problems.</p>
 <ol class="loweralpha">
 <li><p class="first">Download <a class="reference external" href="ttp://sourceforge.net/projects/mysql-python/files/mysql-python/1.2.2/">MySQL-python-1.2.3.tar.gz</a>.</p>
 </li>
@@ -149,7 +156,10 @@ $ workon &lt;venv_name&gt;</pre>
 </div>
 </li>
 </ol>
-</li>
+</div>
+<div class="section" id="install-django-and-required-apps">
+<h3>Install Django and Required Apps<a class="headerlink" href="#install-django-and-required-apps" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
 <li><p class="first">Install django into your virtual environment, which is very simple using pip:</p>
 <div class="highlight-python"><pre>(&lt;venv_name&gt;)$ pip install django</pre>
 </div>
@@ -158,35 +168,48 @@ $ workon &lt;venv_name&gt;</pre>
 <div class="highlight-python"><pre>(&lt;venv_name&gt;)$ pip install python-memcached
 (&lt;venv_name&gt;)$ pip install south
 (&lt;venv_name&gt;)$ pip install django_wysiwyg
+(&lt;venv_name&gt;)$ pip install markdown
+(&lt;venv_name&gt;)$ pip install postmarkup
+(&lt;venv_name&gt;)$ pip install django-annoying
+(&lt;venv_name&gt;)$ pip install sorl-thumbnail
+(&lt;venv_name&gt;)$ pip install pil
+(&lt;venv_name&gt;)$ pip install django-pure-pagination
 (&lt;venv_name&gt;)$ pip install sphinx</pre>
 </div>
 </li>
-<li><p class="first">Now you need to clone the source code from the repository.  The first thing you need to do is ask someone to add you to the orginization on gitHub so you can use the repository.  Then <tt class="docutils literal"><span class="pre">cd</span></tt> into your working directory and use the following command:</p>
+</ol>
+</div>
+<div class="section" id="get-source-code">
+<h3>Get Source Code<a class="headerlink" href="#get-source-code" title="Permalink to this headline">¶</a></h3>
+<p>Now you need to clone the source code from the repository.  The first thing you need to do is ask someone to add you to the orginization on gitHub so you can use the repository.  Then <tt class="docutils literal"><span class="pre">cd</span></tt> into your working directory and use the following command:</p>
 <div class="highlight-python"><pre>git clone https://github.com/courseportal/coursePortal.git</pre>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">More detailed instructions on how to use git can be found <strong>HERE (LINK THIS!!!)</strong>.</p>
 </div>
-</li>
-<li><p class="first">Sync your database and set it up for south migration using the folloing command:</p>
-<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./south.pl -setup -migrate web assignment</pre>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">You can see what commands that runs by adding the <tt class="docutils literal"><span class="pre">-print</span> <span class="pre">tag</span></tt>.  Detailed documentation on how to use <tt class="docutils literal"><span class="pre">south.pl</span></tt> can be found <strong>HERE (LINK THIS!!!)</strong>.</p>
+<div class="section" id="setup-database">
+<h3>Setup Database<a class="headerlink" href="#setup-database" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Sync your database and set it up for south migration using the folloing command:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ python manage.py syncdb --all
+(&lt;venv_name&gt;)$ python manage.py migrate web assignment pybb --fake</pre>
 </div>
 </li>
 <li><p class="first">If there is a current fixture in <tt class="docutils literal"><span class="pre">web/fixtures/</span></tt> then you can load it using the following command:</p>
 <div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py loaddata web/fixtures/&lt;fixture_name&gt;.json</pre>
 </div>
 </li>
+</ol>
+<ol class="arabic" start="10">
 <li><p class="first">Everything should be working now, check that it is by running the command:</p>
 <div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py runserver</pre>
 </div>
 <p>and make sure everything is working</p>
 </li>
 </ol>
+</div>
 </div>
 </div>
 
@@ -199,7 +222,16 @@ $ workon &lt;venv_name&gt;</pre>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#step-by-step-installation-guide">Step-by-Step Installation Guide</a></li>
+<li><a class="reference internal" href="#step-by-step-installation-guide">Step-by-Step Installation Guide</a><ul>
+<li><a class="reference internal" href="#pip">Pip</a></li>
+<li><a class="reference internal" href="#mysql">MySQL</a></li>
+<li><a class="reference internal" href="#virtualenv">Virtualenv</a></li>
+<li><a class="reference internal" href="#mysql-python">MySQL-Python</a></li>
+<li><a class="reference internal" href="#install-django-and-required-apps">Install Django and Required Apps</a></li>
+<li><a class="reference internal" href="#get-source-code">Get Source Code</a></li>
+<li><a class="reference internal" href="#setup-database">Setup Database</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

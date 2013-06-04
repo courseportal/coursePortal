@@ -274,7 +274,7 @@
     <span class="c">#Get the class that we are in</span>
     <span class="n">current_class</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Class</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">class_id</span><span class="p">)</span>
     <span class="c">#Get categories that are in the current_class</span>
-    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">Category</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">AtomCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
     <span class="c">#Get the &quot;top level&quot; categories</span>
     <span class="n">top_level_categories</span> <span class="o">=</span> <span class="n">categories_in_class</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_categories</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
     
@@ -335,7 +335,7 @@
     <span class="c">#Get class we are in</span>
     <span class="n">current_class</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Class</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">class_id</span><span class="p">)</span>
     <span class="c">#Get categories that are in the current_class</span>
-    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">Category</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">AtomCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
     <span class="c">#Get the &quot;top level&quot; categories</span>
     <span class="n">top_level_categories</span> <span class="o">=</span> <span class="n">categories_in_class</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_categories</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="c">#check that this works</span>
 
@@ -395,7 +395,7 @@
     <span class="c">#Get the class that we are in</span>
     <span class="n">current_class</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Class</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">class_id</span><span class="p">)</span>
     <span class="c">#Get categories that are in the current_class</span>
-    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">Category</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">categories_in_class</span> <span class="o">=</span> <span class="n">AtomCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_class</span><span class="o">=</span><span class="n">current_class</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
     <span class="c">#Get the &quot;top level&quot; categories</span>
     <span class="n">top_level_categories</span> <span class="o">=</span> <span class="n">categories_in_class</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent_categories</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
     
