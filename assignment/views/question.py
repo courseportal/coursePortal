@@ -69,3 +69,6 @@ def create(request):
 	q.save()
 	# return HttpResponse(request.REQUEST['questiondata'])
 	return detail(request, q.id, True)
+
+def form(request):
+	return render(request, 'question/form.html')

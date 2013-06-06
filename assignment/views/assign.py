@@ -83,3 +83,9 @@ def instantiate(request):
             instance.save()
     context = {'breadcrumbs':breadcrumbs,}
     return render(request, 'assignment/instantiate.html', context)
+
+def create(request):
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
+    context = {'breadcrumbs':breadcrumbs}
+    return render(request, 'assignment/addAssignment.html', context)
