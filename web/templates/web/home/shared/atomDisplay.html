@@ -1,0 +1,58 @@
+<!--
+
+To INCLUDE this file:
+
+REQUIRED context:
+
+OPTIONAL context:
+	selected_class
+	atom_list_1
+	atom_list_2
+	atom_list_3
+
+-->
+<!--
+
+	I list atom_list_# as optional because the page just won't display anything if you don't have any of the 3.  This is not a failure so you don't need to check for these variables before you include this file.
+
+-->
+
+{% if not selected_category.child_categories and selected_category.child_atoms %}
+No Atoms or subcategories exist for this category yet!
+{% endif %}
+
+<div class="row-fluid">
+    <div class="span4">
+        {% for atom in atom_list_1%}
+        {% if selected_class %}
+        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="span4">
+        {% for atom in atom_list_2%}
+        {% if selected_class %}
+        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="span4">
+        {% for atom in atom_list_3%}
+        {% if selected_class %}
+        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>

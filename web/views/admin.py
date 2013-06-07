@@ -31,18 +31,21 @@ def batch_add(request):
                 user.set_password(password)
                 user.save()
                 users_added += 1
-                send_mail('KnoAtom New Account', 'You have been registered at knoatom.eecs.umich.edu. Your information is as follows:\n\nUsername: ' + u + '\nPassword: ' + password + '\n\nPlease login and change your password as soon as you can (click on your username at the bottom of the left sidebar).\n\nThank you\n\n-- The Management', 'knoatom-webmaster@umich.edu', [u, 'knoatom-webmaster@umich.edu'])
+                send_mail(
+                    subject='KnoAtom New Account',                                                             message='You have been registered at knoatom.eecs.umich.edu. Your information is as follows:\n\nUsername: ' + u + '\nPassword: ' + password + '\n\nPlease login and change your password as soon as you can (click on your username at the bottom of the left sidebar).\n\nThank you\n\n-- The Management',
+                    from_email='knoatom-noreply@gmail.com',
+                    recipient_list=[u, 'knoatom']
+                )
             messages.success(request, str(users_added) + ' users have been added.')
         else:
             messages.warning(request, 'Could not add users. Did you have the format correct?')
     else:
         form = BatchAddUsersForm(error_class=PlainErrorList)
 
-    t = loader.get_template('admin/batch_add.html')
+    t = loader.get_template('web/admin/batch_add.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('batch_add'), 'title': 'Batch Add'}],
         'form': form,
-        'parent_categories': AtomCategory.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))
 
@@ -59,10 +62,9 @@ def list_videos(request):
             'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating'),
         })
 
-    t = loader.get_template('admin/videos.html')
+    t = loader.get_template('web/admin/videos.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('list_videos'), 'title': 'All Videos'}],
         'top_ranked_videos': top_ranked_videos,
-        'parent_categories': AtomCategory.objects.filter(parent=None),
     })
     return HttpResponse(t.render(c))

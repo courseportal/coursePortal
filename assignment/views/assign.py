@@ -14,7 +14,7 @@ def index(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
     context = {'assignment_list': assignment_list, 'user': request.user, 'breadcrumbs':breadcrumbs}
 
-    return render(request, 'base.html', context)
+    return render(request, 'assignment_nav.html', context)
 
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)

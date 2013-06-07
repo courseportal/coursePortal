@@ -1,0 +1,41 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+		selected_categories
+		selected_atom
+
+	OPTIONAL context:
+		selected_class
+		messages
+
+		content
+		vote_categories
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+
+{% extends "web/home/home.html" %}
+
+{% block content %}
+
+	<h3>Videos</h3>
+	{% include "shared/videos.html" %}
+
+{% endblock %}

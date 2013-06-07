@@ -1,0 +1,49 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		breadcrumbs
+		register_form
+
+	OPTIONAL context:
+		messages
+		selected_class
+		selected_categories
+		selected_atom
+
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+		
+
+-->
+
+{% extends "web/web_base.html" %}
+
+{% block content %}
+<h2>Register</h2>
+
+<form class="form-horizontal" action="{% url 'register' %}" method="post">
+{% csrf_token %}
+
+{% include "web/form_template.html" with form=register_form %}
+
+<div class="form-actions">
+<input class="btn btn-primary" type="submit" value="Register" />
+<input class="btn" type="reset" value="Clear" />
+</div>
+</form>
+
+{% endblock %}

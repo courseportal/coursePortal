@@ -1,0 +1,38 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+
+	OPTIONAL context:
+		top_ranked_videos
+		selected_class
+		selected_categories
+		selected_atom
+		messages
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+
+{% extends "web/web_base.html" %} <!-- Include the base template -->
+
+{% block navbar_content %}
+	<!-- This is the navbar content that is app specific -->
+	{% include "web/navbar.html" %}
+	<!-- "class_nav.html requires top_level_categories to be set" -->
+{% endblock %}

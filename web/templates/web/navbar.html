@@ -1,0 +1,16 @@
+<!-- 
+
+To INCLUDE this file:
+
+REQUIRED context:
+	top_level_categories
+
+OPTIONAL context:
+	curent_class
+
+-->
+<li class="nav-header">Categories</li>
+{% for node in top_level_categories %}
+    {% include "web/tree_view.html" %}
+{% endfor %}
+<li class="divider"></li>
