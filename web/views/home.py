@@ -7,6 +7,8 @@ from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
 
+from pybb.models import Forum
+
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
@@ -183,12 +185,8 @@ def base_category(request, cat_id):
         'atom_list_2': list_2,
         'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
-<<<<<<< HEAD
-=======
         'is_post' : False,
         'atomDisplay' : True,
-
->>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
     })
     return HttpResponse(t.render(c))
 
@@ -213,6 +211,8 @@ def base_atom(request, cat_id, atom_id):
 
     
     content = Submission.objects.filter(tags=current_atom).distinct()
+    
+    forum = Forum.objects.get(atom=current_atom)
 
 
     # un-json-fy the videos
@@ -241,6 +241,7 @@ def base_atom(request, cat_id, atom_id):
         #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
+        'forum': forum,
     })
     return HttpResponse(t.render(c))
     
@@ -285,9 +286,6 @@ def category(request, class_id, cat_id):
     expositions = get_content_for_category(current_category=current_category, is_exposition=True, content_list=[])
     lectureNotes = LectureNote.objects.filter(classBelong = current_class)
 
-<<<<<<< HEAD
-    t = loader.get_template('web/home/class/category.html')
-=======
     #get all the atoms in and under the current category
     atom_list = list()
     temp_atom_list = findChildAtom(current_category,list())
@@ -299,8 +297,7 @@ def category(request, class_id, cat_id):
     list_2 = atom_list[length:length*2]
     list_3 = atom_list[length*2:]
 
-    t = loader.get_template('home/classes.html')
->>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
+    t = loader.get_template('web/home/class/category.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
@@ -308,19 +305,11 @@ def category(request, class_id, cat_id):
         'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
-<<<<<<< HEAD
-        #'selected_category': current_category,
-=======
-        'selected_category': current_category,
         'atom_list_1': list_1,
         'atom_list_2': list_2,
         'atom_list_3': list_3,
->>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
         'vote_categories': VoteCategory.objects.all(),
         'selected_class':current_class,
-        #'categories_in_class':categories_in_class,
-        'is_post' : False,
-        'atomDisplay' : True,
     })
     return HttpResponse(t.render(c))
 
@@ -353,6 +342,7 @@ def atom(request, class_id, cat_id, atom_id):
         breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
     breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
 
+    forum = Forum.objects.get(atom=current_atom)
     
     content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
     for c in content:
@@ -386,13 +376,8 @@ def atom(request, class_id, cat_id, atom_id):
         #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
-<<<<<<< HEAD
         'selected_class':current_class,
-=======
-        'current_class':current_class,
-        'is_post': False,
-        'atomDisplay' : False,
->>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
+        'forum': forum,
     })
     return HttpResponse(t.render(c))
 

@@ -31,24 +31,15 @@ class AtomAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         cat = Category.objects.get_or_create(name="Atoms")[0]
-        if not change:
-            forum = Forum.objects.create(
-                atom=obj,
-                category=cat,
-                name=obj.name
-#                    #description=obj.description # Add when we have field
-            )
-            forum.save()
-            forum.moderators.add(request.user)
-        else:
+        if change:
             try:
                 forum = Forum.objects.get(atom=obj)
             except ObjectDoesNotExist:
                     forum = Forum.objects.create(
                         atom=obj,
                         category=cat,
-                        name=obj.name
-        #                    #description=obj.description # Add when we have field
+                        name=obj.name,
+                        description=obj.summary # Add when we have field
                     )
                     forum.save()
                     forum.moderators.add(request.user)
@@ -58,7 +49,21 @@ class AtomAdmin(admin.ModelAdmin):
             #forum.moderators.add(request.user)
             #obj.forum.description = obj.description
         obj.save()
-            
+    
+    def log_addition(self, request, obj):
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        try:
+            forum = Forum.objects.get(atom=obj)
+        except ObjectDoesNotExist:
+                forum = Forum.objects.create(
+                    atom=obj,
+                    category=cat,
+                    name=obj.name,
+                    description=obj.summary # Add when we have field
+                )
+                forum.save()
+                forum.moderators.add(request.user)
+    
                         
         
 
