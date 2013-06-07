@@ -1,0 +1,18 @@
+<!--
+
+To INCLUDE this template:
+
+	REQUIRED context:
+		None
+
+	OPTIONAL context:
+		messages
+
+-->
+<!--
+This stump provides the message view functionality.  It should be included in all of your files in the block "messsage"
+-->
+
+{% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}

@@ -1,0 +1,59 @@
+<!--
+
+To INCLUDE this file:
+
+	REQUIRED context:
+		None
+
+	OPTIONAL context:
+		atom_list_1
+		atom_list_2
+		atom_list_3
+	
+		content
+		vote_categories
+
+		expositions
+
+		lectureNotes
+
+-->
+<!--
+Although you dont *need* any context to display this page, it would look pretty stupid.  You should include the context variables if you are going to use this template.  The only reasonable reason you wouldn't have any content is that you included all of the context variables, they just happened to be empty.  They are under optional because you don't need to check that they are non-null before you use this template.
+
+Note: Currently the displays for category and atom are so similar that we can use the same template with 2 if statements.  If there start to be more differences than similarities then I will do the same sort of thing I'm doing with base and class (create a shared files that both other files extend).
+
+-->
+
+<h3>
+	<ul class = "nav nav-tabs">
+		<li class = "active"><a href="#1" data-toggle="tab">Videos</a></li>
+		<li class = ""><a href = "#2" data-toggle="tab">Expositions</a><li>
+		<li class = ""><a href = "#3" data-toggle="tab">Notes</a></li>
+		{% if not selected_atom %}
+			<li class = ""><a href = "#4" data-toggle="tab">Atoms Display</a></li>
+		{% endif %}
+	</ul>
+</h3>
+
+{% load my_filters %}
+<div class="tab-content">
+	<div class="tab-pane active" id="1">
+		{% include "web/home/shared/videos.html" %}
+	</div>
+
+	<div class="tab-pane", id="2">
+		{% include "web/home/shared/expos.html" %}
+	</div>
+
+	<div class="tab-pane", id="3">
+		{% include "web/home/shared/lectureNote.html"%}
+	</div>
+	
+	{% if not selected_atom %}
+		<div class="tab-pane", id="4">
+			{% include "web/home/shared/atomDisplay.html" %}
+		</div>
+	{% endif %}
+
+</div>

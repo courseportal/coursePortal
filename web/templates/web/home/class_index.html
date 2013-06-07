@@ -1,0 +1,42 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+
+	OPTIONAL context:
+		class_list
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+
+{% extends "web/home/home.html" %}
+
+{% block content %}
+
+{% if class_list %}
+	<ul>
+	{% for class in class_list %}
+		<li><a href="{% url "classes" class.id %}">{{ class.name }}</a></li>
+	{% endfor %}
+	<ul>
+{% else %}
+	<p>No classes are available.</p>
+{% endif %}
+
+{% endblock %}
