@@ -80,3 +80,23 @@ function save(){
   	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }
+
+function preview(){
+	question = {
+		title: '',
+		code: '',
+		solutions: [],
+		text: ''
+	};
+
+	question.title = $('#title').val();
+	question.code = code.getValue();
+	for (var i = 0; i < solutions.length; i++) {
+  		question.solutions.push(solutions[i].getValue());
+  	}
+  	question.text = tinymce.activeEditor.getContent({format : 'raw'});
+
+	$('#previewname').val($('#title').val());
+  	$('#previewdata').val(JSON.stringify(question));
+  	$('#inline').submit();
+}

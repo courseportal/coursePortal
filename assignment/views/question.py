@@ -69,3 +69,45 @@ def create(request):
 	q.save()
 	# return HttpResponse(request.REQUEST['questiondata'])
 	return detail(request, q.id, True)
+
+
+def preview(request):
+	q = Question.objects.get(request.POST['previewdata'])
+	q = json.loads(q)
+	test = ''
+	try:
+		exec q['code']
+	except Exception as ex:
+		test += str(ex)
+		return HttpResponse(test)
+
+
+	for integer_index in range(len(q['solutions'])):
+		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
+		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	exec q['solutions'][0]
+	solution = answer
+
+	#q text formatted here
+	text = q['text']
+	# shuffle(q['texts'])
+	# text = q['texts'][0]
+
+	local_dict = dict(locals())
+	text = Template(text).substitute(local_dict)
+
+	# #choices formatted here
+	choices = []
+	q['solutions'].pop(0)
+	for choice in q['solutions']:
+		exec choice
+		choices.append(answer)
+
+	context = {
+		'text': text,
+		'answer': solution,
+		'choices': choices,
+		'newly_added': newly_added,
+	}
+
+	return render(request, 'question/preview.html', context)

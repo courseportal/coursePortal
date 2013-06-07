@@ -36,6 +36,7 @@ function checkCheck(toCheck){
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
 <script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
 
 
@@ -48,24 +49,28 @@ function checkCheck(toCheck){
 <br>
 <br>
 
-<form name="input" action="{% url "eval"%}"  method = "post">
-{% csrf_token %}
-{% if choices %}
-	<strong>Choices:</strong>
-	<br>
-	<label class="radio">
-	{% for c in choices %}
-		<input type="radio" name="choice" value={{c}}>{{c}}<br>
-	{% endfor %}
-	</label>
+{% if question_selected.can_edit %}
+	<form name="input" action="{% url "eval"%}"  method = "post">
+	{% csrf_token %}
+	{% if choices %}
+		<strong>Choices:</strong>
+		<br>
+		<label class="radio">
+		{% for c in choices %}
+			<input type="radio" name="choice" value={{c}}>{{c}}<br>
+		{% endfor %}
+		</label>
+	{% else %}
+		<strong>Answer:</strong>
+		<br>
+		<input type="text" name="choice" placeholder="Type something">
+		<br>
+	{% endif %}
+	<input type="hidden" name="question" value={{question_selected.id}}>
+	<button type="submit" class="btn">Submit</button>
 {% else %}
-	<strong>Answer:</strong>
-	<br>
-	<input type="text" name="choice" placeholder="Type something">
-	<br>
+	<p>You already answered this question!></p>
 {% endif %}
-<input type="hidden" name="question" value={{question_selected.id}}>
-<button type="submit" class="btn">Submit</button>
 </form>
 </body>
 </html>
