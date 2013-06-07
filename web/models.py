@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
+from haystack import indexes
 
 STATUS_CHOICES = (
     ('A', 'Active'),
@@ -22,6 +23,7 @@ class Class(models.Model):
 
 class BaseCategory(models.Model):
     name = models.CharField(max_length=200)
+    summary = models.TextField()
     child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 
     class Meta:
@@ -33,6 +35,7 @@ class BaseCategory(models.Model):
 
 class Atom(models.Model):
     name = models.CharField(max_length=200)
+    summary = models.TextField()
     base_category = models.ForeignKey(BaseCategory, related_name = "child_atoms")
     #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     class Meta:
@@ -73,7 +76,7 @@ class Submission(models.Model):
     video = models.CharField(max_length=400, blank=True, help_text ="Please enter an 11 character YouTube VIDEO_ID   or  enter [\"VIDEO_ID\"] directly. (e.g. http://www.youtube.com/watch?v=VIDEO_ID) ")
     date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
     date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-    tags = models.ManyToManyField(Atom)
+    tags = models.ManyToManyField(Atom, related_name="tags")
 
     def __unicode__(self):
         return self.title  

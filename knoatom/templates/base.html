@@ -85,6 +85,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 							<li><a href="{% url "home" %}">Home</a></li>
 							<li><a href="{% url "class_index" %}">Class Index</a></li>
 							<li><a href="{% url "pybb:index" %}">Forums</a><li>
+							<li><a href="{% url "haystack_search" %}">Search</a></li>
 							{% if user.is_authenticated %}
 								<li><a href="{% url 'assignment' %}">Assignments</a></li>
 							{% endif %}

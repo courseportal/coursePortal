@@ -133,12 +133,12 @@ INSTALLED_APPS = (
                   'django.contrib.sites',
                   'django.contrib.messages',
                   'django.contrib.staticfiles',
-                  'south',
+                  #'south',
                   #'djangobb_forum',
                   #'registration',
                   #'pagination',
                   #'django_authopenid',
-                  #'haystack',
+                  'haystack',
                   #'django_messages',
                   'web',
                   'assignment',
@@ -207,5 +207,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
    "django.core.context_processors.static",
    "django.core.context_processors.tz",
    "django.contrib.messages.context_processors.messages",
+   "django.core.context_processors.csrf",
    'pybb.context_processors.processor',
 )
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr',
+    },
+}

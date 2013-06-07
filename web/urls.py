@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     url(r'^class/(?P<class_id>\d+)/$', 'web.views.home.classes', name='classes'),
     url(r'^class-index/$', 'web.views.home.class_index', name='class_index'),
     url(r'^category/(?P<cat_id>\d+)/$', 'web.views.home.base_category', name='base_category'),
-    url(r'^category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/$', 'web.views.home.base_atom', name="base_atom"),
+    url(r'^category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/$', 'web.views.home.base_atom', name='base_atom'),
     url(r'^$', 'web.views.home.index', name='home'),
 
     url(r'^mu-25b8a55c-a9fee579-723dcc44-9782bfc2$', 'web.views.blitz.index'),

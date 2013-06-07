@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>This is the index search page!!!!!!</h2>
+<h2>Search</h2>
+
+<form method="get" action=".">
+    <table>
+        <tbody>
+            {{ form.as_table }}
+            <tr>
+                <td>&nbsp;</td>
+                <td><input type="submit" value="Search"></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+{% if query %}
+<!-- Begin faceting. -->
+<div class="row-fluid">
+    <div class="span2">
+<h4>Class Search <h4>
+<h4>By Author</h4>
+<div>
+    <dl>
+        {% if facets.fields.ClassAuthor %}
+        <dt>Author</dt>
+        {# Provide only the top 5 authors #}
+        {% for author in facets.fields.ClassAuthor|slice:":5" %}
+        <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassAuthor_exact:{{ author.0|urlencode }}">{{ author.0 }}</a> ({{ author.1 }})</dd>
+        {% endfor %}
+        {% else %}
+        <p>No author facets.</p>
+        {% endif %}
+    </dl>
+</div>
+<h4>Class Search <h4>
+<h4>By Status</h4>
+    <div>
+        <dl>
+            {% if facets.fields.ClassStatus %}
+            <dt>Status</dt>
+            {# Provide only the top 5 authors #}
+            {% for status in facets.fields.ClassStatus|slice:":2" %}
+            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassStatus_exact:{{ author.0|urlencode }}">{{ status.0 }}</a> ({{ status.1 }})</dd>
+            {% endfor %}
+            {% else %}
+            <p>No status facets.</p>
+            {% endif %}
+        </dl>
+    </div>
+    
+    </div>
+<!-- End faceting -->
+    <div class="span10">
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab1" data-toggle="tab">Class</a></li>
+                <li><a href="#tab2" data-toggle="tab">Base Category</a></li>
+                <li><a href="#tab3" data-toggle="tab">Atom</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <p>for classes..</p>
+                    {% for result in page.object_list %}
+                        {% if result.object.author%}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No class results found.</p>
+                    {% endfor %}
+
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <p>for categories..</p>
+                    {% for result in page.object_list %}
+                        {% if not result.object.author and not result.object.base_category %}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No category results found.</p>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane" id="tab3">
+                    <p>for atoms..</p>
+                    {% for result in page.object_list %}
+                        {% if result.object.base_category and not result.object.author %}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No atom results found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endif %}
+{% endblock %}

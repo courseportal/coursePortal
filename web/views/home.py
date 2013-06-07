@@ -183,6 +183,12 @@ def base_category(request, cat_id):
         'atom_list_2': list_2,
         'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
+<<<<<<< HEAD
+=======
+        'is_post' : False,
+        'atomDisplay' : True,
+
+>>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
     })
     return HttpResponse(t.render(c))
 
@@ -279,7 +285,22 @@ def category(request, class_id, cat_id):
     expositions = get_content_for_category(current_category=current_category, is_exposition=True, content_list=[])
     lectureNotes = LectureNote.objects.filter(classBelong = current_class)
 
+<<<<<<< HEAD
     t = loader.get_template('web/home/class/category.html')
+=======
+    #get all the atoms in and under the current category
+    atom_list = list()
+    temp_atom_list = findChildAtom(current_category,list())
+    for item in temp_atom_list:
+        if atom_list.count(item)==0:
+            atom_list.append(item)
+    length = int(len(atom_list))/3+1
+    list_1 = atom_list[0:length]
+    list_2 = atom_list[length:length*2]
+    list_3 = atom_list[length*2:]
+
+    t = loader.get_template('home/classes.html')
+>>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
@@ -287,11 +308,19 @@ def category(request, class_id, cat_id):
         'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
+<<<<<<< HEAD
         #'selected_category': current_category,
+=======
+        'selected_category': current_category,
+        'atom_list_1': list_1,
+        'atom_list_2': list_2,
+        'atom_list_3': list_3,
+>>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
         'vote_categories': VoteCategory.objects.all(),
         'selected_class':current_class,
         #'categories_in_class':categories_in_class,
         'is_post' : False,
+        'atomDisplay' : True,
     })
     return HttpResponse(t.render(c))
 
@@ -344,8 +373,7 @@ def atom(request, class_id, cat_id, atom_id):
 
 
     expositions = current_atom.exposition_set.all()
-    lectureNotes = LectureNote.objects.filter(classBelong = current_class)
-
+    lectureNotes = LectureNote.objects.filter(classBelong = current_class)    
 
     t = loader.get_template('web/home/class/category.html')
     c = RequestContext(request, {
@@ -358,7 +386,13 @@ def atom(request, class_id, cat_id, atom_id):
         #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
+<<<<<<< HEAD
         'selected_class':current_class,
+=======
+        'current_class':current_class,
+        'is_post': False,
+        'atomDisplay' : False,
+>>>>>>> 9a4828578c65131d35cd4bacbe5ca2f151115aaf
     })
     return HttpResponse(t.render(c))
 

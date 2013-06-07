@@ -1,0 +1,92 @@
+{% load more_like_this %}
+
+{% with obj=result.object %}
+{% if obj.author %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_class_{{ obj.id }}">
+            <span>Class: {{ obj.name }}</span>
+            {% if obj.status ==  A  %}
+            <span style="float:right">Status: Active</span>
+            {% else %}
+            <span style="float:right">Status: Not Active</span>
+            {% endif %}
+        </a>
+    </div>
+    <div id="collapse_class_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href="{% url 'classes' obj.id %}">[Enter the class...]</a>
+            </div>
+            Summary: There is no Summary about the class yet, need to create in model first..
+        </div>
+    </div>
+</div>
+{% else %}
+    {% if obj.base_category  %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_atom_{{ obj.id }}">
+            Atom: {{ obj.name }}
+    </a>
+    </div>
+    <div id="collapse_atom_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href=" {% url 'base_atom' obj.base_category.id obj.id %}">[Enter the Atom...]</a>
+            </div>
+            Summary: {{ obj.summary }}
+            {% more_like_this obj as related_content limit 5%}
+            {% if related_content%}
+                <div>
+                    <br>
+                    <p><strong>Related:</strong></p>
+                    <ul>
+                        {% for related in related_content %}
+                            {% if related.object.base_category %}
+                            <li><a href="?q={{related.object.name}}">Atom: {{ related.object.name }}</a></li>
+                            {% else %}
+                            <li><a href="?q={{related.object.name}}">Category: {{ related.object.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+    {% else %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_category_{{ obj.id }}">
+            Category: {{ obj.name }}
+        </a>
+    </div>
+    <div id="collapse_category_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href="{% url 'base_category' obj.id %}">[Enter the Base Category...]</a>
+            </div>
+            Summary: {{ obj.summary }}
+            {% more_like_this obj as related_content limit 5%}
+            {% if related_content%}
+            <div>
+                <br>
+                <p><strong>Related:</strong></p>
+                <ul>
+                    {% for related in related_content %}
+                    {% if related.object.base_category %}
+                    <li><a href="?q={{related.object.name}}">Atom: {{ related.object.name }}</a></li>
+                    {% else %}
+                    <li><a href="?q={{related.object.name}}">Category: {{ related.object.name }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+    {% endif %}
+{% endif %}
+{% endwith %}
