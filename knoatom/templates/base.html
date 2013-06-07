@@ -1,0 +1,168 @@
+<!-- 
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		breadcrumbs
+
+	OPTIONAL context:
+		None
+
+BLOCKS:
+  extra_style
+  extra_head
+  extra_script
+  head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+<!--
+
+This is the base html file.  ALL of the style and theme stuff should go here.  Every other file should EXTEND this, but not neccessarily directly.
+
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+	
+{% block extra_style %}{% endblock %}
+	
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title|default:"KnoAtom" }}</title>
+
+{% block extra_head %}{% endblock %}
+{% block extra_script %}{% endblock %}
+
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+
+<link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/bootstrap-responsive.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/bootstrap-wysihtml5.css" rel="stylesheet">
+
+{% block head %}
+{% endblock %}
+
+</head>
+<body>
+
+<div class="container">
+
+	<div class="row-fluid">
+		<div class="span12">
+			<!-- I really need to change the way breadcrumbs work -->
+		{% block breadcrumb %}
+		<ul class="breadcrumb">
+		    <li>
+		    <a href="/">KnoAtom</a> |
+		    </li>
+		    {% for b in breadcrumbs %}
+		        <li class="{% if forloop.last %}active{% endif %}">
+		        <a href="{{ b.url }}">{{ b.title }}</a>
+		        {% if not forloop.last %}<span class="divider">/</span>{% endif %}
+		        </li>
+		    {% endfor %}
+		</ul>
+		{% endblock %}
+		</div> <!-- end .span12 -->
+	</div> <!-- end .row -->
+
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well">
+					{% block sidebar %} <!-- I don't intend on ever replacing the whole thing, but its good to have the option just incase -->
+						<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
+							<!-- Default Navigation -->
+							<li class="nav-header">Navigation</li>
+							<li><a href="{% url "home" %}">Home</a></li>
+							<li><a href="{% url "class_index" %}">Class Index</a></li>
+							<li><a href="{% url "pybb:index" %}">Forums</a><li>
+							<li><a href="{% url "haystack_search" %}">Search</a></li>
+							{% if user.is_authenticated %}
+								<li><a href="{% url 'assignment' %}">Assignments</a></li>
+							{% endif %}
+
+							<li class="divider"></li>
+
+							{% block navbar_content %}
+								<!-- There should be a divider at the end of any content that goes here! -->
+							{% endblock %}
+
+							<li class="nav-header">Meta</li>
+							{% if user.is_authenticated %}
+								<li><a href="{% url 'account' %}">{{ user }}</a></li>
+								<li><a href="{% url 'submit' %}">Submit New Content</a></li>
+								<li><a href="{% url 'logout' %}">Logout</a></li>
+							{% else %}
+								<li><a href="{% url 'login' %}">Login</a></li>
+								<li><a href="{% url 'register' %}">Register</a></li>
+							{% endif %}
+						</ul>
+					{% endblock %} <!-- end .sidebar -->
+			</div> <!-- end .well -->
+		</div> <!-- end .span3 -->
+		<div class="span9">
+			{% block message %}
+				<!-- This block is the messages that show up at the top of the screen -->
+			{% endblock %}
+			
+			<!-- Default Title -->
+			{% block page_title %}
+			{% endblock %}
+			
+			{% block content %}
+				<!-- This block is the main content of the page -->
+			{% endblock %}
+		</div> <!-- end .span9 -->
+	</div> <!-- end .row -->
+
+	<div class="row-fluid">
+		<div class="span12">
+			<div id="footer">
+				{% block footer %}
+					<p>Copyright &copy; 2012</p>
+				{% endblock %}
+			</div> <!-- end #footer -->
+		</div> <!-- end .span12 -->
+	</div> <!-- end .row -->
+</div> <!-- end .container -->
+
+
+<!-- What the fuck are these doing here? -->
+<div class="modal fade" id="global_modal" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">x</a><h3>Video Preview</h3>
+	</div>
+	<div class="modal-body">
+		<!-- empty, for now -->
+	</div>
+</div> <!-- end #global_modal -->
+
+<div class="modal fade" id="expo_modal" >
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">x</a><h3>Exposition viewer</h3>
+	</div>
+	<div class="modal-body">
+		<!-- empty, for now -->
+	</div>
+</div> <!-- end #expo_modal -->
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
+<script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}/pybb/js/jquery.formset.min.js"></script>
+<script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
+</body>
+</html>

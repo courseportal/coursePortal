@@ -11,3 +11,4 @@ Index:
 	
 	modules/web
 	modules/assignment
+	modules/templates

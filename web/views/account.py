@@ -63,7 +63,7 @@ def index(request):
             else:
                 messages.warning(request, 'We could not delete your account.')
 
-    t = loader.get_template('account/index.html')
+    t = loader.get_template('web/account/index.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('account'), 'title': 'Account'}],
         'password_form': password_form,
@@ -84,7 +84,12 @@ def forgot_password(request):
                 if user:
                     logging.debug('Changing password for %s' % user)
                     new_password = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(10))
-                    send_mail('KnoAtom Password Reset', 'You requested to reset your password at knoatom.eecs.umich.edu. Here is your new password: ' + new_password + '\n\nIf you did not request this change, contact us immediatly.\n\n-- The Management', 'knoatom-webmaster@umich.edu', [user.email, 'knoatom-webmaster@umich.edu'])
+                    send_mail(
+                        subject='KnoAtom Password Reset',
+                        message='You requested to reset your password at knoatom.eecs.umich.edu. Here is your new password: ' + new_password + '\n\nIf you did not request this change, contact us immediatly.\n\n-- The Management',
+                        from_email='knoatom-noreply@gmail.com',
+                        recipient_list=[user.email, EMAIL_HOST_USER]
+                    )
                     user.set_password(new_password)
                     user.save()
                     logging.debug('Successfully changed password for %s: %s' % (user, new_password))
@@ -93,7 +98,7 @@ def forgot_password(request):
     else:
         form = ForgotPasswordForm(error_class=PlainErrorList)
 
-    t = loader.get_template('account/forgot_password.html')
+    t = loader.get_template('web/account/forgot_password.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
@@ -124,7 +129,7 @@ def login(request):
     else:
         form = LoginForm(initial={'redirect': request.GET.get('next', None),}, error_class=PlainErrorList)
 
-    t = loader.get_template('account/login.html')
+    t = loader.get_template('web/account/login.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
@@ -155,14 +160,19 @@ def register(request):
                 user.save()
                 m = hashlib.md5()
                 m.update(user.email + str(user.date_joined).split('.')[0])
-                send_mail(subject = 'KnoAtom Registration', message = 'You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management', from_email = 'knoatom.webmaster@umich.edu', recipient_list = [user.email], fail_silently = False)
+                send_mail(
+                    subject='KnoAtom Registration', 
+                    message='You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management',
+                    from_email='knoatom-noreply@gmail.com', 
+                    recipient_list=[user.email, EMAIL_HOST_USER], 
+                    fail_silently=False)
                 messages.success(request, 'You have been registered. Please login to continue.')
                 return HttpResponseRedirect(reverse('login'))
         messages.warning(request, 'Could not register you. Try again.')
     else:
         form = RegisterForm(error_class=PlainErrorList)
 
-    t = loader.get_template('account/register.html')
+    t = loader.get_template('web/account/register.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('register'), 'title': 'Register'}],
         'register_form': form,

@@ -1,0 +1,24 @@
+<!--
+
+To INCLUDE this file:
+
+	REQUIRED context:
+		None
+
+	OPTIONAL context:
+		top_ranked_videos
+
+-->
+
+<!-- 
+This file contains things that are in both "base/home.html "and class/home.html".  Right now it doesn't serve much purpose to have those files seperate, but might prove useful in the future.
+-->
+
+<!-- Default app specific content for the content page, will get overridden by other templates -->
+
+<!-- Should spruce this up a bit -->
+{% if top_ranked_videos %}
+	{% include "web/home/shared/top_ratings.html" %}
+{% else %}
+	<p>Click on a category on the left to get started!</p>
+{% endif %}
