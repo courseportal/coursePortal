@@ -121,10 +121,10 @@ class AtomCategoryAdminForm(forms.ModelForm):
 class AtomCategoryAdmin(admin.ModelAdmin):
     form = AtomCategoryAdminForm
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if request.path != "/admin/web/category/add/":
+        if request.path != "/admin/web/atomcategory/add/":
             if db_field.name == "child_categories":
                 #retrieve the category id from request.path
-                temp0 = "/admin/web/category/"
+                temp0 = "/admin/web/atomcategory/"
                 temp1 = "/"
                 temp2 = request.path.split(temp0,1)[1]
                 category_id = int(temp2.split(temp1,1)[0])
