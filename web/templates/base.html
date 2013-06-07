@@ -13,6 +13,8 @@
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-button.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-dropdown.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-tab.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-transition.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-collapse.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
 <link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ STATIC_PREFIX }}css/bootstrap-responsive.css" rel="stylesheet">
@@ -48,6 +50,7 @@
         <li class="nav-header">Navigation</li>
         <li><a href="{% url "home" %}">Home</a></li>
         <li><a href="{% url 'class_index' %}">Class Index</a></li>
+        <li><a href="{% url 'haystack_search' %}">Search</a></li>
         {% if user.is_authenticated %}
             <li><a href="{% url 'assignment' %}">Assignments</a></li>
         {% endif %}

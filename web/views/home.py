@@ -185,6 +185,8 @@ def base_category(request, cat_id):
         'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
         'is_post' : False,
+        'atomDisplay' : True,
+
     })
     return HttpResponse(t.render(c))
 
@@ -249,7 +251,7 @@ def category(request, class_id, cat_id):
     - Use memcached to save the popular video rankings to save a lot of time
     """
     #get category we are in
-    current_category = get_object_or_404(Category, id=cat_id)
+    current_category = get_object_or_404(AtomCategory, id=cat_id)
     #Get the class that we are in
     current_class = get_object_or_404(Class, id=class_id)
     #Get categories that are in the current_class
@@ -282,6 +284,17 @@ def category(request, class_id, cat_id):
     expositions = get_content_for_category(current_category=current_category, is_exposition=True, content_list=[])
     lectureNotes = LectureNote.objects.filter(classBelong = current_class)
 
+    #get all the atoms in and under the current category
+    atom_list = list()
+    temp_atom_list = findChildAtom(current_category,list())
+    for item in temp_atom_list:
+        if atom_list.count(item)==0:
+            atom_list.append(item)
+    length = int(len(atom_list))/3+1
+    list_1 = atom_list[0:length]
+    list_2 = atom_list[length:length*2]
+    list_3 = atom_list[length*2:]
+
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
@@ -291,10 +304,14 @@ def category(request, class_id, cat_id):
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
         'selected_category': current_category,
+        'atom_list_1': list_1,
+        'atom_list_2': list_2,
+        'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
         'categories_in_class':categories_in_class,
         'is_post' : False,
+        'atomDisplay' : True,
     })
     return HttpResponse(t.render(c))
 
@@ -307,7 +324,7 @@ def atom(request, class_id, cat_id, atom_id):
     #Get atom we are in
     current_atom = get_object_or_404(Atom, id=atom_id)
     #get category we are in
-    current_category = get_object_or_404(Category, id=cat_id)
+    current_category = get_object_or_404(AtomCategory, id=cat_id)
 ##    #Get the parents of the category we are in
 ##    parents = current_category.parent_categories.all() #Check that it is correct
     
@@ -347,8 +364,7 @@ def atom(request, class_id, cat_id, atom_id):
 
 
     expositions = current_atom.exposition_set.all()
-    lectureNotes = LectureNote.objects.filter(classBelong = current_class)
-
+    lectureNotes = LectureNote.objects.filter(classBelong = current_class)    
 
     t = loader.get_template('home/classes.html')
     c = RequestContext(request, {
@@ -363,6 +379,7 @@ def atom(request, class_id, cat_id, atom_id):
         'vote_categories': VoteCategory.objects.all(),
         'current_class':current_class,
         'is_post': False,
+        'atomDisplay' : False,
     })
     return HttpResponse(t.render(c))
 

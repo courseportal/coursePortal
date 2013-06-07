@@ -5,20 +5,35 @@ No Atoms or subcategories exist for this category yet!
 <div class="row-fluid">
     <div class="span4">
         {% for atom in atom_list_1%}
-        <a href="/atom/{{ atom.id }}">{{ atom.name }}</a>
+        {% if current_class %}
+        <a href="{% url 'atom' current_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
         <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
         {% endfor %}
     </div>
     <div class="span4">
         {% for atom in atom_list_2%}
-        <a href="/atom/{{ atom.id }}">{{ atom.name }}</a>
+        {% if current_class %}
+        <a href="{% url 'atom' current_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
         <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
         {% endfor %}
     </div>
     <div class="span4">
         {% for atom in atom_list_3%}
-        <a href="/atom/{{ atom.id }}">{{ atom.name }}</a>
+        {% if current_class %}
+        <a href="{% url 'atom' current_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
         <br />
+        {% else %}
+        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
+        <br />
+        {% endif %}
         {% endfor %}
     </div>
 </div>
