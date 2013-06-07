@@ -1,8 +1,32 @@
 $(init);
 
+// (function( $, undefined ) {
+//   if ($.ui && $.ui.dialog) {
+//     $.ui.dialog.overlay.events = $.map('focus,keydown,keypress'.split(','), function(event) { return event + '.dialog-overlay'; }).join(' ');
+//   }
+// }(jQuery));
+
 function init(){
-	$("#formiframe").width ( $("#myModal").width()*0.98);
-	$("#formiframe").height (document.body.clientHeight*0.5);
+	$( '#questionsList2' ).sortable();
+	$( '#dialog' ).dialog({ 
+		width: document.body.clientWidth*0.7,
+		// maxWidth: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.68,
+		// maxHeight: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+		focus: function(event, ui){
+			$('body').addClass('dialog-open');
+		},
+		close: function(event, ui){
+			$('body').removeClass('dialog-open');
+		}
+	});
+	// $( '#dialog' ).load('assignment/question/form/')
+	load_Form();
+	$( '#opener' ).click(function() {
+  		$( '#dialog' ).dialog("open");
+	});
 }
 
 CodeMirrorSettings = {
@@ -42,26 +66,10 @@ function save(){
   	$('#questionForm').submit();
 }
 
-function loadForm(){
-	TINY.box.show({
-		iframe:'assignment/question/form/',
-		close: true,
-		boxid:'frameless',
-		width:750,
-		height:450,
-		fixed:true,
-		maskid:'blackmask',
-		maskopacity:40,
-		closejs: function(){
-			closeJS()
-		}
-	});
-}
-
 function load_Form(){
 	tinymce.init({
 	   selector: 'textarea#text',
-	   force_p_newlines : false
+	   force_p_newlines : false 
 	});
 	CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
 }
