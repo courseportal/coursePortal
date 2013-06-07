@@ -14,16 +14,16 @@ def index(request):
 	context = {'question_list': question_list}
 	return render(request, 'question/index.html', context)
 
-def detail(request, id, newly_added):
+def detail(request, id, newly_added=False):
 	question = Question.objects.get(pk=id)
 	q = json.loads(question.data)
 
 	test = ''
-	try:
-		exec q['code']
-	except Exception as ex:
-		test += str(ex)
-		return HttpResponse(test)
+	#try:
+	#	exec q['code']
+	#except Exception as ex:
+	#	test += str(ex)
+	#	return HttpResponse(test)
 
 
 	for integer_index in range(len(q['solutions'])):
@@ -33,7 +33,7 @@ def detail(request, id, newly_added):
 	solution = answer
 
 	#q text formatted here
-	text = q['text']
+	text = q['text'][0]
 	# shuffle(q['texts'])
 	# text = q['texts'][0]
 
@@ -70,9 +70,8 @@ def create(request):
 	# return HttpResponse(request.REQUEST['questiondata'])
 	return detail(request, q.id, True)
 
-
 def preview(request):
-	q = Question.objects.get(request.POST['previewdata'])
+	q = request.POST['previewdata']
 	q = json.loads(q)
 	test = ''
 	try:
@@ -107,7 +106,10 @@ def preview(request):
 		'text': text,
 		'answer': solution,
 		'choices': choices,
-		'newly_added': newly_added,
 	}
 
 	return render(request, 'question/preview.html', context)
+
+def form(request):
+	return render(request, 'question/form.html')
+

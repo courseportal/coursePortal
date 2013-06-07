@@ -62,8 +62,8 @@ def instantiate(request):
             solution = answer
 
             #q text formatted here
-            shuffle(q['texts'])
-            text = q['texts'][0]
+            #shuffle(q['texts'])
+            text = q['text'][0]
 
             local_dict = dict(locals())
             text = Template(text).substitute(local_dict)
@@ -83,3 +83,9 @@ def instantiate(request):
             instance.save()
     context = {'breadcrumbs':breadcrumbs,}
     return render(request, 'assignment/instantiate.html', context)
+
+def create(request):
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
+    context = {'breadcrumbs':breadcrumbs}
+    return render(request, 'assignment/addAssignment.html', context)

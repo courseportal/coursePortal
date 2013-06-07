@@ -36,30 +36,6 @@ function add_choice(){
 	solnIndex++;
 }
 
-function render_YUI(div, group, textheight){
-	textheight = textheight || "100px";
-	var myEditor = new YAHOO.widget.Editor(div, {
-	    height: textheight,
-	    width: $('#div').width(),
-	    dompath: false,
-	    animate: true,
-	    toolbar: {
-	        buttons: [
-	            { group: 'textstyle', label: 'Font Style',
-	                buttons: [
-	                    { type: 'push', label: 'Bold', value: 'bold' },
-	                    { type: 'push', label: 'Italic', value: 'italic' },
-	                    { type: 'push', label: 'Underline', value: 'underline' },
-	                    { type: 'separator' },
-	                ]
-	            }
-	        ]
-	    }
-	});
-	myEditor.render();
-	return myEditor;
-}
-
 function save(){
 	//empty object
 	question = {

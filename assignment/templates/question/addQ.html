@@ -16,6 +16,7 @@
 
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
+
 <script type="text/javascript" src="{{STATIC_PREFIX}}fancybox/jquery-1.4.3.min.js"></script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}fancybox/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
 <link rel="stylesheet" href="{{STATIC_PREFIX}}fancybox/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" >
@@ -28,8 +29,7 @@
 		});
 </script>
 
-<body class="yui-skin-sam">
-
+<body>
 	<div class="row-fluid">
 			Title<br/>
 			<input type="text" id="title"></input>
@@ -53,17 +53,6 @@
 			TEXT:<br/>
 			<textarea name="text" id="text"></textarea>
 		</div>
-		<!-- <div class="span5 offset1">
-			<button type="button" data-toggle="collapse" data-target="#alttextdiv">
-	  			Show alternate texts
-			</button>
-			<div id="alttextdiv" class="collapse">
-				<div id="alttextlistdiv"></div>
-				<button type="button" onclick="add_text()">
-					Add alternate text
-				</button>
-			</div>
-		</div> -->
 	</div>
 	<hr>
 	<form action="{% url "preview" %}" method="post" id="inline">
@@ -79,6 +68,7 @@
 		<input type="text" style="display:none" id="data" name="questiondata"></input>
 		<button type="button" onclick="save()">submit</button>
 	</form>
+
 </body>
 </html>
 
