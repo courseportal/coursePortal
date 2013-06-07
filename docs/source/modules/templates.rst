@@ -1,4 +1,4 @@
-.. _web_templates:
+.. _templates:
 
 =========
 Templates

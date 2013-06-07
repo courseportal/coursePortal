@@ -35,6 +35,8 @@ except ImportError:
 
 from pybb import defaults
 
+from web.models import Atom
+
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -69,7 +71,7 @@ class Category(models.Model):
     )
 
     class Meta(object):
-        ordering = ['position']
+        ordering = ['position', 'name']
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
@@ -103,6 +105,8 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    
+    atom = models.ForeignKey(Atom, related_name="forum", blank=True, null=True)
 
     class Meta(object):
         ordering = ['position', 'name']

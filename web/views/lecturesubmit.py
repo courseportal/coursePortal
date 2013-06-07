@@ -30,9 +30,9 @@ def handle_uploaded_file(f):
             destination.write(chunk)
 
 @login_required()
-def index(request, pk):
+def index(request, class_id):
     
-    class_id = get_object_or_404(Class, pk=pk)
+    selected_class = get_object_or_404(Class, pk=class_id)
     
     if request.method == 'POST':
         form = LectureNoteForm(request.POST, request.FILES)
@@ -46,12 +46,12 @@ def index(request, pk):
     #        return HttpResponseRedirect('/success/LectureNoteUpload/')
     else:
         form = LectureNoteForm()
-    t = loader.get_template('LectureNoteUpload.html')
+    t = loader.get_template('web/home/shared/LectureNoteUpload.html')
     c = RequestContext(request, {
                    'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
                    'form': form,
                    'parent_categories': AtomCategory.objects.filter(parent=None),
-                   'class_id': class_id,
+                   'selected_class': selected_class,
                    })
     return HttpResponse(t.render(c))
 
