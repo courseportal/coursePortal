@@ -106,7 +106,7 @@ class Forum(models.Model):
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
     
-    atom = models.ForeignKey(Atom, related_name="forum", blank=True, null=True)
+    atom = models.ForeignKey(Atom, related_name="forum", blank=True, null=True,unique=True)
 
     class Meta(object):
         ordering = ['position', 'name']
