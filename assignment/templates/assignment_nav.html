@@ -42,7 +42,22 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% if user.is_authenticated %}
 
+<<<<<<< HEAD
 	{% block navbar_content %}
+=======
+{% if user.is_staff %}
+        <li class="nav-header">My Class</li>
+        <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
+        <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
+        <ul class="nav nav-list">
+        {%for t in user.templates.all%}
+            <li><a href="/admin/assignment/assignment/{{t.id}}">{{t}}</a></li>
+        {%endfor%}
+        </ul>
+        <li><a href="{% url "add_question" %}">Add Question</a></li>
+        <li class="divider"></li>
+{% endif %}
+>>>>>>> 70d1d22b3fb4de75a838b62e189c06c2715d4c5e
 
 		{% if user.is_staff or user.is_superuser %}
 		        <li class="nav-header">Administrative</li>
@@ -54,7 +69,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 		{% if user.is_staff %}
 		        <li class="nav-header">My Class</li>
-		        <li><a href="/admin/assignment/assignment/add">Add Assignment</a></li>
+		        <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
 		        <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
 		        <ul class="nav nav-list">
 		        {%for t in user.templates.all%}
@@ -64,6 +79,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 		        <li><a href="{% url "add_question" %}">Add Question</a></li>
 		        <li class="divider"></li>
 		{% endif %}
+		
 
 		{% if user.is_active %}
 		        <li class "nav-header">Student Affairs</li>

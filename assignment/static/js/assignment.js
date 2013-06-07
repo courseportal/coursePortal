@@ -1,3 +1,9 @@
+$(init);
+
+function init(){
+	$("#formiframe").width ( $("#myModal").width()*0.98);
+	$("#formiframe").height (document.body.clientHeight*0.5);
+}
 
 CodeMirrorSettings = {
 	mode: 'python',
@@ -6,27 +12,6 @@ CodeMirrorSettings = {
 	indentWithTabs: true,
 	theme: 'monokai'
 };
-// render_YUI('solution', solutions);
-// render_YUI('text', texts);
-
-code = CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
-solutions = [];
-// text = render_YUI('text');
-
-tinymce.init({
-   selector: "textarea#text",
-   force_p_newlines : false
-});
-
-// function add_text(){
-// 	newdiv = '<textarea name="temp" id="temp"></textarea>';
-// 	newdiv = newdiv.replace(/temp/g, 'text'+count);
-// 	$('#alttextlistdiv').append(newdiv);
-// 	render_YUI('text'+count, texts, '60px');
-// 	count++;
-// }
-
-solnIndex = 0;
 
 function add_choice(){
 	newDiv = '<div id="temp" class="soln"></div>';
@@ -55,4 +40,42 @@ function save(){
 	$('#questionname').val($('#title').val());
   	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
+}
+
+function loadForm(){
+	TINY.box.show({
+		iframe:'assignment/question/form/',
+		close: true,
+		boxid:'frameless',
+		width:750,
+		height:450,
+		fixed:true,
+		maskid:'blackmask',
+		maskopacity:40,
+		closejs: function(){
+			closeJS()
+		}
+	});
+}
+
+function load_Form(){
+	tinymce.init({
+	   selector: 'textarea#text',
+	   force_p_newlines : false
+	});
+	CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
+}
+
+
+
+$('#myModal').on('show', function () {
+  $('body').addClass('dialog-open');
+})
+
+$('#myModal').on('hidden', function () {
+  $('body').removeClass('dialog-open');
+})
+
+function add_question(){
+	$('#myModal').modal('toggle');
 }

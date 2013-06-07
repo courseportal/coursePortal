@@ -1,47 +1,44 @@
-
-{% extends "assignment_nav.html" %}
+{% extends "base.html" %}
 {% block content %}
+<!-- TINY MCE -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
 
+<!-- CODE MIRROR -->
 <script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
 <script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
 
-
+<!-- bootstrap js -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+
+<!-- font awesome -->
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
+<!-- tinyBOX -->
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}tinybox2/style.css">
+<script type="text/javascript" src="{{STATIC_PREFIX}}tinybox2/packed.js"></script>
+
+<!-- javascript -->
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
 
 <html>
 
 <body>
-	<div class="row-fluid">
-			Title<br/>
-			<input type="text" id="title"></input>
+
+	<div id="assignmentDiv"></div>
+	<a class="btn btn-large btn-inverse" href="#" onclick="loadForm()">
+		<i class="icon-plus"></i> Add Question </a>
+
+	<button type="button" onclick="add_question()">Launch modal</button>
+	<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<iframe id="formiframe" src="/assignment/question/form"></iframe>
 	</div>
-	<div class="row-fluid">
-		<div id="solutiondiv" class="span8">
-			CODE:<br/>
-			<textarea name="solution" id="solution"></textarea>
-		</div>
-		<div class="span4">
-			SOLUTIONS:<br/>
-			<div id="solnDiv" class="solnDiv">
-			</div>
-			<a class="btn btn-large btn-inverse" href="#" onclick="add_choice()">
-  				<i class="icon-plus"></i>  Add Answer</a>
-		</div>
-	</div>
-	<hr>
-	<div class="row-fluid">
-		<div id="textdiv" class="span9">
-			TEXT:<br/>
-			<textarea name="text" id="text"></textarea>
-		</div>
-	</div>
-	<hr>
+
+	<!-- <li onclick="loadForm()">iFrame, Blue Mask, Absolute Position, Frameless, Close Callback</li> -->
+
+
 	<form action="/assignment/question/create" method="post" id="questionForm">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="questionname" name="questionname"></input>
@@ -50,6 +47,4 @@
 	</form>
 
 </body>
-
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/test.js"></script>
 {% endblock %}
