@@ -1,24 +1,26 @@
-
-{% extends "base.html" %}
-{% block content %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+<!-- TINY MCE -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
 
+<!-- CODE MIRROR -->
 <script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
 <script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
 
-
+<!-- bootstrap js -->
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/jquery.min.js"></script>
+<link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+
+<!-- font awesome --><!-- 
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css"> -->
 
+<!-- javascript -->
 
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css"
-
-
-<html>
-
-<body>
+<div style="">
 	<div class="row-fluid">
 			Title<br/>
 			<input type="text" id="title"></input>
@@ -30,10 +32,9 @@
 		</div>
 		<div class="span4">
 			SOLUTIONS:<br/>
-			<div id="solnDiv" class="solnDiv">
-			</div>
+			<div id="solnDiv" class="solnDiv"></div>
 			<a class="btn btn-large btn-inverse" href="#" onclick="add_choice()">
-  				<i class="icon-plus"></i>  Add Answer</a>
+					<i class="icon-plus"></i>  Add Answer</a>
 		</div>
 	</div>
 	<hr>
@@ -50,8 +51,7 @@
 		<input type="text" style="display:none" id="data" name="questiondata"></input>
 		<button type="button" onclick="save()">submit</button>
 	</form>
+	<p>OVERFLOWING</p>
+</div>
 
-</body>
-
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/test.js"></script>
-{% endblock %}
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/form.js"></script>
