@@ -172,7 +172,7 @@ def base_category(request, cat_id):
     list_2 = atom_list[length:length*2]
     list_3 = atom_list[length*2:]
 
-    t = loader.get_template('web/home/base/index.html')
+    t = loader.get_template('web/home/base/category.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
