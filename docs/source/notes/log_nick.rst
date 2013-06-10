@@ -9,6 +9,24 @@ Nick's Development Log
 
 This is where I will keep a log of what I'm working on, problems I'm having, or just notes in general.
 
+Week of June 10-15
+==================
+
+This week I'm working on fully integrating the forums into the website as well as improving the user upload system and then if there is time adding a vote system to the forums and user uploads.  The following todo list will probably take more than 1 week to implement
+
+Todo:
+    *   Get forum poll system working (Done!)
+    *   Integrate forum into the Atom better
+    *   Add functionality to submit new content for:
+            -   Expositions
+            -   Lecture Notes
+            -   Examples
+    *   Add a report feature for all content/posts so that malicious/disrespectful content can be removed
+    *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.
+    *   Implement a vote based ranking system for the forums and for listing content
+    *   Give users a rating based on submissions and quality of their submissions and use that rating to give "initial" rating to new content/posts
+    *   Submit a bug feature
+
 Week of June 3-7
 ================
 

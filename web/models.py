@@ -60,7 +60,7 @@ class Exposition(models.Model):
     title = models.CharField(max_length=100) # title of the article or website
     link = models.CharField(max_length=100) # A URL to the location of the exposition
     atom = models.ForeignKey(Atom)
-
+    owner = models.ForeignKey(User)
 
     class Meta:
         ordering = ['title']

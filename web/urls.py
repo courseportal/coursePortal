@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
+	
+	url(r'^expo_submit/', 'web.views.submission.exposition', name='expo_submit'),
                     
     #LectureNote
     url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.lecturesubmit.display',name='LectureNoteDisplay'),
