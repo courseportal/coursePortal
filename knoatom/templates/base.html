@@ -32,7 +32,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <!doctype html>
 <html lang="en">
 <head>
-	
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
 {% block extra_style %}{% endblock %}
 	
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -166,7 +169,6 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 </div> <!-- end #expo_modal -->
 
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>

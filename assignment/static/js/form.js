@@ -4,7 +4,8 @@ CodeMirrorSettings = {
 	tabSize: 2,
 	lineNumbers: true,
 	indentWithTabs: true,
-	theme: 'monokai'
+	theme: 'monokai',
+	autofocus: false
 };
 
 tinymce.init({
