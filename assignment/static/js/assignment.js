@@ -1,17 +1,21 @@
 $(init);
 
-// (function( $, undefined ) {
-//   if ($.ui && $.ui.dialog) {
-//     $.ui.dialog.overlay.events = $.map('focus,keydown,keypress'.split(','), function(event) { return event + '.dialog-overlay'; }).join(' ');
-//   }
-// }(jQuery));
+CodeMirrorSettings = {
+	mode: 'python',
+	tabSize: 2,
+	lineNumbers: true,
+	indentWithTabs: true,
+	theme: 'monokai'
+};
+
+solutions = []
 
 function init(){
 	$( '#questionsList2' ).sortable();
 	$( '#dialog' ).dialog({ 
-		width: document.body.clientWidth*0.7,
+		width: document.body.clientWidth*0.50,
 		// maxWidth: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.68,
+		height: document.body.clientHeight*0.8,
 		// maxHeight: document.body.clientHeight*0.7,
 		modal: true,
 		autoOpen: false,
@@ -22,27 +26,22 @@ function init(){
 			$('body').removeClass('dialog-open');
 		}
 	});
-	// $( '#dialog' ).load('assignment/question/form/')
-	load_Form();
+	tinymce.init({
+	   selector: 'textarea#text',
+	   force_p_newlines : false 
+	});
+	CodeMirror.fromTextArea($('#codetext').get(0), CodeMirrorSettings);
+	CodeMirror.fromTextArea($('#solntext').get(0), CodeMirrorSettings);
+
 	$( '#opener' ).click(function() {
   		$( '#dialog' ).dialog("open");
 	});
 }
 
-CodeMirrorSettings = {
-	mode: 'python',
-	tabSize: 2,
-	lineNumbers: true,
-	indentWithTabs: true,
-	theme: 'monokai'
-};
-
-function add_choice(){
-	newDiv = '<div id="temp" class="soln"></div>';
-	newDiv = newDiv.replace(/temp/g, 'soln'+solnIndex);
-	$('#solnDiv').append(newDiv);
-	solutions.push(CodeMirror($('#soln'+solnIndex).get(0), CodeMirrorSettings));
-	solnIndex++;
+function add_choice_div(){
+	newDiv = '<div class="answer"></div>';
+	$('#choicediv').append(newDiv);
+	solutions.push(CodeMirror($('#choicediv').get(0), CodeMirrorSettings));
 }
 
 function save(){
@@ -65,16 +64,6 @@ function save(){
   	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }
-
-function load_Form(){
-	tinymce.init({
-	   selector: 'textarea#text',
-	   force_p_newlines : false 
-	});
-	CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
-}
-
-
 
 $('#myModal').on('show', function () {
   $('body').addClass('dialog-open');

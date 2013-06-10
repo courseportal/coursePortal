@@ -42,9 +42,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% if user.is_authenticated %}
 
-<<<<<<< HEAD
 	{% block navbar_content %}
-=======
 {% if user.is_staff %}
         <li class="nav-header">My Class</li>
         <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
@@ -57,7 +55,6 @@ I have changed this file a bit, you should use this as the template you extend. 
         <li><a href="{% url "add_question" %}">Add Question</a></li>
         <li class="divider"></li>
 {% endif %}
->>>>>>> 70d1d22b3fb4de75a838b62e189c06c2715d4c5e
 
 		{% if user.is_staff or user.is_superuser %}
 		        <li class="nav-header">Administrative</li>
