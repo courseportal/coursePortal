@@ -4,9 +4,8 @@
 {% block title %}{% trans "Editing the post" %}{% endblock title %}
 
 {% block extra_script %}
-    {{ block.super }}
-    {% include "pybb/_markitup.html" %}
     <script type="text/javascript" src="{{ STATIC_URL }}/pybb/js/jquery.formset.min.js"></script>
+    {% include "pybb/_markitup.html" %}
 {% endblock %}
 
 {% block content %}
