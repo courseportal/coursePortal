@@ -1,10 +1,5 @@
 $(init);
 
-function init(){
-	$("#formiframe").width ( $("#myModal").width()*0.98);
-	$("#formiframe").height (document.body.clientHeight*0.5);
-}
-
 CodeMirrorSettings = {
 	mode: 'python',
 	tabSize: 2,
@@ -13,12 +8,40 @@ CodeMirrorSettings = {
 	theme: 'monokai'
 };
 
-function add_choice(){
-	newDiv = '<div id="temp" class="soln"></div>';
-	newDiv = newDiv.replace(/temp/g, 'soln'+solnIndex);
-	$('#solnDiv').append(newDiv);
-	solutions.push(CodeMirror($('#soln'+solnIndex).get(0), CodeMirrorSettings));
-	solnIndex++;
+solutions = []
+
+function init(){
+	$( '#questionsList2' ).sortable();
+	$( '#dialog' ).dialog({ 
+		width: document.body.clientWidth*0.50,
+		// maxWidth: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.8,
+		// maxHeight: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+		focus: function(event, ui){
+			$('body').addClass('dialog-open');
+		},
+		close: function(event, ui){
+			$('body').removeClass('dialog-open');
+		}
+	});
+	tinymce.init({
+	   selector: 'textarea#text',
+	   force_p_newlines : false 
+	});
+	CodeMirror.fromTextArea($('#codetext').get(0), CodeMirrorSettings);
+	CodeMirror.fromTextArea($('#solntext').get(0), CodeMirrorSettings);
+
+	$( '#opener' ).click(function() {
+  		$( '#dialog' ).dialog("open");
+	});
+}
+
+function add_choice_div(){
+	newDiv = '<div class="answer"></div>';
+	$('#choicediv').append(newDiv);
+	solutions.push(CodeMirror($('#choicediv').get(0), CodeMirrorSettings));
 }
 
 function save(){
@@ -41,32 +64,6 @@ function save(){
   	$('#data').val(JSON.stringify(question));
   	$('#questionForm').submit();
 }
-
-function loadForm(){
-	TINY.box.show({
-		iframe:'assignment/question/form/',
-		close: true,
-		boxid:'frameless',
-		width:750,
-		height:450,
-		fixed:true,
-		maskid:'blackmask',
-		maskopacity:40,
-		closejs: function(){
-			closeJS()
-		}
-	});
-}
-
-function load_Form(){
-	tinymce.init({
-	   selector: 'textarea#text',
-	   force_p_newlines : false
-	});
-	CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
-}
-
-
 
 $('#myModal').on('show', function () {
   $('body').addClass('dialog-open');
