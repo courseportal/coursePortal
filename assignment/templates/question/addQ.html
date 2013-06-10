@@ -13,27 +13,14 @@
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
-<!-- tinyBOX -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}tinybox2/style.css">
-<script type="text/javascript" src="{{STATIC_PREFIX}}tinybox2/packed.js"></script>
+<link rel="stylesheet" href="{{STATIC_PREFIX}}nyromodal/styles/nyroModal.css" type="text/css" media="screen" />
+<script type="text/javascript" src="{{STATIC_PREFIX}}nyromodal/js/jquery.nyroModal.custom.js"></script>
 
-<script type="text/javascript">
-	function previewForm(){
-		preview();
-		//document.forms["previewer"].submit();
-		TINY.box.show({
-			iframe:'assignment/question/preview.html',
-			close: true,
-			boxid:'frameless',
-			width:750,
-			height:450,
-			fixed:true,
-			maskid:'blackmask',
-			maskopacity:40,
-		});
-	}
+<script>
+	$(document).ready(function(){
+		$("#previewform").nm();
+	});
 </script>
-
 
 <body>
 	<div class="row-fluid">
@@ -63,11 +50,11 @@
 	<hr>
 
 
-	<form method="post" id="previewer">
+	<form method="post" action="{% url "preview" %}" id="previewform">
 	{% csrf_token %}
 		<input style="display:none" type="text" id="previewname" name="previewname"></input>
 		<input style="display:none" type="text" id="previewdata" name="previewdata"></input>
-		<button onclick="previewForm()" class="btn">Preview</button>
+		<button type="submit" onclick="preview()" class="btn">Preview</button>
 	</form>
 
 	<form action="/assignment/question/create" method="post" id="questionForm">
