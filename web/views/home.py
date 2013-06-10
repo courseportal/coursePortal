@@ -43,9 +43,9 @@ def index(request):
                 'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
             })
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
-    
-    template = loader.get_template('web/home/base/index.html')
-    context = RequestContext(request, {
+		
+	template = loader.get_template('web/home/base/index.html')
+	context = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
         'top_level_categories': top_level_base_categories,
         'top_ranked_videos': top_ranked_videos,

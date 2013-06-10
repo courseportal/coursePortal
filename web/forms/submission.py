@@ -34,3 +34,16 @@ class SubmissionForm(forms.Form):
 
 class LectureNoteForm(forms.Form):
     file = forms.FileField(label='Select a file',help_text='max. 42 megabytes')
+    
+
+class ExpoForm(forms.Form):
+    r"""    
+    This is the form for the exposition submit page.
+    
+    """
+    title = forms.CharField(max_length=100, required=True)
+    link = forms.CharField(max_length=256, required=True)
+    
+    atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission')
+    
+

@@ -5,10 +5,10 @@ from django.db.models import Q
 from django.forms.util import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import json
-from web.forms.submission import SubmissionForm
-from web.models import AtomCategory, Submission, Class, BaseCategory
+from web.forms.submission import SubmissionForm, ExpoForm
+from web.models import AtomCategory, Submission, Class, BaseCategory, Exposition
 
 class PlainErrorList(ErrorList):
     """
@@ -47,7 +47,7 @@ def index(request, sid):
                 sub.tags = form.cleaned_data['tags']
                 sub.save()
                 messages.success(request, 'Successfully saved.')
-                return HttpResponseRedirect(reverse('submit', args=[sid]))
+                return HttpResponseRedirect(reverse('post', args=[s.id])) 
             messages.warning(request, 'Error saving. Fields might be invalid.')
         else:
             if form.is_valid():
@@ -81,11 +81,38 @@ def index(request, sid):
 
     t = loader.get_template('web/home/submit.html')
     c = RequestContext(request, {
-        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
         'top_level_categories': top_level_categories,
         'form': form,
         #'child_categories': child_categories,
         #'parent_categories': L,
     })
     return HttpResponse(t.render(c))
+    
+@login_required()
+def exposition(request):
+	
+	# Get "top level" categories
+	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 
+	if request.method == 'POST': # If the form has been submitted...
+		form = ExpoForm(request.POST) # A form bound to the POST data
+		if form.is_valid():	# All validation rules pass
+		
+			# Creating the exposition from the data
+			expo = Exposition(owner=request.user)
+			expo.title = form.cleaned_data['title']
+			expo.link = form.cleaned_data['link']
+			expo.atom = form.cleaned_data['atom']
+			expo.save()
+			
+			return HttpResponseRedirect(reverse('home')) #should change this
+		messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = ExpoForm() # Create an unbound form
+	
+	return render(request, 'web/home/expo_submit.html', {
+		'form': form,
+		'top_level_categories': top_level_categories,
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+	})

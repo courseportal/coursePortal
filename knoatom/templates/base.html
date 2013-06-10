@@ -39,7 +39,6 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <title>{{ title|default:"KnoAtom" }}</title>
 
 {% block extra_head %}{% endblock %}
-{% block extra_script %}{% endblock %}
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
@@ -99,7 +98,18 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 							<li class="nav-header">Meta</li>
 							{% if user.is_authenticated %}
 								<li><a href="{% url 'account' %}">{{ user }}</a></li>
-								<li><a href="{% url 'submit' %}">Submit New Content</a></li>
+								<li class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    Submit New Content
+                    <b class="caret"></b>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <a href="{% url 'submit' %}">Video</a>
+                    <a href="{% url 'expo_submit' %}">Exposition</a>
+                    <a href="#">Lecture Notes</a>
+                    <a href="#">Example</a>
+                  </ul>
+                </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>
 							{% else %}
 								<li><a href="{% url 'login' %}">Login</a></li>
@@ -162,7 +172,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
 <script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
-<script src="{{ STATIC_URL }}/pybb/js/jquery.formset.min.js"></script>
 <script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
+{% block extra_script %}{% endblock %}
 </body>
 </html>
