@@ -62,8 +62,8 @@ def instantiate(request):
             solution = answer
 
             #q text formatted here
-            shuffle(q['texts'])
-            text = q['texts'][0]
+            #shuffle(q['texts'])
+            text = q['text'][0]
 
             local_dict = dict(locals())
             text = Template(text).substitute(local_dict)
