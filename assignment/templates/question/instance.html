@@ -1,28 +1,7 @@
-{% extends "base.html" %}
+{% extends "assignment_nav.html" %}
 {% block content%}
-<script>
-function validate(){
-	x= document.forms["input"]["choice"];
-	if(checkCheck(x) == false){
-		alert("You need to provide an answer!");
-		return false;
-	}
-	return true;
-}
 
-function checkCheck(toCheck){
-	if(toCheck.type == "checkbox" || toCheck.type == "radio"){
-		if(toCheck.length){
-			for(i=0; i<toCheck.length; i++){
-				if(toCheck [i].checked) return true;
-			}
-			return false;
-		}
-		else return toCheck.checked;
-	}
-	else return toCheck.value!=null && toCheck.value!='';
-}
-</script>
+
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
@@ -34,8 +13,12 @@ function checkCheck(toCheck){
     },
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
-</script>
 
+	function reroute(){
+		document.inputForm.action='{% url "save" %}';
+		return true;
+	}
+</script>
 <script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
 
 <div class="row">
@@ -46,31 +29,29 @@ function checkCheck(toCheck){
 {{text | safe}}
 <br>
 <br>
-
-{% if question_selected.can_edit %}
-	<form name="input" action="{% url "eval"%}"  method = "post">
-	{% csrf_token %}
-	{% if choices %}
-		<strong>Choices:</strong>
+<form name="inputForm" action="{% url "eval"%}"  method = "post">
+{% csrf_token %}
+{% if choices %}
+	<strong>Choices:</strong>
+	<br>
+	<label class="radio">
+	{% for c in choices %}
+		<input type="radio" name="{{q.id}}choice" value={{c}} {% ifequal q.student_answer c.solution %}checked{%endifequal%} {%ifequal q.can_edit 0%}disabled{%endifequal%}>{{c}}
 		<br>
-		<label class="radio">
-		{% for c in choices %}
-			<input type="radio" name="choice" value={{c}}>{{c}}<br>
-		{% endfor %}
-		</label>
-	{% else %}
-		<strong>Answer:</strong>
-		<br>
-		<input type="text" name="choice" placeholder="Type something">
-		<br>
-	{% endif %}
-	<input type="hidden" name="question" value={{question_selected.id}}>
-	<button type="submit" class="btn">Submit</button>
+	{% endfor %}
+	</label>
 {% else %}
-	<p>You already answered this question!></p>
+	<strong>Answer:</strong>
+	<br>
+	<input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
+	<br>
 {% endif %}
+<input type="hidden" name="assignment" value={{assignment_selected.id}}></input>
+<button type="submit" onclick="return reroute();" class="btn" {%ifequal q.can_edit 0%}disabled{%endifequal%}>Save</button>
+<button type="submit" class="btn" {%ifequal q.can_edit 0%}disabled{%endifequal%}>Submit</button>
 </form>
 </body>
 </html>
 {% endblock %}
+
 

@@ -7,19 +7,18 @@ from math import *
 from random import shuffle
 
 
-def detail(request,pk, id):
-    #search for an already generated instance
+def detail(request, pk, id):
     assignmentInstance = request.user.assignmentInstances.get(pk=pk)
     question = assignmentInstance.questions.get(pk=id)
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
     breadcrumbs.append({'url': reverse('assignment_detail', args=[assignmentInstance.id]), 'title': assignmentInstance})
     breadcrumbs.append({'url': reverse('question_instance', args=[assignmentInstance.id, question.id]), 'title': question})
     context = {
-    	'assignment_list': request.user.assignmentInstances.all(),
+        'user': request.user,
     	'question_selected': question,
+        'q':question,
     	'assignment_selected': assignmentInstance,
         'text': question.text,
-        'answer': question.solution,
         'choices': question.choiceInstances.all(),
         'breadcrumbs': breadcrumbs,
     }

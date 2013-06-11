@@ -36,6 +36,7 @@ class QuestionInstance(models.Model):
     text = models.TextField()
     value = models.FloatField(default = 1.0)
     can_edit = models.BooleanField(default=True)
+    student_answer = models.TextField(default = "")
     assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.title
