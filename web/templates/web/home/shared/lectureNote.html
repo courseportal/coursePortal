@@ -11,10 +11,10 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-{% if not lectureNotes %}
+{% if not notes %}
 	No lecture notes exist for this category yet!
 {% endif %}
-{% for e in lectureNotes %}
-	<a href="/media/{{ e.file }}">{{ e.filename }}</a>
+{% for e in notes %}
+	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>
 	<br />
 {% endfor %}

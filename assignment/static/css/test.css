@@ -1,4 +1,15 @@
 
+.question-description{
+	padding:6px 0px 0px 0px
+}
+
+.question-remove{
+	padding:4px 0px 0px 0px
+}
+
+.question-pts{
+	padding:0px 20px 0px 0px
+}
 
 body.dialog-open { overflow: hidden; }
 
@@ -11,7 +22,7 @@ body.dialog-open { overflow: hidden; }
 	padding: 0px 0px 10px 0px;
 }
 
-.solnDiv .CodeMirror {
+.answer .CodeMirror {
   /* Set height, width, borders, and global font properties here */
-  height: 40px;
+  height: 25px;
 }

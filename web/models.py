@@ -2,6 +2,9 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from knoatom.settings import MEDIA_ROOT
 
 STATUS_CHOICES = (
     ('A', 'Active'),
@@ -60,7 +63,7 @@ class Exposition(models.Model):
     title = models.CharField(max_length=100) # title of the article or website
     link = models.CharField(max_length=100) # A URL to the location of the exposition
     atom = models.ForeignKey(Atom)
-
+    owner = models.ForeignKey(User)
 
     class Meta:
         ordering = ['title']
@@ -103,16 +106,40 @@ class Vote(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-    file = models.FileField(upload_to = 'file')
-    owner = models.ForeignKey(User)
-    classBelong = models.ForeignKey(Class, related_name = 'classBelong')
-    filename = models.CharField(max_length=200)
-#content = models.TextField()
-#date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
-#date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-
-    def __unicode__(self):
-        return self.filename
+	file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
+	owner = models.ForeignKey(User)
+	filename = models.CharField(max_length=200)
+	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
+	date_created = models.DateTimeField(auto_now=True)
+	
+	def __unicode__(self):
+		return self.filename
+		
+class Example(models.Model):
+	file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
+	owner = models.ForeignKey(User)
+	filename = models.CharField(max_length=200)
+	atom = models.ForeignKey(Atom, related_name = "example_set")
+	date_created = models.DateTimeField(auto_now=True)
+	
+	def __unicode__(self):
+		return self.filename
+		
+@receiver(pre_delete, sender=LectureNote)
+def delete_note_file(sender, **kwargs):
+	r"""
+	This adds the functionality to remove the file upon deletion.
+	"""
+	
+	kwargs['instance'].file.delete()
+	
+@receiver(pre_delete, sender=Example)
+def delete_example_file(sender, **kwargs):
+	r"""
+	This adds the functionality to remove the file upon deletion.
+	"""
+	
+	kwargs['instance'].file.delete()
 
 #bugReport
 class BugReport(models.Model):

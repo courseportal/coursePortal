@@ -23,13 +23,38 @@ def grades(request):
     return render(request, 'assignment/grades.html', context)
 
 def eval(request):
-    question = QuestionInstance.objects.get(pk=request.POST['question'])
-    assignment = question.assignmentInstance
-    answer = request.POST['choice']
-    if answer==question.solution:
-        assignment.score += question.value
+    assignment = AssignmentInstance.objects.get(pk=request.POST['assignment'])
+    
+    for question in assignment.questions.all():
+        try:
+            answer = request.POST[str(question.id)+'choice']
+            if answer==question.solution:
+                assignment.score += question.value
+                assignment.save()
+            question.can_edit=False
+            question.student_answer=answer;
+            question.save()
+        except:
+            continue
+        
+    if assdone(assignment):
+        assignment.can_edit=False
         assignment.save()
-    question.can_edit=False
-    question.save()
     return index(request)
 
+def save(request):
+    assignment = AssignmentInstance.objects.get(pk=request.POST['assignment'])    
+    for question in assignment.questions.all():
+        try:
+            answer = request.POST[str(question.id)+'choice']
+            question.student_answer=answer;
+            question.save()
+        except:
+            continue
+    return index(request)
+
+def assdone(assignment):
+    for q in assignment.questions.all():
+        if q.can_edit:
+            return False
+    return True

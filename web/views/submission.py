@@ -5,10 +5,10 @@ from django.db.models import Q
 from django.forms.util import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import json
-from web.forms.submission import SubmissionForm
-from web.models import AtomCategory, Submission, Class, BaseCategory
+from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm
+from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
 class PlainErrorList(ErrorList):
     """
@@ -88,3 +88,91 @@ def index(request, sid):
                        #'parent_categories': L,
                        })
     return HttpResponse(t.render(c))
+
+	
+@login_required()
+def note_submit(request):
+	r"""
+	This is the view for the lecture note submit feature.
+	"""
+	
+	# Get "top level" categories
+	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+
+	if request.method == 'POST': # If the form has been submitted...
+		form = LectureNoteForm(request.POST, request.FILES)
+		if form.is_valid():	# All validation rules pass
+			note = LectureNote(owner=request.user)
+			note.file = request.FILES['file']
+			note.atom = form.cleaned_data['atom']
+			note.filename = form.cleaned_data['filename']
+			note.save()
+			
+			return HttpResponseRedirect(reverse('home')) #should change this
+		messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = LectureNoteForm() # Create an unbound form
+
+	return render(request, 'web/home/note_submit.html', {
+		'form': form,
+		'top_level_categories': top_level_categories,
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+	})
+	
+@login_required()
+def example_submit(request):
+	r"""
+	This is the view for the example submit feature.
+	"""
+	
+	# Get "top level" categories
+	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+
+	if request.method == 'POST': # If the form has been submitted...
+		form = ExampleForm(request.POST, request.FILES)
+		if form.is_valid():	# All validation rules pass
+			example = Example(owner=request.user)
+			example.file = request.FILES['file']
+			example.atom = form.cleaned_data['atom']
+			example.filename = form.cleaned_data['filename']
+			example.save()
+			
+			return HttpResponseRedirect(reverse('home')) #should change this
+		messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = ExampleForm() # Create an unbound form
+
+	return render(request, 'web/home/example_submit.html', {
+		'form': form,
+		'top_level_categories': top_level_categories,
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+	})
+    
+@login_required()
+def exposition(request):
+	
+	# Get "top level" categories
+	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+
+	if request.method == 'POST': # If the form has been submitted...
+		form = ExpoForm(request.POST) # A form bound to the POST data
+		if form.is_valid():	# All validation rules pass
+		
+			# Creating the exposition from the data
+			expo = Exposition(owner=request.user)
+			expo.title = form.cleaned_data['title']
+			expo.link = form.cleaned_data['link']
+			expo.atom = form.cleaned_data['atom']
+			expo.save()
+			
+			return HttpResponseRedirect(reverse('home')) #should change this
+		messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = ExpoForm() # Create an unbound form
+	
+	return render(request, 'web/home/expo_submit.html', {
+		'form': form,
+		'top_level_categories': top_level_categories,
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+	})
+
