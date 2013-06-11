@@ -107,10 +107,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                     <b class="caret"></b>
                   </a>
                   <ul class="dropdown-menu">
-                    <a href="{% url 'submit' %}">Video</a>
-                    <a href="{% url 'expo_submit' %}">Exposition</a>
-                    <a href="#">Lecture Notes</a>
-                    <a href="#">Example</a>
+                    <a href="{% url "submit" %}">Video</a>
+                    <a href="{% url "expo_submit" %}">Exposition</a>
+                    <a href="{% url "note_submit" %}">Lecture Notes</a>
+                    <a href="{% url "example_submit" %}">Example</a>
                   </ul>
                 </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>

@@ -1,6 +1,7 @@
 *.pyc
 *.sw
 */migrations/*
+*/media/*
 update.bat
 .DS_Store
 *~
