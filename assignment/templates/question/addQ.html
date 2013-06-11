@@ -1,8 +1,6 @@
 
 {% extends "assignment_nav.html" %}
 {% block content %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
 
 <script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
@@ -15,16 +13,17 @@
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
-<script type="text/javascript" src="{{STATIC_PREFIX}}fancybox/jquery-1.4.3.min.js"></script>
-<script type="text/javascript" src="{{STATIC_PREFIX}}fancybox/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
-<link rel="stylesheet" href="{{STATIC_PREFIX}}fancybox/fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" >
-<script type="text/javascript">
-		$(document).ready(function() {
-			$("#inline").fancybox({
-				'autoScale'			: true,
-				'titlePosition'	: 'over',
-			});
-		});
+<!-- nyromodal -->
+<link rel="stylesheet" href="{{STATIC_PREFIX}}nyromodal/styles/nyroModal.css" type="text/css" media="screen" />
+<script type="text/javascript" src="{{STATIC_PREFIX}}nyromodal/js/jquery.nyroModal.custom.js"></script>
+
+<!-- JQUERY UI -->
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+
+<script>
+	$(document).ready(function(){
+		$("#previewform").nm();
+	});
 </script>
 
 <body>
@@ -42,7 +41,7 @@
 			<div id="solnDiv" class="solnDiv">
 			</div>
 			<a class="btn btn-large btn-inverse" href="#" onclick="add_choice()">
-  				<i class="icon-plus"></i>  Add Answer</a>
+			<i class="icon-plus"></i>  Add Answer</a>
 		</div>
 	</div>
 	<hr>
@@ -53,11 +52,13 @@
 		</div>
 	</div>
 	<hr>
-	<form action="{% url "preview" %}" method="post" id="inline">
+
+
+	<form method="post" action="{% url "preview" %}" id="previewform">
 	{% csrf_token %}
-		<input type="text" style="display:none" id="previewname" name="previewname"></input>
-		<input type="text" style="display:none" id="previewdata" name="previewdata"></input>
-		<button type="button" onclick="preview()">preview</button>
+		<input style="display:none" type="text" id="previewname" name="previewname"></input>
+		<input style="display:none" type="text" id="previewdata" name="previewdata"></input>
+		<button type="submit" onclick="preview()" class="btn">Preview</button>
 	</form>
 
 	<form action="/assignment/question/create" method="post" id="questionForm">
@@ -72,4 +73,7 @@
 
 
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/test.js"></script>
+
+
+
 {% endblock %}

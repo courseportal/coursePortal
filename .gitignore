@@ -7,3 +7,4 @@ update.bat
 *~
 docs/html/*
 docs/doctrees/*
+*/codemirror/*

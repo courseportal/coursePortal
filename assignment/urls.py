@@ -8,9 +8,10 @@ urlpatterns = patterns('',
     url(r'question/form/?$', 'assignment.views.question.form', name='question'),
     url(r'question/?$', 'assignment.views.question.index', name='question'),
     
-    url(r'students/?$', 'assignment.views.staff.viewStudent', name='view_student'),   
+    url(r'students/?$', 'assignment.views.staff.viewStudent', name='view_student'),
 
     url(r'eval/?$', 'assignment.views.student.eval', name='eval'),
+    url(r'save/?$', 'assignment.views.student.save', name='save'),
     url(r'grades/?$', 'assignment.views.student.grades', name='grades'),
 
     url(r'preview/?$', 'assignment.views.question.preview', name='preview'),

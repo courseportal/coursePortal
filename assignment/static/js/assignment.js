@@ -8,14 +8,23 @@ CodeMirrorSettings = {
 	theme: 'monokai'
 };
 
-solutions = []
+code = {};
+solution = {};
+choices = [];
+text = {};
 
 function init(){
-	$( '#questionsList2' ).sortable();
+	$( '#questionsList' ).sortable({
+		update: function(event, ui) {
+	      $('#questionsList>.row-fluid').each(function(index){
+	         $(this).find('.question-edit').attr('onclick', 'load_question('+index+')');
+	      });
+	   },
+	});
 	$( '#dialog' ).dialog({ 
 		width: document.body.clientWidth*0.50,
 		// maxWidth: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.8,
+		height: document.body.clientHeight*0.7,
 		// maxHeight: document.body.clientHeight*0.7,
 		modal: true,
 		autoOpen: false,
@@ -24,14 +33,16 @@ function init(){
 		},
 		close: function(event, ui){
 			$('body').removeClass('dialog-open');
-		}
+		},
+		beforeClose: function( event, ui ) {
+		},
 	});
 	tinymce.init({
 	   selector: 'textarea#text',
 	   force_p_newlines : false 
 	});
-	CodeMirror.fromTextArea($('#codetext').get(0), CodeMirrorSettings);
-	CodeMirror.fromTextArea($('#solntext').get(0), CodeMirrorSettings);
+	code = CodeMirror.fromTextArea($('#codetext').get(0), CodeMirrorSettings);
+	solution = CodeMirror.fromTextArea($('#solntext').get(0), CodeMirrorSettings);
 
 	$( '#opener' ).click(function() {
   		$( '#dialog' ).dialog("open");
@@ -39,10 +50,23 @@ function init(){
 }
 
 function add_choice_div(){
-	newDiv = '<div class="answer"></div>';
-	$('#choicediv').append(newDiv);
-	solutions.push(CodeMirror($('#choicediv').get(0), CodeMirrorSettings));
+	$('#choicediv').append('<div class="answer"></div>');
+	choices.push(CodeMirror($('.answer:last').get(0), CodeMirrorSettings));
 }
+
+function load_question(num){ 
+	//wipe out existing data
+	code.setValue('');
+	solution.setValue('');
+}
+
+function save_question(num){
+
+	if(num < 0){ //this is a new question
+
+	}
+}
+
 
 function save(){
 	//empty object

@@ -11,6 +11,10 @@
     },
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
+  function reroute(){
+		document.inputForm.action='{% url "save" %}';
+		return true;
+	}
 </script>
 
 <script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
@@ -19,33 +23,35 @@
 </div>
 
 {% if question_list %}
+<form name="inputForm" action="{% url "eval"%}"  method = "post">
+	{% csrf_token %}
     <ul>
-    {% for question in question_list %}
+    {% for q in question_list %}
     <div class="row">
     <h4><div class="span6">{{question.title}}</div></h4>
-	</div>
-    <body>
-		{{question.text | safe}}
+	 </div>
+		{{q.text | safe}}
 		<br>
 		<br>
-		<form action=" ">
-			{% if question.choiceInstances.all %}
-				<strong>Choices:</strong>
-				<br>
-				{% for c in question.choiceInstances.all %}
-					<input type="radio" name="choice" value={{c}}>{{c}}<br>
-				{% endfor %}
-			{% else %}
-				<strong>Answer:</strong>
-				<br>
-				<input type="text">
-			{% endif %}
-		</form>
-		</body>
+		{% if q.choiceInstances.all %}
+			<strong>Choices:</strong>
+			<br>
+			{% for c in q.choiceInstances.all %}
+				<input type="radio" name="{{q.id}}choice" value={{c}} {% ifequal q.student_answer c.solution %}checked{%endifequal%} {%ifequal q.can_edit 0%}disabled{%endifequal%}>{{c}}
+			{% endfor %}
+		{% else %}
+			<strong>Answer:</strong>
+			<br>
+			<input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
+		{% endif %}
 		<br>
 		<br>
     {% endfor %}
     </ul>
+    <input type="hidden" name="assignment" value={{assignment_selected.id}} >
+    <button type="submit" onclick="return reroute()" class="btn" {%ifequal assignment_selected.can_edit 0%}disabled{%endifequal%}>Save</button>
+    <button type="submit" class="btn" {%ifequal assignment_selected.can_edit 0%}disabled{%endifequal%}>Submit</button>
+</form>
 {% else %}
     <p>No questions in this assignment.</p>
 {% endif %}
