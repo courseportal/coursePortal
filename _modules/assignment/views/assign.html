@@ -63,7 +63,7 @@
     <span class="n">breadcrumbs</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;assignment&#39;</span><span class="p">),</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Assignments&#39;</span><span class="p">}]</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;assignment_list&#39;</span><span class="p">:</span> <span class="n">assignment_list</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s">&#39;breadcrumbs&#39;</span><span class="p">:</span><span class="n">breadcrumbs</span><span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;base.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;assignment_nav.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
     <span class="n">assignment</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">assignmentInstances</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
@@ -111,8 +111,8 @@
             <span class="n">solution</span> <span class="o">=</span> <span class="n">answer</span>
 
             <span class="c">#q text formatted here</span>
-            <span class="n">shuffle</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s">&#39;texts&#39;</span><span class="p">])</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s">&#39;texts&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c">#shuffle(q[&#39;texts&#39;])</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s">&#39;text&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="n">local_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">local_dict</span><span class="p">)</span>
@@ -132,6 +132,12 @@
             <span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;breadcrumbs&#39;</span><span class="p">:</span><span class="n">breadcrumbs</span><span class="p">,}</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;assignment/instantiate.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">breadcrumbs</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;assignment&#39;</span><span class="p">),</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Assignment&#39;</span><span class="p">}]</span>
+    <span class="n">breadcrumbs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;url&#39;</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;add_question&#39;</span><span class="p">),</span> <span class="s">&#39;title&#39;</span><span class="p">:</span><span class="s">&#39;Add Question&#39;</span><span class="p">})</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;breadcrumbs&#39;</span><span class="p">:</span><span class="n">breadcrumbs</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;assignment/addAssignment.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 </pre></div>
 
           </div>

@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Templates &mdash; knoatom 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="knoatom 0.5 documentation" href="../index.html" />
+    <link rel="up" title="knoatom Source Code Documentation Index" href="../code_index.html" />
+    <link rel="next" title="Notes and Development Logs" href="../notes.html" />
+    <link rel="prev" title="assignment Documentation" href="assignment.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../notes.html" title="Notes and Development Logs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="assignment.html" title="assignment Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">knoatom 0.5 documentation</a> &raquo;</li>
+          <li><a href="../code_index.html" accesskey="U">knoatom Source Code Documentation Index</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="templates">
+<span id="id1"></span><h1>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h1>
+<p>The template system for knoatom uses bootstrap 2.0.  We have one base template that should be extended by every other template at some degree.  The top of all the templates in web tell you what context variables are required to be set for correct rendering, and which ones are optional.  It also tells you what blocks you can override from <tt class="docutils literal"><span class="pre">base.html</span></tt> or another template that it extends.</p>
+<div class="section" id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h2>
+<p>The idea behind the structure of the templates is to seperate as much content as possible from <tt class="docutils literal"><span class="pre">base.html</span></tt> and make any content that is in it overridable.  <tt class="docutils literal"><span class="pre">base.html</span></tt> should only be used for the style and theme of the website and every other template should extend it to get that theme.  The structure for web (as of 6/7/2013) is as follows:</p>
+<div class="highlight-python"><pre>base.html
+  EXTENDED BY:
+    web_base.html
+      INCLUDES:
+        navbar.html
+          INCLUDES:
+            tree_view.html
+        message.html
+      EXTENDED BY:
+    account/forgot_password.html
+      Includes:
+        form_template.html
+    account/index.html
+      Includes:
+        form_template.html
+    account/login.html
+      Includes:
+        form_template.html
+    account/register.html
+      Includes:
+        form_template.html
+    admin/batch_add.html
+      Includes:
+        form_template.html
+    admin/videos.html
+            home/home.html
+      EXTENDED BY:
+        home/post.html
+        home/submit.html
+          Includes:
+            form_template.html
+
+        home/base/atom.html
+          INCLUDES:
+            home/shared/atom.html
+              INCLUDES:
+                home/shared/content.html
+                  INCLUDES:
+                    home/shared/videos.html
+                    home/shared/expos.html
+                    home/shared/lectureNote.html
+                    home/shared/atomDisplay.html
+        home/class/atom.html
+        INCLUDES:
+          home/shared/atom.html
+            INCLUDES:
+              home/shared/content.html
+                INCLUDES:
+                  home/shared/videos.html
+                  home/shared/expos.html
+                  home/shared/lectureNote.html
+                  home/shared/atomDisplay.html
+
+
+        home/base/category.html
+          INCLUDES:
+            home/shared/category.html
+              INCLUDES:
+                home/shared/content.html
+                  INCLUDES:
+                    home/shared/videos.html
+                    home/shared/expos.html
+                    home/shared/lectureNote.html
+                    home/shared/atomDisplay.html
+
+        home/class/category.html
+        INCLUDES:
+          home/shared/category.html
+            INCLUDES:
+              home/shared/content.html
+                INCLUDES:
+                  home/shared/videos.html
+                  home/shared/expos.html
+                  home/shared/lectureNote.html
+                  home/shared/atomDisplay.html
+
+
+        home/base/index.html
+          INCLUDES:
+            home/shared/index.html
+              INCLUDES:
+                top_ratings.html
+        home/class/index.html
+        INCLUDES:
+          home/shared/index.html
+              INCLUDES:
+                top_ratings.html</pre>
+</div>
+<p>It might be a little hard to read because of how many files there are, but there are a lot of patterns and repeated files.</p>
+</div>
+<div class="section" id="template-writing-guide">
+<h2>Template Writing Guide<a class="headerlink" href="#template-writing-guide" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>There should be <strong>NO</strong> special content in <tt class="docutils literal"><span class="pre">base.html</span></tt>.  The only possible content that should go there is extremely default content or content that is <strong>site wide</strong>.  Any content that goes in <tt class="docutils literal"><span class="pre">base.html</span></tt> should <strong>always</strong> be overridable by putting it in blocks.</li>
+<li><tt class="docutils literal"><span class="pre">base.html</span></tt> should contain all the style of the site and is where the majority of the html code should go.  The style of the site should be as uniform as possible, and this is why it goes in <tt class="docutils literal"><span class="pre">base.html</span></tt></li>
+<li>Follow django&#8217;s main principle, don&#8217;t repeat yourself.  Django&#8217;s template system is really well designed, so take advantage of it.  Never write code twice, that makes it twice as hard to change when you need to change it.  Whenever two places need the same code abstract it by including or extending it.</li>
+<li>Each section should contain its own &#8220;base&#8221; template which everything in its app extends.  For instance in <tt class="docutils literal"><span class="pre">web</span></tt>, everything extends <tt class="docutils literal"><span class="pre">web_home.html</span></tt> which implements the messaging system, and everything that needs a category list extends <tt class="docutils literal"><span class="pre">home.html</span></tt> which implements the category list for everything else.  An example of a place where you should use include is for the class and base atom templates.  These templates are the same right now, but since they might change in the future I created seperate templates and put all of the shared code in an included file that both of them include.</li>
+<li>Try your best to follow the style that is already implemented because consistent code is much easier to read.</li>
+<li>Document your changes as much as possible so others can understand your code</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Templates</a><ul>
+<li><a class="reference internal" href="#structure">Structure</a></li>
+<li><a class="reference internal" href="#template-writing-guide">Template Writing Guide</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="assignment.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">assignment</span></tt> Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../notes.html"
+                        title="next chapter">Notes and Development Logs</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/templates.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../notes.html" title="Notes and Development Logs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="assignment.html" title="assignment Documentation"
+             >previous</a> |</li>
+        <li><a href="../index.html">knoatom 0.5 documentation</a> &raquo;</li>
+          <li><a href="../code_index.html" >knoatom Source Code Documentation Index</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nick Terrell, Taoran Yan, Jacob Texel, Ian Lai.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

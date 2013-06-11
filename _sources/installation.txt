@@ -144,6 +144,8 @@ Install Django and Required Apps
 		(<venv_name>)$ pip install pil
 		(<venv_name>)$ pip install django-pure-pagination
 		(<venv_name>)$ pip install sphinx
+		(<venv_name>)$ pip install pysolr
+		(<venv_name>)$ pip install simplejson
 		
 Get Source Code
 ---------------

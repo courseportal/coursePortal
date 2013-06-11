@@ -46,7 +46,7 @@
              accesskey="P">previous</a> |</li>
         <li><a href="../../index.html">knoatom 0.5 documentation</a> &raquo;</li>
           <li><a href="../../code_index.html" >knoatom Source Code Documentation Index</a> &raquo;</li>
-          <li><a href="../web.html" accesskey="U"><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">web</span></tt> Documentation</a> &raquo;</li> 
+          <li><a href="../web.html" accesskey="U"><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">web</span></tt> Documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -60,137 +60,38 @@
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title first">Table of Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#module-web.views.home" id="id1">home.py</a></li>
-<li><a class="reference internal" href="#module-web.views.submission" id="id2">submission.py</a></li>
-<li><a class="reference internal" href="#module-web.views.lecturesubmit" id="id3">lecturesubmit.py</a></li>
-<li><a class="reference internal" href="#module-web.views.account" id="id4">account.py</a></li>
-<li><a class="reference internal" href="#module-web.views.admin" id="id5">admin.py</a></li>
+<li><a class="reference internal" href="#home-py" id="id1">home.py</a></li>
+<li><a class="reference internal" href="#submission-py" id="id2">submission.py</a></li>
+<li><a class="reference internal" href="#lecturesubmit-py" id="id3">lecturesubmit.py</a></li>
+<li><a class="reference internal" href="#account-py" id="id4">account.py</a></li>
+<li><a class="reference internal" href="#admin-py" id="id5">admin.py</a></li>
 <li><a class="reference internal" href="#other" id="id6">Other</a><ul>
-<li><a class="reference internal" href="#module-web.views.ajax" id="id7">ajax.py</a></li>
+<li><a class="reference internal" href="#ajax-py" id="id7">ajax.py</a></li>
 <li><a class="reference internal" href="#module-web.views.blitz" id="id8">blitz.py</a></li>
 <li><a class="reference internal" href="#module-web.views.google_webmaster" id="id9">google_webmaster.py</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<span class="target" id="module-web.views"></span><div class="section" id="module-web.views.home">
-<span id="home-py"></span><span id="web-views-home"></span><h2><a class="toc-backref" href="#id1">home.py</a><a class="headerlink" href="#module-web.views.home" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="web.views.home.atom">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">atom</tt><big>(</big><em>request</em>, <em>class_id</em>, <em>cat_id</em>, <em>atom_id</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.atom" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the view for a specific category</li>
-<li>Creates the breadcrumbs for the page</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.base_atom">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">base_atom</tt><big>(</big><em>request</em>, <em>cat_id</em>, <em>atom_id</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#base_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.base_atom" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the view for a specific category</li>
-<li>Creates the breadcrumbs for the page</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.base_category">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">base_category</tt><big>(</big><em>request</em>, <em>cat_id</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#base_category"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.base_category" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the category page</li>
-<li>Generates a list of the most popular videos for each category of rating</li>
-<li>Use memcached to save the popular video rankings to save a lot of time</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.category">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">category</tt><big>(</big><em>request</em>, <em>class_id</em>, <em>cat_id</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#category"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.category" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the category page</li>
-<li>Generates a list of the most popular videos for each category of rating</li>
-<li>Use memcached to save the popular video rankings to save a lot of time</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.classes">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">classes</tt><big>(</big><em>request</em>, <em>class_id</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.classes" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the home page</li>
-<li>Generates a list of the most popular videos for each category of rating</li>
-<li>Use memcached to save the popular video rankings to save a lot of time</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.get_content_for_category">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">get_content_for_category</tt><big>(</big><em>current_category</em>, <em>is_exposition</em>, <em>content_list=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#get_content_for_category"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.get_content_for_category" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the content for a category. Set content_list=[].</p>
-<p>When calling this function set current_category for the category you want to get content for and set is_exposition.  If <tt class="docutils literal"><span class="pre">is_exposition==True</span></tt> then we return the expositions for this category, otherwise we return the submissions.  Do not set <tt class="docutils literal"><span class="pre">content_list</span></tt>, this is used for recursion.</p>
-<p>We define content &#8220;in this category&#8221; if the content belongs to an atom that is in <tt class="docutils literal"><span class="pre">current_category</span></tt> or any of its sub-categories.  To acchieve this we use recursion.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">You have to input an empty list for content_list when calling this function.  The default argument doesn&#8217;t work and causes both expositions and Submissions to be added to the same list.</p>
+<span class="target" id="module-web.views"></span><div class="section" id="home-py">
+<span id="web-views-home"></span><h2><a class="toc-backref" href="#id1">home.py</a><a class="headerlink" href="#home-py" title="Permalink to this headline">¶</a></h2>
 </div>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.get_parent_categories">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">get_parent_categories</tt><big>(</big><em>current_category</em>, <em>current_class=None</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#get_parent_categories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.get_parent_categories" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function gets all of the parent categories for <tt class="docutils literal"><span class="pre">current_category</span></tt>.</p>
-<p>If <tt class="docutils literal"><span class="pre">current_class</span></tt> is not set then it will filter the parent_categories list to only include categories that are in <tt class="docutils literal"><span class="pre">current_class</span></tt>, otherwise it will return all parent categories.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">If there are loops in your categories this will result in infinite loops, but you shouldn&#8217;t be able to create categories in the admin site that result in infinite loops.</p>
+<div class="section" id="submission-py">
+<span id="web-views-submission"></span><h2><a class="toc-backref" href="#id2">submission.py</a><a class="headerlink" href="#submission-py" title="Permalink to this headline">¶</a></h2>
 </div>
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.home.post">
-<tt class="descclassname">web.views.home.</tt><tt class="descname">post</tt><big>(</big><em>request</em>, <em>sid</em><big>)</big><a class="reference internal" href="../../_modules/web/views/home.html#post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.home.post" title="Permalink to this definition">¶</a></dt>
-<dd><ul class="simple">
-<li>Generates the view for the specific post (submission) from <cite>sid</cite></li>
-<li>Creates the appropriate breadcrumbs for the categories</li>
-</ul>
-</dd></dl>
-
+<div class="section" id="lecturesubmit-py">
+<span id="web-views-lecturesubmit"></span><h2><a class="toc-backref" href="#id3">lecturesubmit.py</a><a class="headerlink" href="#lecturesubmit-py" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-web.views.submission">
-<span id="submission-py"></span><span id="web-views-submission"></span><h2><a class="toc-backref" href="#id2">submission.py</a><a class="headerlink" href="#module-web.views.submission" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="web.views.submission.PlainErrorList">
-<em class="property">class </em><tt class="descclassname">web.views.submission.</tt><tt class="descname">PlainErrorList</tt><a class="reference internal" href="../../_modules/web/views/submission.html#PlainErrorList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.submission.PlainErrorList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Look at this amazing class documentation</p>
-<dl class="method">
-<dt id="web.views.submission.PlainErrorList.as_plain">
-<tt class="descname">as_plain</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/web/views/submission.html#PlainErrorList.as_plain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.submission.PlainErrorList.as_plain" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the error message</p>
-<p><strong>Not sure</strong></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="web.views.submission.index">
-<tt class="descclassname">web.views.submission.</tt><tt class="descname">index</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/web/views/submission.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#web.views.submission.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function does a lot of really cool things</p>
-</dd></dl>
-
+<div class="section" id="account-py">
+<span id="web-views-account"></span><h2><a class="toc-backref" href="#id4">account.py</a><a class="headerlink" href="#account-py" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-web.views.lecturesubmit">
-<span id="lecturesubmit-py"></span><span id="web-views-lecturesubmit"></span><h2><a class="toc-backref" href="#id3">lecturesubmit.py</a><a class="headerlink" href="#module-web.views.lecturesubmit" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-web.views.account">
-<span id="account-py"></span><span id="web-views-account"></span><h2><a class="toc-backref" href="#id4">account.py</a><a class="headerlink" href="#module-web.views.account" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-web.views.admin">
-<span id="admin-py"></span><span id="web-views-admin"></span><h2><a class="toc-backref" href="#id5">admin.py</a><a class="headerlink" href="#module-web.views.admin" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="admin-py">
+<span id="web-views-admin"></span><h2><a class="toc-backref" href="#id5">admin.py</a><a class="headerlink" href="#admin-py" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="other">
 <span id="web-views-other"></span><h2><a class="toc-backref" href="#id6">Other</a><a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="module-web.views.ajax">
-<span id="ajax-py"></span><h3><a class="toc-backref" href="#id7">ajax.py</a><a class="headerlink" href="#module-web.views.ajax" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="ajax-py">
+<h3><a class="toc-backref" href="#id7">ajax.py</a><a class="headerlink" href="#ajax-py" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="module-web.views.blitz">
 <span id="blitz-py"></span><h3><a class="toc-backref" href="#id8">blitz.py</a><a class="headerlink" href="#module-web.views.blitz" title="Permalink to this headline">¶</a></h3>
@@ -210,13 +111,13 @@
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Views</a><ul>
-<li><a class="reference internal" href="#module-web.views.home">home.py</a></li>
-<li><a class="reference internal" href="#module-web.views.submission">submission.py</a></li>
-<li><a class="reference internal" href="#module-web.views.lecturesubmit">lecturesubmit.py</a></li>
-<li><a class="reference internal" href="#module-web.views.account">account.py</a></li>
-<li><a class="reference internal" href="#module-web.views.admin">admin.py</a></li>
+<li><a class="reference internal" href="#home-py">home.py</a></li>
+<li><a class="reference internal" href="#submission-py">submission.py</a></li>
+<li><a class="reference internal" href="#lecturesubmit-py">lecturesubmit.py</a></li>
+<li><a class="reference internal" href="#account-py">account.py</a></li>
+<li><a class="reference internal" href="#admin-py">admin.py</a></li>
 <li><a class="reference internal" href="#other">Other</a><ul>
-<li><a class="reference internal" href="#module-web.views.ajax">ajax.py</a></li>
+<li><a class="reference internal" href="#ajax-py">ajax.py</a></li>
 <li><a class="reference internal" href="#module-web.views.blitz">blitz.py</a></li>
 <li><a class="reference internal" href="#module-web.views.google_webmaster">google_webmaster.py</a></li>
 </ul>
@@ -270,7 +171,7 @@
              >previous</a> |</li>
         <li><a href="../../index.html">knoatom 0.5 documentation</a> &raquo;</li>
           <li><a href="../../code_index.html" >knoatom Source Code Documentation Index</a> &raquo;</li>
-          <li><a href="../web.html" ><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">web</span></tt> Documentation</a> &raquo;</li> 
+          <li><a href="../web.html" ><tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">web</span></tt> Documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

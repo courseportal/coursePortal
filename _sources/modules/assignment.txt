@@ -48,8 +48,3 @@ Admin
 	:members:
 
 .. _assignment_templates:
-
-Templates
-=========
-
-Assignment has its own templates, though the base template is `web/templates/base.html`.  Documentation for `base.html` can be found :ref:`here<web_templates>`.
