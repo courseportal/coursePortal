@@ -16,7 +16,7 @@ OPTIONAL context:
 	No expositions exist for this category yet!
 {% endif %}
 {% for e in expositions %}
-	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">{{ e.title }}</a>
+	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">{{ e.title }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "expo_submit" e.id %}">edit</a>) (<a href="{% url "delete_expo" e.id %}">delete</a>) {% endif %}
 	<br />
 {% endfor %}
 

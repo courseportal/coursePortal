@@ -15,6 +15,6 @@ OPTIONAL context:
 	No lecture notes exist for this category yet!
 {% endif %}
 {% for e in notes %}
-	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>
+	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "note_submit" e.id %}">edit</a>) (<a href="{% url "delete_note" e.id %}">delete</a>) {% endif %}
 	<br />
 {% endfor %}

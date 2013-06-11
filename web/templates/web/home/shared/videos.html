@@ -10,7 +10,7 @@ OPTIONAL context:
 	vote_categories
 
 -->
-
+{% load my_filters %}
 {% for c in content %}
 	<div class="row-fluid submission">
 		<div class="span12">
@@ -26,6 +26,7 @@ OPTIONAL context:
 				{% if user.is_staff or user.is_superuser or c.owner == user %}
 					<div class="edit">
 						<p><a href="{% url 'submit' c.id %}">Edit</a></p>
+            <p><a href="{% url 'delete_video' c.id %}">Delete</a></p>
 					</div>
 				{% endif %}
 				{% if user.is_authenticated %}
@@ -67,7 +68,7 @@ OPTIONAL context:
 			<div class="well">
 				Tags: 
 				{% for t in c.tags.all %}
-					<a href="{% url 'base_atom' selected_category.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
+					<a href="{% url 'base_atom' t.base_category.id t.id %}">{{ t }}</a> {% if not forloop.last %} | {% endif %}
 				{% endfor %}
 			</div> <!-- end .well -->
 		</div> <!-- end .span9 -->
