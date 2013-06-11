@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'question/?$', 'assignment.views.question.index', name='question'),
     
     url(r'students/?$', 'assignment.views.staff.viewStudent', name='view_student'),
+    url(r'evaluate/?$', 'assignment.views.staff.metrics', name='metrics'),
 
     url(r'eval/?$', 'assignment.views.student.eval', name='eval'),
     url(r'save/?$', 'assignment.views.student.save', name='save'),
