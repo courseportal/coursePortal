@@ -454,8 +454,8 @@ def classes(request, class_id):
 
 def post(request, sid):
     """
-    - Generates the view for the specific post (submission) from `sid`
-    - Creates the appropriate breadcrumbs for the categories
+    -	Generates the view for the specific post (submission) from `sid`
+    -	Creates the appropriate breadcrumbs for the categories
     """
     #Get the "top level" categories
     top_level_categories = BaseCategory.objects.filter(parent_categories=None)
@@ -478,7 +478,7 @@ def post(request, sid):
         'content': [s],
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
-        'selected_category': current_category,
+        #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
     })
