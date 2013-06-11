@@ -28,6 +28,8 @@ def eval(request):
     answer = request.POST['choice']
     if answer==question.solution:
         assignment.score += question.value
-        assignment.save();
-    question.delete();
+        assignment.save()
+    question.can_edit=False
+    question.save()
     return index(request)
+

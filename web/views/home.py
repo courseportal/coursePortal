@@ -7,6 +7,10 @@ from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
 
+from pybb.models import Forum
+from django.core.mail import send_mail, BadHeaderError
+
+
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
@@ -16,12 +20,12 @@ def class_index(request):
     #Get the "top level" categories
     top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
     
-    template = loader.get_template('home/index.html')
+    template = loader.get_template('web/home/class_index.html')
     class_list = Class.objects.order_by('name')
     context = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
         'class_list': class_list,
-        'top_level_base_categories': top_level_base_categories,
+        'top_level_categories': top_level_base_categories,
     })
     return HttpResponse(template.render(context))
 
@@ -42,12 +46,11 @@ def index(request):
             })
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
     
-    template = loader.get_template('home/classes.html')
+    template = loader.get_template('web/home/base/index.html')
     context = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-        'top_level_base_categories': top_level_base_categories,
+        'top_level_categories': top_level_base_categories,
         'top_ranked_videos': top_ranked_videos,
-        'is_post': False,
     })
     return HttpResponse(template.render(context))
 
@@ -171,22 +174,21 @@ def base_category(request, cat_id):
     list_2 = atom_list[length:length*2]
     list_3 = atom_list[length*2:]
 
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/base/index.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
         #'lectureNotes': lectureNotes,
-        'top_level_base_categories': top_level_base_categories,
+        'top_level_categories': top_level_base_categories,
         'selected_categories': parent_categories,
-        'selected_category': current_category,
+        #'selected_category': current_category,
         'atom_list_1': list_1,
         'atom_list_2': list_2,
         'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
         'is_post' : False,
         'atomDisplay' : True,
-
     })
     return HttpResponse(t.render(c))
 
@@ -211,6 +213,8 @@ def base_atom(request, cat_id, atom_id):
 
     
     content = Submission.objects.filter(tags=current_atom).distinct()
+    
+    forum = Forum.objects.get(atom=current_atom)
 
 
     # un-json-fy the videos
@@ -229,17 +233,17 @@ def base_atom(request, cat_id, atom_id):
     expositions = current_atom.exposition_set.all()
 
 
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/base/atom.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
         'expositions': expositions,
-        'top_level_base_categories': top_level_base_categories,
+        'top_level_categories': top_level_base_categories,
         'selected_categories': parent_categories,
-        'selected_category': current_category,
+        #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
-        'is_post': False,
+        'forum': forum,
     })
     return HttpResponse(t.render(c))
     
@@ -295,7 +299,7 @@ def category(request, class_id, cat_id):
     list_2 = atom_list[length:length*2]
     list_3 = atom_list[length*2:]
 
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/class/category.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
@@ -303,15 +307,11 @@ def category(request, class_id, cat_id):
         'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
-        'selected_category': current_category,
         'atom_list_1': list_1,
         'atom_list_2': list_2,
         'atom_list_3': list_3,
         'vote_categories': VoteCategory.objects.all(),
-        'current_class':current_class,
-        'categories_in_class':categories_in_class,
-        'is_post' : False,
-        'atomDisplay' : True,
+        'selected_class':current_class,
     })
     return HttpResponse(t.render(c))
 
@@ -344,6 +344,7 @@ def atom(request, class_id, cat_id, atom_id):
         breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
     breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
 
+    forum = Forum.objects.get(atom=current_atom)
     
     content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
     for c in content:
@@ -366,7 +367,7 @@ def atom(request, class_id, cat_id, atom_id):
     expositions = current_atom.exposition_set.all()
     lectureNotes = LectureNote.objects.filter(classBelong = current_class)    
 
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/class/category.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': content,
@@ -374,12 +375,11 @@ def atom(request, class_id, cat_id, atom_id):
         'lectureNotes': lectureNotes,
         'top_level_categories': top_level_categories,
         'selected_categories': parent_categories,
-        'selected_category': current_category,
+        #'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
-        'current_class':current_class,
-        'is_post': False,
-        'atomDisplay' : False,
+        'selected_class':current_class,
+        'forum': forum,
     })
     return HttpResponse(t.render(c))
 
@@ -410,14 +410,13 @@ def classes(request, class_id):
         cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
 
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/class/index.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url':reverse('classes', args=[current_class.id]), 'title': current_class.name}],
         'top_level_categories': top_level_categories,
         'top_ranked_videos': top_ranked_videos,
         'vote_categories': VoteCategory.objects.all(),
-        'current_class':current_class,
-        'is_post': False,
+        'selected_class':current_class,
     })
     return HttpResponse(t.render(c))
 
@@ -441,27 +440,7 @@ def post(request, sid):
     breadcrumbs = []
     breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
 
-##    if len(parent_categories) >= 1:
-##        parent = parent_categories[0]
-##        breadcrumbs.append({'url': reverse('category', args=[current_class.id,parent.id]), 'title': parent})
-##    else: parent = None
-##
-##    categories = s.tags.filter( ~Q(parent=None) )
-##    if len(categories) >= 1: 
-##        category = categories[0]
-##    else: category = None
-##
-##    if parent == None:
-##        c = category.parent.all()
-##        if len(c) > 0:
-##            c = category.parent.all()[0]
-##            breadcrumbs.append({'url': reverse('category', args=[current_class.id,c.id]), 'title': c})
-##                
-##    if category:
-##        breadcrumbs.append({'url': reverse('category', args=[current_class.id,category.id]), 'title': category})
-
-
-    t = loader.get_template('home/classes.html')
+    t = loader.get_template('web/home/post.html')
     c = RequestContext(request, {
         'breadcrumbs': breadcrumbs,
         'content': [s],
@@ -470,6 +449,21 @@ def post(request, sid):
         'selected_category': current_category,
         'selected_atom': current_atom,
         'vote_categories': VoteCategory.objects.all(),
-        'is_post': True,
     })
+    return HttpResponse(t.render(c))
+
+
+
+
+def bugReportConfirm(request, bid):
+    b = BugReport.objects.get(id=bid)
+    subject = b.subject
+    content = b.content
+    email= b.email
+    t = loader.get_template('web/home/confirm.html')
+    c = RequestContext(request, {
+                       'subject': subject,
+                       'content': content,
+                       'email': email,
+                       })
     return HttpResponse(t.render(c))

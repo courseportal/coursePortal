@@ -12,6 +12,26 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 Week of June 3-7
 ================
 
+This week I implemented the forums and completly changed the template structure.
+
+I used the `Pybbm forums<https://pybbm.readthedocs.org/en/latest/index.html>`_ to implement the forums.  Most of it was fairly easy to integrate as it was built to be able to easily plug into an existing project.  I had a few problems though including:
+	*	The template took some time to set up so that it works
+	*	I had some problems with urls.py because of the ordering and the regexs used
+	*	The poll feature wasn't working and it took me forever to find out why, now it is half working and I have a good idea on how to fix the other part
+
+Then I once I got the forums (almost) working I started to work on integrating it into the site.  First I implemented the admin part so that when you create/edit/delete an atom the cooresponding forum gets created/edited/deleted.  Then I started working on changing the templates so that I can integrate the forums into the site.  When I was changing the templates I realized that our current templates were very messy in that:
+	*	``base.html`` was very janky and had a lot of content in it where it really should only be a theme/style for the rest of the site with very little content, all of which should be overridable.
+	*	There was a lot of duplicate code throughout the whole template system making it very hard to make chages because you had to make changes in 5 places
+	*	We used the same template for the class, category, atom and post views so they were very cluttered and had a lot of ``{% if variable_exists %}`` statements when you should really be using blocks and extending templates.
+	*	Some of it was just plain wrong and some of it was unneeded
+	
+I went through and completly changed the template system and documented it.  You can see the documentation and a guide on how the templates should be set up :ref:`here<templates>`.
+
+Lastly I worked on implementing the forum into the atom view as well as creating a link to the base forum. 
+
+Goals
+-----
+
 This week I want to mess around with the orginazational system a little bit to reflect what we discussed in the :ref:`Meeting on 5/7/2013<meeting_notes_5_31_2013>`.
 
 I also want to work on implementing a forum with one "board" for each atom

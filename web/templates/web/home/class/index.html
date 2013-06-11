@@ -1,0 +1,48 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		selected_class
+		breadcrumbs
+
+	OPTIONAL context:
+		top_ranked_videos
+		messages
+		selected_categories
+		selected_atom
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+
+-->
+
+{% extends "web/home/home.html" %}
+{% block page_title %}
+	{% include "web/home/class/title.html" %}
+{% endblock %}
+{% block content %}
+	{% include "web/home/shared/index.html" %}
+{% endblock %}
+
+<!--
+
+The only reason I have this file is because I want to have consistency
+in the context variables of files when you use them as templates.
+
+Also because in the future we might want to make the class home view
+different than the base home view.
+
+Note:  There shouldn't be anything in here that is also in "base/index.html", everything that is in both should be in "shared/index.html"
+
+-->

@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% block content%}
 <script>
 function validate(){
 	x= document.forms["input"]["choice"];
@@ -21,9 +23,21 @@ function checkCheck(toCheck){
 	else return toCheck.value!=null && toCheck.value!='';
 }
 </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
 
-{% extends "base.html" %}
-{% block content%}
+<script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
+
 <div class="row">
 	<h1><div class="span3 offset3">{{question_selected.title}}</div></h2>
 </div>
@@ -33,24 +47,28 @@ function checkCheck(toCheck){
 <br>
 <br>
 
-<form name="input" action="{% url "eval"%}"  method = "post">
-{% csrf_token %}
-{% if choices %}
-	<strong>Choices:</strong>
-	<br>
-	<label class="radio">
-	{% for c in choices %}
-		<input type="radio" name="choice" value={{c}}>{{c}}<br>
-	{% endfor %}
-	</label>
+{% if question_selected.can_edit %}
+	<form name="input" action="{% url "eval"%}"  method = "post">
+	{% csrf_token %}
+	{% if choices %}
+		<strong>Choices:</strong>
+		<br>
+		<label class="radio">
+		{% for c in choices %}
+			<input type="radio" name="choice" value={{c}}>{{c}}<br>
+		{% endfor %}
+		</label>
+	{% else %}
+		<strong>Answer:</strong>
+		<br>
+		<input type="text" name="choice" placeholder="Type something">
+		<br>
+	{% endif %}
+	<input type="hidden" name="question" value={{question_selected.id}}>
+	<button type="submit" class="btn">Submit</button>
 {% else %}
-	<strong>Answer:</strong>
-	<br>
-	<input type="text" name="choice" placeholder="Type something">
-	<br>
+	<p>You already answered this question!></p>
 {% endif %}
-<input type="hidden" name="question" value={{question_selected.id}}>
-<button type="submit" class="btn">Submit</button>
 </form>
 </body>
 </html>

@@ -15,7 +15,7 @@ class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
     data = models.TextField()
     questions = models.ManyToManyField(Question)
-    users = models.ManyToManyField(User, related_name='templates', blank=True, null=True)
+    owners = models.ManyToManyField(User, related_name='templates', blank=True, null=True)
     def __unicode__(self):
         return self.title
 
@@ -23,6 +23,7 @@ class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, related_name = 'assignmentInstances')
     template = models.ForeignKey(Assignment, related_name = 'instances')
+    can_edit = models.BooleanField(default=True)
     score = models.FloatField(default = 0)
     max_score = models.FloatField(default = 0)
     def __unicode__(self):
@@ -34,6 +35,7 @@ class QuestionInstance(models.Model):
     solution = models.TextField()
     text = models.TextField()
     value = models.FloatField(default = 1.0)
+    can_edit = models.BooleanField(default=True)
     assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.title

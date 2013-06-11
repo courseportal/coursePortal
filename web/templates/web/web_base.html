@@ -1,0 +1,43 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		breadcrumbs
+
+	OPTIONAL context:
+		messages
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+
+{% extends "base.html" %} <!-- Include the base template -->
+
+{% block message %}
+	<!-- This is the block for messages -->
+	{% include "web/message.html" %}
+{% endblock %}
+
+{% block page_title %}
+	<div class="page-header">
+		<h1>KnoAtom</h1>
+	</div>
+{% endblock %}
+
+<!-- Default app specific content for the content page, will get overridden by other templates -->
+{% block content %}
+	<h2>You are seeing this page in error, please contact the webmaster!</h2>
+{% endblock %}

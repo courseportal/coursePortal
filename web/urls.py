@@ -14,15 +14,14 @@ urlpatterns = patterns('',
 
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 
-
-    #url(r'^class/(?P<class_id>\d+)/submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
+    url(r'^bugReport/(?P<bid>\d+)?/?$', 'web.views.bugReport.index', name='bugReport'),
+    url(r'^confirm/(?P<bid>\d+)?/?$', 'web.views.home.bugReportConfirm', name='bugReportConfirm'),
                     
     #LectureNote
     url(r'^media/file/(?P<filename>\w+\.pdf)$', 'web.views.lecturesubmit.display',name='LectureNoteDisplay'),
     url(r'^class/(?P<class_id>\d+)/submit/LectureNoteUpload/?$', 'web.views.lecturesubmit.index', name='LectureNoteUpload'),
-                       
-    #url(r'^class/(?P<class_id>\d+)/post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+                      
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
 
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='atom'),

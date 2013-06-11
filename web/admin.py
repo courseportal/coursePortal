@@ -4,7 +4,11 @@ from django.db.models import Q
 from django import forms
 from django.forms.models import BaseModelFormSet, modelformset_factory, BaseInlineFormSet
 from django.forms.formsets import formset_factory
+from django.core.exceptions import ObjectDoesNotExist
 from sets import Set
+
+# Import ForumInlineAdmin
+from pybb.models import Forum, Category
 
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
@@ -24,6 +28,44 @@ class LectureNoteAdmin(admin.ModelAdmin):
 
 class AtomAdmin(admin.ModelAdmin):
     inlines = [ExposInline]
+    
+    def save_model(self, request, obj, form, change):
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        if change:
+            try:
+                forum = Forum.objects.get(atom=obj)
+            except ObjectDoesNotExist:
+                    forum = Forum.objects.create(
+                        atom=obj,
+                        category=cat,
+                        name=obj.name,
+                        description=obj.summary # Add when we have field
+                    )
+                    forum.save()
+                    forum.moderators.add(request.user)
+                
+            forum.name = obj.name
+            forum.save()
+            #forum.moderators.add(request.user)
+            #obj.forum.description = obj.description
+        obj.save()
+    
+    def log_addition(self, request, obj):
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        try:
+            forum = Forum.objects.get(atom=obj)
+        except ObjectDoesNotExist:
+                forum = Forum.objects.create(
+                    atom=obj,
+                    category=cat,
+                    name=obj.name,
+                    description=obj.summary # Add when we have field
+                )
+                forum.save()
+                forum.moderators.add(request.user)
+    
+                        
+        
 
 
 class BaseCategoryAdminForm(forms.ModelForm):

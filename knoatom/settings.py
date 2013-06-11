@@ -10,9 +10,16 @@ ADMINS = (
           ('Bryan Kendall', 'bkend@umich.edu'),
           )
 
+# Email
 EMAIL_SUBJECT_PREFIX = '[KnoAtom] '
-
 SERVER_EMAIL = 'knoatom-noreply@umich.edu'
+
+#smtp
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'knoatom.webmaster@gmail.com'
+EMAIL_HOST_PASSWORD = 'djangogrubsalad'
+EMAIL_PORT = 587
 
 MANAGERS = ADMINS
 
@@ -28,7 +35,8 @@ DATABASES = {
 }
 
 # For PYBB
-#PYBB_TEMPLATE = 'forum_base.html'
+PYBB_TEMPLATE = 'forum_base.html'
+PYBB_POLL_MAX_ANSWERS = 10
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -55,6 +63,8 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
 MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'knoatom-static/media/').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
@@ -74,10 +84,8 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-                    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-                    # Always use forward slashes, even on Windows.
-                    # Don't forget to use absolute paths, not relative paths.
-                    )
+    os.path.join(PROJECT_ROOT, 'static'),
+)
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -126,7 +134,6 @@ INSTALLED_APPS = (
                   'django.contrib.messages',
                   'django.contrib.staticfiles',
                   #'south',
-                  #'djangobb_forum',
                   #'registration',
                   #'pagination',
                   #'django_authopenid',
@@ -172,9 +179,6 @@ LOGGING = {
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'knoatom.webmaster@gmail.com'
-EMAIL_HOST_PASSWORD = 'djangogrubsalad'
 
 LOGIN_URL = '/login'
 
@@ -210,7 +214,17 @@ HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
         'URL': 'http://127.0.0.1:8983/solr',
+        #'TIMEOUT': 60 * 5,
+        'INCLUDE_SPELLING': True,
+    #'BATCH_SIZE': 100,
     },
 }
 
+
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+#Default is 'AND', can also be changed to 'OR'
+#HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+#controls what fieldname Haystack relies on as the default field for searching within. Default='text'
+#HAYSTACK_DOCUMENT_FIELD = 'text'

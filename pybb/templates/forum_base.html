@@ -1,0 +1,40 @@
+<!-- 
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		breadcrumbs
+
+	OPTIONAL context:
+		None
+
+BLOCKS:
+  extra_style
+  extra_head
+  extra_script
+  head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+<!-- 
+Base for the forums
+-->
+
+{% extends "base.html" %}
+
+{% block message %}
+	{% if messages %}
+		<ul class="messages">
+			{% for message in messages %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

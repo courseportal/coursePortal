@@ -1,0 +1,50 @@
+<!--
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+		selected_class
+		selected_categories
+		selected_atom
+
+	OPTIONAL context:
+		messages
+		forum
+
+		content
+		vote_categories
+
+		expositions
+
+		lectureNotes
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+
+<!--
+Only things that are unique to class should go in here, anything shared with base should go in "shared/atom.html"
+-->
+{% extends "web/home/home.html" %}
+{% block page_title %}
+	{% include "web/home/class/title.html" %}
+{% endblock %}
+{% block content %}
+
+	{% include "web/home/shared/atom.html" %}
+
+{% endblock %}

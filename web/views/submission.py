@@ -79,9 +79,10 @@ def index(request, sid):
     else: form_action = reverse('submit')
     
 
-    t = loader.get_template('submit.html')
+    t = loader.get_template('web/home/submit.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+        'top_level_categories': top_level_categories,
         'form': form,
         #'child_categories': child_categories,
         #'parent_categories': L,
