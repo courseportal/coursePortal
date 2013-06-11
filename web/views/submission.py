@@ -30,9 +30,9 @@ class PlainErrorList(ErrorList):
 @login_required()
 def index(request, sid):
     """
-    This function does a lot of really cool things
-    
-    """
+        This function does a lot of really cool things
+        
+        """
     #Get the "top level" categories
     top_level_categories = BaseCategory.objects.filter(parent_categories=None)
     
@@ -47,7 +47,7 @@ def index(request, sid):
                 sub.tags = form.cleaned_data['tags']
                 sub.save()
                 messages.success(request, 'Successfully saved.')
-                return HttpResponseRedirect(reverse('submit', args=[sid]))
+                return HttpResponseRedirect(reverse('post', args=[s.id]))
             messages.warning(request, 'Error saving. Fields might be invalid.')
         else:
             if form.is_valid():
@@ -77,15 +77,14 @@ def index(request, sid):
 
     if sid: form_action = reverse('submit', args=[sid])
     else: form_action = reverse('submit')
-    
+
 
     t = loader.get_template('web/home/submit.html')
     c = RequestContext(request, {
-        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-        'top_level_categories': top_level_categories,
-        'form': form,
-        #'child_categories': child_categories,
-        #'parent_categories': L,
-    })
+                       'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+                       'top_level_categories': top_level_categories,
+                       'form': form,
+                       #'child_categories': child_categories,
+                       #'parent_categories': L,
+                       })
     return HttpResponse(t.render(c))
-
