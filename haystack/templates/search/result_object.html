@@ -1,12 +1,12 @@
 {% load more_like_this %}
 
 {% with obj=result.object %}
-{% if obj.author %}
+{% if result.model_name == 'class' %}
 <div class="accordion-group">
     <div class="accordion-heading">
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_class_{{ obj.id }}">
             <span>Class: {{ obj.name }}</span>
-            {% if obj.status ==  A  %}
+            {% if obj.status == 'A' %}
             <span style="float:right">Status: Active</span>
             {% else %}
             <span style="float:right">Status: Not Active</span>
@@ -23,7 +23,7 @@
     </div>
 </div>
 {% else %}
-    {% if obj.base_category  %}
+    {% if result.model_name == 'atom' %}
 <div class="accordion-group">
     <div class="accordion-heading">
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_atom_{{ obj.id }}">
@@ -46,7 +46,9 @@
                             {% if related.object.base_category %}
                             <li><a href="?q={{related.object.name}}">Atom: {{ related.object.name }}</a></li>
                             {% else %}
+                                {% if related.object.child_categories %}
                             <li><a href="?q={{related.object.name}}">Category: {{ related.object.name }}</a></li>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </ul>
@@ -55,7 +57,8 @@
         </div>
     </div>
 </div>
-    {% else %}
+{% else %}
+    {% if result.model_name == 'basecategory' %}
 <div class="accordion-group">
     <div class="accordion-heading">
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_category_{{ obj.id }}">
@@ -78,7 +81,9 @@
                     {% if related.object.base_category %}
                     <li><a href="?q={{related.object.name}}">Atom: {{ related.object.name }}</a></li>
                     {% else %}
+                        {% if related.object.child_categories %}
                     <li><a href="?q={{related.object.name}}">Category: {{ related.object.name }}</a></li>
+                        {% endif %}
                     {% endif %}
                     {% endfor %}
                 </ul>
@@ -88,5 +93,6 @@
     </div>
 </div>
     {% endif %}
+{% endif %}
 {% endif %}
 {% endwith %}

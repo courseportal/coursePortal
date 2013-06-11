@@ -35,7 +35,20 @@ BLOCKS(Including inherited blocks):
 
 {% block content %}
 
-	<h3>Videos</h3>
-	{% include "web/home/shared/videos.html" %}
-
+	<h3>Thanks for Bug Report submission ! </h3>
+    <br></br>
+    <table class="table">
+    <tr>
+        <td>From: </td>
+        <td>{{ email }}</td>
+    </tr>
+    <tr>
+        <td>Subject: </td>
+        <td>{{subject}} </td>
+    </tr>
+    <tr>
+        <td>Content: </td>
+        <td>{{content}} </td>
+    </tr>
+    </table>
 {% endblock %}

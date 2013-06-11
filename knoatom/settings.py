@@ -38,6 +38,9 @@ DATABASES = {
 PYBB_TEMPLATE = 'forum_base.html'
 PYBB_POLL_MAX_ANSWERS = 10
 
+# List of allowed file upload types
+ALLOWED_FILE_EXTENTIONS = ['.pdf']
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -65,7 +68,7 @@ USE_L10N = True
 # Example: "/home/media/media.lawrence.com/media/"
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'knoatom-static/media/').replace('\\','/')
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media/').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -133,7 +136,7 @@ INSTALLED_APPS = (
                   'django.contrib.sites',
                   'django.contrib.messages',
                   'django.contrib.staticfiles',
-                  'south',
+                  #'south',
                   #'registration',
                   #'pagination',
                   #'django_authopenid',
@@ -214,5 +217,17 @@ HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
         'URL': 'http://127.0.0.1:8983/solr',
+        #'TIMEOUT': 60 * 5,
+        'INCLUDE_SPELLING': True,
+    #'BATCH_SIZE': 100,
     },
 }
+
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+#Default is 'AND', can also be changed to 'OR'
+#HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+#controls what fieldname Haystack relies on as the default field for searching within. Default='text'
+#HAYSTACK_DOCUMENT_FIELD = 'text'

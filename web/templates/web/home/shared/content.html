@@ -15,8 +15,8 @@ To INCLUDE this file:
 		forum
 
 		expositions
-
-		lectureNotes
+    examples
+    notes
 
 -->
 <!--
@@ -31,10 +31,11 @@ Note: Currently the displays for category and atom are so similar that we can us
 		<li class = "active"><a href="#1" data-toggle="tab">Videos</a></li>
 		<li class = ""><a href = "#2" data-toggle="tab">Expositions</a><li>
 		<li class = ""><a href = "#3" data-toggle="tab">Notes</a></li>
+    <li class = ""><a href = "#4" data-toggle="tab">Examples</a></li>
 		{% if not selected_atom %}
-			<li class = ""><a href = "#4" data-toggle="tab">Atoms Display</a></li>
+			<li class = ""><a href = "#5" data-toggle="tab">Atoms Display</a></li>
 		{% else %}
-			<li class = ""><a href = "#4" data-toggle="tab">Atom Forums</a></li>
+			<li class = ""><a href = "#5" data-toggle="tab">Atom Forums</a></li>
 		{% endif %}
 	</ul>
 </h3>
@@ -50,15 +51,19 @@ Note: Currently the displays for category and atom are so similar that we can us
 	</div>
 
 	<div class="tab-pane", id="3">
-		{% include "web/home/shared/lectureNote.html"%}
+		{% include "web/home/shared/lectureNote.html" %}
 	</div>
+  
+  <div class="tab-pane", id="4">
+    {% include "web/home/shared/examples.html" %}
+  </div>
 	
 	{% if not selected_atom %}
-		<div class="tab-pane", id="4">
+		<div class="tab-pane", id="5">
 			{% include "web/home/shared/atomDisplay.html" %}
 		</div>
 	{% else %}
-		<div class="tab-pane", id="4">
+		<div class="tab-pane", id="5">
 			{% if forum.id %}
 				<a href="{% url "pybb:forum" forum.id %}">{{ selected_atom.name }}</a>
 			{% endif %}

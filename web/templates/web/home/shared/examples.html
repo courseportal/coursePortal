@@ -1,0 +1,20 @@
+<!--
+
+To INCLUDE this file:
+
+REQUIRED context:
+	None
+
+OPTIONAL context:
+	examples
+
+-->
+
+<!-- Should make this prettier -->
+{% if not examples %}
+	No examples exist for this category yet!
+{% endif %}
+{% for e in examples %}
+	<a target="_blank" href="{% url "example" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "example_submit" e.id %}">edit</a>) (<a href="{% url "delete_example" e.id %}">delete</a>) {% endif %}
+	<br />
+{% endfor %}

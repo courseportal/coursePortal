@@ -6,15 +6,15 @@ REQUIRED context:
 	None
 
 OPTIONAL context:
-	lectureNotes
+	notes
 
 -->
 
 <!-- Should make this prettier -->
-{% if not lectureNotes %}
+{% if not notes %}
 	No lecture notes exist for this category yet!
 {% endif %}
-{% for e in lectureNotes %}
-	<a href="/media/{{ e.file }}">{{ e.filename }}</a>
+{% for e in notes %}
+	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "note_submit" e.id %}">edit</a>) (<a href="{% url "delete_note" e.id %}">delete</a>) {% endif %}
 	<br />
 {% endfor %}

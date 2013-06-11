@@ -17,6 +17,7 @@ class SearchForm(forms.Form):
     q = forms.CharField(required=False, label=_('Search'))
 
     def __init__(self, *args, **kwargs):
+        print("come in here~!")
         self.searchqueryset = kwargs.pop('searchqueryset', None)
         self.load_all = kwargs.pop('load_all', False)
 

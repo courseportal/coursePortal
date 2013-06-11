@@ -5,15 +5,13 @@ To EXTEND/USE this file:
 	REQUIRED context:
 		top_level_categories
 		breadcrumbs
-		selected_categories
-		selected_atom
+		form
 
 	OPTIONAL context:
-		selected_class
 		messages
-
-		content
-		vote_categories
+		selected_class
+		selected_categories
+		selected_atom
 
 BLOCKS(Including inherited blocks):
   extra_style
@@ -34,8 +32,15 @@ BLOCKS(Including inherited blocks):
 {% extends "web/home/home.html" %}
 
 {% block content %}
+  <h2>Delete {{ name }}</h2>
 
-	<h3>Videos</h3>
-	{% include "web/home/shared/videos.html" %}
+  <form class="form-horizontal" action="{{ form_action }}" method="post">
+    {% csrf_token %}
 
+    <div>
+      <input class="btn btn-primary" type="submit" name="yes" value="Yes" />
+      <input class="btn" type="submit" name="no" value="No" />
+    </div>
+  
+  </form>
 {% endblock %}

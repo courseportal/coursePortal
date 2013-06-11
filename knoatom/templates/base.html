@@ -55,6 +55,14 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 </head>
 <body>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
+    <script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
+    {% block extra_script %}{% endblock %}
 
 <div class="container">
 
@@ -107,16 +115,18 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                     <b class="caret"></b>
                   </a>
                   <ul class="dropdown-menu">
-                    <a href="{% url 'submit' %}">Video</a>
-                    <a href="{% url 'expo_submit' %}">Exposition</a>
-                    <a href="#">Lecture Notes</a>
-                    <a href="#">Example</a>
+                    <a href="{% url "submit" %}">Video</a>
+                    <a href="{% url "expo_submit" %}">Exposition</a>
+                    <a href="{% url "note_submit" %}">Lecture Notes</a>
+                    <a href="{% url "example_submit" %}">Example</a>
                   </ul>
                 </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>
+                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
 							{% else %}
 								<li><a href="{% url 'login' %}">Login</a></li>
 								<li><a href="{% url 'register' %}">Register</a></li>
+                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
 							{% endif %}
 						</ul>
 					{% endblock %} <!-- end .sidebar -->
@@ -168,13 +178,6 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	</div>
 </div> <!-- end #expo_modal -->
 
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
-<script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
-<script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
-{% block extra_script %}{% endblock %}
+
 </body>
 </html>

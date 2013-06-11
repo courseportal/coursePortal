@@ -29,8 +29,6 @@ BLOCKS(Including inherited blocks):
 
 -->
 
-<!-- Submit form for videos -->
-
 {% extends "web/home/home.html" %}
 
 {% block content %}
@@ -72,7 +70,7 @@ $(document).ready(function() {
 });
 </script>
 
-<h2>Create New Video Submission</h2>
+<h2>Report a bug !!!</h2>
 
 <form class="form-horizontal" action="{{ form_action }}" method="post">
 {% csrf_token %}
@@ -81,7 +79,7 @@ $(document).ready(function() {
 
 <div class="form-actions">
 <input class="btn btn-primary" type="submit" value="Submit" />
-<a class="btn" id="preview_video">Preview Video</a>
+<a class="btn" id="preview_video">Preview Report</a>
 </div>
 </form>
 

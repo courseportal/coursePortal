@@ -32,9 +32,9 @@ BLOCKS(Including inherited blocks):
 {% extends "web/home/home.html" %}
 
 {% block content %}
-  <h2>Create New Exposition Submission</h2>
+  <h2>Create New Lecture Note Submission</h2>
 
-  <form class="form-horizontal" action="{{ form_action }}" method="post">
+  <form enctype="multipart/form-data" class="form-horizontal" action="{{ form_action }}" method="post">
     {% csrf_token %}
     {% include "web/form_template.html" with form=form %}
 
@@ -42,6 +42,6 @@ BLOCKS(Including inherited blocks):
       <input class="btn btn-primary" type="submit" value="Submit" />
       <input class="btn" type="reset" value="Clear" />
     </div>
-
+  
   </form>
 {% endblock %}
