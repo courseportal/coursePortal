@@ -139,7 +139,7 @@ class Example(models.Model):
 			
 	def vote_down(self, user):
 		if user.votes.example_vote_down:
-		elif user.votes.example_vote_up:
+        elif user.votes.example_vote_up:
 			user.votes.example_vote_up = False
 			user.votes.example_vote_down = True
 			self.votes -= 2
