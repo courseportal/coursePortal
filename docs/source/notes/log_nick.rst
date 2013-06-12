@@ -22,6 +22,14 @@ So far this week so far I have:
         
         Lecture Notes and Examples are limited to ``.pdf`` files right now.
     *   I have been adding documentation as I go to various functions and classes.
+    *   Added the ability for the owner of a user submitted object and all staff/superusers to edit/delete that object where they are listed.  This works for:
+        
+            -   Expositions
+            -   Lecture Notes
+            -   Examples
+            -   Videos
+    
+    *   Improved aesthetics of exposition/note/example display list
 
 Goals
 -----
@@ -36,9 +44,11 @@ Todo:
             -   Lecture Notes(Done!)
             -   Examples(Done!)
     *   Add functionality to edit/delete content you submitted for:
-            -   Expositions
-            -   Lecture Notes
-            -   Examples
+            -   Expositions(Done!)
+            -   Lecture Notes(Done!)
+            -   Examples(Done!)
+            -   Videos(Done!)
+    *   Put a delete option in the submit form if they are editing
     *   Add a report feature for all content/posts so that malicious/disrespectful content can be removed
     *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.
     *   Implement a vote based ranking system for the forums and for listing content

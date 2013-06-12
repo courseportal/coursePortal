@@ -14,7 +14,49 @@ OPTIONAL context:
 {% if not examples %}
 	No examples exist for this category yet!
 {% endif %}
-{% for e in examples %}
-	<a target="_blank" href="{% url "example" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "example_submit" e.id %}">edit</a>) (<a href="{% url "delete_example" e.id %}">delete</a>) {% endif %}
-	<br />
-{% endfor %}
+<table class="table table-bordered table-hover">
+  <thead>
+    <th> </th>
+    <th>Name</th>
+    <th>Created By</th>
+    <th>Votes</th>
+    <th>Options</th>
+  </thead>
+  <tbody>
+    {% for e in examples %}
+      <tr>
+        <td style="width:10px">
+          <div class="arrow-up">
+            <i class="icon-arrow-up"></i>
+          </div>
+          <div class="arrow-down">
+            <i class="icon-arrow-down"></i>
+          </div>
+        </td>
+        <td>
+        	<a target="_blank" href="{% url "example" e.id %}">
+            {{ e.filename }}
+          </a>
+        </td>
+        <td>
+          {{ e.owner }}
+        </td>
+        <td style="width:25px">
+          5
+        </td>
+        <td>
+        {% if user.is_staff or user.is_superuser or e.owner == user %}
+          <a href="{% url "example_submit" e.id %}">
+            <i class="icon-edit"></i>
+          </a>
+          <a href="{% url "delete_example" e.id %}">
+            <i class="icon-remove"></i>
+          </a>
+        {% else %}
+          None
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
