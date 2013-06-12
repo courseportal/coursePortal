@@ -18,6 +18,7 @@ class Class(models.Model):
     students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
+    summary = models.TextField(default="There is no summary added at this time.")
     def __unicode__(self):
         return self.name
     class Meta:

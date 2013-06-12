@@ -169,11 +169,11 @@
         
         <field name="ClassAuthor_exact" type="string" indexed="true" stored="true" multiValued="false" />
         
-        <field name="ClassStatus_exact" type="boolean" indexed="true" stored="true" multiValued="false" />
+        <field name="ClassStatus_exact" type="string" indexed="true" stored="true" multiValued="false" />
         
         <field name="ClassAuthor" type="text_en" indexed="true" stored="true" multiValued="false" />
         
-        <field name="ClassStatus" type="boolean" indexed="true" stored="true" multiValued="false" />
+        <field name="ClassStatus" type="text_en" indexed="true" stored="true" multiValued="false" />
         
         <field name="ForumTitle" type="text_en" indexed="true" stored="true" multiValued="false" />
         
