@@ -9,12 +9,11 @@ from knoatom.settings import MEDIA_ROOT
 STATUS_CHOICES = (
     ('A', 'Active'),
     ('N', 'Not active'),
-
 )
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, blank=True)
+    allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
     students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
