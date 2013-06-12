@@ -15,10 +15,42 @@ OPTIONAL context:
 {% if not expositions %}
 	No expositions exist for this category yet!
 {% endif %}
-{% for e in expositions %}
-	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">{{ e.title }}</a>
-	<br />
-{% endfor %}
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <th>Name</th>
+    <th>Created By</th>
+    <th>Options</th>
+  </thead>
+  <tbody>
+    {% for e in expositions %}
+      <tr>
+        <td>
+        	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">
+            {{ e.title }}
+          </a>
+        </td>
+        <td>
+          {{ e.owner }}
+        </td>
+        <td>
+        {% if user.is_staff or user.is_superuser or e.owner == user %}
+          <a href="{% url "expo_submit" e.id %}">
+            <i class="icon-edit"></i>
+          </a>
+          <a href="{% url "delete_expo" e.id %}">
+            <i class="icon-remove"></i>
+          </a>
+        {% else %}
+          None
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
 
 <!-- Including a stylesheet here seems a bit hacky to me... -->
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />

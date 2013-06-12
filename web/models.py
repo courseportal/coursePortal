@@ -5,16 +5,16 @@ from haystack import indexes
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
+from rating.models import UserVotes
 
 STATUS_CHOICES = (
     ('A', 'Active'),
     ('N', 'Not active'),
-
 )
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, blank=True)
+    allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
     students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
@@ -122,6 +122,30 @@ class Example(models.Model):
 	filename = models.CharField(max_length=200)
 	atom = models.ForeignKey(Atom, related_name = "example_set")
 	date_created = models.DateTimeField(auto_now=True)
+	
+	user_votes = models.ManyToManyField(UserVotes)
+	votes = models.IntegerField(default=0)
+
+	#user_votes = example.user_votes.get(user=user)
+	def vote_up(self, user):
+		if user.votes.example_vote_up:
+		elif user.votes.example_vote_down:
+			user.votes.example_vote_down = False
+			user.votes.example_vote_up = True
+			self.votes += 2
+		else:
+			user.votes.example_vote_up = True
+			self.votes += 1
+			
+	def vote_down(self, user):
+		if user.votes.example_vote_down:
+		elif user.votes.example_vote_up:
+			user.votes.example_vote_up = False
+			user.votes.example_vote_down = True
+			self.votes -= 2
+		else:
+			user.votes.example_vote_up = True
+			self.votes -= 1
 	
 	def __unicode__(self):
 		return self.filename

@@ -73,4 +73,10 @@ class ExpoForm(forms.Form):
 	
 	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission')
 	
+class DeleteForm(forms.Form):
+	r"""
+	This is a generic form to confirm the deletion of an Exposition, LectureNote, Example or Submission.
+	"""
+	
+	
 

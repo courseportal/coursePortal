@@ -32,13 +32,15 @@ BLOCKS(Including inherited blocks):
 {% extends "web/home/home.html" %}
 
 {% block content %}
-<h2>Create New Lecture Note Submission</h2>
+  <h2>Delete {{ name }}</h2>
 
-<form class="form-horizontal" action="{{ form_action }}" method="post">
-  {% csrf_token %}
-  {% include "web/form_template.html" with form=form %}
+  <form class="form-horizontal" action="{{ form_action }}" method="post">
+    {% csrf_token %}
+
+    <div>
+      <input class="btn btn-primary" type="submit" name="yes" value="Yes" />
+      <input class="btn" type="submit" name="no" value="No" />
+    </div>
   
-  <input class="btn btn-primary" type="submit" value="Submit"/>
-  
-</form>
+  </form>
 {% endblock %}

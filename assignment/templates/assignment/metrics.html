@@ -1,0 +1,36 @@
+{% extends "assignment_nav.html" %}
+
+
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+
+{% block content %}
+<div class="row">
+	<h1><div class="span3 offset3">Class Metrics</div></h1>
+</div>
+{% for stats in stat_set %}
+	<div class="row-fluid">
+		<div class="span5"><h3>Class:{{stats.className}}</div>
+		<div class="span1"><button id="plot" type="btn" onclick="return display({{stats.classid}},{{user.id}})" >Plot</div>
+	</div>
+	<br>
+	<div>Average: {{stats.average}}</div>
+	<div>Standard Deviation: {{stats.deviation}}</div>
+	<div>Minimum: {{stats.minimum}}</div>
+	<div>Maximum: {{stats.maximum}}</div>
+	<div>Median: {{stats.median}}</div>
+	<div style="display:none">
+		<img id="dialog{{user.id}}{{stats.classid}}" src="{{STATIC_PREFIX}}img/box{{user.id}}{{stats.classid}}.png"  alt="Class plot">
+	</div>
+
+
+
+
+{%endfor%}
+<script>
+function display(classid, userid){
+	var name="#dialog";
+	name=name.concat(userid, classid);
+  	$( name ).dialog();
+}
+</script>
+{% endblock %}

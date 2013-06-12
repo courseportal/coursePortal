@@ -62,7 +62,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 	<li class="nav-header">Administrative</li>
 	<li><a href="{% url "assign" %}">Assign something</a></li>
 	<li><a href="{% url "view_student" %}">View Students</a></li>
-	<li>Class Performance</li>
+	<li><a href="{% url "metrics" %}">Class Performance</a></li>
 	<li class="divider"></li>
 {% endif %}
 {% if user.is_active %}
