@@ -43,9 +43,8 @@ class ClassIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     ClassTitle = indexes.CharField(model_attr='name')
     ClassAuthor = indexes.CharField(model_attr='author', faceted=True)
-    ClassStatus = indexes.BooleanField(model_attr='status', faceted=True)
+    ClassStatus = indexes.CharField(model_attr='status', faceted=True)
     #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
-
 
     def get_model(self):
         return Class
