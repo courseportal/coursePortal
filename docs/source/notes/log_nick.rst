@@ -48,6 +48,7 @@ Todo:
             -   Lecture Notes(Done!)
             -   Examples(Done!)
             -   Videos(Done!)
+    *   Check to see if the profile image in the forums works
     *   Put a delete option in the submit form if they are editing
     *   Add a report feature for all content/posts so that malicious/disrespectful content can be removed
     *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.

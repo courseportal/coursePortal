@@ -1,6 +1,7 @@
 from django.do import models
 
-class VotableItem(models.Model):
-	vote = models.IntegerField(default=0)
+class UserVotes(models.Model):
+	user = models.OneToOneField(User, related_name="votes")
 	
-	def vote_up()
+	example_vote_up = models.BooleanField(default=False)
+	example_vote_down = models.BooleanField(default=False)

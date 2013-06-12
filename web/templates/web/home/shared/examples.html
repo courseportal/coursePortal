@@ -11,6 +11,8 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
+{% load my_filters %}
+
 {% if not examples %}
 	No examples exist for this category yet!
 {% endif %}
@@ -42,7 +44,7 @@ OPTIONAL context:
           {{ e.owner }}
         </td>
         <td style="width:25px">
-          5
+          e.votes
         </td>
         <td>
         {% if user.is_staff or user.is_superuser or e.owner == user %}
