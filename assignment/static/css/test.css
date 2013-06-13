@@ -1,10 +1,16 @@
-
+	
 .question-description{
 	padding:6px 0px 0px 0px
 }
 
-.question-remove{
+/*.question-remove{
 	padding:4px 0px 0px 0px
+}*/
+
+
+
+.input-fit{
+	width: 100%
 }
 
 .question-pts{
