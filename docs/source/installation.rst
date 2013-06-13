@@ -146,6 +146,7 @@ Install Django and Required Apps
 		(<venv_name>)$ pip install sphinx
 		(<venv_name>)$ pip install pysolr
 		(<venv_name>)$ pip install simplejson
+        (<venv_name>)$ pip install numpy
 		
 Get Source Code
 ---------------
