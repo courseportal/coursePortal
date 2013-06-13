@@ -153,7 +153,7 @@ INSTALLED_APPS = (
                   # For PYBBM
                   'pybb',
                   'sorl.thumbnail',
-                  'rating'
+                  #'rating'
                   )
 
 
