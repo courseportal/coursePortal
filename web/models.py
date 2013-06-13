@@ -159,9 +159,7 @@ class Example(models.Model):
 
     def __unicode__(self):
         return self.filename
-	
 
-#user_votes = example.user_votes.get(user=user)	
 
 		
 @receiver(pre_delete, sender=LectureNote)
