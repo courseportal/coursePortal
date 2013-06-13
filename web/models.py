@@ -5,7 +5,7 @@ from haystack import indexes
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
-from rating.models import UserVotes
+#from rating.models import UserVotes
 
 STATUS_CHOICES = (
     ('A', 'Active'),
@@ -115,40 +115,54 @@ class LectureNote(models.Model):
 	
 	def __unicode__(self):
 		return self.filename
-		
-class Example(models.Model):
-	file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
-	owner = models.ForeignKey(User)
-	filename = models.CharField(max_length=200)
-	atom = models.ForeignKey(Atom, related_name = "example_set")
-	date_created = models.DateTimeField(auto_now=True)
-	
-	user_votes = models.ManyToManyField(UserVotes)
-	votes = models.IntegerField(default=0)
 
-	#user_votes = example.user_votes.get(user=user)
-	def vote_up(self, user):
-		if user.votes.example_vote_up:
-		elif user.votes.example_vote_down:
-			user.votes.example_vote_down = False
-			user.votes.example_vote_up = True
-			self.votes += 2
-		else:
-			user.votes.example_vote_up = True
-			self.votes += 1
-			
-	def vote_down(self, user):
-		if user.votes.example_vote_down:
+class UserVotes(models.Model):
+	user = models.OneToOneField(User, related_name="votes")
+	example_vote_up = models.BooleanField(default=False)
+	example_vote_down = models.BooleanField(default=False)
+
+
+class Example(models.Model):
+    file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
+    owner = models.ForeignKey(User)
+    filename = models.CharField(max_length=200)
+    atom = models.ForeignKey(Atom, related_name = "example_set")
+    date_created = models.DateTimeField(auto_now=True)
+    user_votes = models.ManyToManyField(UserVotes)
+    votes = models.IntegerField(default=0)
+
+    def vote_up(self,user):
+        if user.votes.example_vote_up:
+            return
+        elif user.votes.example_vote_down:
+            user.votes.example_vote_down = False
+            user.votes.example_vote_up = True
+            self.votes += 2
+            return
+        else:
+            user.votes.example_vote_up = True
+            self.votes += 1
+            return
+
+    def vote_down(self, user):
+        if user.votes.example_vote_down:
+            return
         elif user.votes.example_vote_up:
-			user.votes.example_vote_up = False
-			user.votes.example_vote_down = True
-			self.votes -= 2
-		else:
-			user.votes.example_vote_up = True
-			self.votes -= 1
+            user.votes.example_vote_up = False
+            user.votes.example_vote_down = True
+            self.votes -= 2
+            return
+        else:
+            user.votes.example_vote_down = True
+            self.votes -= 1
+            return
+
+    def __unicode__(self):
+        return self.filename
 	
-	def __unicode__(self):
-		return self.filename
+
+#user_votes = example.user_votes.get(user=user)	
+
 		
 @receiver(pre_delete, sender=LectureNote)
 def delete_note_file(sender, **kwargs):

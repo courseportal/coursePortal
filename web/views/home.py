@@ -10,7 +10,6 @@ import json
 from pybb.models import Forum
 from django.core.mail import send_mail, BadHeaderError
 
-
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 
@@ -49,7 +48,7 @@ def index(request):
 		for category in VoteCategory.objects.all():
 			# for now, calculate an average for each video
 			top_ranked_videos.append({
-				'vote_category': category, 
+				'vote_category': category,
 				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
 			})
 		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
