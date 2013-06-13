@@ -2,19 +2,23 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from knoatom.settings import MEDIA_ROOT
+#from rating.models import UserVotes
 
 STATUS_CHOICES = (
     ('A', 'Active'),
     ('N', 'Not active'),
-
 )
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
-    allowed_users = models.ManyToManyField(User, blank=True)
+    allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
     students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
     author = models.ForeignKey(User, related_name = 'author')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
+    summary = models.TextField(default="There is no summary added at this time.")
     def __unicode__(self):
         return self.name
     class Meta:
@@ -103,14 +107,87 @@ class Vote(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-    file = models.FileField(upload_to = 'file')
+	file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
+	owner = models.ForeignKey(User)
+	filename = models.CharField(max_length=200)
+	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
+	date_created = models.DateTimeField(auto_now=True)
+	
+	def __unicode__(self):
+		return self.filename
+
+class UserVotes(models.Model):
+	user = models.OneToOneField(User, related_name="votes")
+	example_vote_up = models.BooleanField(default=False)
+	example_vote_down = models.BooleanField(default=False)
+
+
+class Example(models.Model):
+    file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
     owner = models.ForeignKey(User)
-    classBelong = models.ForeignKey(Class, related_name = 'classBelong')
     filename = models.CharField(max_length=200)
-#content = models.TextField()
-#date_created = models.DateTimeField(auto_now_add=True, default=datetime.now)
-#date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
+    atom = models.ForeignKey(Atom, related_name = "example_set")
+    date_created = models.DateTimeField(auto_now=True)
+    user_votes = models.ManyToManyField(UserVotes)
+    votes = models.IntegerField(default=0)
+
+    def vote_up(self,user):
+        if user.votes.example_vote_up:
+            return
+        elif user.votes.example_vote_down:
+            user.votes.example_vote_down = False
+            user.votes.example_vote_up = True
+            self.votes += 2
+            return
+        else:
+            user.votes.example_vote_up = True
+            self.votes += 1
+            return
+
+    def vote_down(self, user):
+        if user.votes.example_vote_down:
+            return
+        elif user.votes.example_vote_up:
+            user.votes.example_vote_up = False
+            user.votes.example_vote_down = True
+            self.votes -= 2
+            return
+        else:
+            user.votes.example_vote_down = True
+            self.votes -= 1
+            return
 
     def __unicode__(self):
         return self.filename
 
+
+		
+@receiver(pre_delete, sender=LectureNote)
+def delete_note_file(sender, **kwargs):
+	r"""
+	This adds the functionality to remove the file upon deletion.
+	"""
+	
+	kwargs['instance'].file.delete()
+	
+@receiver(pre_delete, sender=Example)
+def delete_example_file(sender, **kwargs):
+	r"""
+	This adds the functionality to remove the file upon deletion.
+	"""
+	
+	kwargs['instance'].file.delete()
+
+#bugReport
+class BugReport(models.Model):
+    subject = models.CharField(max_length=100)
+    content = models.TextField()
+    email = models.EmailField()
+    cc_myself = models.BooleanField(default=False)
+    def __unicode__(self):
+        return self.subject
+    class Meta:
+        ordering = ['subject']
+        verbose_name_plural = "BugReports"
+
+    

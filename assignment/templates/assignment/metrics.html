@@ -1,0 +1,42 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}css/boxplot.css">
+<script type="text/javascript" src="{{STATIC_PREFIX}}js/boxplot.js"></script>
+
+
+<div class="row">
+	<h1><div class="span3 offset3">Class Metrics</div></h1>
+</div>
+{% for stats in stat_set %}
+	<div class="row-fluid">
+		<div class="span5"><h3>Class:{{stats.className}}</div>
+		<div class="span1">
+			<button 
+				id="plot"
+				type="btn" 
+				onclick="return display({{stats.data}},{{stats.classid}},{{user.id}});" >	Plot
+		</div>
+	</div>
+	<div>Average: {{stats.average}}</div>
+	<div>Standard Deviation: {{stats.deviation}}</div>
+	<div>Minimum: {{stats.minimum}}</div>
+	<div>Maximum: {{stats.maximum}}</div>
+	<div>Median: {{stats.median}}</div>
+	<div style="display:none">
+		<div style="width:150px;" id="dialog{{user.id}}{{stats.classid}}" title="Class boxplot"></div>
+	</div>
+
+
+
+{%endfor%}
+<script>
+function display(data, classid, userid){
+	var name1="dialog", name2="#";
+	name1=name1.concat(userid, classid);
+	name2=name2.concat(name1)
+	createBoxPlot(data, 300, name1);
+  	$( name2 ).dialog();
+}
+</script>
+{% endblock %}

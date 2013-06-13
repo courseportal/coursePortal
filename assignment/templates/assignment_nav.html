@@ -42,7 +42,9 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% if user.is_authenticated %}
 
-	{% block navbar_content %}
+
+{% block navbar_content %}
+
 {% if user.is_staff %}
         <li class="nav-header">My Class</li>
         <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
@@ -56,53 +58,39 @@ I have changed this file a bit, you should use this as the template you extend. 
         <li class="divider"></li>
 {% endif %}
 
-		{% if user.is_staff or user.is_superuser %}
-		        <li class="nav-header">Administrative</li>
-		        <li><a href="{% url "assign" %}">Assign something</a></li>
-		        <li><a href="{% url "view_student" %}">View Students</a></li>
-		        <li>Class Performance</li>
-		        <li class="divider"></li>
-		{% endif %}
+{% if user.is_staff or user.is_superuser %}
+	<li class="nav-header">Administrative</li>
+	<li><a href="{% url "assign" %}">Assign something</a></li>
+	<li><a href="{% url "view_student" %}">View Students</a></li>
+	<li><a href="{% url "metrics" %}">Class Performance</a></li>
+	<li class="divider"></li>
+{% endif %}
+{% if user.is_active %}
+   <li class "nav-header">Student Affairs</li>
+   <li class="{% if grade_check == 1 %}active{%endif%}">
+   <a href="{% url "grades" %}">View grades</a></li>
 
-		{% if user.is_staff %}
-		        <li class="nav-header">My Class</li>
-		        <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
-		        <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
-		        <ul class="nav nav-list">
-		        {%for t in user.templates.all%}
-		            <li><a href="/admin/assignment/assignment/{{t.id}}">{{t}}</a></li>
-		        {%endfor%}
-		        </ul>
-		        <li><a href="{% url "add_question" %}">Add Question</a></li>
-		        <li class="divider"></li>
-		{% endif %}
-		
+   <li class="{% if assignment_selected %}open{%endif%}">
+      <a href="{% url "assignment"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
+   <ul class="nav nav-list">
+   {% for a in user.assignmentInstances.all %}
+      {% if a.questions.all %}
+         <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
+         <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
+         <ul class="nav nav-list">
+         {% for q in a.questions.all %}
+            <li class="{% if q.id == question_selected.id %}active{% endif %}">
+            <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a></li>
+            </li>
+         {% endfor %}
+         </ul>
+      {% endif %}
+   {% endfor %}
+   </ul>
+   <li class="divider"></li>
+{% endif %}
 
-		{% if user.is_active %}
-		        <li class "nav-header">Student Affairs</li>
-		        <li class="{% if grade_check == 1 %}active{%endif%}">
-		            <a href="{% url "grades" %}">View grades</a></li>
-
-		        <li class="{% if assignment_selected %}open{%endif%}">
-		            <a href="{% url "assignment"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
-		        <ul class="nav nav-list">
-		        {% for a in user.assignmentInstances.all %}
-		            {% if a.questions.all %}
-		                <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
-		                <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
-		                <ul class="nav nav-list">
-		                    {% for q in a.questions.all %}
-		                    <li class="{% if q.id == question_selected.id %}active{% endif %}">
-		                        <a href="{% url "question_instance" a.id q.id %}">{{ q }}</a></li>
-		                    </li>
-		                    {% endfor %}
-		                </ul>
-		            {% endif %}
-		        {% endfor %}
-		        </ul>
-		{% endif %}
-		<li class="divider"></li>
-	{% endblock %}
+{% endblock %}
 	
 {% endif %}
 

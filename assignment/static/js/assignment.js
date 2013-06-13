@@ -149,7 +149,6 @@ function save(){
 		title: '',
 		questions: [],		
 	}
-
 	assignment.title = 'testing';
 
 	$('#questionsList>.row-fluid').each(function(index){

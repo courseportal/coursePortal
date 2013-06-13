@@ -74,5 +74,4 @@ function preview(){
 
 	$('#previewname').val($('#title').val());
   	$('#previewdata').val(JSON.stringify(question));
-  	$('#inline').submit();
 }

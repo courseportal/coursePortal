@@ -32,7 +32,7 @@ OPTIONAL context:
         {% endfor %}
         {% if node.child_categories != None %}
             {% for child in node.child_categories.all %}
-                {% with node=child template_name="tree_view.html" %}
+                {% with node=child template_name="web/tree_view.html" %}
                     {% include template_name %}
                 {% endwith %}
             {% endfor %}

@@ -1,15 +1,15 @@
 from haystack import indexes
 
 from web.models import Atom, BaseCategory, Class
-
+from pybb.models import Category, Forum, Topic, Post
 
 class AtomIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
+    text = indexes.EdgeNgramField(document=True, use_template=True)
     AtomTitle = indexes.CharField(model_attr='name')
     AtomSum = indexes.CharField(model_attr='summary')
-    AtomTitle_auto = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
     AtomSuggestions = indexes.FacetCharField()
     rendered = indexes.CharField(use_template=True, indexed=False)
+    #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
 
     def get_model(self):
         return Atom
@@ -22,11 +22,12 @@ class AtomIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class BaseCategoryIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
+    text = indexes.EdgeNgramField(document=True, use_template=True)
     BaseCatTitle = indexes.CharField(model_attr='name')
     BaseCatSum = indexes.CharField(model_attr='summary')
     BaseCatSuggestions = indexes.FacetCharField()
     rendered = indexes.CharField(use_template=True, indexed=False)
+    #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
 
     def get_model(self):
         return BaseCategory
@@ -39,19 +40,58 @@ class BaseCategoryIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class ClassIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
+    text = indexes.EdgeNgramField(document=True, use_template=True)
     ClassTitle = indexes.CharField(model_attr='name')
     ClassAuthor = indexes.CharField(model_attr='author', faceted=True)
-    ClassStatus = indexes.BooleanField(model_attr='status', faceted=True)
+    ClassStatus = indexes.CharField(model_attr='status', faceted=True)
+    #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
 
     def get_model(self):
         return Class
 
 
+class CategoryIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    CatTitle = indexes.CharField(model_attr='name')
+
+    def get_model(self):
+        return Category
 
 
+class ForumIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    ForumTitle = indexes.CharField(model_attr='name')
+    ForumDescription = indexes.CharField(model_attr='description')
+    #ForumMod = indexes.CharField(model_attr='moderators')
+    
+    def get_model(self):
+        return Forum
 
 
+class TopicIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    TopicTitle = indexes.CharField(model_attr='name')
+    
+    def get_model(self):
+        return Topic
+
+
+class RenderableItemIndex(indexes.SearchIndex):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    Message = indexes.CharField(model_attr='body')
+
+    class Meta:
+        abstract = True
+
+    def get_model(self):
+        return RenderableItem
+
+
+class PostIndex(RenderableItemIndex, indexes.Indexable):
+    createTime = indexes.DateTimeField(model_attr='created')
+
+    def get_model(self):
+        return Post
 
 
 

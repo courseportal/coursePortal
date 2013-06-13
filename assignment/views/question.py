@@ -29,11 +29,12 @@ def detail(request, id, newly_added=False):
 	for integer_index in range(len(q['solutions'])):
 		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
 		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	exec q['code']
 	exec q['solutions'][0]
 	solution = answer
 
 	#q text formatted here
-	text = q['text'][0]
+	text = q['text']
 	# shuffle(q['texts'])
 	# text = q['texts'][0]
 
@@ -84,6 +85,7 @@ def preview(request):
 	for integer_index in range(len(q['solutions'])):
 		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
 		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	exec q['code']
 	exec q['solutions'][0]
 	solution = answer
 

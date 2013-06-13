@@ -1,0 +1,69 @@
+{% with obj=result.object %}
+{% if result.model_name == 'topic' %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_topic_{{ obj.id }}">
+            <span>Topic: {{ obj.name }}</span>
+            {% if obj.updated %}
+            <span style="float:right">Updated: {{ obj.updated }} </span>
+            {% else %}
+            <span style="float:right"> No Update </span>
+            {% endif %}
+        </a>
+    </div>
+    <div id="collapse_topic_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href="{% url 'pybb:topic' obj.id %}">[Enter the Topic...]</a>
+                <span style="float:right">Created: {{obj.created}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    {% if result.model_name == 'forum' %}
+
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_forum_{{ obj.id }}">
+            Forum: {{ obj.name }}
+        </a>
+    </div>
+    <div id="collapse_forum_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href="{% url 'pybb:forum' obj.id %}">[Enter the Forum...]</a>
+                </div>
+                Description: {{ obj.description }}
+                <div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+{% if result.model_name == 'post' %}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_post_{{ obj.id }}">
+            <span>Post: {{ obj.body }}</span>
+            {% if obj.updated %}
+            <span style="float:right">Updated: {{ obj.updated }} </span>
+            {% else %}
+            <span style="float:right"> No Update </span>
+            {% endif %}
+        </a>
+    </div>
+    <div id="collapse_post_{{ obj.id }}" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div>
+                <a href="{% url 'pybb:post' obj.id %}">[Enter the Post...]</a>
+                <span style="float:right">Created: {{obj.created}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% endif %}
+{% endif %}
+{% endif %}
+{% endwith %}

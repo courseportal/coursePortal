@@ -17,8 +17,8 @@ To EXTEND/USE this file:
 		vote_categories
 
 		expositions
-
-		lectureNotes
+    examples
+		notes
 
 BLOCKS(Including inherited blocks):
   extra_style
@@ -40,6 +40,9 @@ BLOCKS(Including inherited blocks):
 Only things that are unique to class should go in here, anything shared with base should go in "shared/atom.html"
 -->
 {% extends "web/home/home.html" %}
+
+
+
 {% block page_title %}
 	{% include "web/home/class/title.html" %}
 {% endblock %}

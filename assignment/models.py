@@ -13,7 +13,7 @@ class Question(models.Model):
 
 class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
-    data = models.TextField()
+    data = models.TextField(default='', null=True, blank=True)
     questions = models.ManyToManyField(Question)
     owners = models.ManyToManyField(User, related_name='templates', blank=True, null=True)
     def __unicode__(self):
@@ -36,6 +36,7 @@ class QuestionInstance(models.Model):
     text = models.TextField()
     value = models.FloatField(default = 1.0)
     can_edit = models.BooleanField(default=True)
+    student_answer = models.TextField(default = "")
     assignmentInstance = models.ForeignKey(AssignmentInstance, related_name='questions', default = None)
     def __unicode__(self):
         return self.title
