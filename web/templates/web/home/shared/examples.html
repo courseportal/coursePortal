@@ -11,11 +11,23 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
+{% block extra_script %}
+<script>
+
+
+
+    
+
+    
+</script>
+{% endblock %}
 {% load my_filters %}
 
 {% if not examples %}
 	No examples exist for this category yet!
 {% endif %}
+<div id="result">
+</div>
 <table class="table table-bordered table-hover">
   <thead>
     <th> </th>
@@ -26,12 +38,14 @@ OPTIONAL context:
   </thead>
   <tbody>
     {% for e in examples %}
+      
+      
       <tr>
         <td style="width:10px">
-          <div class="arrow-up">
+            <div class="arrow-up" vote-example-id="{{e.id}}" vote-type="1">
             <i class="icon-arrow-up"></i>
           </div>
-          <div class="arrow-down">
+          <div class="arrow-down" vote-example-id="{{e.id}}" vote-type="0">
             <i class="icon-arrow-down"></i>
           </div>
         </td>
@@ -44,7 +58,9 @@ OPTIONAL context:
           {{ e.owner }}
         </td>
         <td style="width:25px">
-          e.votes
+            <div class="vote-sum">
+            {{e.votes}}
+            </div>
         </td>
         <td>
         {% if user.is_staff or user.is_superuser or e.owner == user %}

@@ -73,6 +73,66 @@ init_rating_stars = function() {
 };
 
 /*
+ * Vote_up initialization
+ */
+init_vote_up = function() {
+    $('.arrow-up').click(function() {
+                         
+                         $.ajax({
+                                'url': '/ajax/voteExample/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
+                                'context': this,
+                                'statusCode': {
+                                200: function(data) {
+                                console.log(data)
+                                if(data.result == true) {
+                                console.log(this)
+                                $('.vote-sum').text(data.votes)
+                                alert("You have successfully voted Up, thanks!");
+                                
+                                }else{
+                                alert("You have already voted!");
+                                }
+                                }
+                                }
+                                });
+                         
+                         
+                         });
+};
+
+/*
+ * Vote_down initialization
+ */
+init_vote_down = function() {
+    $('.arrow-down').click(function() {
+                         
+                         $.ajax({
+                                'url': '/ajax/voteExample/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
+                                'context': this,
+                                'statusCode': {
+                                200: function(data) {
+                                console.log(data)
+                                if(data.result == true) {
+                                console.log(this)
+                                $('.vote-sum').text(data.votes)
+                                alert("You have successfully voted Down, thanks!");
+                                }else{
+                                alert("You have already voted!");
+                                }
+                                }
+                                }
+                                });
+                         
+                         
+                         });
+};
+
+
+
+
+
+
+/*
  * Video viewer on submissions
  */
 init_video_viewer = function() {
@@ -102,5 +162,7 @@ init_video_viewer = function() {
 $(document).ready(function() {
     init_sidebar();
     init_rating_stars();
+    init_vote_up();
+    init_vote_down();
     init_video_viewer();
 });
