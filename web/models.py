@@ -126,25 +126,6 @@ class Example(models.Model):
 	votes = models.IntegerField(default=0)
 
 	#user_votes = example.user_votes.get(user=user)
-	def vote_up(self, user):
-		if user.votes.example_vote_up:
-		elif user.votes.example_vote_down:
-			user.votes.example_vote_down = False
-			user.votes.example_vote_up = True
-			self.votes += 2
-		else:
-			user.votes.example_vote_up = True
-			self.votes += 1
-			
-	def vote_down(self, user):
-		if user.votes.example_vote_down:
-		elif user.votes.example_vote_up:
-			user.votes.example_vote_up = False
-			user.votes.example_vote_down = True
-			self.votes -= 2
-		else:
-			user.votes.example_vote_up = True
-			self.votes -= 1
 	
 	def __unicode__(self):
 		return self.filename

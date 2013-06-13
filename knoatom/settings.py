@@ -136,7 +136,7 @@ INSTALLED_APPS = (
                   'django.contrib.sites',
                   'django.contrib.messages',
                   'django.contrib.staticfiles',
-                  #'south',
+                  'south',
                   #'registration',
                   #'pagination',
                   #'django_authopenid',
@@ -152,7 +152,8 @@ INSTALLED_APPS = (
                   
                   # For PYBBM
                   'pybb',
-                  'sorl.thumbnail'
+                  'sorl.thumbnail',
+                  'rating'
                   )
 
 
