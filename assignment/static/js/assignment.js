@@ -79,7 +79,7 @@ function save(){
 
 	question.title = $('#title').val();
 	question.code = code.getValue();
-	for (var i = 0; i < solutions.length; i++) {
+	for (var i = 0; i < question.solutions.length; i++) {
   		question.solutions.push(solutions[i].getValue());
   	}
   	question.text = tinymce.activeEditor.getContent({format : 'raw'});
