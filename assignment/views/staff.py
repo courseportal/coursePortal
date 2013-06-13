@@ -6,7 +6,6 @@ from assignment.models import *
 from web.models import *
 from django.contrib.auth.models import User
 import numpy as np
-from pylab import *
 
 def viewStudent(request):
 	user = request.user
@@ -91,9 +90,6 @@ def metrics(request):
 		stats.maximum=np.nanmax(stats.data)
 		#median
 		stats.median=np.median(stats.data)
-		boxplot(data)
-		temp='assignment/static/img/box'+str(user.id)+str(c.id)
-		savefig(temp)
 		stat_set.append(stats)
 
 	context = {
