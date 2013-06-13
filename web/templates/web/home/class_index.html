@@ -29,12 +29,95 @@ BLOCKS(Including inherited blocks):
 
 {% block content %}
 
-{% if class_list %}
-	<ul>
-	{% for class in class_list %}
-		<li><a href="{% url "classes" class.id %}">{{ class.name }}</a></li>
-	{% endfor %}
-	<ul>
+{% if list_by_name %}
+    <div class="row-fluid">
+        <ul class = "nav nav-tabs">
+            <li class = "active"><a href="#1" data-toggle="tab">Sort By Name</a></li>
+            <li class = ""><a href = "#2" data-toggle="tab">Sort By Instructor</a><li>
+                <li class = ""><a href = "#3" data-toggle="tab">Sort by Status</a></li>
+        </ul>
+    </div>
+
+<div class="tab-content">
+	<div class="tab-pane active" id="1" >
+        {% for class in list_by_name %}
+		<div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
+            
+            <div class = "span10" style="text-align: left;">
+                <div>
+                    Title: {{ class.name }}</br>
+                    Instructor: <a href="">{{ class.author }}</a>
+                </div>
+            </div>
+            <div class = "span2" style="text-align: right;">
+                <div>
+                    {% if class.status == "N" %}
+                    Status: Not Active
+                    {% else %}
+                    Status: Active
+                    {% endif %}
+                    </br>
+                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+	</div>
+    
+	<div class="tab-pane", id="2">
+        {% for class in list_by_author %}
+        <div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
+            
+            <div class = "span10" style="text-align: left;">
+                <div>
+                    Title: {{ class.name }}</br>
+                    Instructor: <a href="">{{ class.author }}</a>
+                </div>
+            </div>
+            <div class = "span2" style="text-align: right;">
+                <div>
+                    {% if class.status == "N" %}
+                    Status: Not Active
+                    {% else %}
+                    Status: Active
+                    {% endif %}
+                    </br>
+                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+	</div>
+    
+	<div class="tab-pane", id="3">
+        {% for class in list_by_status %}
+        <div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
+            
+            <div class = "span10" style="text-align: left;">
+                <div>
+                    Title: {{ class.name }}</br>
+                    Instructor: <a href="">{{ class.author }}</a>
+                </div>
+            </div>
+            <div class = "span2" style="text-align: right;">
+                <div>
+                    {% if class.status == "N" %}
+                    Status: Not Active
+                    {% else %}
+                    Status: Active
+                    {% endif %}
+                    </br>
+                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+	</div>
+
+
 {% else %}
 	<p>No classes are available.</p>
 {% endif %}

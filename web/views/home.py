@@ -18,16 +18,20 @@ for m in get_models():
 def class_index(request):
 
 	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	template = loader.get_template('web/home/class_index.html')
-	class_list = Class.objects.order_by('name')
-	context = RequestContext(request, {
+    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+    class_list = Class.objects.all()
+    list_by_name = class_list.order_by('name')
+    list_by_status = class_list.order_by('status')
+    list_by_author = class_list.order_by('author')
+    template = loader.get_template('web/home/class_index.html')
+    context = RequestContext(request, {
 		'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
-		'class_list': class_list,
+		'list_by_name': list_by_name,
+        'list_by_status': list_by_status,
+        'list_by_author': list_by_author,
 		'top_level_categories': top_level_base_categories,
 	})
-	return HttpResponse(template.render(context))
+    return HttpResponse(template.render(context))
 
 def index(request):
 	"""
@@ -331,7 +335,7 @@ def category(request, class_id, cat_id):
 		'breadcrumbs': breadcrumbs,
 		'content': content,
 		'expositions': expositions,
-		'lectureNotes': lectureNotes,
+        #'lectureNotes': lectureNotes,
 		'top_level_categories': top_level_categories,
 		'selected_categories': parent_categories,
 		'atom_list_1': list_1,
@@ -402,7 +406,7 @@ def atom(request, class_id, cat_id, atom_id):
 		'breadcrumbs': breadcrumbs,
 		'content': content,
 		'expositions': expositions,
-		'lectureNotes': lectureNotes,
+        #'lectureNotes': lectureNotes,
 		'top_level_categories': top_level_categories,
 		'selected_categories': parent_categories,
 		#'selected_category': current_category,

@@ -13,6 +13,7 @@ urlpatterns = patterns('haystack.views',
     #url(r'^$', SearchView(), name='haystack_simple_search'),
     #url(r'^auto/', search_view_factory(view_class=SearchView,template='search/autoComplete.html',form_class=AutocompleteModelSearchForm), name='haystack_auto_search'),
     url(r'^$', FacetedSearchView(form_class=FacetedSearchForm, searchqueryset=SearchQuerySet().facet('ClassAuthor')), name='haystack_search'),
+    url(r'^facet/$', FacetedSearchView(form_class=FacetedSearchForm, searchqueryset=SearchQuerySet().facet('ClassStatus')), name='haystack_search_facet'),
     
 )
 

@@ -39,9 +39,9 @@
         <dl>
             {% if facets.fields.ClassStatus %}
             <dt>Status</dt>
-            {# Provide only the top 5 authors #}
+            {# Provide only the top 2 status #}
             {% for status in facets.fields.ClassStatus|slice:":2" %}
-            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassStatus_exact:{{ author.0|urlencode }}">{{ status.0 }}</a> ({{ status.1 }})</dd>
+            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassStatus_exact:{{ status.0|urlencode }}">{{ status.0 }}</a> ({{ status.1 }})</dd>
             {% endfor %}
             {% else %}
             <p>No status facets.</p>
