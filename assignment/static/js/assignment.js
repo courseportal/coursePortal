@@ -28,6 +28,11 @@ function init(){
 		// maxHeight: document.body.clientHeight*0.7,
 		modal: true,
 		autoOpen: false,
+		open: function(event, ui){
+			code = CodeMirror($('#codediv').get(0), CodeMirrorSettings);
+			solution = CodeMirror($('#solndiv').get(0), CodeMirrorSettings);
+			load_question_helper();
+		},
 		focus: function(event, ui){
 			$('body').addClass('dialog-open');
 		},
@@ -41,12 +46,8 @@ function init(){
 	   selector: 'textarea#text',
 	   force_p_newlines : false 
 	});
-	code = CodeMirror.fromTextArea($('#codetext').get(0), CodeMirrorSettings);
-	solution = CodeMirror.fromTextArea($('#solntext').get(0), CodeMirrorSettings);
 
-	$( '#opener' ).click(function() {
-  		$( '#dialog' ).dialog("open");
-	});
+	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 }
 
 function add_choice_div(){
@@ -55,48 +56,122 @@ function add_choice_div(){
 }
 
 function load_question(num){ 
-	//wipe out existing data
-	code.setValue('');
-	solution.setValue('');
+	//change save destination
+	$('#questionNum').val(num);
+	$('#question-save-button').attr('onclick', 'save_question('+num+')');
+	$( '#dialog' ).dialog('open');
+	//open the dialog
+}
+
+function load_question_helper(){
+	num = $('#questionNum').val();
+	numQuestions = $('#questionsList').children().length;
+	if(num > numQuestions){ //this is a new question
+
+		//wipe out all form fields
+		$('#questiontitle').val('');
+		code.setValue('');
+		solution.setValue('');
+		$('#choicediv').html(''); //wipe out choices
+		choices = [];
+		tinymce.activeEditor.setContent('');
+	}
+
+	else{
+		//load the data from the text
+		questiondata = $('#questionsList :nth-child('+num+')').find('input[type=hidden]').val();
+		question = jQuery.parseJSON(questiondata);
+
+		//replace the fields
+		$('#questiontitle').val(question.title);
+		code.setValue(question.code);
+		solution.setValue(question.solution);
+		$('#choicediv').html(''); //wipe out choices
+		choices = [];
+		for (var i = 0; i < question.choices.length; i++){//replace them
+			$('#choicediv').append('<div class="answer"></div>');
+			choices.push(CodeMirror($('.answer:last').get(0), CodeMirrorSettings));
+			choices[i].setValue(question.choices[i]);
+		}
+		tinymce.activeEditor.setContent(question.text);
+	}
 }
 
 function save_question(num){
 
-	if(num < 0){ //this is a new question
-
+	numQuestions = $('#questionsList').children().length;
+	//if a new question, add to the question list
+	if(num > numQuestions){
+		questionHTML = 
+			'<div class="row-fluid"> \
+				<input type="hidden"></input> \
+				<div class="span5 question-description">'+
+				$('#questiontitle').val()+
+				'</div> \
+				<div class="span1 btn" onclick="load_question('+num+')"> \
+					<i class="icon-edit-sign"> Edit</i> \
+				</div> \
+				<div class="span1 question-pts"> \
+					<input type="text" class="input-mini" value="0"></input> \
+				</div> \
+				<div class="span1 question-remove"> \
+					<i class="icon-remove-sign"></i> \
+				</div> \
+			</div>';
+		$('#questionsList').append(questionHTML);
 	}
+
+	//create the question object
+	datafield = $('#questionsList :nth-child('+num+')').find('input[type=hidden]');
+	question = {
+		choices: [],
+	};
+	question.title = $('#questiontitle').val();
+	question.code = code.getValue();
+	question.solution = solution.getValue();
+	for(var i = 0; i < choices.length; i++){
+		question.choices.push(choices[i].getValue());
+	}
+	question.text = tinymce.activeEditor.getContent();
+	questiondata = JSON.stringify(question);
+	datafield.val(questiondata);
+
+	//close the dialog
+	$( '#dialog' ).dialog('close');
+	$('#codediv').html('');
+	$('#solndiv').html('');
 }
 
 
 function save(){
 	//empty object
-	question = {
+	assignment = {
 		title: '',
-		code: '',
-		solutions: [],
-		text: ''
-	};
+		questions: [],		
+	}
+	assignment.title = 'testing';
 
-	question.title = $('#title').val();
-	question.code = code.getValue();
-	for (var i = 0; i < question.solutions.length; i++) {
-  		question.solutions.push(solutions[i].getValue());
-  	}
-  	question.text = tinymce.activeEditor.getContent({format : 'raw'});
+	$('#questionsList>.row-fluid').each(function(index){
+		questiondata = $(this).find('input[type=hidden]').val();
+		question = jQuery.parseJSON(questiondata);
+		assignment.questions.push(question);
+   });
 
-	$('#questionname').val($('#title').val());
-  	$('#data').val(JSON.stringify(question));
-  	$('#questionForm').submit();
+   assignmentdata = JSON.stringify(assignment, undefined, 2);
+   alert(assignmentdata);
 }
 
-$('#myModal').on('show', function () {
-  $('body').addClass('dialog-open');
-})
+// function add_question(){
+// 	//wipe out the form
+// 	$('#questiontitle').val('');
+// 	code.setValue('');
+// 	solution.setValue('');
+// 	$('#choicediv').html('');
+// 	tinymce.activeEditor.setContent('');
 
-$('#myModal').on('hidden', function () {
-  $('body').removeClass('dialog-open');
-})
+// 	//change save destination
+// 	$('#question-save-button').attr('onclick', 'save_question(-1)');
 
-function add_question(){
-	$('#myModal').modal('toggle');
-}
+// 	//open form
+// 	$( '#dialog' ).dialog('open');
+// }
