@@ -31,57 +31,75 @@ def vote(request, submission_id, vote_category, vote_value):
     return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You must be authenticated'}), mimetype="application/json")
 
 
-def voteExample(request, example_id, vote_type):
+def voteGeneral(request,item ,item_id, vote_type):
     if request.method != 'GET':
+        print("I am not GET")
         return HttpResponseNotAllowed(['GET'])
     if request.user.is_authenticated():
-        e = Example.objects.get(id=example_id)
-        if vote_type == '1':
-            if request.user.votes.example_vote_up:
-                e.votes +=0
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': False, 'votes': e.votes}), mimetype="application/json")
-            elif request.user.votes.example_vote_down:
-                request.user.votes.example_vote_down = False
-                request.user.votes.example_vote_up = True
-                e.votes += 2
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': True,'votes': e.votes}), mimetype="application/json")
-            elif request.user.votes.example_vote_up == False:
-                request.user.votes.example_vote_up = True
-                e.votes += 1
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': True, 'votes': e.votes}), mimetype="application/json")
-            else:
-                print("Error")
-                return HttpResponseServerError(json.dumps({'result': False, 'error': 'error looking up your voting example information'}), mimetype="application/json")
-        elif vote_type == '0':
-            if request.user.votes.example_vote_down:
-                e.votes -=0
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': False, 'votes': e.votes}), mimetype="application/json")
-            elif request.user.votes.example_vote_up:
-                request.user.votes.example_vote_up = False
-                request.user.votes.example_vote_down = True
-                e.votes -= 2
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': True, 'votes': e.votes}), mimetype="application/json")
-            elif request.user.votes.example_vote_down == False:
-                request.user.votes.example_vote_down = True
-                e.votes -= 1
-                e.save()
-                request.user.votes.save()
-                return HttpResponse(json.dumps({'result': True, 'votes': e.votes}), mimetype="application/json")
-            else:
-                print("Error")
-                return HttpResponseServerError(json.dumps({'result': False, 'error': 'error looking up your voting example information'}), mimetype="application/json")
+        if item == '1':
+            e = Exposition.objects.get(id=item_id)
+        elif item == '2':
+            e = LectureNote.objects.get(id=item_id)
+        elif item == '3':
+            e = Example.objects.get(id=item_id)
         else:
-            print("something wrong with vote_type!!!")
+            print("Something wrong!")
+        print(e.id)
+        try:
+            if item == '1':
+                vote_example = VoteExposition.objects.filter(user=request.user).get(example=e)
+            elif item == '2':
+                vote_example = VoteLectureNote.objects.filter(user=request.user).get(example=e)
+            else:
+                vote_example = VoteExample.objects.filter(user=request.user).get(example=e)
+
+        # Check if the previous vote arees with the new vote
+        # Update e.votes and vote_example accordingly
+            if vote_type == '1':
+                if vote_example.vote == 1:
+                    return HttpResponse(json.dumps({'result': False, 'votes': e.votes,'id':e.id}), mimetype="application/json")
+                elif vote_example.vote == -1:
+                    vote_example.vote = 1
+                    vote_example.save()
+                    e.votes +=2
+                    e.save()
+                    return HttpResponse(json.dumps({'result': True,'votes': e.votes,'id':e.id}), mimetype="application/json")
+
+            elif vote_type == '0':
+                print("vote_type==0")
+                if vote_example.vote == -1:
+                    return HttpResponse(json.dumps({'result': False, 'votes': e.votes,'id':e.id}), mimetype="application/json")
+                elif vote_example.vote == 1:
+                    vote_example.vote = -1
+                    vote_example.save()
+                    e.votes -=2
+                    e.save()
+                    return HttpResponse(json.dumps({'result': True,'votes': e.votes,'id':e.id}), mimetype="application/json")
+            else:
+                print("something wrong with vote_type!!!")
+        except (VoteExposition.DoesNotExist, VoteLectureNote.DoesNotExist, VoteExample.DoesNotExist):
+            if item == '1':
+                vote_example = VoteExposition.objects.create(user=request.user,example=e, vote=1)
+            elif item == '2':
+                vote_example = VoteLectureNote.objects.create(user=request.user,example=e, vote=1)
+            else:
+                vote_example = VoteExample.objects.create(user=request.user,example=e, vote=1)
+
+            if vote_type == '1':
+                vote_example.vote = 1
+                vote_example.save()
+                e.votes +=1
+                e.save()
+                return HttpResponse(json.dumps({'result': True, 'votes': e.votes,'id':e.id}), mimetype="application/json")
+            elif vote_type == '0':
+                vote_example.vote = -1
+                vote_example.save()
+                e.votes -=1
+                e.save()
+                return HttpResponse(json.dumps({'result': True, 'votes': e.votes,'id':e.id}), mimetype="application/json")
+
+            else:
+                print("something wrong with vote_type!!!")
 
     print("should not be GET")
     return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You must be authenticated'}), mimetype="application/json")

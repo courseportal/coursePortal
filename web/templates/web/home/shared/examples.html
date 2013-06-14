@@ -11,16 +11,6 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-{% block extra_script %}
-<script>
-
-
-
-    
-
-    
-</script>
-{% endblock %}
 {% load my_filters %}
 
 {% if not examples %}
@@ -42,10 +32,10 @@ OPTIONAL context:
       
       <tr>
         <td style="width:10px">
-            <div class="arrow-up" vote-example-id="{{e.id}}" vote-type="1">
+            <div class="arrow-up" item-type="3" vote-example-id="{{e.id}}" vote-type="1">
             <i class="icon-arrow-up"></i>
           </div>
-          <div class="arrow-down" vote-example-id="{{e.id}}" vote-type="0">
+          <div class="arrow-down" item-type="3" vote-example-id="{{e.id}}" vote-type="0">
             <i class="icon-arrow-down"></i>
           </div>
         </td>
@@ -58,7 +48,7 @@ OPTIONAL context:
           {{ e.owner }}
         </td>
         <td style="width:25px">
-            <div class="vote-sum">
+            <div class="votes-sum-{{e.id}}">
             {{e.votes}}
             </div>
         </td>

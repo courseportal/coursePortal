@@ -79,16 +79,15 @@ init_vote_up = function() {
     $('.arrow-up').click(function() {
                          
                          $.ajax({
-                                'url': '/ajax/voteExample/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
+                                'url': '/ajax/voteGeneral/' + $(this).attr('item-type')  + '/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
                                 'context': this,
                                 'statusCode': {
                                 200: function(data) {
                                 console.log(data)
                                 if(data.result == true) {
                                 console.log(this)
-                                $('.vote-sum').text(data.votes)
-                                alert("You have successfully voted Up, thanks!");
-                                
+                                var s = '.votes-sum-'+data.id
+                                $(s).text(data.votes)
                                 }else{
                                 alert("You have already voted!");
                                 }
@@ -107,15 +106,15 @@ init_vote_down = function() {
     $('.arrow-down').click(function() {
                          
                          $.ajax({
-                                'url': '/ajax/voteExample/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
+                                'url': '/ajax/voteGeneral/'+ $(this).attr('item-type') + '/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
                                 'context': this,
                                 'statusCode': {
                                 200: function(data) {
                                 console.log(data)
                                 if(data.result == true) {
                                 console.log(this)
-                                $('.vote-sum').text(data.votes)
-                                alert("You have successfully voted Down, thanks!");
+                                var s = '.votes-sum-'+data.id
+                                $(s).text(data.votes)
                                 }else{
                                 alert("You have already voted!");
                                 }
