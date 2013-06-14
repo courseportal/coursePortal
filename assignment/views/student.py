@@ -4,7 +4,7 @@ from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import *
 from django.contrib.auth.models import User
-from assign import index
+from assign import main
 from random import shuffle
 from math import *
 
@@ -40,7 +40,7 @@ def eval(request):
     if assdone(assignment):
         assignment.can_edit=False
         assignment.save()
-    return index(request)
+    return main(request)
 
 def save(request):
     assignment = AssignmentInstance.objects.get(pk=request.POST['assignment'])    
@@ -51,10 +51,21 @@ def save(request):
             question.save()
         except:
             continue
-    return index(request)
+    return main(request)
 
 def assdone(assignment):
     for q in assignment.questions.all():
         if q.can_edit:
             return False
     return True
+
+def list(request):
+    assignment_list = request.user.assignmentInstances.all()
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url': reverse('list'), 'title': 'List'})
+    context = {
+        'user':request.user,
+        'assignment_list':assignment_list,
+        'breadcrumbs':breadcrumbs,
+    }
+    return render(request, 'assignment/list.html',context)

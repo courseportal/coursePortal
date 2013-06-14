@@ -29,17 +29,17 @@
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
-			<input type="text" id="assigntitle"></input>
+			<input type="text" id="assigntitle" value = "{{assignment.title}}"></input>
 		</div>
 	</div>
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate"></input>
+			<input type="text" id="assigndate" value = "{{start_date}}"></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate"></input>
+			<input type="text" id="duedate" value = "{{due_date}}"></input>
 		</div>
 	</div>
 	<div class="row-fluid">
@@ -53,6 +53,22 @@
 				<input type="hidden" id="questionNum"></input>
 			</div>
 			<div id="questionsList">
+				{% for q in assignment.questions.all %}
+				<div class="row-fluid" id="{{user.id}}_{{q.id}}"> 
+					<input type="hidden"></input> 
+					<div class="span5 question-description">{{q.title}}
+					</div> 
+					<div class="span1 btn" onclick="load_question('+num+')" disabled>
+						<i class="icon-edit-sign"> Edit</i> 
+					</div> 
+					<div class="span1 question-pts"> 
+						<input type="text" class="input-fit" value="0"></input> 
+					</div>
+					<div class="span1 question-remove btn" onclick="remove_question_exists({{user.id}},{{q.id}})"> 
+						<i class="icon-remove-sign"></i> 
+					</div> 
+				</div>
+				{%endfor%}
 			</div>
 		</div>
 	</div>

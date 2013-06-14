@@ -14,20 +14,26 @@ OPTIONAL context:
 {% if not notes %}
 	No lecture notes exist for this category yet!
 {% endif %}
-{% for e in notes %}
-	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "note_submit" e.id %}">edit</a>) (<a href="{% url "delete_note" e.id %}">delete</a>) {% endif %}
-	<br />
-{% endfor %}
 
 <table class="table table-bordered table-hover">
-  <thead>
-    <th>Name</th>
-    <th>Created By</th>
-    <th>Options</th>
-  </thead>
+    <thead>
+        <th> </th>
+        <th>Name</th>
+        <th>Created By</th>
+        <th>Votes</th>
+        <th>Options</th>
+    </thead>
   <tbody>
     {% for e in notes %}
       <tr>
+          <td style="width:10px">
+              <div class="arrow-up" item-type="2" vote-example-id="{{e.id}}" vote-type="1">
+                  <i class="icon-arrow-up"></i>
+              </div>
+              <div class="arrow-down" item-type="2" vote-example-id="{{e.id}}" vote-type="0">
+                  <i class="icon-arrow-down"></i>
+              </div>
+          </td>
         <td>
         	<a target="_blank" href="{% url "note" e.id %}">
             {{ e.filename }}
@@ -35,6 +41,11 @@ OPTIONAL context:
         </td>
         <td>
           {{ e.owner }}
+        </td>
+        <td style="width:25px">
+            <div class="votes-sum-{{e.id}}">
+                {{e.votes}}
+            </div>
         </td>
         <td>
         {% if user.is_staff or user.is_superuser or e.owner == user %}

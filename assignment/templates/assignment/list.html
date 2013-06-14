@@ -1,0 +1,23 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+<table class="table">
+<tr>
+	<th>Assignment Name</th>
+	<th>Value</th>
+	<th>Completed?</th>
+	<th>Due Date</th>
+</tr>
+{% for a in assignment_list %}
+<tr>
+	<td>{{a.title}}</td>
+	<td>{{a.max_score}}</td>
+	{% ifequal a.can_edit 0 %}
+		<td>Yes</td>
+	{% else %}
+		<td>No</td>
+	{% endifequal %}
+	<td>{{a.due_date}}</td>
+</tr>
+{%endfor%}
+</table>
+{% endblock %}

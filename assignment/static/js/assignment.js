@@ -157,6 +157,12 @@ function remove_question(num){
 	$('#question'+num).remove()
 }
 
+function remove_question_exists(userid, qid){
+	name="#";
+	name=name.concat(userid,'_', qid);
+	$(name).remove();
+}
+
 function save(){
 	//empty object
 	assignment = {
@@ -180,8 +186,8 @@ function save(){
 		assignment.questions.push(question);
    });
 
-   assignmentdata = JSON.stringify(assignment, undefined, 2);
-   alert(assignmentdata);
+   $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+   $('#assignmentForm').submit();
 }
 
 // function add_question(){
