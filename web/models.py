@@ -107,7 +107,7 @@ class Vote(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-	file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
+	file = models.FileField(upload_to='lecture_notes/')
 	owner = models.ForeignKey(User)
 	filename = models.CharField(max_length=200)
 	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
@@ -123,7 +123,7 @@ class UserVotes(models.Model):
 
 
 class Example(models.Model):
-    file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
+    file = models.FileField(upload_to='examples/')
     owner = models.ForeignKey(User)
     filename = models.CharField(max_length=200)
     atom = models.ForeignKey(Atom, related_name = "example_set")

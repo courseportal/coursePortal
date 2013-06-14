@@ -11,25 +11,20 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-{% if not notes %}
-	No lecture notes exist for this category yet!
-{% endif %}
-{% for e in notes %}
-	<a target="_blank" href="{% url "note" e.id %}">{{ e.filename }}</a>{% if user.is_staff or user.is_superuser or e.owner == user %} (<a href="{% url "note_submit" e.id %}">edit</a>) (<a href="{% url "delete_note" e.id %}">delete</a>) {% endif %}
-	<br />
-{% endfor %}
 
-<table class="table table-bordered table-hover">
+<table id="notes" class="table tablesorter table-bordered table-hover">
   <thead>
+    <tr>
     <th>Name</th>
     <th>Created By</th>
     <th>Options</th>
+  </tr>
   </thead>
   <tbody>
     {% for e in notes %}
       <tr>
         <td>
-        	<a target="_blank" href="{% url "note" e.id %}">
+        	<a target="_blank" href="{{ e.file.url }}">
             {{ e.filename }}
           </a>
         </td>
@@ -52,3 +47,11 @@ OPTIONAL context:
     {% endfor %}
   </tbody>
 </table>
+
+<script>
+$(document).ready(function() 
+    { 
+        $("#notes").tablesorter({headers: { 2:{sorter: false}} }); 
+    } 
+); 
+</script>

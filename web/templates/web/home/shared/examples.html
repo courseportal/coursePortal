@@ -21,11 +21,8 @@ OPTIONAL context:
     
 </script>
 {% endblock %}
-{% load my_filters %}
 
-{% if not examples %}
-	No examples exist for this category yet!
-{% endif %}
+
 <div id="result">
 </div>
 <table class="table table-bordered table-hover">
@@ -50,7 +47,8 @@ OPTIONAL context:
           </div>
         </td>
         <td>
-        	<a target="_blank" href="{% url "example" e.id %}">
+          
+        	<a target="_blank" href="{{ e.file.url }}">
             {{ e.filename }}
           </a>
         </td>

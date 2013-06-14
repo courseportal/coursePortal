@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Avg
 from django.db.models.loading import get_models

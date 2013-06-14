@@ -5,6 +5,7 @@ PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+THUMBNAIL_DEBUG = True
 
 ADMINS = (
           ('Bryan Kendall', 'bkend@umich.edu'),
@@ -153,7 +154,7 @@ INSTALLED_APPS = (
                   # For PYBBM
                   'pybb',
                   'sorl.thumbnail',
-                  'rating'
+                  #'rating'
                   )
 
 

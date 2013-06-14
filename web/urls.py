@@ -30,10 +30,6 @@ urlpatterns = patterns('',
 	url(r'^example_submit/(?P<exid>\d+)?/delete/?$', 'web.views.submission.delete_example', name='delete_example'),
 	url(r'^submit/(?P<sid>\d+)?/delete/?$', 'web.views.submission.delete_video', name='delete_video'),
 	
-	
-	# File Viewing
-	url(r'^example/(?P<pk>\d+)/?$', 'web.views.file_views.example_display', name='example'),
-	url(r'^note/(?P<pk>\d+)/?$', 'web.views.file_views.note_display', name='note'),
 	       
 
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
