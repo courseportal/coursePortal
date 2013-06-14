@@ -17,8 +17,10 @@ function init(){
 	$( '#questionsList' ).sortable({
 		update: function(event, ui) {
 	      $('#questionsList>.row-fluid').each(function(index){
-	         $(this).find('.question-edit').attr('onclick', 'load_question('+index+')');
-	         $(this).find('.question-remove').attr('onclick', 'remove_question('+index+')');
+	      	num = index+1
+	      	$(this).id = 'question'+num;
+	         $(this).find('.question-edit').attr('onclick', 'load_question('+num+')');
+	         $(this).find('.question-remove').attr('onclick', 'remove_question('+num+')');
 	      });
 	   },
 	});
@@ -107,7 +109,7 @@ function save_question(num){
 	//if a new question, add to the question list
 	if(num > numQuestions){
 		questionHTML = 
-			'<div class="row-fluid"> \
+			'<div class="row-fluid" id="question'+num+'"> \
 				<input type="hidden"></input> \
 				<div class="span5 question-description">'+
 				$('#questiontitle').val()+
@@ -126,7 +128,7 @@ function save_question(num){
 	}
 
 	//create the question object
-	datafield = $('#questionsList :nth-child('+num+')').find('input[type=hidden]');
+	datafield = $('#question'+num).find('input[type=hidden]');
 	question = {
 		choices: [],
 	};
@@ -142,12 +144,17 @@ function save_question(num){
 
 	//close the dialog
 	$( '#dialog' ).dialog('close');
+
+	//kill codemirrors so that they can be replaced
 	$('#codediv').html('');
 	$('#solndiv').html('');
+
+	//update the description
+	$('#question'+num).find('.question-description').html(question.title);
 }
 
 function remove_question(num){
-	$('#questionsList :nth-child('+num+')').remove()
+	$('#question'+num).remove()
 }
 
 function save(){
