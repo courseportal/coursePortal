@@ -11,13 +11,15 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-<table id="notes" class="table tablesorter table-bordered table-hover">
+<table class="tablesorter">
   <thead>
     <tr>
-    <th>Name</th>
-    <th>Created By</th>
-    <th>Options</th>
-  </tr>
+      <th data-sorter="false"> </th>
+      <th>Name</th>
+      <th>Created By</th>
+      <th>Votes</th>
+      <th data-sorter="false">Options</th>
+    </tr>
   </thead>
   <tbody>
     {% for e in notes %}
@@ -38,7 +40,7 @@ OPTIONAL context:
         <td>
           {{ e.owner }}
         </td>
-        <td style="width:25px">
+        <td style="width:75px">
             <div class="votes-sum-{{e.id}}">
                 {{e.votes}}
             </div>
@@ -60,10 +62,4 @@ OPTIONAL context:
   </tbody>
 </table>
 
-<script>
-$(document).ready(function() 
-    { 
-        $("#notes").tablesorter({headers: { 2:{sorter: false}} }); 
-    } 
-); 
-</script>
+{% include "web/home/shared/tablesorter.html" %}

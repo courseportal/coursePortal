@@ -28,98 +28,38 @@ BLOCKS(Including inherited blocks):
 {% extends "web/home/home.html" %}
 
 {% block content %}
-
-{% if list_by_name %}
-    <div class="row-fluid">
-        <ul class = "nav nav-tabs">
-            <li class = "active"><a href="#1" data-toggle="tab">Sort By Name</a></li>
-            <li class = ""><a href = "#2" data-toggle="tab">Sort By Instructor</a><li>
-                <li class = ""><a href = "#3" data-toggle="tab">Sort by Status</a></li>
-        </ul>
-    </div>
-
-<div class="tab-content">
-	<div class="tab-pane active" id="1" >
-        {% for class in list_by_name %}
-		<div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
-            
-            <div class = "span10" style="text-align: left;">
-                <div>
-                    Title: {{ class.name }}</br>
-                    Instructor: <a href="">{{ class.author }}</a>
-                </div>
-            </div>
-            <div class = "span2" style="text-align: right;">
-                <div>
-                    {% if class.status == "N" %}
-                    Status: Not Active
-                    {% else %}
-                    Status: Active
-                    {% endif %}
-                    </br>
-                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
-                </div>
-            </div>
-        </div>
-        <hr>
-        {% endfor %}
-	</div>
-    
-	<div class="tab-pane", id="2">
-        {% for class in list_by_author %}
-        <div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
-            
-            <div class = "span10" style="text-align: left;">
-                <div>
-                    Title: {{ class.name }}</br>
-                    Instructor: <a href="">{{ class.author }}</a>
-                </div>
-            </div>
-            <div class = "span2" style="text-align: right;">
-                <div>
-                    {% if class.status == "N" %}
-                    Status: Not Active
-                    {% else %}
-                    Status: Active
-                    {% endif %}
-                    </br>
-                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
-                </div>
-            </div>
-        </div>
-        <hr>
-        {% endfor %}
-	</div>
-    
-	<div class="tab-pane", id="3">
-        {% for class in list_by_status %}
-        <div class="row-fluid" style="margin-top: -5px; margin-bottom: -5px">
-            
-            <div class = "span10" style="text-align: left;">
-                <div>
-                    Title: {{ class.name }}</br>
-                    Instructor: <a href="">{{ class.author }}</a>
-                </div>
-            </div>
-            <div class = "span2" style="text-align: right;">
-                <div>
-                    {% if class.status == "N" %}
-                    Status: Not Active
-                    {% else %}
-                    Status: Active
-                    {% endif %}
-                    </br>
-                    <a href="{% url "classes" class.id %}">[Enter the class..]</a>
-                </div>
-            </div>
-        </div>
-        <hr>
-        {% endfor %}
-	</div>
-
-
-{% else %}
-	<p>No classes are available.</p>
-{% endif %}
+<div id="table">
+  <table class="tablesorter">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Instructor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for class in class_list %}
+      <!-- If the class is active or user is the author put on the list -->
+        {% if class.status == "A" or class.author == user or user.is_superuser or user.is_staff %}
+          <tr>
+            <td><a href="{% url "classes" class.id %}">{{ class.name }}</a></td>
+            <td>{{ class.author }}</td>
+          </tr>
+        {% else %}
+        <!-- else if they are an allowed user make it show up -->
+          {% for allowed in class.allowed_users.all %}
+            {% if user == allowed %}
+            <tr>
+              <td><a href="{% url "classes" class.id %}">{{ class.name }}</a></td>
+              <td>{{ class.author }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+  
+  {% include "web/home/shared/tablesorter.html" %}
 
 {% endblock %}
