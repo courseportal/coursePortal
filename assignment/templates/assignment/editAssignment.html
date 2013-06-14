@@ -54,7 +54,7 @@
 			</div>
 			<div id="questionsList">
 				{% for q in assignment.questions.all %}
-				<div class="row-fluid" id="{{user.id}}_{{q.id}}"> 
+				<div class="row-fluid"> 
 					<input type="hidden"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
@@ -64,7 +64,7 @@
 					<div class="span1 question-pts"> 
 						<input type="text" class="input-fit" value="0"></input> 
 					</div>
-					<div class="span1 question-remove btn" onclick="remove_question_exists({{user.id}},{{q.id}})"> 
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')" disabled> 
 						<i class="icon-remove-sign"></i> 
 					</div> 
 				</div>
