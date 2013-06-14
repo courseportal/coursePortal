@@ -41,14 +41,16 @@ function save(){
 	question = {
 		title: '',
 		code: '',
-		solutions: [],
+		solution: {},
+		choices: [],
 		text: ''
 	};
 
 	question.title = $('#title').val();
 	question.code = code.getValue();
-	for (var i = 0; i < solutions.length; i++) {
-  		question.solutions.push(solutions[i].getValue());
+	solution = solutions[0].getValue();
+	for (var i = 1; i < solutions.length; i++) {
+  		question.choices.push(solutions[i].getValue());
   	}
   	question.text = tinymce.activeEditor.getContent({format : 'raw'});
 
@@ -61,14 +63,16 @@ function preview(){
 	question = {
 		title: '',
 		code: '',
-		solutions: [],
+		solution: {},
+		choices: [],
 		text: ''
 	};
 
 	question.title = $('#title').val();
 	question.code = code.getValue();
-	for (var i = 0; i < solutions.length; i++) {
-  		question.solutions.push(solutions[i].getValue());
+	solution=solutions[0].getValue();
+	for (var i = 1; i < solutions.length; i++) {
+  		question.choices.push(solutions[i].getValue());
   	}
   	question.text = tinymce.activeEditor.getContent({format : 'raw'});
 

@@ -157,8 +157,8 @@ function save(){
 		assignment.questions.push(question);
    });
 
-   assignmentdata = JSON.stringify(assignment, undefined, 2);
-   alert(assignmentdata);
+   $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+   $('#assignmentForm').submit();
 }
 
 // function add_question(){

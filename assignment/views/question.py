@@ -19,18 +19,20 @@ def detail(request, id, newly_added=False):
 	q = json.loads(question.data)
 
 	test = ''
-	#try:
-	#	exec q['code']
-	#except Exception as ex:
-	#	test += str(ex)
-	#	return HttpResponse(test)
+	try:
+		exec q['code']
+	except Exception as ex:
+		test += str(ex)
+		return HttpResponse(test)
 
 
-	for integer_index in range(len(q['solutions'])):
-		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
-		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	q['solution']= q['solution'].replace('<br>', '\n')
+	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	for integer_index in range(len(q['choices'])):
+		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 	exec q['code']
-	exec q['solutions'][0]
+	exec q['solution']
 	solution = answer
 
 	#q text formatted here
@@ -43,8 +45,7 @@ def detail(request, id, newly_added=False):
 
 	# #choices formatted here
 	choices = []
-	q['solutions'].pop(0)
-	for choice in q['solutions']:
+	for choice in q['choices']:
 		exec choice
 		choices.append(answer)
 
@@ -81,12 +82,13 @@ def preview(request):
 		test += str(ex)
 		return HttpResponse(test)
 
-
-	for integer_index in range(len(q['solutions'])):
-		q['solutions'][integer_index]= q['solutions'][integer_index].replace('<br>', '\n')
-		q['solutions'][integer_index] = q['solutions'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	q['solution']= q['solution'].replace('<br>', '\n')
+	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	for integer_index in range(len(q['choices'])):
+		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 	exec q['code']
-	exec q['solutions'][0]
+	exec q['solution']
 	solution = answer
 
 	#q text formatted here
@@ -99,8 +101,7 @@ def preview(request):
 
 	# #choices formatted here
 	choices = []
-	q['solutions'].pop(0)
-	for choice in q['solutions']:
+	for choice in q['choices']:
 		exec choice
 		choices.append(answer)
 
@@ -114,4 +115,5 @@ def preview(request):
 
 def form(request):
 	return render(request, 'question/form.html')
+
 

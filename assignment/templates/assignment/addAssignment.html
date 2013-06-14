@@ -127,10 +127,9 @@
 	</div>
 
 	<hr>
-	<form action="/assignment/question/create" method="post" id="questionForm">
+	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
 	{% csrf_token %}
-		<input type="text" style="display:none" id="questionname" name="questionname"></input>
-		<input type="text" style="display:none" id="data" name="questiondata"></input>
+		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
 
