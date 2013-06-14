@@ -55,20 +55,28 @@
 			<div id="questionsList">
 				{% for q in assignment.questions.all %}
 				<div class="row-fluid"> 
-					<input type="hidden"></input> 
+					<input type="hidden" value = "{{q.data}}"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
-					<div class="span1 btn" onclick="load_question('+num+')" disabled>
+					<div class="span1 question-edit btn" onclick="load_question(0)">
 						<i class="icon-edit-sign"> Edit</i> 
 					</div> 
 					<div class="span1 question-pts"> 
 						<input type="text" class="input-fit" value="0"></input> 
 					</div>
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')" disabled> 
+					<div class="span1 question-remove btn" onclick="remove_question(0)"> 
 						<i class="icon-remove-sign"></i> 
 					</div> 
 				</div>
 				{%endfor%}
+				<script>
+					$('#questionsList>.row-fluid').each(function(index){
+	      			num = index+1
+	      			$(this).id = 'question'+num;
+	         		$(this).find('.question-edit').attr('onclick', 'load_question('+num+')');
+	         		$(this).find('.question-remove').attr('onclick', 'remove_question('+num+')');
+	      		});
+	      	</script>
 			</div>
 		</div>
 	</div>

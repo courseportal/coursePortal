@@ -96,6 +96,7 @@ def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
     start_date = json.loads(assignment.data)['start']
     due_date = json.loads(assignment.data)['due']
+    int_index=1
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
     context = {
@@ -103,6 +104,7 @@ def editA(request, id):
         'start_date': start_date,
         'due_date': due_date,
         'breadcrumbs': breadcrumbs,
+        'int_index' : int_index
     }
     return render(request, 'assignment/editAssignment.html', context)
 
