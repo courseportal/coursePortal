@@ -150,6 +150,12 @@ function remove_question(num){
 	$('#questionsList :nth-child('+num+')').remove()
 }
 
+function remove_question_exists(userid, qid){
+	name="#";
+	name=name.concat(userid,'_', qid);
+	$(name).remove();
+}
+
 function save(){
 	//empty object
 	assignment = {

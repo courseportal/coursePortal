@@ -15,12 +15,14 @@ urlpatterns = patterns('',
     url(r'eval/?$', 'assignment.views.student.eval', name='eval'),
     url(r'save/?$', 'assignment.views.student.save', name='save'),
     url(r'grades/?$', 'assignment.views.student.grades', name='grades'),
+    url(r'list/?$', 'assignment.views.student.list', name='list'),
 
     url(r'assign/create/?$', 'assignment.views.assign.create', name='create_assignment'),    
     url(r'assign/add/?$', 'assignment.views.assign.addA', name='add_assignment'),
+    url(r'assign/edit/(?P<id>\d+)/?$', 'assignment.views.assign.editA', name='edit_assignment'),
     url(r'assign/instantiate/?$', 'assignment.views.assign.instantiate', name='instantiate'),
     url(r'assign/?$', 'assignment.views.assign.assign', name='assign'),
     url(r'(?P<id>\d+)/?$', 'assignment.views.assign.detail', name='assignment_detail'),
-    url(r'', 'assignment.views.assign.index', name='assignment'),
+    url(r'', 'assignment.views.assign.main', name='assignment'),
 
 )
