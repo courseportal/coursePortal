@@ -36,7 +36,8 @@
 	<br>
 	<label class="radio">
 	{% for c in choices %}
-		<input type="radio" name="{{q.id}}choice" value={{c}} {% ifequal q.student_answer c.solution %}checked{%endifequal%} {%ifequal q.can_edit 0%}disabled{%endifequal%}>{{c}}
+		<input type="radio" name="{{q.id}}choice" value={{c}} {% if q.student_answer==c.solution %}checked{%endif%} {%if q.can_edit==0%}disabled{%endif%}>{{c}}
+		</input>
 		<br>
 	{% endfor %}
 	</label>
@@ -44,6 +45,9 @@
 	<strong>Answer:</strong>
 	<br>
 	<input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
+	{% if q.can_edit==0 %}
+		<div text="green">{{q.solution}}</div>
+	{% endif %}
 	<br>
 {% endif %}
 <input type="hidden" name="assignment" value={{assignment_selected.id}}></input>
