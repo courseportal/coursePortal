@@ -18,6 +18,7 @@ function init(){
 		update: function(event, ui) {
 	      $('#questionsList>.row-fluid').each(function(index){
 	         $(this).find('.question-edit').attr('onclick', 'load_question('+index+')');
+	         $(this).find('.question-remove').attr('onclick', 'remove_question('+index+')');
 	      });
 	   },
 	});
@@ -46,6 +47,9 @@ function init(){
 	   selector: 'textarea#text',
 	   force_p_newlines : false 
 	});
+
+	$('#assigndate').datepicker();
+	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 }
@@ -112,9 +116,9 @@ function save_question(num){
 					<i class="icon-edit-sign"> Edit</i> \
 				</div> \
 				<div class="span1 question-pts"> \
-					<input type="text" class="input-mini" value="0"></input> \
+					<input type="text" class="input-fit" value="0"></input> \
 				</div> \
-				<div class="span1 question-remove"> \
+				<div class="span1 question-remove btn" onclick="remove_question('+num+')"> \
 					<i class="icon-remove-sign"></i> \
 				</div> \
 			</div>';
@@ -142,18 +146,30 @@ function save_question(num){
 	$('#solndiv').html('');
 }
 
+function remove_question(num){
+	$('#questionsList :nth-child('+num+')').remove()
+}
 
 function save(){
 	//empty object
 	assignment = {
 		title: '',
+		start: '',
+		due: '',
 		questions: [],		
 	}
-	assignment.title = 'testing';
+
+	assignment.title = $('#assigntitle').val();
+	assignment.start = $('#assigndate').datepicker('getDate');
+	assignment.due = $('#duedate').datepicker('getDate');
+
+
 
 	$('#questionsList>.row-fluid').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
+		question.points = $(this).find('input[type=text]').val();
+		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
 

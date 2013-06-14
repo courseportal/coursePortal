@@ -2,7 +2,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
 #from rating.models import UserVotes
@@ -65,7 +65,8 @@ class Exposition(models.Model):
     link = models.CharField(max_length=100) # A URL to the location of the exposition
     atom = models.ForeignKey(Atom)
     owner = models.ForeignKey(User)
-
+    votes = models.IntegerField(default=0)
+    
     class Meta:
         ordering = ['title']
 
@@ -107,19 +108,15 @@ class Vote(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-	file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
-	owner = models.ForeignKey(User)
-	filename = models.CharField(max_length=200)
-	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
-	date_created = models.DateTimeField(auto_now=True)
-	
-	def __unicode__(self):
-		return self.filename
+    file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
+    owner = models.ForeignKey(User)
+    filename = models.CharField(max_length=200)
+    atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
+    votes = models.IntegerField(default=0)
+    date_created = models.DateTimeField(auto_now=True)
 
-class UserVotes(models.Model):
-	user = models.OneToOneField(User, related_name="votes")
-	example_vote_up = models.BooleanField(default=False)
-	example_vote_down = models.BooleanField(default=False)
+    def __unicode__(self):
+        return self.filename
 
 
 class Example(models.Model):
@@ -128,40 +125,49 @@ class Example(models.Model):
     filename = models.CharField(max_length=200)
     atom = models.ForeignKey(Atom, related_name = "example_set")
     date_created = models.DateTimeField(auto_now=True)
-    user_votes = models.ManyToManyField(UserVotes)
     votes = models.IntegerField(default=0)
-
-    def vote_up(self,user):
-        if user.votes.example_vote_up:
-            return
-        elif user.votes.example_vote_down:
-            user.votes.example_vote_down = False
-            user.votes.example_vote_up = True
-            self.votes += 2
-            return
-        else:
-            user.votes.example_vote_up = True
-            self.votes += 1
-            return
-
-    def vote_down(self, user):
-        if user.votes.example_vote_down:
-            return
-        elif user.votes.example_vote_up:
-            user.votes.example_vote_up = False
-            user.votes.example_vote_down = True
-            self.votes -= 2
-            return
-        else:
-            user.votes.example_vote_down = True
-            self.votes -= 1
-            return
+    #user_votes = models.ManyToManyField(UserVotes)
 
     def __unicode__(self):
         return self.filename
 
+class VoteExposition(models.Model):
+    user = models.ForeignKey(User)
+    example = models.ForeignKey(Exposition)
+    vote = models.IntegerField(default=0)
 
-		
+class VoteLectureNote(models.Model):
+    user = models.ForeignKey(User)
+    example = models.ForeignKey(LectureNote)
+    vote = models.IntegerField(default=0)
+
+class VoteExample(models.Model):
+    user = models.ForeignKey(User)
+    example = models.ForeignKey(Example)
+    vote = models.IntegerField(default=0)
+
+#class UserVotes(models.Model):
+#user = models.OneToOneField(User, related_name="votes")
+#example_vote_up = models.BooleanField(default=False)
+#example_vote_down = models.BooleanField(default=False)
+
+
+#@receiver(post_save, sender=User)
+    #def create_uservotes(sender, **kwargs):
+        #if UserVotes.objects.filter(user=kwargs['instance']).count()==1:
+    #return
+        #else:
+        #UserVotes.objects.create(user=kwargs['instance'])
+#return
+
+#@receiver(pre_delete,sender=User)
+    #def delete_uservotes(sender, **kwargs):
+        #if UserVotes.objects.filter(user=kwargs['instance']).count()==1:
+        #UserVotes.objects.filter(user=kwargs['instance']).delete()
+    #return
+        #else:
+#return
+
 @receiver(pre_delete, sender=LectureNote)
 def delete_note_file(sender, **kwargs):
 	r"""
