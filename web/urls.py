@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     url(r'^view_videos/?$', 'web.views.admin.list_videos', name='list_videos'),
 
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
-    url(r'^ajax/voteExample/(\d+)/(\d+)/?$', 'web.views.ajax.voteExample', name='voteExample'),                   
+    url(r'^ajax/voteGeneral/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.voteGeneral', name='voteGeneral'),                   
 
 
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),

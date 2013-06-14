@@ -121,14 +121,14 @@ function createBoxPlot(dataArray, height, divID) {
 	overallDiv.style.height = height + "px";
 	overallDiv.style.width = "56px";
 	overallDiv.style.border = "none";
-	overallDiv.style.borderRight = "1px dotted";
+	overallDiv.style.borderRight = "none";
 	overallDiv.id = overallID;
 	document.getElementById(divID).appendChild(overallDiv);
 
 	var upperDiv = document.createElement("div");
 	upperDiv.id = "upperBox" + divID;
 	upperDiv.className = "boxplot-element";
-	upperDiv.style.top = mq3 + "px";
+	upperDiv.style.top = mq3+10 + "px";
 	upperDiv.style.height = (mmedian - mq3) + "px";
 	document.getElementById(overallID).appendChild(upperDiv);
 
@@ -148,7 +148,7 @@ function createBoxPlot(dataArray, height, divID) {
 	var upperWhiskerDiv = document.createElement("div");
 	upperWhiskerDiv.id = "upperWhisker" + divID;
 	upperWhiskerDiv.className = "boxplot-element";
-	upperWhiskerDiv.style.top = mupperWhisker + "px";
+	upperWhiskerDiv.style.top = mupperWhisker+10 + "px";
 	document.getElementById(overallID).appendChild(upperWhiskerDiv);
 
 	for(i = 0; i < mildOutliers.length; i++) {
@@ -156,7 +156,7 @@ function createBoxPlot(dataArray, height, divID) {
 		newDiv.className = "boxplot-element";
 		newDiv.style.width="4px";
 		newDiv.style.height="4px";
-		newDiv.style.top = mmildOutliers[i] + "px";
+		newDiv.style.top = mmildOutliers[i]+10 + "px";
 		newDiv.style.left= "50px";
 		document.getElementById(overallID).appendChild(newDiv);
 	}
@@ -166,7 +166,7 @@ function createBoxPlot(dataArray, height, divID) {
 		newDiv.style.background = "#666";
 		newDiv.style.width="4px";
 		newDiv.style.height="4px";
-		newDiv.style.top = mextremeOutliers[i] + "px";
+		newDiv.style.top = mextremeOutliers[i]+10 + "px";
 		newDiv.style.left= "50px";
 		document.getElementById(overallID).appendChild(newDiv);
 	}
@@ -174,7 +174,7 @@ function createBoxPlot(dataArray, height, divID) {
 	var lowerLabel = document.createElement("div");
 	lowerLabel.className = "boxplot-label";
 	lowerLabel.innerHTML = "" + roundVal(lowerWhisker);
-	lowerLabel.style.top = mlowerWhisker + "px";
+	lowerLabel.style.top = (mlowerWhisker-9) + "px";
 	lowerLabel.style.left = "0px";
 	document.getElementById(overallID).appendChild(lowerLabel);
 	
@@ -195,14 +195,14 @@ function createBoxPlot(dataArray, height, divID) {
 	var q3Label = document.createElement("div");
 	q3Label.className = "boxplot-label";
 	q3Label.innerHTML = "" + roundVal(q3);
-	q3Label.style.top = (mq3 - 9) + "px";
+	q3Label.style.top = (mq3 - 9)+10 + "px";
 	q3Label.style.left = "80px";
 	document.getElementById(overallID).appendChild(q3Label);
 	
 	var upperLabel = document.createElement("div");
 	upperLabel.className = "boxplot-label";
 	upperLabel.innerHTML = "" + roundVal(upperWhisker);
-	upperLabel.style.top = (mupperWhisker - 9) + "px";
+	upperLabel.style.top = (mupperWhisker - 9)+10 + "px";
 	upperLabel.style.left = "0px";
 	document.getElementById(overallID).appendChild(upperLabel);
 	

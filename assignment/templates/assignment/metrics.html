@@ -24,7 +24,7 @@
 	<div>Maximum: {{stats.maximum}}</div>
 	<div>Median: {{stats.median}}</div>
 	<div style="display:none">
-		<div id="dialog{{user.id}}{{stats.classid}}" title="Class boxplot"/>
+		<div style="width:150px;" id="dialog{{user.id}}{{stats.classid}}" title="Class boxplot"></div>
 	</div>
 
 
@@ -35,7 +35,7 @@ function display(data, classid, userid){
 	var name1="dialog", name2="#";
 	name1=name1.concat(userid, classid);
 	name2=name2.concat(name1)
-	createBoxPlot(data, 500, name1);
+	createBoxPlot(data, 300, name1);
   	$( name2 ).dialog();
 }
 </script>

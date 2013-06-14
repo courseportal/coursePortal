@@ -11,7 +11,6 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-
 <table id="notes" class="table tablesorter table-bordered table-hover">
   <thead>
     <tr>
@@ -23,6 +22,14 @@ OPTIONAL context:
   <tbody>
     {% for e in notes %}
       <tr>
+          <td style="width:10px">
+              <div class="arrow-up" item-type="2" vote-example-id="{{e.id}}" vote-type="1">
+                  <i class="icon-arrow-up"></i>
+              </div>
+              <div class="arrow-down" item-type="2" vote-example-id="{{e.id}}" vote-type="0">
+                  <i class="icon-arrow-down"></i>
+              </div>
+          </td>
         <td>
         	<a target="_blank" href="{{ e.file.url }}">
             {{ e.filename }}
@@ -30,6 +37,11 @@ OPTIONAL context:
         </td>
         <td>
           {{ e.owner }}
+        </td>
+        <td style="width:25px">
+            <div class="votes-sum-{{e.id}}">
+                {{e.votes}}
+            </div>
         </td>
         <td>
         {% if user.is_staff or user.is_superuser or e.owner == user %}
