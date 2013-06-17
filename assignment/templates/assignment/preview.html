@@ -27,12 +27,12 @@
 	</div>
 	{{q.text | safe}}
 		<br>
-		{% if q.choices.count>0 %}
+		{% if q.choices.0 %}
 			<strong>Choices:</strong>
 			<br>
 			{% for c in q.choices %}
 				<input type="radio" value={{c}}>{{c}}</input>
-				<br>\
+				<br>
 			{% endfor %}
 		{% else %}
 			<strong>Answer:</strong>

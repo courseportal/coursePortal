@@ -1,6 +1,6 @@
 $(init);
 
-$("#previewform").nm();
+
 
 CodeMirrorSettings = {
 	mode: 'python',
@@ -14,6 +14,7 @@ code = {};
 solution = {};
 choices = [];
 text = {};
+
 
 function init(){
 
@@ -69,6 +70,7 @@ function init(){
 	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
+	$("#previewform").nm();
 }
 
 function add_choice_div(){
@@ -196,6 +198,7 @@ function save(){
    $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
    $('#assignmentForm').submit();
 }
+
 
 function preview(){
 	//empty object
