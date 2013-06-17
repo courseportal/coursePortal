@@ -6,6 +6,8 @@ from assignment.models import *
 from web.models import *
 from django.contrib.auth.models import User
 import numpy as np
+from string import Template
+from math import *
 
 def viewStudent(request):
 	user = request.user
@@ -18,6 +20,49 @@ def viewStudent(request):
    }
 	return render(request, 'assignment/students.html', context)
 
+def previewAssignment(request):
+	assignment = json.loads(request.POST['previewdata'])
+	question_list=[]
+	try:
+		for q in assignment['questions']:
+			question={
+				'title':'',
+				'solution':'',
+				'text':'',
+				'choices':[]
+	   	}
+			question['title'] = q['title']
+			q['solution']= q['solution'].replace('<br>', '\n')
+			q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+			for integer_index in range(len(q['choices'])):
+				q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+				q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+			exec q['code']
+			question['solution']=eval(q['solution'])
+
+			#q text formatted here
+			local_dict = dict(locals())
+			question['text'] = Template(q['text']).substitute(local_dict)
+
+			for choice in q['choices']:
+				answer = eval(choice)
+				question['choices'].append(answer)
+			if len(q['choices']) > 0:
+				question['choices'].append(question['solution'])
+			question_list.append(question)
+
+	except Exception as ex:
+		test=''
+		test += str(ex)
+		return HttpResponse(test)
+
+	context = {
+		'question_list': question_list,
+   	'assignment': assignment
+	}
+	return render(request, 'assignment/preview.html', context)
+
+
 class ClassStats():
 	className=''
 	classid=''
@@ -27,8 +72,6 @@ class ClassStats():
 	minimum=0.0
 	maximum=0.0
 	plot=None
-	
-
 
 def metrics(request):
 	user=request.user

@@ -24,6 +24,10 @@
 <!-- javascript -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
 
+<!-- nyromodal -->
+<link rel="stylesheet" href="{{STATIC_PREFIX}}nyromodal/styles/nyroModal.css" type="text/css" media="screen" />
+<script type="text/javascript" src="{{STATIC_PREFIX}}nyromodal/js/jquery.nyroModal.custom.js"></script>
+
 <html>
 
 <body>
@@ -121,6 +125,5 @@
 		<button type="button" class="btn" onclick="save()" disabled>Preview</button>
 		<button type="button" class="btn btn-primary" onclick="save()">Submit</button>
 	</form>
-
 </body>
 {% endblock %}
