@@ -63,8 +63,7 @@ def instantiate(request):
                 q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
                 q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
             exec q['code']
-            exec q['solution']
-            solution=answer
+            solution=eval(q['solution'])
             #q text formatted here
             text = q['text']
 
@@ -75,7 +74,7 @@ def instantiate(request):
             question_instance.save()
 
             for choice in q['choices']:
-                exec choice
+                answer = eval(choice)
                 choice_instance = ChoiceInstance(solution=answer, question=question_instance)
                 choice_instance.save()
             if len(q['choices']) > 0:

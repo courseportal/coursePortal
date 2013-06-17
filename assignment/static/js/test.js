@@ -48,7 +48,7 @@ function save(){
 
 	question.title = $('#title').val();
 	question.code = code.getValue();
-	solution = solutions[0].getValue();
+	question.solution = solutions[0].getValue();
 	for (var i = 1; i < solutions.length; i++) {
   		question.choices.push(solutions[i].getValue());
   	}
@@ -70,7 +70,7 @@ function preview(){
 
 	question.title = $('#title').val();
 	question.code = code.getValue();
-	solution=solutions[0].getValue();
+	question.solution=solutions[0].getValue();
 	for (var i = 1; i < solutions.length; i++) {
   		question.choices.push(solutions[i].getValue());
   	}

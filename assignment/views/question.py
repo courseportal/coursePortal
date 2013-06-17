@@ -32,8 +32,7 @@ def detail(request, id, newly_added=False):
 		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
 		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 	exec q['code']
-	exec q['solution']
-	solution = answer
+	solution = eval(q['solution'])
 
 	#q text formatted here
 	text = q['text']
@@ -46,8 +45,7 @@ def detail(request, id, newly_added=False):
 	# #choices formatted here
 	choices = []
 	for choice in q['choices']:
-		exec choice
-		choices.append(answer)
+		choices.append(eval(choice))
 
 	context = {
 		'text': text,
@@ -88,8 +86,7 @@ def preview(request):
 		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
 		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 	exec q['code']
-	exec q['solution']
-	solution = answer
+	solution = eval(q['solution'])
 
 	#q text formatted here
 	text = q['text']
@@ -102,8 +99,7 @@ def preview(request):
 	# #choices formatted here
 	choices = []
 	for choice in q['choices']:
-		exec choice
-		choices.append(answer)
+		choices.append(eval(choice))
 
 	context = {
 		'text': text,
