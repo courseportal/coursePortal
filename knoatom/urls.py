@@ -1,4 +1,6 @@
 from django.conf.urls import patterns, include, url
+from django.conf import settings
+from django.conf.urls.static import static
 from web import urls as web_urls
 from assignment import urls as assignment_urls
 from haystack import urls as haystack_urls
@@ -15,6 +17,6 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^forum/', include('pybb.urls', namespace = 'pybb')),
     # Uncomment the next line to enable the admin:
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

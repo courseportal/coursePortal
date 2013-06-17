@@ -12,17 +12,13 @@ OPTIONAL context:
 
 <!-- Should make this prettier -->
 
-{% if not expositions %}
-	No expositions exist for this category yet!
-{% endif %}
-
-<table class="table table-bordered table-hover">
+<table class="tablesorter">
     <thead>
-        <th> </th>
+        <th data-sorter="false"> </th>
         <th>Name</th>
         <th>Created By</th>
         <th>Votes</th>
-        <th>Options</th>
+        <th data-sorter="false">Options</th>
     </thead>
   <tbody>
     {% for e in expositions %}
@@ -44,7 +40,7 @@ OPTIONAL context:
         <td>
           {{ e.owner }}
         </td>
-          <td style="width:25px">
+          <td style="width:75px">
               <div class="votes-sum-{{e.id}}">
                   {{e.votes}}
               </div>
@@ -66,7 +62,7 @@ OPTIONAL context:
   </tbody>
 </table>
 
-
+{% include "web/home/shared/tablesorter.html" %}
 
 <!-- Including a stylesheet here seems a bit hacky to me... -->
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />

@@ -11,18 +11,16 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-{% if not notes %}
-	No lecture notes exist for this category yet!
-{% endif %}
-
-<table class="table table-bordered table-hover">
-    <thead>
-        <th> </th>
-        <th>Name</th>
-        <th>Created By</th>
-        <th>Votes</th>
-        <th>Options</th>
-    </thead>
+<table class="tablesorter">
+  <thead>
+    <tr>
+      <th data-sorter="false"> </th>
+      <th>Name</th>
+      <th>Created By</th>
+      <th>Votes</th>
+      <th data-sorter="false">Options</th>
+    </tr>
+  </thead>
   <tbody>
     {% for e in notes %}
       <tr>
@@ -35,14 +33,14 @@ OPTIONAL context:
               </div>
           </td>
         <td>
-        	<a target="_blank" href="{% url "note" e.id %}">
+        	<a target="_blank" href="{{ e.file.url }}">
             {{ e.filename }}
           </a>
         </td>
         <td>
           {{ e.owner }}
         </td>
-        <td style="width:25px">
+        <td style="width:75px">
             <div class="votes-sum-{{e.id}}">
                 {{e.votes}}
             </div>
@@ -63,3 +61,5 @@ OPTIONAL context:
     {% endfor %}
   </tbody>
 </table>
+
+{% include "web/home/shared/tablesorter.html" %}
