@@ -28,20 +28,18 @@
     <ul>
     {% for q in question_list %}
     <div class="row">
-    <h4><div class="span6">{{question.title}}</div></h4>
+    <h3><div class="span6">{{q.title}}</div></h3>
 	 </div>
-		{{q.text | safe}}
-		<br>
-		<br>
+		<strong>{{q.text | safe}}</strong>
 		{% if q.choiceInstances.all %}
 			<strong>Choices:</strong>
 			<br>
 			{% for c in q.choiceInstances.all %}
 				<input type="radio" name="{{q.id}}choice" value={{c}} {% ifequal q.student_answer c.solution %}checked{%endifequal%} {%ifequal q.can_edit 0%}disabled{%endifequal%}>{{c}}
+				<br>
 			{% endfor %}
 		{% else %}
-			<strong>Answer:</strong>
-			<br>
+			<strong>Answer:</strong><br>
 			<input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
 		{% endif %}
 		<br>

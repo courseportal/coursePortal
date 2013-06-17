@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ModelForm, Textarea
 import random
+from django.utils import simplejson as json
 
 
 class Question(models.Model):
