@@ -109,19 +109,27 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 							<li class="nav-header">Meta</li>
 							{% if user.is_authenticated %}
-								<li><a href="{% url 'account' %}">{{ user }}</a></li>
-								<li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    Submit New Content
-                    <b class="caret"></b>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <a href="{% url "submit" %}">Video</a>
-                    <a href="{% url "expo_submit" %}">Exposition</a>
-                    <a href="{% url "note_submit" %}">Lecture Notes</a>
-                    <a href="{% url "example_submit" %}">Example</a>
-                  </ul>
-                </li>
+								<li>
+                                    <div>
+                                        <a href="{% url 'account' %}">{{ user }}</a>
+                                        <span class="cur-user-rate">{% for i in user.ratingUser.all %}
+                                            {{i.rating}}
+                                        {% endfor %}
+                                        </span>
+                                    </div>
+                                </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    Submit New Content
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <a href="{% url "submit" %}">Video</a>
+                                    <a href="{% url "expo_submit" %}">Exposition</a>
+                                    <a href="{% url "note_submit" %}">Lecture Notes</a>
+                                    <a href="{% url "example_submit" %}">Example</a>
+                                </ul>
+                            </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>
                                 <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
 							{% else %}

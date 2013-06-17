@@ -2,7 +2,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
 #from rating.models import UserVotes
@@ -27,7 +27,7 @@ class Class(models.Model):
 
 class BaseCategory(models.Model):
     name = models.CharField(max_length=200)
-    summary = models.TextField()
+    summary = models.TextField(default="There is no summary added at this time.")
     child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 
     class Meta:
@@ -39,7 +39,7 @@ class BaseCategory(models.Model):
 
 class Atom(models.Model):
     name = models.CharField(max_length=200)
-    summary = models.TextField()
+    summary = models.TextField(default="There is no summary added at this time.")
     base_category = models.ForeignKey(BaseCategory, related_name = "child_atoms")
     #prereq = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="postreq")
     class Meta:
@@ -59,22 +59,9 @@ class AtomCategory(models.Model):
 
     def __unicode__(self):
         return self.name
-    
-class Exposition(models.Model):
-    title = models.CharField(max_length=100) # title of the article or website
-    link = models.CharField(max_length=100) # A URL to the location of the exposition
-    atom = models.ForeignKey(Atom)
-    owner = models.ForeignKey(User)
-    votes = models.IntegerField(default=0)
-    
-    class Meta:
-        ordering = ['title']
-
-    def __unicode__(self):
-        return self.title
 
 class Submission(models.Model):
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, related_name="video_owner")
     date = models.DateTimeField(auto_now_add=True, blank=True)
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -106,27 +93,41 @@ class Vote(models.Model):
     def __unicode__(self):
         return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
 
+
+class Exposition(models.Model):
+    title = models.CharField(max_length=100) # title of the article or website
+    link = models.CharField(max_length=100) # A URL to the location of the exposition
+    atom = models.ForeignKey(Atom)
+    owner = models.ForeignKey(User, related_name="exposition_owner")
+    votes = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['title']
+    
+    def __unicode__(self):
+        return self.title
+
+
 #Lecture Note
 class LectureNote(models.Model):
     file = models.FileField(upload_to=MEDIA_ROOT+'/lecture_notes/')
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, related_name="lecturenote_owner")
     filename = models.CharField(max_length=200)
     atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
     votes = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now=True)
-
+    
     def __unicode__(self):
         return self.filename
 
 
 class Example(models.Model):
     file = models.FileField(upload_to=MEDIA_ROOT+'/examples/')
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, related_name="example_owner")
     filename = models.CharField(max_length=200)
     atom = models.ForeignKey(Atom, related_name = "example_set")
     date_created = models.DateTimeField(auto_now=True)
     votes = models.IntegerField(default=0)
-    #user_votes = models.ManyToManyField(UserVotes)
 
     def __unicode__(self):
         return self.filename
@@ -146,43 +147,108 @@ class VoteExample(models.Model):
     example = models.ForeignKey(Example)
     vote = models.IntegerField(default=0)
 
-#class UserVotes(models.Model):
-#user = models.OneToOneField(User, related_name="votes")
-#example_vote_up = models.BooleanField(default=False)
-#example_vote_down = models.BooleanField(default=False)
+
+class UserRating(models.Model):
+    user = models.ForeignKey(User, related_name="ratingUser")
+    ExpoRating = models.IntegerField(default=0)
+    LecNoteRating = models.IntegerField(default=0)
+    ExampleRating = models.IntegerField(default=0)
+    VoteUp = models.IntegerField(default=0)
+    VoteDown = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)
 
 
-#@receiver(post_save, sender=User)
-    #def create_uservotes(sender, **kwargs):
-        #if UserVotes.objects.filter(user=kwargs['instance']).count()==1:
-    #return
-        #else:
-        #UserVotes.objects.create(user=kwargs['instance'])
-#return
+@receiver(post_save, sender=Exposition)
+def add_expo_rate(sender, **kwargs):
+    all_expos = Exposition.objects.filter(owner=kwargs['instance'].owner).all()
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    user_rate.ExpoRating = 0
+    for expo in all_expos:
+        user_rate.ExpoRating += 10
+        user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VoteUp + user_rate.VoteDown + 200
+        user_rate.save()
 
-#@receiver(pre_delete,sender=User)
-    #def delete_uservotes(sender, **kwargs):
-        #if UserVotes.objects.filter(user=kwargs['instance']).count()==1:
-        #UserVotes.objects.filter(user=kwargs['instance']).delete()
-    #return
-        #else:
-#return
+
+@receiver(post_save, sender=LectureNote)
+def add_note_rate(sender, **kwargs):
+    all_lecNote = LectureNote.objects.filter(owner=kwargs['instance'].owner).all()
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    user_rate.LecNoteRating =0
+    for lecNote in all_lecNote:
+        user_rate.LecNoteRating += 10
+        user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VoteUp + user_rate.VoteDown +200
+        user_rate.save()
+
+
+@receiver(post_save, sender=Example)
+def add_example_rate(sender, **kwargs):
+    all_example = Example.objects.filter(owner=kwargs['instance'].owner).all()
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    user_rate.ExampleRating = 0
+    for example in all_example:
+        user_rate.ExampleRating += 10
+        user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VoteUp + user_rate.VoteDown +200
+        user_rate.save()
+
+@receiver(post_save, sender=User)
+def create_uservotes(sender, **kwargs):
+    if UserRating.objects.filter(user=kwargs['instance']).count()==1:
+        print("This user already has one uservotes table~!")
+    else:
+        print(kwargs['instance'])
+        UserRating.objects.create(user=kwargs['instance'])
+        user_rate = UserRating.objects.get(user=kwargs['instance'])
+        user_rate.rating = 200
+        user_rate.save()
+        print("created one just now!!")
+
+@receiver(post_delete, sender=Exposition)
+def delete_exposition_file(sender, **kwargs):
+    """
+    This adds the functionality to remove the file upon deletion.
+    """
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    user_rate.ExpoRating -= 10
+    user_rate.rating -= 10
+    user_rate.save()
+
 
 @receiver(pre_delete, sender=LectureNote)
 def delete_note_file(sender, **kwargs):
-	r"""
-	This adds the functionality to remove the file upon deletion.
-	"""
-	
-	kwargs['instance'].file.delete()
-	
-@receiver(pre_delete, sender=Example)
+    """
+        This adds the functionality to remove the file upon deletion.
+        """
+    kwargs['instance'].file.delete()
+
+
+@receiver(post_delete, sender=LectureNote)
+def delete_note_rate(sender, **kwargs):
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    print("LecNoteRating before: ")
+    print(user_rate.LecNoteRating)
+    user_rate.LecNoteRating -= 10
+    print("LecNoteRating after: ")
+    print(user_rate.LecNoteRating)
+    user_rate.rating -= 10
+    user_rate.save()
+    print("rating after: ")
+    print(user_rate.rating)
+
+
+@receiver(pre_delete, sender=LectureNote)
 def delete_example_file(sender, **kwargs):
-	r"""
-	This adds the functionality to remove the file upon deletion.
-	"""
-	
-	kwargs['instance'].file.delete()
+    """
+        This adds the functionality to remove the file upon deletion.
+        """
+    kwargs['instance'].file.delete()
+
+@receiver(post_delete, sender=Example)
+def delete_example_rate(sender, **kwargs):
+    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+    user_rate.ExampleRating -= 10
+    user_rate.rating -= 10
+    user_rate.save()
+
 
 #bugReport
 class BugReport(models.Model):
