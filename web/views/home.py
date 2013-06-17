@@ -1,8 +1,9 @@
 from django.core.cache import cache
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Avg
 from django.db.models.loading import get_models
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404
 import json
@@ -19,15 +20,11 @@ def class_index(request):
 	#Get the "top level" categories
     top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
     class_list = Class.objects.all()
-    list_by_name = class_list.order_by('name')
-    list_by_status = class_list.order_by('status')
-    list_by_author = class_list.order_by('author')
+    
     template = loader.get_template('web/home/class_index.html')
     context = RequestContext(request, {
 		'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
-		'list_by_name': list_by_name,
-        'list_by_status': list_by_status,
-        'list_by_author': list_by_author,
+		'class_list': class_list,
 		'top_level_categories': top_level_base_categories,
 	})
     return HttpResponse(template.render(context))
@@ -421,12 +418,17 @@ def atom(request, class_id, cat_id, atom_id):
 
 def classes(request, class_id):
 	"""
-	- Generates the home page
-	- Generates a list of the most popular videos for each category of rating
-	- Use memcached to save the popular video rankings to save a lot of time
+	-	Generates the home page
+	-	Generates a list of the most popular videos for each category of rating
+	-	Use memcached to save the popular video rankings to save a lot of time
 	"""
 	#Get the class that we are in
 	current_class = get_object_or_404(Class, id=class_id)
+	
+	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id)):
+		print("\n\nHolla\n\n")
+		return HttpResponseRedirect(reverse('class_index'))
+	
 	#Get categories that are in the current_class
 	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
 	#Get the "top level" categories

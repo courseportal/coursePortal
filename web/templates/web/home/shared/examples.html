@@ -11,20 +11,15 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-{% load my_filters %}
 
-{% if not examples %}
-	No examples exist for this category yet!
-{% endif %}
-<div id="result">
-</div>
-<table class="table table-bordered table-hover">
+
+<table class="tablesorter">
   <thead>
-    <th> </th>
+    <th data-sorter="false"> </th>
     <th>Name</th>
     <th>Created By</th>
     <th>Votes</th>
-    <th>Options</th>
+    <th data-sorter="false">Options</th>
   </thead>
   <tbody>
     {% for e in examples %}
@@ -40,14 +35,15 @@ OPTIONAL context:
           </div>
         </td>
         <td>
-        	<a target="_blank" href="{% url "example" e.id %}">
+          
+        	<a target="_blank" href="{{ e.file.url }}">
             {{ e.filename }}
           </a>
         </td>
         <td>
           {{ e.owner }}
         </td>
-        <td style="width:25px">
+        <td style="width:75px">
             <div class="votes-sum-{{e.id}}">
             {{e.votes}}
             </div>
@@ -68,3 +64,58 @@ OPTIONAL context:
     {% endfor %}
   </tbody>
 </table>
+
+<script>
+// tablesorter 2.10.8
+// Documentation found here:
+// http://mottie.github.io/tablesorter/docs/index.html
+
+// Bootstrap specific example here:
+// http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+$(function() {
+
+  $.extend($.tablesorter.themes.bootstrap, {
+    // these classes are added to the table. To see other table classes available,
+    // look here: http://twitter.github.com/bootstrap/base-css.html#tables
+    table      : 'table table-bordered',
+    header     : 'bootstrap-header', // give the header a gradient background
+    footerRow  : '',
+    footerCells: '',
+    icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+    sortNone   : 'bootstrap-icon-unsorted',
+    sortAsc    : 'icon-chevron-up',
+    sortDesc   : 'icon-chevron-down',
+    active     : '', // applied when column is sorted
+    hover      : '', // use custom css here - bootstrap class may not override it
+    filterRow  : '', // filter row class
+    even       : '', // odd row zebra striping
+    odd        : ''  // even row zebra striping
+  });
+
+  // call the tablesorter plugin and apply the uitheme widget
+  $("table").tablesorter({
+    // this will apply the bootstrap theme if "uitheme" widget is included
+    // the widgetOptions.uitheme is no longer required to be set
+    theme : "bootstrap",
+
+    widthFixed: true,
+
+    headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+    // Set to sort initially by votes in descending order and name in ascending order
+    sortList : [[3,1]],
+    
+    // Set to always append a sort by votes in descending order on all user sorting
+    
+    sortAppend : [[3,1]],
+    
+    
+
+    // widget code contained in the jquery.tablesorter.widgets.js file
+    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+    widgets : ["uitheme"] //,, "filter", "zebra" ],
+
+   
+  })
+
+});
+</script>

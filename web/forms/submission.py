@@ -42,6 +42,11 @@ def validate_file_extension(value):
 			valid = True
 	if not valid:
 		raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
+		
+def validate_link(value):
+	r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""
+	if not (re.match('^http://', value) or re.match('^https://', value)):
+		raise ValidationError(u'The link must begin with http:// or https://.')
 
 class LectureNoteForm(forms.Form):
 	r"""
@@ -49,9 +54,9 @@ class LectureNoteForm(forms.Form):
 	
 	"""
 	
-	filename = forms.CharField(max_length=200)
-	file = forms.FileField(validators=[validate_file_extension])
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission')
+	filename = forms.CharField(max_length=200, required=True)
+	file = forms.FileField(validators=[validate_file_extension], required=True)
+	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission', required=True)
 	
 class ExampleForm(forms.Form):
 	r"""
@@ -59,9 +64,9 @@ class ExampleForm(forms.Form):
 	
 	"""
 	
-	filename = forms.CharField(max_length=200)
-	file = forms.FileField(validators=[validate_file_extension])
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission')
+	filename = forms.CharField(max_length=200, required=True)
+	file = forms.FileField(validators=[validate_file_extension], required=True)
+	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission', required=True)
 
 class ExpoForm(forms.Form):
 	r"""	
@@ -69,9 +74,9 @@ class ExpoForm(forms.Form):
 	
 	"""
 	title = forms.CharField(max_length=100, required=True)
-	link = forms.CharField(max_length=256, required=True)
+	link = forms.CharField(max_length=256, required=True, validators=[validate_link], initial="http://")
 	
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission')
+	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission', required=True)
 	
 class DeleteForm(forms.Form):
 	r"""
