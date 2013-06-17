@@ -14,14 +14,17 @@ Week of June 17-21
 
 Goals
 -----
-
-Todo:
-    *   Integrate forum into the Atom better
-    *   Put a delete option in the submit form if they are editing
-    *   Add a report feature for all content/posts so that malicious/disrespectful content can be removed
+    
+New Todo:
+    *   Testing
+    *   Documentation
+    *   More validation for uploaded file types
+    *   Implement the vote ranking system from content into the forums
     *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.
-    *   Implement a vote based ranking system for the forums
-    *   Give users a rating based on submissions and quality of their submissions and use that rating to give "initial" rating to new content/posts (Taoran is working on it)
+    *   Put a delete option in the submit form for user uploaded content
+    *   Add a report feature for all content/posts so malicious/disrespectful content can be removed
+    *   Integrate forum into Atom better
+
 
 Week of June 9-14
 ==================
@@ -34,7 +37,8 @@ So far this week so far I have:
         -   Lecture Notes
         -   Examples
         
-        Lecture Notes and Examples are limited to ``.pdf`` files right now.
+        Lecture Notes and Examples are limited to ``.pdf`` files right now.  The ``ALLOWED_FILE_EXTENSIONS`` setting in ``settings.py`` sets the allowed file extensions.  We should probably do more type checking than just this because people can lie.
+        
     *   I have been adding documentation as I go to various functions and classes.
     *   Added the ability for the owner of a user submitted object and all staff/superusers to edit/delete that object where they are listed.  This works for:
         

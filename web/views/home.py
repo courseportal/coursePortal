@@ -418,9 +418,9 @@ def atom(request, class_id, cat_id, atom_id):
 
 def classes(request, class_id):
 	"""
-	- Generates the home page
-	- Generates a list of the most popular videos for each category of rating
-	- Use memcached to save the popular video rankings to save a lot of time
+	-	Generates the home page
+	-	Generates a list of the most popular videos for each category of rating
+	-	Use memcached to save the popular video rankings to save a lot of time
 	"""
 	#Get the class that we are in
 	current_class = get_object_or_404(Class, id=class_id)
