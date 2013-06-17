@@ -69,8 +69,7 @@ def instantiate(request):
 
             local_dict = dict(locals())
             text = Template(text).substitute(local_dict)
-            # #choices formatted here
-            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data[question.title]), assignmentInstance=instance)
+            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][question.title]), assignmentInstance=instance)
             question_instance.save()
 
             for choice in q['choices']:
@@ -93,14 +92,14 @@ def addA(request):
 
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
-    start_date = json.loads(assignment.data)['start']
-    due_date = json.loads(assignment.data)['due']
+    assign_data = json.loads(assignment.data)
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
     context = {
         'assignment': assignment,
-        'start_date': start_date,
-        'due_date': due_date,
+        'start_date': assign_data['start'],
+        'due_date': assign_data['due'],
+        'point_list': assign_data['questions'],
         'breadcrumbs': breadcrumbs,
     }
     return render(request, 'assignment/editAssignment.html', context)
@@ -113,10 +112,12 @@ def create(request):
     data=dict()
     data['due']=a['due']
     data['start']=a['start']
+    questions=dict()
     assignment.owners.add(request.user)
     for q in a['questions']:
         assignment.questions.add(createQ(q))
-        data[q['title']]=q['points']
+        questions[q['title']]=q['points']
+    data['questions']=questions
     assignment.data=json.dumps(data)
     assignment.save()
     return main(request)
@@ -126,6 +127,7 @@ def createQ(x):
     question = Question()
     question.title = x['title']
     data=dict()
+    data['title']=x['title']
     data['code']=x['code']
     data['text']=x['text']
     data['solution']=x['solution']
