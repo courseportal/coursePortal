@@ -44,15 +44,15 @@ BLOCKS(Including inherited blocks):
 
 	<div class="tabbable">
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="#1" data-toggle="tab">Password</a></li>
+			<li class=""><a href="#1" data-toggle="tab">Password</a></li>
 			<li class=""><a href="#2" data-toggle="tab">Display Name</a></li>
 			<li class=""><a href="#3" data-toggle="tab">Advanced</a></li>
-            <li class=""><a href="#4" data-toggle="tab">Rating Detail</a></li>
+            <li class="active"><a href="#4" data-toggle="tab">Rating Detail</a></li>
 		</ul> <!-- .nav nav-tabs -->
 	
 		<div class="tab-content">
 
-			<div class="tab-pane active" id="1">
+			<div class="tab-pane" id="1">
 				<h3>Change Password</h3>
 				<form class="form-horizontal" action="{% url "account" %}" method="post">
 				{% csrf_token %}

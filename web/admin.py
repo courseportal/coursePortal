@@ -14,6 +14,17 @@ from pybb.models import Forum, Category
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 
+class ExpositionAdmin(admin.ModelAdmin):
+    exclude = ('owner','votes',)
+    
+    def save_model(self, request, obj, form, change):
+        print("I am in save_model function!!!")
+        if not change:
+			obj.owner = request.user
+			obj.save()
+        super(ExpositionAdmin, self).save_model(request, obj, form, change)
+
+
 class ExposInline(admin.StackedInline):
 	model = Exposition
 	extra = 3
@@ -37,7 +48,7 @@ class FileUploadForm(forms.ModelForm):
 		return self.cleaned_data['file']
 
 class LectureNoteAdmin(admin.ModelAdmin):
-	exclude = ('owner',)
+	exclude = ('owner','votes',)
 	form = FileUploadForm
 	def save_model(self, request, obj, form, change):
 		if not change:
@@ -46,7 +57,7 @@ class LectureNoteAdmin(admin.ModelAdmin):
 		super(LectureNoteAdmin, self).save_model(request, obj, form, change)
 		
 class ExampleAdmin(admin.ModelAdmin):
-	exclude = ('owner',)
+	exclude = ('owner','votes',)
 	form = FileUploadForm
 	def save_model(self, request, obj, form, change):
 		if not change:
@@ -377,7 +388,7 @@ admin.site.register(Example, ExampleAdmin)
 admin.site.register(BaseCategory,BaseCategoryAdmin)
 admin.site.register(AtomCategory, AtomCategoryAdmin)
 admin.site.register(Atom, AtomAdmin)
-admin.site.register(Exposition)
+admin.site.register(Exposition, ExpositionAdmin)
 admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(Vote)
 admin.site.register(VoteCategory)
