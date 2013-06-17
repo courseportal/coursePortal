@@ -12,7 +12,7 @@ def viewStudent(request):
 	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
 	breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
 	context = {
-   	'class_list': user.author.all(),
+   	'class_list': user.author.all() | user.allowed_classes.all(),
    	'user': user,
    	'breadcrumbs':breadcrumbs
    }
@@ -35,7 +35,7 @@ def metrics(request):
 	stat_set=[]
 	maxPossible=0
 	achieved=0
-	for c in user.allowed_classes.all():
+	for c in user.allowed_classes.all() | user.author.all():
 		stats=ClassStats();
 		stats.className=c.name
 		stats.classid=c.id
@@ -44,42 +44,12 @@ def metrics(request):
 		maxPossible = 0.0
 		achieved = 0.0
 		for s in c.students.all():
-			for i in s.instances.all():
-				maxPossible+=i.max_score
-				achieved+=i.score
-			if maxPossible>0:
-				data.append((achieved/maxPossible)*100)
-		stats.data=data
-		#Calculate average
-		stats.average = np.average(stats.data)#can add weighting
-		#Calculate std deviation
-		stats.deviation = np.std(stats.data)
-		#Number completed?
-		#Min, Max
-		stats.minimum=np.nanmin(stats.data)
-		stats.maximum=np.nanmax(stats.data)
-		#median
-		stats.median=np.median(stats.data)
-		pylab.boxplot(stats.data)
-		temp='assignment/static/img/box'+str(user.id)+str(c.id)
-		savefig(temp)
-		stat_set.append(stats)
-
-	for c in user.author.all():
-		stats=ClassStats();
-		stats.className=c.name
-		stats.classid=c.id
-		#Generate data
-		data=[]
-		for s in c.students.all():
-			maxPossible = 0.0
-			achieved = 0.0
 			for i in s.assignmentInstances.all():
 				maxPossible+=i.max_score
 				achieved+=i.score
 			if maxPossible>0:
 				data.append((achieved/maxPossible)*100)
-		stats.data.extend(data)
+		stats.data=data
 		#Calculate average
 		stats.average = np.average(stats.data)#can add weighting
 		#Calculate std deviation

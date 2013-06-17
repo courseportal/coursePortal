@@ -51,7 +51,7 @@ I have changed this file a bit, you should use this as the template you extend. 
         <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
         <ul class="nav nav-list">
         {%for t in user.templates.all%}
-            <li><a href="/admin/assignment/assignment/{{t.id}}">{{t}}</a></li>
+            <li><a href="assignment/assign/edit/{{t.id}}">{{t}}</a></li>
         {%endfor%}
         </ul>
         <li><a href="{% url "add_question" %}">Add Question</a></li>
@@ -71,7 +71,7 @@ I have changed this file a bit, you should use this as the template you extend. 
    <a href="{% url "grades" %}">View grades</a></li>
 
    <li class="{% if assignment_selected %}open{%endif%}">
-      <a href="{% url "assignment"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
+      <a href="{% url "list"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
    <ul class="nav nav-list">
    {% for a in user.assignmentInstances.all %}
       {% if a.questions.all %}

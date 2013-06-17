@@ -7,7 +7,7 @@
 	padding:4px 0px 0px 0px
 }*/
 
-
+.no-close .ui-dialog-titlebar-close {display: none }
 
 .input-fit{
 	width: 100%
