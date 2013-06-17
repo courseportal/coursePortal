@@ -12,10 +12,11 @@ import hashlib
 import logging
 import random, string
 from web.forms.account import *
-from web.models import AtomCategory
+from web.models import AtomCategory, UserRating
 
 @login_required()
 def index(request):
+    user_rate = UserRating.objects.get(user=request.user)
     password_form = ChangePasswordForm(error_class=PlainErrorList)
     username_form = ChangeUsernameForm(error_class=PlainErrorList)
     delete_account_form = DeleteAccountForm(error_class=PlainErrorList)
@@ -69,6 +70,7 @@ def index(request):
         'password_form': password_form,
         'username_form': username_form,
         'delete_account_form': delete_account_form,
+        'user_rate': user_rate,
     })
     return HttpResponse(t.render(c))
 

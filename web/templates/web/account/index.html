@@ -47,6 +47,7 @@ BLOCKS(Including inherited blocks):
 			<li class="active"><a href="#1" data-toggle="tab">Password</a></li>
 			<li class=""><a href="#2" data-toggle="tab">Display Name</a></li>
 			<li class=""><a href="#3" data-toggle="tab">Advanced</a></li>
+            <li class=""><a href="#4" data-toggle="tab">Rating Detail</a></li>
 		</ul> <!-- .nav nav-tabs -->
 	
 		<div class="tab-content">
@@ -104,6 +105,69 @@ BLOCKS(Including inherited blocks):
 				<!-- !modal -->
 			</div> <!-- #3 -->
 
+            <div class="tab-pane active" id="4">
+				<h3>Rating Detail</h3>
+                <table class="table table-bordered table-hover" >
+                    <thead>
+                        <th style="text-align: center">Register</th>
+                        <th style="text-align: center">Video</th>
+                        <th style="text-align: center">Exposition</th>
+                        <th style="text-align: center">Lec Note</th>
+                        <th style="text-align: center">Example</th>
+                        <th style="text-align: center">VoteUp</th>
+                        <th style="text-align: center">VoteDown</th>
+                        <th style="text-align: center">Sum</th>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td style="text-align: center">
+                                <div>
+                                    200
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    N/A
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    {{ user_rate.ExpoRating }}
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                {{ user_rate.LecNoteRating }}
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    {{ user_rate.ExampleRating }}
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    {{ user_rate.VoteUp }}
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    {{ user_rate.VoteDown }}
+                                </div>
+                            </td>
+                            <td style="text-align: center">
+                                <div>
+                                    {{ user_rate.rating }}
+                                </div>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div> <!-- #4 -->
+            
+            
 		</div> <!-- .tab-content -->
 	</div> <!-- .tabbable .tabs-left -->
 

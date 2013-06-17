@@ -17,9 +17,8 @@
 {# {% if query %} #}
 <!-- Begin faceting. -->
 <div class="row-fluid">
-    <div class="span2">
-<h4>Class Search <h4>
-<h4>By Author</h4>
+    <div class="span3">
+<a href="{%url 'haystack_search' %}"><h4>Class Search By Author<h4></a>
 <div>
     <dl>
         {% if facets.fields.ClassAuthor %}
@@ -33,15 +32,14 @@
         {% endif %}
     </dl>
 </div>
-<h4>Class Search <h4>
-<h4>By Status</h4>
+<a href="{%url 'haystack_search_facet' %}"><h4>Class Search By Status<h4></a>
     <div>
         <dl>
             {% if facets.fields.ClassStatus %}
             <dt>Status</dt>
             {# Provide only the top 2 status #}
             {% for status in facets.fields.ClassStatus|slice:":2" %}
-            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassStatus_exact:{{ status.0|urlencode }}">{{ status.0 }}</a> ({{ status.1 }})</dd>
+            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=ClassStatus_exact:{{ status.0|urlencode }}">{% if status.0 == 'A' %}Active{% else %}Not Active{% endif %}</a> ({{ status.1 }})</dd>
             {% endfor %}
             {% else %}
             <p>No status facets.</p>
@@ -51,7 +49,7 @@
     
     </div>
 <!-- End faceting -->
-    <div class="span10">
+    <div class="span9">
         <div class="tabbable">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#tab1" data-toggle="tab">Class</a></li>

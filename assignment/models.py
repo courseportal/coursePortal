@@ -24,8 +24,10 @@ class AssignmentInstance(models.Model):
     user = models.ForeignKey(User, related_name = 'assignmentInstances')
     template = models.ForeignKey(Assignment, related_name = 'instances')
     can_edit = models.BooleanField(default=True)
-    score = models.FloatField(default = 0)
-    max_score = models.FloatField(default = 0)
+    start_date = models.DateTimeField()
+    due_date = models.DateTimeField()
+    score = models.FloatField(default = 0.0)
+    max_score = models.FloatField(default = 0.0)
     def __unicode__(self):
         return self.title
 
