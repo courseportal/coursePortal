@@ -5,12 +5,14 @@ from haystack import indexes
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
-#from rating.models import UserVotes
+
 
 STATUS_CHOICES = (
 	('A', 'Active'),
 	('N', 'Not active'),
 )
+
+
 
 class Class(models.Model):
 	name = models.CharField(max_length=100)

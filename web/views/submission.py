@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
 import json
-from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm
+from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm, testModalForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
 class PlainErrorList(ErrorList):
@@ -89,7 +89,7 @@ def index(request, sid):
                        })
     return HttpResponse(t.render(c))
 
-	
+
 @login_required()
 def note_submit(request, nid):
 	r"""
@@ -112,6 +112,7 @@ def note_submit(request, nid):
 			note.save()
 			
 			return HttpResponseRedirect(reverse('home')) #should change this
+    
 		messages.warning(request, 'Error saving. Fields might be invalid.')
 	else:
 		if nid:

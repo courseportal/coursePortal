@@ -41,11 +41,15 @@ OPTIONAL context:
           {{ e.owner }}
         </td>
         <td style="width:75px">
-            <div class="votes-sum-{{e.id}}">
+            <div class="votes-sum-2-{{e.id}}">
                 {{e.votes}}
             </div>
         </td>
         <td>
+            <!-- Button to trigger modal -->
+            <a href="#myModal{{e.id}}" data-toggle="modal">
+                <i class="icon-flag"></i>
+            </a>
         {% if user.is_staff or user.is_superuser or e.owner == user %}
           <a href="{% url "note_submit" e.id %}">
             <i class="icon-edit"></i>
@@ -58,8 +62,32 @@ OPTIONAL context:
         {% endif %}
         </td>
       </tr>
+      <!-- Modal -->
+      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <form class="testForm" method="post" action="{{form_action}}">
+              {% csrf_token %}
+              <div class="form-actions">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Make a Report: </h3>
+                  </div>
+                  <div class="modal-body">
+                      {% include "web/form_template.html" with form=form %}
+                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
+                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                      <button class="btn btn-primary">Submit</button>
+                  </div>
+              </div>
+          </form>
+      </div>
+      <!--End of Modal-->
     {% endfor %}
   </tbody>
 </table>
+
+
 
 {% include "web/home/shared/tablesorter.html" %}

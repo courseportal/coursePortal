@@ -69,7 +69,7 @@ def voteGeneral(request,item ,item_id, vote_type):
                     # update current user rating
                     cur_user_rate = UserRating.objects.get(user=request.user)
                     rating = cur_user_rate.rating
-                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 
             elif vote_type == '0':
                 if vote_example.vote == -1:
@@ -87,7 +87,7 @@ def voteGeneral(request,item ,item_id, vote_type):
                     # update current user rating
                     cur_user_rate = UserRating.objects.get(user=request.user)
                     rating = cur_user_rate.rating
-                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
             else:
                 print("something wrong with vote_type!!!")
         except (VoteExposition.DoesNotExist, VoteLectureNote.DoesNotExist, VoteExample.DoesNotExist):
@@ -111,7 +111,7 @@ def voteGeneral(request,item ,item_id, vote_type):
                 # update current user rating
                 cur_user_rate = UserRating.objects.get(user=request.user)
                 rating = cur_user_rate.rating
-                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
             elif vote_type == '0':
                 vote_example.vote = -1
                 vote_example.save()
@@ -125,7 +125,7 @@ def voteGeneral(request,item ,item_id, vote_type):
                 # update current user rating
                 cur_user_rate = UserRating.objects.get(user=request.user)
                 rating = cur_user_rate.rating
-                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating , 'votes': e.votes,'id':e.id}), mimetype="application/json")
+                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating , 'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 
             else:
                 print("something wrong with vote_type!!!")

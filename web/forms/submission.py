@@ -19,6 +19,10 @@ def validate_youtube_video_id(value):
 		if not regex_vid_id.match(v):
 			raise ValidationError(u'%s is not a valid YouTube video id.' % v)
 
+class testModalForm(forms.Form):
+    subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
+    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff 24/7 to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
+
 class SubmissionForm(forms.Form):
 	title = forms.CharField(max_length=100, required=True)
 	content = forms.CharField(widget=forms.Textarea, required=True)

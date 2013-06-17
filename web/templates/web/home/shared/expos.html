@@ -11,7 +11,7 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-
+<div id="report"> </div>
 <table class="tablesorter">
     <thead>
         <th data-sorter="false"> </th>
@@ -33,7 +33,7 @@ OPTIONAL context:
           </td>
 
         <td>
-        	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">
+        	<a class="expo_link" data-toggle="modal" href="expo_modal">
             {{ e.title }}
           </a>
         </td>
@@ -41,11 +41,15 @@ OPTIONAL context:
           {{ e.owner }}
         </td>
           <td style="width:75px">
-              <div class="votes-sum-{{e.id}}">
+              <div class="votes-sum-1-{{e.id}}">
                   {{e.votes}}
               </div>
           </td>
         <td>
+        <!-- Button to trigger modal -->
+        <a href="#myModal{{e.id}}" data-toggle="modal">
+            <i class="icon-flag"></i>
+        </a>
         {% if user.is_staff or user.is_superuser or e.owner == user %}
           <a href="{% url "expo_submit" e.id %}">
             <i class="icon-edit"></i>
@@ -58,9 +62,32 @@ OPTIONAL context:
         {% endif %}
         </td>
       </tr>
+      <!-- Modal -->
+      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <form class="testForm" method="post" action="{{form_action}}">
+              {% csrf_token %}
+              <div class="form-actions">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Make a Report: </h3>
+                  </div>
+                  <div class="modal-body">
+                      {% include "web/form_template.html" with form=form %}
+                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
+                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                      <button class="btn btn-primary">Submit</button>
+                  </div>
+              </div>
+          </form>
+      </div>
     {% endfor %}
   </tbody>
 </table>
+
+
 
 {% include "web/home/shared/tablesorter.html" %}
 
@@ -70,7 +97,7 @@ OPTIONAL context:
     $('textarea').addClass('span6').wysihtml5();
     $('.expo_link').each(function() {
         $(this).click(function() {
-            $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+$(this).attr('data-href')+'">Loading...</iframe>'); 
+            $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+$(this).attr('data-href')+'">Loading...</iframe>');
             $('#expo_modal').modal('toggle').css({
                 width:'auto',
                 'margin-left':function(){
@@ -79,4 +106,5 @@ OPTIONAL context:
             });
         })
     });
+    
 </script>
