@@ -157,6 +157,7 @@ def base_category(request, cat_id):
             content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
             send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
             messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
         else:
             messages.warning(request, 'Error saving. Fields might be invalid.')
     else:
@@ -243,6 +244,7 @@ def base_atom(request, cat_id, atom_id):
             content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
             send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
             messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
         else:
             messages.warning(request, 'Error saving. Fields might be invalid.')
     else:
@@ -305,11 +307,24 @@ def base_atom(request, cat_id, atom_id):
 	
 
 def category(request, class_id, cat_id):
-	"""
-	- Generates the category page
-	- Generates a list of the most popular videos for each category of rating
-	- Use memcached to save the popular video rankings to save a lot of time
-	"""
+    """
+        - Generates the category page
+        - Generates a list of the most popular videos for each category of rating
+        - Use memcached to save the popular video rankings to save a lot of time
+        """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
+    
 	#get category we are in
 	current_category = get_object_or_404(AtomCategory, id=cat_id)
 	#Get the class that we are in
@@ -370,15 +385,28 @@ def category(request, class_id, cat_id):
 		'selected_class':current_class,
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
 	return HttpResponse(t.render(c))
 
 
 def atom(request, class_id, cat_id, atom_id):
-	"""
-	- Generates the view for a specific category
-	- Creates the breadcrumbs for the page
-	"""
+    """
+        - Generates the view for a specific category
+        - Creates the breadcrumbs for the page
+    """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
 	#Get atom we are in
 	current_atom = get_object_or_404(Atom, id=atom_id)
 	#get category we are in
@@ -441,6 +469,7 @@ def atom(request, class_id, cat_id, atom_id):
 		'forum': forum,
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
 	return HttpResponse(t.render(c))
 
