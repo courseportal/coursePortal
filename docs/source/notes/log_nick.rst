@@ -15,6 +15,14 @@ Week of June 17-21
 So far this week I have:
     *   Added custom validation to the exposition form to ensure that the link begins with ``http://`` or ``https://``
     *   Changed the video display list to a sortable table to be consistent with the rest of the content display lists
+    *   Added a sticky feature for content lists in classes
+        
+        *   First I added a sticky field for each content type in the Class model
+        *   Then I added functionality to force the table sort to be prepended by a sort on sticky/not stickied by adding a hidden column for sticky status
+        *   Then I added a button for ``authors`` and ``allowed_users`` of a class to be able to sticky content in the content list for videos, expositions, notes and examples.
+        
+            *   I used AJAX to have the (not) stickied change be reflected in the table without reloading the page
+            *   Then I added automatic table updating and resorting when the votes or sticky status is changed
 
 Goals
 -----

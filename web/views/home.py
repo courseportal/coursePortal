@@ -479,6 +479,7 @@ def atom(request, class_id, cat_id, atom_id):
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
 	if request.user.is_authenticated():
+		
 		for c in all_content:
 			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}

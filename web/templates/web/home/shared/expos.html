@@ -118,15 +118,15 @@ OPTIONAL context:
           </td>
         <td>
         <!-- Button to trigger modal -->
-        <a href="#myModal{{e.id}}" data-toggle="modal">
+        <a href="#myModalExpo{{e.id}}" data-toggle="modal">
             <i class="icon-flag"></i>
         </a>
         {% include "web/home/shared/sticky.html" with type=1 %}
         {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "expo_submit" e.id %}">
+          <a href="{% url "expo_submit" e.id %}?next={{request.path}}">
             <i class="icon-edit"></i>
           </a>
-          <a href="{% url "delete_expo" e.id %}">
+          <a href="{% url "delete_expo" e.id %}?next={{request.path}}">
             <i class="icon-remove"></i>
           </a>
         {% endif %}
@@ -134,7 +134,7 @@ OPTIONAL context:
         <td style="display:none;"><div class="stickied-1-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div id="myModalExpo{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <form class="testForm" method="post" action="{{form_action}}">
               {% csrf_token %}
               <div class="form-actions">
