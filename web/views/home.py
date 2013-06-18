@@ -353,7 +353,7 @@ def category(request, class_id, cat_id):
 
 	if request.user.is_authenticated():
 		for c in content:
-			ratings = c.votes.filter(user=request.user)
+			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
@@ -443,7 +443,7 @@ def atom(request, class_id, cat_id, atom_id):
 
 	if request.user.is_authenticated():
 		for c in content:
-			ratings = c.votes.filter(user=request.user)
+			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
