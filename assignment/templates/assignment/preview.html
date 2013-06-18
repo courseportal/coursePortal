@@ -1,0 +1,50 @@
+<!-- JQUERY UI -->
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
+
+<body>
+<div class="row">
+	<h1><div class="span4 offset3">{{ assignment.title }}</div></h1>
+</div>
+
+{% if question_list %}
+   {% for q in question_list %}
+   <div class="row">
+   <h4><div class="span6">{{q.title}}</div></h4>
+	</div>
+	{{q.text | safe}}
+		<br>
+		{% if q.choices.0 %}
+			<strong>Choices:</strong>
+			<br>
+			{% for c in q.choices %}
+				<input type="radio" value={{c}}>{{c}}</input>
+				<br>
+			{% endfor %}
+		{% else %}
+			<strong>Answer:</strong>
+			<br>
+			<input type="text">
+		{% endif %}
+		<br>
+		<br>
+    {% endfor %}
+    <button class="btn" disabled>Save</button>
+    <button class="btn" disabled>Submit</button>
+{% else %}
+    <p>No questions in this assignment.</p>
+{% endif %}
+</body>

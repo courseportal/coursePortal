@@ -1,5 +1,6 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
+{% load my_filters %}
 
 <!-- TINY MCE -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
@@ -19,6 +20,10 @@
 
 <!-- JQUERY UI -->
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+
+<!-- nyromodal -->
+<link rel="stylesheet" href="{{STATIC_PREFIX}}nyromodal/styles/nyroModal.css" type="text/css" media="screen" />
+<script type="text/javascript" src="{{STATIC_PREFIX}}nyromodal/js/jquery.nyroModal.custom.js"></script>
 
 <!-- javascript -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
@@ -54,29 +59,23 @@
 			</div>
 			<div id="questionsList">
 				{% for q in assignment.questions.all %}
-				<div class="row-fluid"> 
+				<div class="row-fluid question-whole" id="question{{forloop.counter}}"> 
 					<input type="hidden" value = "{{q.data}}"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
-					<div class="span1 question-edit btn" onclick="load_question(0)">
+					<div class="span1 question-edit btn" onclick="load_question({{forloop.counter}})">
 						<i class="icon-edit-sign"> Edit</i> 
 					</div> 
+					{% with title=q.title %}
 					<div class="span1 question-pts"> 
-						<input type="text" class="input-fit" value="0"></input> 
+						<input type="text" class="input-fit point-value" value="{{point_list|lookup:title }}"></input> 
 					</div>
-					<div class="span1 question-remove btn" onclick="remove_question(0)"> 
+					{% endwith %}
+					<div class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
 						<i class="icon-remove-sign"></i> 
 					</div> 
 				</div>
 				{%endfor%}
-				<script>
-					$('#questionsList>.row-fluid').each(function(index){
-	      			num = index+1
-	      			$(this).id = 'question'+num;
-	         		$(this).find('.question-edit').attr('onclick', 'load_question('+num+')');
-	         		$(this).find('.question-remove').attr('onclick', 'remove_question('+num+')');
-	      		});
-	      	</script>
 			</div>
 		</div>
 	</div>
@@ -120,11 +119,15 @@
 	</div>
 
 	<hr>
+	<form action="{% url "preview_assignment" %}" method="post" id="previewform">
+	{% csrf_token %}
+		<input type="text" style="display:none" id="previewdata" name="previewdata"></input>
+		<button  class="btn" onclick="preview()">Preview</button>
+	</form>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
-
 </body>
 {% endblock %}

@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
 import json
-from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm
+from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm, testModalForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
 class PlainErrorList(ErrorList):
@@ -89,7 +89,7 @@ def index(request, sid):
                        })
     return HttpResponse(t.render(c))
 
-	
+
 @login_required()
 def note_submit(request, nid):
 	r"""
@@ -112,6 +112,7 @@ def note_submit(request, nid):
 			note.save()
 			
 			return HttpResponseRedirect(reverse('home')) #should change this
+    
 		messages.warning(request, 'Error saving. Fields might be invalid.')
 	else:
 		if nid:
@@ -294,7 +295,7 @@ def delete_note(request, nid):
 	if request.method == 'POST':
 		form = DeleteForm(request.POST)
 		if form.is_valid():
-			if request.POST['yes']:
+			if request.POST.get('yes'):
 				note.delete()
 			return HttpResponseRedirect(reverse('home')) #should change this
 				
@@ -310,30 +311,31 @@ def delete_note(request, nid):
 	
 @login_required()
 def delete_video(request, sid):
-	r"""
-	This is the view for the exposition delete feature.
-	"""
+    r"""
+        This is the view for the exposition delete  .
+    """
 	
-	sub = Submission.objects.get(pk=sid)
+    sub = Submission.objects.get(pk=sid)
 	
 	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == sub.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
+    if not (request.user.is_staff or request.user.is_superuser or request.user == sub.owner):
+        return HttpResponseRedirect(reverse('home')) #should change this
 	
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST['yes']:
-				sub.delete()
-			return HttpResponseRedirect(reverse('home')) #should change this
+    if request.method == 'POST':
+        form = DeleteForm(request.POST)
+        if form.is_valid():
+            if request.POST.get('yes'):
+                sub.delete()
+            return HttpResponseRedirect(reverse('home')) #should change this
+
 				
-	else:
-		form = DeleteForm()
-		
-	return render(request, 'web/home/delete.html', {
+    else:
+        form = DeleteForm()
+
+    return render(request, 'web/home/delete.html', {
 		'name': sub.title,
 		'form': form,
 		'top_level_categories': top_level_categories,

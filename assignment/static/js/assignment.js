@@ -1,5 +1,7 @@
 $(init);
 
+
+
 CodeMirrorSettings = {
 	mode: 'python',
 	tabSize: 2,
@@ -12,6 +14,7 @@ code = {};
 solution = {};
 choices = [];
 text = {};
+
 
 function init(){
 
@@ -67,6 +70,7 @@ function init(){
 	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
+	$("#previewform").nm();
 }
 
 function add_choice_div(){
@@ -170,12 +174,6 @@ function remove_question(num){
 		$('#question'+num).remove()
 }
 
-function remove_question_exists(userid, qid){
-	name="#";
-	name=name.concat(userid,'_', qid);
-	$(name).remove();
-}
-
 function save(){
 	//empty object
 	assignment = {
@@ -199,6 +197,32 @@ function save(){
 
    $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
    $('#assignmentForm').submit();
+}
+
+
+function preview(){
+	//empty object
+	assignment = {
+		title: '',
+		start: '',
+		due: '',
+		questions: [],		
+	}
+
+	assignment.title = $('#assigntitle').val();
+	assignment.start = $('#assigndate').datepicker('getDate');
+	assignment.due = $('#duedate').datepicker('getDate');
+
+	$('#questionsList>.row-fluid').each(function(index){
+		questiondata = $(this).find('input[type=hidden]').val();
+		question = jQuery.parseJSON(questiondata);
+		question.points = $(this).find('input[type=text]').val();
+		console.log($(this).find('input[type=text]'))
+		assignment.questions.push(question);
+   });
+
+   $('#previewdata').val(JSON.stringify(assignment, undefined, 2));
+   $('#previewform').submit();
 }
 
 // function add_question(){

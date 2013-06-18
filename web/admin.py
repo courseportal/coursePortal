@@ -371,9 +371,10 @@ class SubmissionAdminForm(forms.ModelForm):
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-	form = SubmissionAdminForm
+    form = SubmissionAdminForm
+    exclude = ('votes',)
 
-	def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):
 		if change:
 			if not obj.video.startswith("[\""):
 				print("I am NOT with [\" ")
