@@ -23,7 +23,7 @@
 </div>
 
 {% if question_list %}
-<form name="inputForm" action="{% url "eval"%}"  method = "post">
+<form name="inputForm" action="{% url "eval" %}"  method = "post">
 	{% csrf_token %}
     <ul>
     {% for q in question_list %}

@@ -102,7 +102,7 @@ def editA(request, id):
         'point_list': assign_data['questions'],
         'breadcrumbs': breadcrumbs,
     }
-    return render(request, 'assignment/editAssignment.html', context)
+    return render(request, 'assignment/addAssignment.html', context)
 
 def create(request):
     a=json.loads(request.POST['assignmentdata'])

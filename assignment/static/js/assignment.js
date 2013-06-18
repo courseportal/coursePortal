@@ -186,6 +186,7 @@ function remove_question(num){
 
 function save(){
 	//empty object
+	var redo='';
 	assignment = {
 		title: '',
 		start: '',
@@ -194,8 +195,32 @@ function save(){
 	}
 
 	assignment.title = $('#assigntitle').val();
+	if(assignment.title == ''){
+		redo+="Title\n";
+	}
+	else
+		$('#assigntitle').style="";
+
 	assignment.start = $('#assigndate').datepicker('getDate');
+	if(assignment.start == null){
+		redo+="Assign date\n";
+	}
+	else
+		$('#assigndate').style="";
+
 	assignment.due = $('#duedate').datepicker('getDate');
+	if(assignment.due == null){
+		redo+="Due date\n";
+	}
+	else
+		$('#duedate').style="";
+
+	if(redo!=''){
+		var msg = "The following fields are required:\n"
+		msg+=redo
+		alert(msg);
+		return false;
+	}
 
 	$('#questionsList>.row-fluid').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
