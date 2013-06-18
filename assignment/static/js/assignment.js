@@ -51,13 +51,23 @@ function init(){
 			$('body').removeClass('dialog-open');
 		},
 		beforeClose: function( event, ui ) {
-			// warning = 'Are you sure you want to cancel editing?  Any changes will not be saved.';
-			// if(confirm(warning))
-			// 	return true;
-			// else
-			// 	return false;
+			warning = "Closing this will not save changes. Proceed?";
+			if ( event.originalEvent && $(event.originalEvent.target).closest(".ui-dialog-titlebar-close").length ) {
+				if(confirm(warning)){
+					$('#codediv').html('');
+					$('#solndiv').html('');
+					return true;
+				}
+				else
+					return false;
+			}
+			else{
+				$('#codediv').html('');
+				$('#solndiv').html('');
+				return true;
+			}
 		},
-		dialogClass: 'no-close',
+		//dialogClass: 'no-close',
 	});
 	//init wysiwyg
 	tinymce.init({
@@ -199,6 +209,15 @@ function save(){
    $('#assignmentForm').submit();
 }
 
+function Qpreview(num){
+	questiondata = $('#question'+num).find('input[type=hidden]').val();
+	question = jQuery.parseJSON(questiondata);
+	alert(JSON.stringify(question, undefined, 2));
+
+	$.ajax('/')
+
+
+}
 
 function preview(){
 	//empty object
