@@ -20,6 +20,33 @@ def viewStudent(request):
    }
 	return render(request, 'assignment/students.html', context)
 
+def previewQuestion(request):
+	q = json.loads(request.POST['questiondata'])
+
+	q['solution']= q['solution'].replace('<br>', '\n')
+	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	for integer_index in range(len(q['choices'])):
+		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+
+	try: 
+		exec q['code']
+		q['solution'] = eval(q['solution'])
+
+	except Exception as ex:
+		test=''
+		test += str(ex)
+		return HttpResponse(test)
+
+	local_dict = dict(locals())
+	q['text'] = Template(q['text']).substitute(local_dict)
+
+	context = {
+		'question': q
+	}
+	return HttpResponse('no errors :)')
+
+
 def previewAssignment(request):
 	assignment = json.loads(request.POST['previewdata'])
 	question_list=[]

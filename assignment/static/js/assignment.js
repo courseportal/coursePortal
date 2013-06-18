@@ -199,6 +199,15 @@ function save(){
    $('#assignmentForm').submit();
 }
 
+function Qpreview(num){
+	questiondata = $('#question'+num).find('input[type=hidden]').val();
+	question = jQuery.parseJSON(questiondata);
+	alert(JSON.stringify(question, undefined, 2));
+
+	$.ajax('/')
+
+
+}
 
 function preview(){
 	//empty object
