@@ -85,10 +85,10 @@ init_vote_up = function() {
                                 200: function(data) {
                                 console.log(data)
                                 if(data.result == true) {
-                                console.log(this)
-                                var s = '.votes-sum-'+data.id
-                                $('.cur-user-rate').text(data.requestUserRating)
-                                $(s).text(data.votes)
+                                console.log(this);
+                                var s = '.votes-sum-'+data.itemType+'-'+data.id;
+                                $('.cur-user-rate').text(data.requestUserRating);
+                                $(s).text(data.votes);
                                 }else{
                                 alert("You have already voted!");
                                 }
@@ -113,10 +113,10 @@ init_vote_down = function() {
                                 200: function(data) {
                                 console.log(data)
                                 if(data.result == true) {
-                                console.log(this)
-                                var s = '.votes-sum-'+data.id
-                                $('.cur-user-rate').text(data.requestUserRating)
-                                $(s).text(data.votes)
+                                console.log(this);
+                                var s = '.votes-sum-'+data.itemType+'-'+data.id;
+                                $('.cur-user-rate').text(data.requestUserRating);
+                                $(s).text(data.votes);
                                 }else{
                                 alert("You have already voted!");
                                 }

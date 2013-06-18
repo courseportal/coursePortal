@@ -30,21 +30,6 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 
-def send_email(request):
-    subject = request.POST.get('subject', '')
-    message = request.POST.get('content', '')
-    from_email = request.POST.get('email', '')
-    if subject and message and from_email:
-        try:
-            send_mail(subject, message, from_email, ['tyan@umich.edu'])
-        except BadHeaderError:
-            return HttpResponse('Invalid header found.')
-        return HttpResponseRedirect('web/home/confirm.html')
-    else:
-        # In reality we'd use a form class
-        # to get proper validation errors.
-        return HttpResponse('Make sure all fields are entered and valid.')
-
 #@login_required()
 def index(request,bid):
     """

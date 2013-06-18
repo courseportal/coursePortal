@@ -9,3 +9,8 @@ def lookup(dict, index):
     if index in dict:
         return dict[index]
     return ''
+
+
+@register.filter
+def to_class_name(value):
+    return value.__class__.__name__

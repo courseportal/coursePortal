@@ -50,45 +50,64 @@ def previewQuestion(request):
 def previewAssignment(request):
 	assignment = json.loads(request.POST['previewdata'])
 	question_list=[]
-	try:
-		for q in assignment['questions']:
-			question={
-				'title':'',
-				'solution':'',
-				'text':'',
-				'choices':[]
-	   	}
-			question['title'] = q['title']
-			q['solution']= q['solution'].replace('<br>', '\n')
-			q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-			for integer_index in range(len(q['choices'])):
-				q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-				q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	test = ''
+	
+	for q in assignment['questions']:
+		question={
+			'title':'',
+			'solution':'',
+			'text':'',
+			'choices':[]
+	   }
+
+		question['title'] = q['title']
+		q['solution']= q['solution'].replace('<br>', '\n')
+		q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+		try:
 			exec q['code']
+		except Exception as ex:
+			test += errorMsg(q['title'], ex, 'code')
+
+		try:
 			question['solution']=eval(q['solution'])
+		except Exception as ex:
+			test += errorMsg(q['title'], ex, 'solution')
 
-			#q text formatted here
-			local_dict = dict(locals())
-			question['text'] = Template(q['text']).substitute(local_dict)
+		#Format chice texts
+		for integer_index in range(len(q['choices'])):
+			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+			
 
-			for choice in q['choices']:
-				answer = eval(choice)
+		#q text formatted here
+		local_dict = dict(locals())
+		question['text'] = Template(q['text']).substitute(local_dict)
+
+		for integer_index in range(len(q['choices'])):
+			try:
+				answer = eval(q['choices'][integer_index])
 				question['choices'].append(answer)
-			if len(q['choices']) > 0:
-				question['choices'].append(question['solution'])
-			question_list.append(question)
+			except Exception as ex:
+				y = "Choice"+str(integer_index+1)
+				test += errorMsg(q['title'], ex, y)
+		if len(q['choices']) > 0:
+			question['choices'].append(question['solution'])
+		question_list.append(question)
 
-	except Exception as ex:
-		test=''
-		test += str(ex)
+	
+
+	if test!='':
 		return HttpResponse(test)
-
 	context = {
 		'question_list': question_list,
    	'assignment': assignment
 	}
 	return render(request, 'assignment/preview.html', context)
 
+def errorMsg(title, error, element):
+	x = "Question \""+title+"\" threw this error in element \""+element+"\":<br>"
+	x+= "&nbsp;&nbsp;&nbsp;&nbsp;"+str(error)+"<br>"
+	return x
 
 class ClassStats():
 	className=''

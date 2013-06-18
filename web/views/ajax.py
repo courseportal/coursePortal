@@ -41,6 +41,8 @@ def voteGeneral(request,item ,item_id, vote_type):
             e = LectureNote.objects.get(id=item_id)
         elif item == '3':
             e = Example.objects.get(id=item_id)
+        elif item == '4':
+            e = Submission.objects.get(id=item_id)
         else:
             print("Something wrong!")
         try:
@@ -48,8 +50,10 @@ def voteGeneral(request,item ,item_id, vote_type):
                 vote_example = VoteExposition.objects.filter(user=request.user).get(example=e)
             elif item == '2':
                 vote_example = VoteLectureNote.objects.filter(user=request.user).get(example=e)
-            else:
+            elif item == '3':
                 vote_example = VoteExample.objects.filter(user=request.user).get(example=e)
+            else:
+                vote_example = VoteVideo.objects.filter(user=request.user).get(example=e)
 
         # Check if the previous vote arees with the new vote
         # Update e.votes and vote_example accordingly
@@ -63,13 +67,14 @@ def voteGeneral(request,item ,item_id, vote_type):
                     e.save()
                     # update user_rate as well
                     user_rate = UserRating.objects.get(user=e.owner)
-                    user_rate.VoteUp += 2
+                    user_rate.VoteUp += 1
+                    user_rate.VoteDown += 1
                     user_rate.rating += 2
                     user_rate.save()
                     # update current user rating
                     cur_user_rate = UserRating.objects.get(user=request.user)
                     rating = cur_user_rate.rating
-                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 
             elif vote_type == '0':
                 if vote_example.vote == -1:
@@ -81,22 +86,25 @@ def voteGeneral(request,item ,item_id, vote_type):
                     e.save()
                     # update user_rate as well
                     user_rate = UserRating.objects.get(user=e.owner)
-                    user_rate.VoteUp -= 2
+                    user_rate.VoteUp -= 1
+                    user_rate.VoteDown -= 1
                     user_rate.rating -= 2
                     user_rate.save()
                     # update current user rating
                     cur_user_rate = UserRating.objects.get(user=request.user)
                     rating = cur_user_rate.rating
-                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                    return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
             else:
                 print("something wrong with vote_type!!!")
-        except (VoteExposition.DoesNotExist, VoteLectureNote.DoesNotExist, VoteExample.DoesNotExist):
+        except (VoteExposition.DoesNotExist, VoteLectureNote.DoesNotExist, VoteExample.DoesNotExist, VoteVideo.DoesNotExist):
             if item == '1':
                 vote_example = VoteExposition.objects.create(user=request.user,example=e, vote=1)
             elif item == '2':
                 vote_example = VoteLectureNote.objects.create(user=request.user,example=e, vote=1)
-            else:
+            elif item == '3':
                 vote_example = VoteExample.objects.create(user=request.user,example=e, vote=1)
+            else:
+                vote_example = VoteVideo.objects.create(user=request.user,example=e, vote=1)
 
             if vote_type == '1':
                 vote_example.vote = 1
@@ -111,7 +119,7 @@ def voteGeneral(request,item ,item_id, vote_type):
                 # update current user rating
                 cur_user_rate = UserRating.objects.get(user=request.user)
                 rating = cur_user_rate.rating
-                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id}), mimetype="application/json")
+                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
             elif vote_type == '0':
                 vote_example.vote = -1
                 vote_example.save()
@@ -119,13 +127,13 @@ def voteGeneral(request,item ,item_id, vote_type):
                 e.save()
                 # update user_rate as well
                 user_rate = UserRating.objects.get(user=e.owner)
-                user_rate.VoteUp -= 1
+                user_rate.VoteDown -= 1
                 user_rate.rating -= 1
                 user_rate.save()
                 # update current user rating
                 cur_user_rate = UserRating.objects.get(user=request.user)
                 rating = cur_user_rate.rating
-                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating , 'votes': e.votes,'id':e.id}), mimetype="application/json")
+                return HttpResponse(json.dumps({'result': True,'requestUserRating': rating , 'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 
             else:
                 print("something wrong with vote_type!!!")

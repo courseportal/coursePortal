@@ -28,10 +28,10 @@ OPTIONAL context:
       <tr>
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
-            <div class="arrow-up" item-type="3" vote-example-id="" vote-type="1">
+            <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
             <i class="icon-arrow-up"></i>
           </div>
-          <div class="arrow-down" item-type="3" vote-example-id="" vote-type="0">
+          <div class="arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0">
             <i class="icon-arrow-down"></i>
           </div>
           <!-- End Implement Voting -->
@@ -59,12 +59,17 @@ OPTIONAL context:
         </td>
         <!-- Votes -->
         <td style="width:75px">
-            <div class="votes-sum-{{c.id}}">
+            <div class="votes-sum-4-{{c.id}}">
             {{c.votes}}
             </div>
         </td>
         <!-- end Votes -->
         <td>
+            <!-- Button to trigger modal -->
+            <a href="#myModal{{c.id}}" data-toggle="modal">
+                <i class="icon-flag"></i>
+            </a>
+
         {% if user.is_staff or user.is_superuser or e.owner == user %}
           <a href="{% url "submit" c.id %}">
             <i class="icon-edit"></i>
@@ -77,6 +82,28 @@ OPTIONAL context:
         {% endif %}
         </td>
       </tr>
+      <!-- Modal -->
+      <div id="myModal{{c.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <form class="testForm" method="post" action="{{form_action}}">
+              {% csrf_token %}
+              <div class="form-actions">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Make a Report: </h3>
+                  </div>
+                  <div class="modal-body">
+                      {% include "web/form_template.html" with form=form %}
+                      <input type="hidden" id="test" name="contentType" value="{{c|to_class_name}}"/>
+                      <input type="hidden" id="test2" name="contentId" value="{{c.id}}"/>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                      <button class="btn btn-primary">Submit</button>
+                  </div>
+              </div>
+          </form>
+      </div>
+      <!--End of Modal-->
     {% endfor %}
   </tbody>
 </table>

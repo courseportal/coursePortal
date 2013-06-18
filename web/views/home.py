@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.cache import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -10,13 +11,14 @@ import json
 
 from pybb.models import Forum
 from django.core.mail import send_mail, BadHeaderError
+from web.forms.submission import testModalForm
 
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 
 
 def class_index(request):
-
+    
 	#Get the "top level" categories
     top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
     class_list = Class.objects.all()
@@ -143,15 +145,28 @@ def findChildAtom(current_category, atom_list):
 
 
 def base_category(request, cat_id):
-	"""
-	-	Generates the category page
-	-	Generates a list of the most popular videos for each category of rating
-	-	Use memcached to save the popular video rankings to save a lot of time
-	"""
-	#get category we are in
-	current_category = get_object_or_404(BaseCategory, id=cat_id)
+    """
+        -	Generates the category page
+        -	Generates a list of the most popular videos for each category of rating
+        -	Use memcached to save the popular video rankings to save a lot of time
+    """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
+    
+    #get category we are in
+    current_category = get_object_or_404(BaseCategory, id=cat_id)
 	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 	
 	#Get list of parent categories, not perfect, improvements can be made
 ##	parent_categories = list()
@@ -161,44 +176,44 @@ def base_category(request, cat_id):
 ##		parent_categories.append(tmp_categories[0])
 ##		print(tmp_categories[0])
 ##		tmp_categories = tmp_categories[0].parent_categories.all()
-	parent_categories = get_parent_categories(current_category=current_category)
+    parent_categories = get_parent_categories(current_category=current_category)
 
 	#Setting breadcrumbs, not perfect, improvements can be made
-	breadcrumbs = []
-	for i in range(1, len(parent_categories)+1):
+    breadcrumbs = []
+    for i in range(1, len(parent_categories)+1):
 		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
 
 	#Get collection of videos from all atoms in this category or sub-categories
-	content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
-	expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
-	notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
-	examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
+    content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
+    expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
+    notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
+    examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
 	
 	
 	# un-json-fy the videos
-	for c in content:
+    for c in content:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
-	if request.user.is_authenticated():
+    if request.user.is_authenticated():
 		for c in content:
-			ratings = c.votes.filter(user=request.user)
+			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
 					c.user_rating[int(r.v_category.id)] = int(r.rating)
 	#get all the atoms in and under the current category
-	atom_list = list()
-	temp_atom_list = findChildAtom(current_category,list())
-	for item in temp_atom_list:
+    atom_list = list()
+    temp_atom_list = findChildAtom(current_category,list())
+    for item in temp_atom_list:
 		if atom_list.count(item)==0:
 			atom_list.append(item)
-	length = int(len(atom_list))/3+1
-	list_1 = atom_list[0:length]
-	list_2 = atom_list[length:length*2]
-	list_3 = atom_list[length*2:]
+    length = int(len(atom_list))/3+1
+    list_1 = atom_list[0:length]
+    list_2 = atom_list[length:length*2]
+    list_3 = atom_list[length*2:]
 
-	t = loader.get_template('web/home/base/category.html')
-	c = RequestContext(request, {
+    t = loader.get_template('web/home/base/category.html')
+    c = RequestContext(request, {
 		'breadcrumbs': breadcrumbs,
 		'content': content,
 		'expositions': expositions,
@@ -212,54 +227,69 @@ def base_category(request, cat_id):
 		'vote_categories': VoteCategory.objects.all(),
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
-	return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c))
 
 def base_atom(request, cat_id, atom_id):
-	"""
-	- Generates the view for a specific category
-	- Creates the breadcrumbs for the page
-	"""
+
+    """
+        - Generates the view for a specific category
+        - Creates the breadcrumbs for the page
+        """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
+
 	#Get atom we are in
-	current_atom = get_object_or_404(Atom, id=atom_id)
+    current_atom = get_object_or_404(Atom, id=atom_id)
 	#get category we are in
-	current_category = get_object_or_404(BaseCategory, id=cat_id)
+    current_category = get_object_or_404(BaseCategory, id=cat_id)
 	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None) #check that this works
+    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None) #check that this works
 
-	parent_categories = get_parent_categories(current_category=current_category)
+    parent_categories = get_parent_categories(current_category=current_category)
 
-	breadcrumbs = []
-	for i in range(1, len(parent_categories)+1):
+    breadcrumbs = []
+    for i in range(1, len(parent_categories)+1):
 		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
-	breadcrumbs.append({'url': reverse('base_atom', args=[current_category.id, current_atom.id]), 'title': current_atom})
+    breadcrumbs.append({'url': reverse('base_atom', args=[current_category.id, current_atom.id]), 'title': current_atom})
 
 	
-	content = Submission.objects.filter(tags=current_atom).distinct()
+    content = Submission.objects.filter(tags=current_atom).distinct()
 	
-	forum = Forum.objects.get(atom=current_atom)
+    forum = Forum.objects.get(atom=current_atom)
 
 
 	# un-json-fy the videos
-	for c in content:
+    for c in content:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
-	if request.user.is_authenticated():
+    if request.user.is_authenticated():
 		for c in content:
-			ratings = c.votes.filter(user=request.user)
+			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
 					c.user_rating[int(r.v_category.id)] = int(r.rating)
 
 
-	expositions = current_atom.exposition_set.all()
-	notes = current_atom.lecturenote_set.all()
-	examples = current_atom.example_set.all()
+    expositions = current_atom.exposition_set.all()
+    notes = current_atom.lecturenote_set.all()
+    examples = current_atom.example_set.all()
 
 
-	t = loader.get_template('web/home/base/atom.html')
-	c = RequestContext(request, {
+    t = loader.get_template('web/home/base/atom.html')
+    c = RequestContext(request, {
 		'breadcrumbs': breadcrumbs,
 		'content': content,
 		'expositions': expositions,
@@ -271,16 +301,30 @@ def base_atom(request, cat_id, atom_id):
 		'forum': forum,
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
-	return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c))
 	
 
 def category(request, class_id, cat_id):
-	"""
-	- Generates the category page
-	- Generates a list of the most popular videos for each category of rating
-	- Use memcached to save the popular video rankings to save a lot of time
-	"""
+    """
+        - Generates the category page
+        - Generates a list of the most popular videos for each category of rating
+        - Use memcached to save the popular video rankings to save a lot of time
+        """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
+    
 	#get category we are in
 	current_category = get_object_or_404(AtomCategory, id=cat_id)
 	#Get the class that we are in
@@ -341,15 +385,28 @@ def category(request, class_id, cat_id):
 		'selected_class':current_class,
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
 	return HttpResponse(t.render(c))
 
 
 def atom(request, class_id, cat_id, atom_id):
-	"""
-	- Generates the view for a specific category
-	- Creates the breadcrumbs for the page
-	"""
+    """
+        - Generates the view for a specific category
+        - Creates the breadcrumbs for the page
+    """
+    if request.method == 'POST': # If the form has been submitted...
+        form = testModalForm(request.POST)
+        if form.is_valid():	# All validation rules pass
+            subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+            content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+            messages.warning(request, 'Report has been successfully submitted. Thank you!')
+            return HttpResponseRedirect(reverse('base_category', args=(cat_id,))) 
+        else:
+            messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        form = testModalForm()
 	#Get atom we are in
 	current_atom = get_object_or_404(Atom, id=atom_id)
 	#get category we are in
@@ -412,6 +469,7 @@ def atom(request, class_id, cat_id, atom_id):
 		'forum': forum,
 		'notes': notes,
 		'examples': examples,
+        'form': form,
 	})
 	return HttpResponse(t.render(c))
 
