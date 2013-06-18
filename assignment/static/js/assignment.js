@@ -1,3 +1,40 @@
+$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+
 $(init);
 
 
@@ -14,6 +51,7 @@ code = {};
 solution = {};
 choices = [];
 text = {};
+preview = {};
 
 
 function init(){
@@ -132,29 +170,7 @@ function load_question_helper(){
 
 function save_question(num){
 
-	numQuestions = $('#questionsList').children().length;
-	//if a new question, add to the question list
-	if(num > numQuestions){
-		questionHTML = 
-			'<div class="row-fluid" id="question'+num+'"> \
-				<input type="hidden"></input> \
-				<div class="span5 question-description">'+
-				$('#questiontitle').val()+
-				'</div> \
-				<div class="span1 btn question-edit" onclick="load_question('+num+')"> \
-					<i class="icon-edit-sign"> Edit</i> \
-				</div> \
-				<div class="span1 question-pts"> \
-					<input type="text" class="input-fit" value="0"></input> \
-				</div> \
-				<div class="span1 question-remove btn" onclick="remove_question('+num+')"> \
-					<i class="icon-remove-sign"></i> \
-				</div> \
-			</div>';
-		$('#questionsList').append(questionHTML);
-	}
-	//create the question object
-	datafield = $('#question'+num).find('input[type=hidden]');
+	//create question object
 	question = {
 		choices: [],
 	};
@@ -166,7 +182,70 @@ function save_question(num){
 	}
 	question.text = tinymce.activeEditor.getContent();
 	questiondata = JSON.stringify(question);
+
+
+	//attempt to preview the question
+	questionPOST = {
+		questiondata: questiondata
+	};
+	$.ajax('/assignment/assign/qpreview', {
+		type: 'POST',
+		async: false,
+		data: questionPOST,
+	}).done(function(response){
+		alert(response);
+		preview = jQuery.parseJSON(response)
+	});
+	if(preview.errors){ //tell them they have an error and quit
+		alert(preview.errors);
+		return;
+	}
+
+	//if a new question, add to the question list
+	numQuestions = $('#questionsList').children().length;
+	if(num > numQuestions){
+		questionHTML = 
+			'<div id="question'+num+'">\
+				<div class="row-fluid questionMenu">\
+					<input type="hidden"></input>\
+				<div class="span5 question-description">'+
+						$('#questiontitle').val()+
+					'</div>\
+					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
+						<i class="icon-edit-sign"> Edit</i>\
+					</div>\
+					<div class="span1 question-pts">\
+						<input type="text" class="input-fit" value="0"></input>\
+					</div>\
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+						<i class="icon-remove-sign"></i>\
+					</div>\
+				</div>\
+				<div class="row-fluid">\
+					<div class="span10 offset1">\
+						Question:\
+						<div class="textPreview"></div>\
+					<div>\
+				</div>\
+				<div class="row-fluid">\
+					<div class="span10 offset1">\
+						Solutions:\
+						<div class="solnsPreview"></div>\
+					</div>\
+				</div>\
+			</div>';
+		$('#questionsList').append(questionHTML);
+	}
+
+	//save the data to a hidden field
+	datafield = $('#question'+num).find('input[type=hidden]');
 	datafield.val(questiondata);
+
+	//fill out the preview
+	textPreview = $('#question'+num).find('.textPreview');
+	textPreview.html(preview.text);
+	solnsPreview = $('#question'+num).find('.solnsPreview');
+	solnsPreview.html(preview.soln);
 
 	//close the dialog
 	$( '#dialog' ).dialog('close');
@@ -209,13 +288,22 @@ function save(){
    $('#assignmentForm').submit();
 }
 
-function Qpreview(num){
-	questiondata = $('#question'+num).find('input[type=hidden]').val();
+function previewQ(questiondata){
+	//given questiondata, it will give you a preview
+	// questiondata = $('#question'+num).find('input[type=hidden]').val();
 	question = jQuery.parseJSON(questiondata);
-	alert(JSON.stringify(question, undefined, 2));
+	questionPOST = {
+		questiondata: questiondata
+	},
 
-	$.ajax('/')
-
+	$.ajax('/assignment/assign/qpreview', {
+		type: 'POST',
+		async: false,
+		data: questionPOST,
+	}).done(function(response){
+		alert(response);
+		return jQuery.parseJSON(response)
+	});
 
 }
 

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import numpy as np
 from string import Template
 from math import *
+from random import *
 
 def viewStudent(request):
 	user = request.user
@@ -23,28 +24,26 @@ def viewStudent(request):
 def previewQuestion(request):
 	q = json.loads(request.POST['questiondata'])
 
+	preview = dict()
+	preview['errors'] = ''
+
 	q['solution']= q['solution'].replace('<br>', '\n')
 	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	for integer_index in range(len(q['choices'])):
-		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+	
+	# for integer_index in range(len(q['choices'])):
+	# 	q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+	# 	q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 
 	try: 
 		exec q['code']
-		q['solution'] = eval(q['solution'])
+		preview['soln'] = eval(q['solution'])
+		local_dict = dict(locals())
+		preview['text'] = Template(q['text']).substitute(local_dict)
 
 	except Exception as ex:
-		test=''
-		test += str(ex)
-		return HttpResponse(test)
+		preview['errors'] += str(ex)
 
-	local_dict = dict(locals())
-	q['text'] = Template(q['text']).substitute(local_dict)
-
-	context = {
-		'question': q
-	}
-	return HttpResponse('no errors :)')
+	return HttpResponse(json.dumps(preview))
 
 
 def previewAssignment(request):
