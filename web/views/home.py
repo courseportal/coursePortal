@@ -298,22 +298,58 @@ def category(request, class_id, cat_id):
 		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
 
 	#Get collection of videos from all atoms in this category or sub-categories
-	content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
-	expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
-	notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
-	examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
+	all_content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
+	all_expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
+	all_notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
+	all_examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
+			
+	
+			
 	
 	# un-json-fy the videos
-	for c in content:
+	for c in all_content:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
 	if request.user.is_authenticated():
-		for c in content:
+		for c in all_content:
 			ratings = c.votes.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
 					c.user_rating[int(r.v_category.id)] = int(r.rating)
+					
+					
+	stickied_content = []
+	content = []
+	for vid in all_content:
+		if vid.classes_stickied_in.filter(id=current_class.id).exists():
+			stickied_content.append(vid)
+		else:
+			content.append(vid)
+					
+	stickied_expositions = []
+	expositions = []
+	for expo in all_expositions:
+		if expo.classes_stickied_in.filter(id=current_class.id).exists():
+			stickied_expos.append(expo)
+		else:
+			expositions.append(expo)
+			
+	stickied_notes = []
+	notes = []
+	for note in all_notes:
+		if note.classes_stickied_in.filter(id=current_class.id).exists():
+			stickied_notes.append(note)
+		else:
+			notes.append(note)
+			
+	stickied_examples = []
+	examples = []-
+	for example in all_examples:
+		if example.classes_stickied_in.filter(id=current_class.id).exists():
+			stickied_examples.append(example)
+		else:
+			examples.append(example)
 
 	#get all the atoms in and under the current category
 	atom_list = list()
@@ -321,7 +357,7 @@ def category(request, class_id, cat_id):
 	for item in temp_atom_list:
 		if atom_list.count(item)==0:
 			atom_list.append(item)
-	length = int(len(atom_list))/3+1
+	length = len(atom_list)/3+1
 	list_1 = atom_list[0:length]
 	list_2 = atom_list[length:length*2]
 	list_3 = atom_list[length*2:]
@@ -329,9 +365,6 @@ def category(request, class_id, cat_id):
 	t = loader.get_template('web/home/class/category.html')
 	c = RequestContext(request, {
 		'breadcrumbs': breadcrumbs,
-		'content': content,
-		'expositions': expositions,
-        #'lectureNotes': lectureNotes,
 		'top_level_categories': top_level_categories,
 		'selected_categories': parent_categories,
 		'atom_list_1': list_1,
@@ -339,6 +372,13 @@ def category(request, class_id, cat_id):
 		'atom_list_3': list_3,
 		'vote_categories': VoteCategory.objects.all(),
 		'selected_class':current_class,
+		
+		'stickied_content': stickied_content,
+		'stickied_expositions': stickied_expositions,
+		'stickied_notes': stickied_notes,
+		'stickied_examples': stickied_examples,
+		'content': content,
+		'expositions': expositions,
 		'notes': notes,
 		'examples': examples,
 	})
@@ -375,34 +415,40 @@ def atom(request, class_id, cat_id, atom_id):
 
 	forum = Forum.objects.get(atom=current_atom)
 	
-	content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
-	for c in content:
-		print(c.video)
-
-
+	all_content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
+	
 	# un-json-fy the videos
-	for c in content:
+	for c in all_content:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
 	if request.user.is_authenticated():
-		for c in content:
+		for c in all_content:
 			ratings = c.votes.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:
 					c.user_rating[int(r.v_category.id)] = int(r.rating)
 
-
-	expositions = current_atom.exposition_set.all()
-	notes = current_atom.lecturenote_set.all()
-	examples = current_atom.example_set.all()
+	stickied_content = []
+	content = []
+	for vid in all_content:
+		if vid.classes_stickied_in.filter(id=current_class.id).exists():
+			stickied_content.append(vid)
+		else:
+			content.append(vid)
+	
+	stickied_expositions = current_class.stickied_expos.filter(atom=current_atom)
+	expositions = current_atom.exposition_set.exclude(id__in = stickied_expositions.value_list('exposition__id', flat=True))
+	
+	stickied_notes = current_class.stickied_notes.filter(atom=current_atom)
+	notes = current_atom.lecturenote_set.exclude(id__in = stickied_notes.value_list('lecturenote__id', flat=True))
+	
+	stickied_examples = current_class.stickied_examples.filter(atom=current_atom)
+	examples = current_atom.example_set.exclude(id__in = stickied_examples.value_list('example__id', flat=True))
 
 	t = loader.get_template('web/home/class/category.html')
 	c = RequestContext(request, {
 		'breadcrumbs': breadcrumbs,
-		'content': content,
-		'expositions': expositions,
-        #'lectureNotes': lectureNotes,
 		'top_level_categories': top_level_categories,
 		'selected_categories': parent_categories,
 		#'selected_category': current_category,
@@ -410,6 +456,13 @@ def atom(request, class_id, cat_id, atom_id):
 		'vote_categories': VoteCategory.objects.all(),
 		'selected_class':current_class,
 		'forum': forum,
+		
+		'stickied_content': stickied_content,
+		'stickied_expositions': stickied_expositions,
+		'stickied_notes': stickied_notes,
+		'stickied_examples': stickied_examples,
+		'content': content,
+		'expositions': expositions,
 		'notes': notes,
 		'examples': examples,
 	})

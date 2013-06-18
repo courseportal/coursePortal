@@ -12,6 +12,10 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 Week of June 17-21
 ==================
 
+So far this week I have:
+    *   Added custom validation to the exposition form to ensure that the link begins with ``http://`` or ``https://``
+    *   Changed the video display list to a sortable table to be consistent with the rest of the content display lists
+
 Goals
 -----
     
