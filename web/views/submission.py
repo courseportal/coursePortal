@@ -92,82 +92,96 @@ def index(request, sid):
 
 @login_required()
 def note_submit(request, nid):
-	r"""
-	This is the view for the lecture note submit feature.
-	"""
-	
+    r"""
+        This is the view for the lecture note submit feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 
-	if request.method == 'POST': # If the form has been submitted...
-		form = LectureNoteForm(request.POST, request.FILES)
-		if form.is_valid():	# All validation rules pass
-			if nid:
-				note = LectureNote.objects.get(pk=nid)
-			else:
-				note = LectureNote(owner=request.user)
-			note.file = request.FILES['file']
-			note.atom = form.cleaned_data['atom']
-			note.filename = form.cleaned_data['filename']
-			note.save()
+    if request.method == 'POST': # If the form has been submitted...
+        form = LectureNoteForm(request.POST, request.FILES)
+        if form.is_valid():	# All validation rules pass
+            if nid:
+                note = LectureNote.objects.get(pk=nid)
+            else:
+                note = LectureNote(owner=request.user)
+            note.file = request.FILES['file']
+            note.atom = form.cleaned_data['atom']
+            note.filename = form.cleaned_data['filename']
+            note.save()
 			
-			return HttpResponseRedirect(reverse('home')) #should change this
+            if nid:
+                return HttpResponseRedirect(redirect_to) #should change this
+            else:
+                return HttpResponseRedirect(reverse('home'))
     
-		messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		if nid:
-			note = LectureNote.objects.get(pk=nid)
-			i_data = {
-				'file': note.file,
-				'atom': note.atom,
-				'filename': note.filename,
-			}
-			form = LectureNoteForm(initial=i_data)
-		else:
-			form = LectureNoteForm() # Create an unbound form
+        messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        if nid:
+            note = LectureNote.objects.get(pk=nid)
+            i_data = {
+                'file': note.file,
+                'atom': note.atom,
+                'filename': note.filename,
+            }
+            form = LectureNoteForm(initial=i_data)
+        else:
+            form = LectureNoteForm() # Create an unbound form
 
-	return render(request, 'web/home/note_submit.html', {
-		'form': form,
-		'top_level_categories': top_level_categories,
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-	})
+    return render(request, 'web/home/note_submit.html', {
+        'form': form,
+        'top_level_categories': top_level_categories,
+        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+    })
 	
 @login_required()
 def example_submit(request, exid):
-	r"""
-	This is the view for the example submit feature.
-	"""
-	
+    r"""
+        This is the view for the example submit feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    print(request.method)
+    #print(request.FILES)
+    if request.method == 'POST': # If the form has been submitted...
+        form = ExampleForm(request.POST, request.FILES)
+        #print(request.POST)
+        #print(request.FILES)
+        #print("I am here!!!")
+        if form.is_valid():	# All validation rules pass
+            print("I am valid!!!")
+            #print(form.cleaned_data)
+            if exid:
+                example = Example.objects.get(pk=exid)
+            else:
+                example = Example(owner=request.user)
+            example.file = request.FILES['file']
+            example.atom = form.cleaned_data['atom']
+            example.filename = form.cleaned_data['filename']
+            example.save()
+        
+            if exid:
+                return HttpResponseRedirect(redirect_to)
+            else:
+                return HttpResponseRedirect(reverse('home'))
 
-	if request.method == 'POST': # If the form has been submitted...
-		form = ExampleForm(request.POST, request.FILES)
-		if form.is_valid():	# All validation rules pass
-			if exid:
-				example = Example.objects.get(pk=exid)
-			else:
-				example = Example(owner=request.user)
-			example.file = request.FILES['file']
-			example.atom = form.cleaned_data['atom']
-			example.filename = form.cleaned_data['filename']
-			example.save()
-			
-			return HttpResponseRedirect(reverse('home')) #should change this
-		messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		if exid:
-			ex = Example.objects.get(pk=exid)
-			i_data = {
+        messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        if exid:
+            ex = Example.objects.get(pk=exid)
+            print(ex.file)
+            i_data = {
 				'file': ex.file,
 				'atom': ex.atom,
 				'filename': ex.filename,
 			}
-			form = ExampleForm(initial=i_data)
-		else:
-			form = ExampleForm() # Create an unbound form
+            form = ExampleForm(initial=i_data)
+        else:
+            form = ExampleForm() # Create an unbound form
 
-	return render(request, 'web/home/example_submit.html', {
+    return render(request, 'web/home/example_submit.html', {
 		'form': form,
 		'top_level_categories': top_level_categories,
 		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
@@ -175,39 +189,44 @@ def example_submit(request, exid):
     
 @login_required()
 def exposition(request, eid):
-	r"""
-	This is the view for the exposition submit feature.
-	"""
+    r"""
+        This is the view for the exposition submit feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 
-	if request.method == 'POST': # If the form has been submitted...
-		form = ExpoForm(request.POST) # A form bound to the POST data
-		if form.is_valid():	# All validation rules pass
-			if eid:
-				expo = Exposition.objects.get(pk=eid)
-			else:
-				expo = Exposition(owner=request.user)
-			expo.title = form.cleaned_data['title']
-			expo.link = form.cleaned_data['link']
-			expo.atom = form.cleaned_data['atom']
-			expo.save()
+    if request.method == 'POST': # If the form has been submitted...
+        form = ExpoForm(request.POST) # A form bound to the POST data
+        if form.is_valid():	# All validation rules pass
+            if eid:
+                expo = Exposition.objects.get(pk=eid)
+            else:
+                expo = Exposition(owner=request.user)
+            expo.title = form.cleaned_data['title']
+            expo.link = form.cleaned_data['link']
+            expo.atom = form.cleaned_data['atom']
+            expo.save()
 			
-			return HttpResponseRedirect(reverse('home')) #should change this
-		messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		if eid:
-			expo = Exposition.objects.get(pk=eid)
-			i_data = {
+            if eid:
+                return HttpResponseRedirect(redirect_to)
+            else:
+                return HttpResponseRedirect(reverse('home'))
+
+        messages.warning(request, 'Error saving. Fields might be invalid.')
+    else:
+        if eid:
+            expo = Exposition.objects.get(pk=eid)
+            i_data = {
 				'title': expo.title,
 				'atom': expo.atom,
 				'link': expo.link,
 			}
-			form = ExpoForm(initial=i_data)
-		else:
-			form = ExpoForm() # Create an unbound form
+            form = ExpoForm(initial=i_data)
+        else:
+            form = ExpoForm() # Create an unbound form
 	
-	return render(request, 'web/home/expo_submit.html', {
+    return render(request, 'web/home/expo_submit.html', {
 		'form': form,
 		'top_level_categories': top_level_categories,
 		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
@@ -215,30 +234,30 @@ def exposition(request, eid):
 
 @login_required()
 def delete_exposition(request, eid):
-	r"""
-	This is the view for the exposition delete feature.
-	"""
-	
-	expo = Exposition.objects.get(pk=eid)
+    r"""
+        This is the view for the exposition delete feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
+    expo = Exposition.objects.get(pk=eid)
 	
 	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == expo.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
+    if not (request.user.is_staff or request.user.is_superuser or request.user == expo.owner):
+        return HttpResponseRedirect(reverse('home')) #should change this
 	
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST['yes']:
-				expo.delete()
-			return HttpResponseRedirect(reverse('home')) #should change this
+    if request.method == 'POST':
+        form = DeleteForm(request.POST)
+        if form.is_valid():
+            if request.POST.get('yes'):
+                expo.delete()
+            return HttpResponseRedirect(redirect_to) #should change this
 				
-	else:
-		form = DeleteForm()
+    else:
+        form = DeleteForm()
 		
-	return render(request, 'web/home/delete.html', {
+    return render(request, 'web/home/delete.html', {
 		'name': expo.title,
 		'form': form,
 		'top_level_categories': top_level_categories,
@@ -247,30 +266,30 @@ def delete_exposition(request, eid):
 	
 @login_required()
 def delete_example(request, exid):
-	r"""
-	This is the view for the exposition delete feature.
-	"""
-	
-	example = Example.objects.get(pk=exid)
+    r"""
+        This is the view for the exposition delete feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
+    example = Example.objects.get(pk=exid)
 	
 	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == example.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
+    if not (request.user.is_staff or request.user.is_superuser or request.user == example.owner):
+        return HttpResponseRedirect(reverse('home')) #should change this
 	
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST['yes']:
-				example.delete()
-			return HttpResponseRedirect(reverse('home')) #should change this
+    if request.method == 'POST':
+        form = DeleteForm(request.POST)
+        if form.is_valid():
+            if request.POST.get('yes'):
+                example.delete()
+            return HttpResponseRedirect(redirect_to) #should change this
 				
-	else:
-		form = DeleteForm()
+    else:
+        form = DeleteForm()
 		
-	return render(request, 'web/home/delete.html', {
+    return render(request, 'web/home/delete.html', {
 		'name': example.filename,
 		'form': form,
 		'top_level_categories': top_level_categories,
@@ -279,30 +298,30 @@ def delete_example(request, exid):
 	
 @login_required()
 def delete_note(request, nid):
-	r"""
-	This is the view for the exposition delete feature.
-	"""
-	
-	note = LectureNote.objects.get(pk=nid)
+    r"""
+        This is the view for the exposition delete feature.
+    """
+    redirect_to = request.REQUEST.get('next','')
+    note = LectureNote.objects.get(pk=nid)
 	
 	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == note.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
+    if not (request.user.is_staff or request.user.is_superuser or request.user == note.owner):
+        return HttpResponseRedirect(reverse('home')) #should change this
 	
 	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST.get('yes'):
-				note.delete()
-			return HttpResponseRedirect(reverse('home')) #should change this
+    if request.method == 'POST':
+        form = DeleteForm(request.POST)
+        if form.is_valid():
+            if request.POST.get('yes'):
+                note.delete()
+            return HttpResponseRedirect(redirect_to) #should change this
 				
-	else:
-		form = DeleteForm()
+    else:
+        form = DeleteForm()
 		
-	return render(request, 'web/home/delete.html', {
+    return render(request, 'web/home/delete.html', {
 		'name': note.filename,
 		'form': form,
 		'top_level_categories': top_level_categories,
@@ -314,7 +333,7 @@ def delete_video(request, sid):
     r"""
         This is the view for the exposition delete  .
     """
-	
+    redirect_to = request.REQUEST.get('next','')
     sub = Submission.objects.get(pk=sid)
 	
 	# Check to see if user has permission to view this, redirect if they don't
@@ -329,7 +348,7 @@ def delete_video(request, sid):
         if form.is_valid():
             if request.POST.get('yes'):
                 sub.delete()
-            return HttpResponseRedirect(reverse('home')) #should change this
+            return HttpResponseRedirect(redirect_to) #should change this
 
 				
     else:
