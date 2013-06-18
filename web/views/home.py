@@ -354,13 +354,13 @@ def category(request, class_id, cat_id):
 	for c in all_content:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
-	if request.user.is_authenticated():
-		for c in all_content:
-			ratings = c.votes.filter(user=request.user)
-			c.user_rating = {}
-			if ratings.count() > 0:
-				for r in ratings:
-					c.user_rating[int(r.v_category.id)] = int(r.rating)
+		if request.user.is_authenticated():
+			for c in all_content:
+				ratings = c.votes_s.filter(user=request.user)
+				c.user_rating = {}
+				if ratings.count() > 0:
+					for r in ratings:
+						c.user_rating[int(r.v_category.id)] = int(r.rating)
 					
 					
 	stickied_content = []
@@ -375,7 +375,7 @@ def category(request, class_id, cat_id):
 	expositions = []
 	for expo in all_expositions:
 		if expo.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_expos.append(expo)
+			stickied_expositions.append(expo)
 		else:
 			expositions.append(expo)
 			
@@ -480,7 +480,7 @@ def atom(request, class_id, cat_id, atom_id):
 
 	if request.user.is_authenticated():
 		for c in all_content:
-			ratings = c.votes.filter(user=request.user)
+			ratings = c.votes_s.filter(user=request.user)
 			c.user_rating = {}
 			if ratings.count() > 0:
 				for r in ratings:

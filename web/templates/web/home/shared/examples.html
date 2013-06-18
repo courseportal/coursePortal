@@ -7,6 +7,7 @@ REQUIRED context:
 
 OPTIONAL context:
 	examples
+  selected_class
 
 -->
 
@@ -38,7 +39,9 @@ OPTIONAL context:
         <td>
           
         	<a target="_blank" href="{{ e.file.url }}">
-            {{ e.filename }} [stickied]
+            <div class="name-3-{{ e.id }}">
+              {{ e.filename }} [stickied]
+            </div>
           </a>
         </td>
         <td>
@@ -54,16 +57,17 @@ OPTIONAL context:
           <a href="#myModal{{e.id}}" data-toggle="modal">
             <i class="icon-flag"></i>
           </a>
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "example_submit" e.id %}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_example" e.id %}">
-            <i class="icon-remove"></i>
-          </a>
-        {% endif %}
+          {% include "web/home/shared/sticky.html" with type=3 %}
+          {% if user.is_staff or user.is_superuser or e.owner == user %}
+            <a href="{% url "example_submit" e.id %}">
+              <i class="icon-edit"></i>
+            </a>
+            <a href="{% url "delete_example" e.id %}">
+              <i class="icon-remove"></i>
+            </a>
+          {% endif %}
         </td>
-        <td style="display:none;">1</td>
+        <td style="display:none;"><div class="stickied-3-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -105,7 +109,9 @@ OPTIONAL context:
         <td>
           
         	<a target="_blank" href="{{ e.file.url }}">
-            {{ e.filename }}
+            <div class="name-3-{{ e.id }}">
+              {{ e.filename }}
+            </div>
           </a>
         </td>
         <td>
@@ -121,6 +127,7 @@ OPTIONAL context:
           <a href="#myModal{{e.id}}" data-toggle="modal">
             <i class="icon-flag"></i>
           </a>
+          {% include "web/home/shared/sticky.html" with type=3 %}
         {% if user.is_staff or user.is_superuser or e.owner == user %}
           <a href="{% url "example_submit" e.id %}">
             <i class="icon-edit"></i>
@@ -130,7 +137,7 @@ OPTIONAL context:
           </a>
         {% endif %}
         </td>
-        <td style="display:none;">0</td>
+        <td style="display:none;"><div class="stickied-3-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
       <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

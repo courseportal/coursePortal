@@ -6,6 +6,7 @@ from django.forms.util import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
+from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm, testModalForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
@@ -159,11 +160,11 @@ def example_submit(request, exid):
 		if exid:
 			ex = Example.objects.get(pk=exid)
 			i_data = {
-				'file': ex.file,
 				'atom': ex.atom,
 				'filename': ex.filename,
 			}
-			form = ExampleForm(initial=i_data)
+			i_file_data = {'file': SimpleUploadedFile(ex.file.url, ex.file.read())}
+			form = ExampleForm(i_data, i_file_data)
 		else:
 			form = ExampleForm() # Create an unbound form
 

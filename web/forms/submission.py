@@ -41,6 +41,8 @@ def validate_file_extension(value):
 	"""
 	
 	valid = False
+	if value == '':
+		valid = True
 	for ext in ALLOWED_FILE_EXTENTIONS:
 		if value.name.endswith(ext):
 			valid = True
