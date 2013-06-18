@@ -40,13 +40,11 @@ def previewAssignment(request):
 			exec q['code']
 		except Exception as ex:
 			test += errorMsg(q['title'], ex, 'code')
-			continue
 
 		try:
 			question['solution']=eval(q['solution'])
 		except Exception as ex:
 			test += errorMsg(q['title'], ex, 'solution')
-			continue
 
 		#Format chice texts
 		for integer_index in range(len(q['choices'])):
@@ -65,7 +63,6 @@ def previewAssignment(request):
 			except Exception as ex:
 				y = "Choice"+str(integer_index+1)
 				test += errorMsg(q['title'], ex, y)
-				continue
 		if len(q['choices']) > 0:
 			question['choices'].append(question['solution'])
 		question_list.append(question)
