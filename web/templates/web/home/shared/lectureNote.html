@@ -47,14 +47,14 @@ OPTIONAL context:
         </td>
         <td>
             <!-- Button to trigger modal -->
-            <a href="#myModal{{e.id}}" data-toggle="modal">
+            <a href="#myModalLecNote{{e.id}}" data-toggle="modal">
                 <i class="icon-flag"></i>
             </a>
         {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "note_submit" e.id %}">
+          <a href="{% url "note_submit" e.id %}?next={{request.path}}">
             <i class="icon-edit"></i>
           </a>
-          <a href="{% url "delete_note" e.id %}">
+          <a href="{% url "delete_note" e.id %}?next={{request.path}}">
             <i class="icon-remove"></i>
           </a>
         {% else %}
@@ -63,7 +63,7 @@ OPTIONAL context:
         </td>
       </tr>
       <!-- Modal -->
-      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div id="myModalLecNote{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
           <form class="testForm" method="post" action="{{form_action}}">
               {% csrf_token %}
               <div class="form-actions">
