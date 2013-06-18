@@ -11,7 +11,7 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-<table class="tablesorter">
+<table id="notes" class="tablesorter">
   <thead>
     <tr>
       <th data-sorter="false"> </th>
@@ -117,7 +117,7 @@ $(function() {
   });
 
   // call the tablesorter plugin and apply the uitheme widget
-  $("table").tablesorter({
+  $("#notes").tablesorter({
     // this will apply the bootstrap theme if "uitheme" widget is included
     // the widgetOptions.uitheme is no longer required to be set
     theme : "bootstrap",

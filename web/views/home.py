@@ -388,7 +388,7 @@ def category(request, class_id, cat_id):
 			notes.append(note)
 			
 	stickied_examples = []
-	examples = []-
+	examples = []
 	for example in all_examples:
 		if example.classes_stickied_in.filter(id=current_class.id).exists():
 			stickied_examples.append(example)

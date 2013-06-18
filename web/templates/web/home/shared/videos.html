@@ -12,7 +12,7 @@ OPTIONAL context:
 -->
 {% load my_filters %}
 
-<table class="tablesorter">
+<table id="videos" class="tablesorter">
   <thead>
     <th data-sorter="false"> </th>
     <th>Video</th>
@@ -136,7 +136,7 @@ $(function() {
   });
 
   // call the tablesorter plugin and apply the uitheme widget
-  $("table").tablesorter({
+  $("#videos").tablesorter({
     // this will apply the bootstrap theme if "uitheme" widget is included
     // the widgetOptions.uitheme is no longer required to be set
     theme : "bootstrap",
