@@ -87,7 +87,7 @@ def instantiate(request):
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
-    context = {'breadcrumbs':breadcrumbs}
+    context = {'breadcrumbs':breadcrumbs, "question_list":list(Question.objects.all())}
     return render(request, 'assignment/addAssignment.html', context)
 
 def editA(request, id):
@@ -99,6 +99,7 @@ def editA(request, id):
         'assignment': assignment,
         'start_date': assign_data['start'],
         'due_date': assign_data['due'],
+        'question_list':list(Question.objects.all()),
         'point_list': assign_data['questions'],
         'breadcrumbs': breadcrumbs,
     }

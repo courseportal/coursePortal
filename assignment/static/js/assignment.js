@@ -69,6 +69,13 @@ function init(){
 		},
 		//dialogClass: 'no-close',
 	});
+
+	$('#loading-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+	})
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -80,6 +87,7 @@ function init(){
 	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
+	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
 	$("#previewform").nm();
 }
 
@@ -259,6 +267,59 @@ function preview(){
    $('#previewdata').val(JSON.stringify(assignment, undefined, 2));
    $('#previewform').submit();
 }
+
+function iframe_preview(qid){
+  previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
+  var ID="#";
+  ID+=qid;
+  $(ID).attr("class", "icon-eye-close");
+  $(ID).attr("onclick", "iframe_close("+qid+")");
+  $(".preview-area").append(previewHTML)
+}
+function iframe_close(qid){
+  var ID = "#";
+  ID+=qid;
+  $("#iframepreview"+qid).remove();
+  $(ID).attr("class", "icon-eye-open");
+  $(ID).attr("onclick", "iframe_preview("+qid+")");
+}
+function loadExisting(qlist){
+	var ID='';
+	//close dialog
+	$( '#loading-zone' ).dialog('close');
+	//look for selected questions
+	for(q in qlist){
+		ID='#';
+		ID+=q.id;
+		//Question is highlighted to be loaded
+		if($(ID).hasClass('icon-eye-close')){
+			//Restore original div
+			$(ID).attr("class", "icon-eye-open");
+			$(ID).attr("onclick", "iframe_preview("+q.id+")");
+			$("#iframepreview"+q.id).remove();
+			//Add question to questionlist
+			num = $('#questionsList').children().length+1;
+			questionHTML = 
+				'<div class="row-fluid" id="question'+num+'"> \
+					<input type="hidden" value='+q.data+'></input> \
+					<div class="span5 question-description">'+
+					q.title+
+					'</div> \
+					<div class="span1 btn question-edit" onclick="load_question('+num+')"> \
+						<i class="icon-edit-sign"> Edit</i> \
+					</div> \
+					<div class="span1 question-pts"> \
+						<input type="text" class="input-fit" value="0"></input> \
+					</div> \
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')"> \
+						<i class="icon-remove-sign"></i> \
+					</div> \
+				</div>';
+			$('#questionsList').append(questionHTML);
+		}
+	}
+}
+
 
 // function add_question(){
 // 	//wipe out the form

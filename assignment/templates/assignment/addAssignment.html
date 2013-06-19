@@ -83,7 +83,7 @@
 	<button class="btn btn-inverse" id="opener">
 		<i class="icon-plus"></i> Add Question </button>
 
-	<button class="btn" id="listings" disabled>
+	<button class="btn" id="listingQ">
 		<i class="icon-plus"></i> Load Existing Question</button>
 	<div id="dialog" style="">
 		<div class="row-fluid">
@@ -131,6 +131,44 @@
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
+<div id="loading-zone">
+	{% if question_list %}
+	<div class="lookyhere">
+   	<body>  
+		<table class="table">  
+      	<thead>  
+        		<tr>  
+           		<th>Title</th>
+           		<th>Subject</th>
+           		<th>Author</th>
+           		<th>Rating</th>
+        		</tr>  
+      	</thead> 
+      	<tbody>
+   	{% for question in question_list %}
+   		<tr>
+   			<td>{{ question.title }}</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+			</tr>
+		
+	   {% endfor %}
+   	   </tbody>  
+   	</table>  
+	</div>
+	{% else %}
+   	<p>No questions exist!</p>
+	{% endif %}
+	{% autoescape off %}
+	<button type="button" class="btn btn-success" onclick="loadExisting({{question_list|scrubber}})">Load Questions</button>
+	{% endautoescape %}
+	<div class="preview-area">
+	</div>
+
+</div>
+
 
 
 </body>
