@@ -23,6 +23,7 @@ So far this week I have:
         
             *   I used AJAX to have the (not) stickied change be reflected in the table without reloading the page
             *   Then I added automatic table updating and resorting when the votes or sticky status is changed
+    *   Abstracted the modal for reporting content to another template because it was repeated 8 times.
 
 Goals
 -----

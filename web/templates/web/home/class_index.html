@@ -39,7 +39,7 @@ BLOCKS(Including inherited blocks):
     <tbody>
       {% for class in class_list %}
       <!-- If the class is active or user is the author put on the list -->
-        {% if class.status == "A" or class.author == user or user.is_superuser or user.is_staff %}
+        {% if class.status == "A" or class.author == user or user.is_superuser %}
           <tr>
             <td><a href="{% url "classes" class.id %}">{{ class.name }}</a></td>
             <td>{{ class.author }}</td>

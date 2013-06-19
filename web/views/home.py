@@ -537,8 +537,7 @@ def classes(request, class_id):
 	#Get the class that we are in
 	current_class = get_object_or_404(Class, id=class_id)
 	
-	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id)):
-		print("\n\nHolla\n\n")
+	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
 		return HttpResponseRedirect(reverse('class_index'))
 	
 	#Get categories that are in the current_class
