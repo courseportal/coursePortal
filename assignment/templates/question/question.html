@@ -1,5 +1,4 @@
-{% extends "assignment_nav.html" %}
-{% block content %}
+
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
@@ -18,15 +17,12 @@
 	<div>Question successfully created! Here is a sample instance:</div>
 {% endif %}
 {{text | safe}}
-<br>
-<br>
 solution:
 <br>
 {{answer}}
-<br><br>
+<br>
 choices:
 <br>
 {% for c in choices %}
 	{{c}}   
 {% endfor %}
-{% endblock %}

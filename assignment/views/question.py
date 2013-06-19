@@ -59,7 +59,7 @@ def detail(request, id, newly_added=False):
 def addQ(request):
 	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
 	breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
-	context = {'breadcrumbs':breadcrumbs}
+	context = {'breadcrumbs':breadcrumbs,}
 	return render(request, 'question/addQ.html', context)
 
 def create(request):

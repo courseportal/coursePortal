@@ -15,21 +15,15 @@ urlpatterns = patterns('',
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
     url(r'^ajax/voteGeneral/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.voteGeneral', name='voteGeneral'),                   
 	url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'),
-
-    url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
-
+	url(r'^ajax/delete/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'),
+	
     url(r'^bugReport/(?P<bid>\d+)?/?$', 'web.views.bugReport.index', name='bugReport'),
     url(r'^confirm/(?P<bid>\d+)?/?$', 'web.views.home.bugReportConfirm', name='bugReportConfirm'),
                     
+    url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
 	url(r'^expo_submit/(?P<eid>\d+)?/?$', 'web.views.submission.exposition', name='expo_submit'),
 	url(r'^note_submit/(?P<nid>\d+)?/?$', 'web.views.submission.note_submit', name='note_submit'),
 	url(r'^example_submit/(?P<exid>\d+)?/?$', 'web.views.submission.example_submit', name='example_submit'),
-	
-	url(r'^expo_submit/(?P<eid>\d+)?/delete/?$', 'web.views.submission.delete_exposition', name='delete_expo'),
-	url(r'^note_submit/(?P<nid>\d+)?/delete/?$', 'web.views.submission.delete_note', name='delete_note'),
-	url(r'^example_submit/(?P<exid>\d+)?/delete/?$', 'web.views.submission.delete_example', name='delete_example'),
-	url(r'^submit/(?P<sid>\d+)?/delete/?$', 'web.views.submission.delete_video', name='delete_video'),
-	
 	       
 
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),

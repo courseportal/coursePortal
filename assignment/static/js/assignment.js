@@ -71,7 +71,8 @@ function init(){
 	//init the dialog
 	$( '#dialog' ).dialog({ 
 		width: document.body.clientWidth*0.50,
-		height: document.body.clientHeight*0.7,
+		height: document.body.clientHeight*0.5,
+		overflow: scroll,
 		modal: true,
 		autoOpen: false,
 		open: function(event, ui){
@@ -107,6 +108,13 @@ function init(){
 		},
 		//dialogClass: 'no-close',
 	});
+
+	$('#loading-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+	})
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -118,6 +126,7 @@ function init(){
 	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
+	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
 	$("#previewform").nm();
 }
 
@@ -152,7 +161,6 @@ function load_question_helper(){
 		//load the data from the text
 		questiondata = $('#questionsList :nth-child('+num+')').find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
-
 		//replace the fields
 		$('#questiontitle').val(question.title);
 		code.setValue(question.code);
@@ -205,10 +213,10 @@ function save_question(num){
 	numQuestions = $('#questionsList').children().length;
 	if(num > numQuestions){
 		questionHTML = 
-			'<div id="question'+num+'">\
+			'<div id="question'+num+'" class="question-whole">\
 				<div class="row-fluid questionMenu">\
 					<input type="hidden"></input>\
-				<div class="span5 question-description">'+
+					<div class="span5 question-description">'+
 						$('#questiontitle').val()+
 					'</div>\
 					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
@@ -265,6 +273,7 @@ function remove_question(num){
 
 function save(){
 	//empty object
+	var redo='';
 	assignment = {
 		title: '',
 		start: '',
@@ -273,8 +282,32 @@ function save(){
 	}
 
 	assignment.title = $('#assigntitle').val();
+	if(assignment.title == ''){
+		redo+="Title\n";
+	}
+	else
+		$('#assigntitle').style="";
+
 	assignment.start = $('#assigndate').datepicker('getDate');
+	if(assignment.start == null){
+		redo+="Assign date\n";
+	}
+	else
+		$('#assigndate').style="";
+
 	assignment.due = $('#duedate').datepicker('getDate');
+	if(assignment.due == null){
+		redo+="Due date\n";
+	}
+	else
+		$('#duedate').style="";
+
+	if(redo!=''){
+		var msg = "The following fields are required:\n"
+		msg+=redo
+		alert(msg);
+		return false;
+	}
 
 	$('#questionsList>.row-fluid').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
@@ -307,20 +340,20 @@ function previewQ(questiondata){
 
 }
 
-function preview(){
+function previewA(){
 	//empty object
 	assignment = {
 		title: '',
 		start: '',
 		due: '',
 		questions: [],		
-	}
+	};
 
 	assignment.title = $('#assigntitle').val();
 	assignment.start = $('#assigndate').datepicker('getDate');
 	assignment.due = $('#duedate').datepicker('getDate');
 
-	$('#questionsList>.row-fluid').each(function(index){
+	$('#questionsList>.question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
@@ -331,6 +364,73 @@ function preview(){
    $('#previewdata').val(JSON.stringify(assignment, undefined, 2));
    $('#previewform').submit();
 }
+
+function iframe_preview(qid){
+  previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
+  var ID="#";
+  ID+=qid;
+  $(ID).attr("class", "icon-eye-close");
+  $(ID).attr("onclick", "iframe_close("+qid+")");
+  $(".preview-area").append(previewHTML)
+}
+function iframe_close(qid){
+  var ID = "#";
+  ID+=qid;
+  $("#iframepreview"+qid).remove();
+  $(ID).attr("class", "icon-eye-open");
+  $(ID).attr("onclick", "iframe_preview("+qid+")");
+}
+function loadExisting(){
+	var ID='';
+	var questionHTML='';
+	//Close dialog box
+	$( '#loading-zone' ).dialog('close');
+	//Loop through selected elements
+	$('.icon-eye-close').each(function(){
+		ID='#';
+		ID+=$(this).attr("id");
+		//reset preview, eye
+		$(ID).attr("class", "icon-eye-open");
+  		$(ID).attr("onclick", "iframe_preview("+$(this).attr("id")+")")
+  		$("#iframepreview"+$(this).attr("id")).remove();
+		//append question data to list
+		num = $('#questionsList').children().length+1;
+		var data = $(ID+"data").attr("value");
+		questionHTML=
+			'<div id="question'+num+'" class="question-whole">\
+				<div class="row-fluid questionMenu">\
+					<input type="hidden"></input>\
+				<div class="span5 question-description">'+
+						$(ID+"title").attr("value")+
+					'</div>\
+					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
+						<i class="icon-edit-sign"> Edit</i>\
+					</div>\
+					<div class="span1 question-pts">\
+						<input type="text" class="input-fit" value="0"></input>\
+					</div>\
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+						<i class="icon-remove-sign"></i>\
+					</div>\
+				</div>\
+				<div class="row-fluid">\
+					<div class="span10 offset1">\
+						Question:\
+						<div class="textPreview"></div>\
+					<div>\
+				</div>\
+				<div class="row-fluid">\
+					<div class="span10 offset1">\
+						Solutions:\
+						<div class="solnsPreview"></div>\
+					</div>\
+				</div>\
+			</div>';
+		$('#questionsList').append(questionHTML);
+		$('#question'+num).find('input[type=hidden]').attr("value",data);
+	});
+}
+
 
 // function add_question(){
 // 	//wipe out the form

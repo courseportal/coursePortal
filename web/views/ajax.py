@@ -30,6 +30,46 @@ def vote(request, submission_id, vote_category, vote_value):
 			return HttpResponseServerError(json.dumps({'result': False, 'error': 'error looking up your voting information'}), mimetype="application/json")
 		return HttpResponse(json.dumps({'result': True}), mimetype="application/json")
 	return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You must be authenticated'}), mimetype="application/json")
+	
+@login_required()
+def delete_content(request, item, item_id):
+	r"""
+	This view handles the deletion of content from the content list with AJAX
+	
+	The first argument is the item type ``item``:
+		*	1 = Exposition
+		*	2 = LectureNote
+		*	3 = Example
+		*	4 = Submission
+		
+	The next argument is the item_id for whatever type of content we are going to delete
+	
+	"""
+	
+	if request.method != 'GET':
+		return HttpResponseNotAllowed(['GET'])
+	# Get the correct object
+	if item == '1':
+		obj = get_object_or_404(Exposition, id=item_id)
+	elif item == '2':
+		obj = get_object_or_404(LectureNote, id=item_id)
+	elif item == '3':
+		obj = get_object_or_404(Example, id=item_id)
+	elif item == '4':
+		obj = get_object_or_404(Submission, id=item_id)
+	else:
+		return HttpResponseBadRequest(json.dumps({'result': False, 'error': 'Bad item type, must be one of {1,2,3,4}'}), mimetype="application/json")
+	
+	# Check that the user has permission to delete the object
+	if not (request.user.is_superuser or request.user == obj.owner):
+		return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You are not authorized to perform this action'}), mimetype="application/json")
+		
+	# We are authorized to perform this action
+	obj_id = obj.id
+	obj.delete()
+	
+	# Return and report a success with the correct response variables
+	return HttpResponse(json.dumps({'result': True, 'itemType': item, 'id':obj_id}), mimetype="application/json")
 
 @login_required()
 def sticky_content(request, class_id, item, item_id):
@@ -51,7 +91,7 @@ def sticky_content(request, class_id, item, item_id):
 	if request.method != 'GET':
 		return HttpResponseNotAllowed(['GET'])
 	selected_class = get_object_or_404(Class, id=class_id)
-	if not (request.user == selected_class.author or selected_class.allowed_users.filter(id=request.user.id).exists()):
+	if not (request.user.is_superuser or request.user == selected_class.author or selected_class.allowed_users.filter(id=request.user.id).exists()):
 		return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You are not authorized to perform this action'}), mimetype="application/json")
 
 	# At this point we know they are authorized to stick/unstick topics

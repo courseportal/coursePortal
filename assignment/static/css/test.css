@@ -32,3 +32,8 @@ body.dialog-open { overflow: hidden; }
   /* Set height, width, borders, and global font properties here */
   height: 25px;
 }
+
+.lookyhere {
+	height:250px;
+	overflow:scroll;
+}

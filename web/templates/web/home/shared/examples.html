@@ -27,7 +27,7 @@ OPTIONAL context:
     {% for e in stickied_examples %}
       
       
-      <tr>
+      <tr id="row-3-{{ e.id }}">
         <td style="width:10px">
             <div class="arrow-up" item-type="3" vote-example-id="{{e.id}}" vote-type="1">
             <i class="icon-arrow-up"></i>
@@ -54,42 +54,18 @@ OPTIONAL context:
         </td>
         <td>
         <!-- Button to trigger modal -->
-          <a href="#myModal{{e.id}}" data-toggle="modal">
-            <i class="icon-flag"></i>
-          </a>
+          <i class="icon-flag" href="#myModalExample{{e.id}}" data-toggle="modal"></i>
           {% include "web/home/shared/sticky.html" with type=3 %}
-          {% if user.is_staff or user.is_superuser or e.owner == user %}
-            <a href="{% url "example_submit" e.id %}">
-              <i class="icon-edit"></i>
-            </a>
-            <a href="{% url "delete_example" e.id %}">
-              <i class="icon-remove"></i>
-            </a>
+          {% if user.is_superuser or e.owner == user %}
+          <i class="icon-edit" href="{% url "example_submit" e.id %}?next={{request.path}}"></i>
+          <i class="icon-remove" href="#deleteModal3{{ e.id }}" data-toggle="modal"></i>
           {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-3-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Example" %}
+      {% include "web/home/shared/delete_modal.html" with type=3 name=e.filename %}
       <!--End of Modal-->
     {% endfor %}
     
@@ -97,7 +73,7 @@ OPTIONAL context:
     {% for e in examples %}
       
       
-      <tr>
+      <tr id="row-3-{{ e.id }}">
         <td style="width:10px">
             <div class="arrow-up" item-type="3" vote-example-id="{{e.id}}" vote-type="1">
             <i class="icon-arrow-up"></i>
@@ -124,42 +100,18 @@ OPTIONAL context:
         </td>
         <td>
         <!-- Button to trigger modal -->
-          <a href="#myModalExample{{e.id}}" data-toggle="modal">
-            <i class="icon-flag"></i>
-          </a>
+          <i class="icon-flag" href="#myModalExample{{e.id}}" data-toggle="modal"></i>
           {% include "web/home/shared/sticky.html" with type=3 %}
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "example_submit" e.id %}?next={{request.path}}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_example" e.id %}?next={{request.path}}">
-            <i class="icon-remove"></i>
-          </a>
+        {% if user.is_superuser or e.owner == user %}
+          <i class="icon-edit" href="{% url "example_submit" e.id %}?next={{request.path}}"></i>
+          <i class="icon-remove" href="#deleteModal3{{ e.id }}" data-toggle="modal"></i>
         {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-3-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModalExample{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Example" %}
+      {% include "web/home/shared/delete_modal.html" with type=3 name=e.filename %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>
