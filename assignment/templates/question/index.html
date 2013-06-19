@@ -1,11 +1,62 @@
-{% "extends assignment_nav.html" %}
+{% extends "assignment_nav.html" %}
+{% block content %}
+
+
+<link rel="stylesheet" href="{{STATIC_PREFIX}}css/test.css" type="text/css"/>
+
+
+
+<script>
+function iframe_preview(qid){
+  previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
+  var ID="#";
+  ID+=qid;
+  $(ID).attr("class", "icon-eye-close");
+  $(ID).attr("onclick", "iframe_close("+qid+")");
+  $(".preview-area").append(previewHTML)
+}
+function iframe_close(qid){
+  var ID = "#";
+  ID+=qid;
+  $("#iframepreview"+qid).remove();
+  $(ID).attr("class", "icon-eye-open");
+  $(ID).attr("onclick", "iframe_preview("+qid+")");
+}
+</script>
 
 {% if question_list %}
-    <ul>
-    {% for question in question_list %}
-        <li><a href="/assignment/question/{{ question.id }}/">{{ question.title }}</a></li>
-    {% endfor %}
-    </ul>
+<div class="lookyhere">
+   <body>  
+	<table class="table">  
+      <thead>  
+        	<tr>  
+           	<th>Title</th>
+           	<th>Subject</th>
+           	<th>Author</th>
+           	<th>Rating</th>
+        	</tr>  
+      </thead> 
+      <tbody>
+   {% for question in question_list %}
+   	<tr>
+   		<td>{{ question.title }}</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+		</tr>
+		
+   {% endfor %}
+      </tbody>  
+   </table>  
+</div>
 {% else %}
-    <p>No questions!</p>
+    <p>No questions exist!</p>
 {% endif %}
+<div class="preview-area">
+</div>
+
+
+
+
+{% endblock %}

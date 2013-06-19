@@ -1,29 +1,26 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
+
 <script>
-function validateAssign()
-{
-	var radio=document.forms["input"]["assignment"];
-	var checkbox=document.forms["input"]["users"];
-  	if(checkCheck(radio)==false){
-  		alert("Select an assignment template!");
-  		return false;
-  	}
-	if(checkCheck(checkbox) == false){
-		alert("Select at least 1 student!");
-		return false;
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+
+	function reroute(){
+		document.inputForm.action='{% url "save" %}';
+		return true;
 	}
-}
-function checkCheck(toCheck){
-	if(toCheck.length){
-		for(i=0; i<toCheck.length; i++){
-			if(toCheck [i].checked) return true;
-		}
-		return false;
-	}
-	return toCheck.checked
-}
 </script>
+<script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
+
 {% if assignments %}
 <form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">
 	{% csrf_token %}
