@@ -33,7 +33,10 @@ BLOCKS(Including inherited blocks):
 
 {% block page_title %}
 	<div class="page-header">
-		<h1>KnoAtom</h1>
+        <span style="font-size: 200%;font-weight:bold;">KnoAtom </span>
+        {% if user.is_staff or user.is_superuser %}
+        <span style="float:right"><a href="{% url 'admin:app_list' app_label='web' %}">[Log into Admin Site..]</a></span>
+        {% endif %}
 	</div>
 {% endblock %}
 

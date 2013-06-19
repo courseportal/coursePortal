@@ -11,5 +11,8 @@ To INCLUDE this file:
 -->
 <!-- This should be included in the "title" block, but who am I to tell you what to do -->
 <div class="page-header">
-	<h1>KnoAtom - {{ selected_class.name }}</h1>
+	<span style="font-size: 200%;font-weight:bold;">KnoAtom - {{ selected_class.name }}</span>
+    {% if user.is_staff or user.is_superuser %}
+    <span style="float:right"><a href="{% url 'admin:web_class_change'  selected_class.id %}">[Log into Class Admin Site..]</a></span>
+    {% endif %}
 </div>

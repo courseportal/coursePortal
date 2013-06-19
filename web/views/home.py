@@ -192,7 +192,9 @@ def base_category(request, cat_id):
 	
 	# un-json-fy the videos
     for c in content:
-		if c.video: c.video = [v for v in json.loads(c.video)]
+        if c.video:
+            print(c.video)
+            c.video = [v for v in json.loads(c.video)]
 
     if request.user.is_authenticated():
 		for c in content:
@@ -266,6 +268,7 @@ def base_atom(request, cat_id, atom_id):
 
 	
     content = Submission.objects.filter(tags=current_atom).distinct()
+    
 	
     forum = Forum.objects.get(atom=current_atom)
 
