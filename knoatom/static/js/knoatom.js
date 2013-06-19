@@ -107,10 +107,35 @@ init_sticking = function() {
 			}
 		});
 	});
-	
-	
 };
 
+/*
+	Delete object AJAX functionality
+*/
+init_delete_content = function() {
+	$('.delete-content').click(function() {
+		$.ajax({
+			'url': '/ajax/delete/' + $(this).attr('item-type') + '/' + $(this).attr('item-id') + '/',
+			'context': this,
+			'statusCode' : {
+				200: function(data) {
+					console.log(data)
+					if (data.result == true) {
+						console.log(this)
+						var row = '#row-' + data.itemType + '-' + data.id;
+						
+						$(row).remove();
+						
+						$("table").trigger("update");
+					}
+					else {
+						alert("Failed to delete object!")
+					}
+				}
+			},
+		});
+	});
+};
 /*
  * Vote_up initialization
  */
@@ -202,6 +227,7 @@ init_video_viewer = function() {
  * Call all the initialization functions
  */
 $(document).ready(function() {
+	init_delete_content();
 	init_sticking();
     init_sidebar();
     init_rating_stars();

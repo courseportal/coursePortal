@@ -26,7 +26,7 @@ OPTIONAL context:
     {% for c in stickied_content %}
       
       
-      <tr>
+      <tr id="row-4-{{ c.id }}">
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
             <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
@@ -71,30 +71,25 @@ OPTIONAL context:
         <!-- end Votes -->
         <td>
             <!-- Button to trigger modal -->
-            <a href="#myModalVideo{{c.id}}" data-toggle="modal">
-                <i class="icon-flag"></i>
-            </a>
-            {% include "web/home/shared/sticky.html" with type=4 e=c %}
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "submit" c.id %}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_video" c.id %}">
-            <i class="icon-remove"></i>
-          </a>
-        {% endif %}
+          <i class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal"></i>
+          {% include "web/home/shared/sticky.html" with type=4 e=c %}
+          {% if user.is_superuser or e.owner == user %}
+            <i class="icon-edit" href="{% url "submit" c.id %}"></i>
+            <i class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal"></i>
+          {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
+      {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
       <!--End of Modal-->
     {% endfor %}
     
     {% for c in content %}
       
       
-      <tr>
+      <tr id="row-4-{{ c.id }}">
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
             <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
@@ -139,23 +134,19 @@ OPTIONAL context:
         <!-- end Votes -->
         <td>
             <!-- Button to trigger modal -->
-            <a href="#myModalVideo{{c.id}}" data-toggle="modal">
-                <i class="icon-flag"></i>
-            </a>
-            {% include "web/home/shared/sticky.html" with type=4 e=c %}
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "submit" c.id %}?next={{request.path}}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_video" c.id %}?next={{request.path}}">
-            <i class="icon-remove"></i>
-          </a>
-        {% endif %}
+          <i class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal"></i>
+        
+          {% include "web/home/shared/sticky.html" with type=4 e=c %}
+          {% if user.is_superuser or e.owner == user %}
+            <i class="icon-edit" href="{% url "submit" c.id %}"></i>
+            <i class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal"></i>
+          {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">0</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
+      {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>
