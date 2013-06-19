@@ -51,7 +51,7 @@ def sticky_content(request, class_id, item, item_id):
 	if request.method != 'GET':
 		return HttpResponseNotAllowed(['GET'])
 	selected_class = get_object_or_404(Class, id=class_id)
-	if not (request.user == selected_class.author or selected_class.allowed_users.filter(id=request.user.id).exists()):
+	if not (request.user.is_superuser or request.user == selected_class.author or selected_class.allowed_users.filter(id=request.user.id).exists()):
 		return HttpResponseForbidden(json.dumps({'result': False, 'error': 'You are not authorized to perform this action'}), mimetype="application/json")
 
 	# At this point we know they are authorized to stick/unstick topics
