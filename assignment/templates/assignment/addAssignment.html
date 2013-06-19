@@ -124,7 +124,7 @@
 	<form action="{% url "preview_assignment" %}" method="post" id="previewform">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="previewdata" name="previewdata"></input>
-		<button  class="btn" onclick="preview()">Preview</button>
+		<button  class="btn" onclick="previewA()">Preview</button>
 	</form>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
 	{% csrf_token %}
@@ -147,11 +147,12 @@
       	<tbody>
    	{% for question in question_list %}
    		<tr>
-   			<td>{{ question.title }}</td>
+   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
 				<td></td>
 				<td></td>
 				<td></td>
 				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
 			</tr>
 		
 	   {% endfor %}
@@ -161,9 +162,7 @@
 	{% else %}
    	<p>No questions exist!</p>
 	{% endif %}
-	{% autoescape off %}
-	<button type="button" class="btn btn-success" onclick="loadExisting({{question_list|scrubber}})">Load Questions</button>
-	{% endautoescape %}
+	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
 	<div class="preview-area">
 	</div>
 
