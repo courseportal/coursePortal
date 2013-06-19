@@ -496,13 +496,13 @@ def atom(request, class_id, cat_id, atom_id):
 			content.append(vid)
 	
 	stickied_expositions = current_class.stickied_expos.filter(atom=current_atom)
-	expositions = current_atom.exposition_set.exclude(id__in = stickied_expositions.value_list('exposition__id', flat=True))
+	expositions = current_atom.exposition_set.exclude(id__in = stickied_expositions)
 	
 	stickied_notes = current_class.stickied_notes.filter(atom=current_atom)
-	notes = current_atom.lecturenote_set.exclude(id__in = stickied_notes.value_list('lecturenote__id', flat=True))
+	notes = current_atom.lecturenote_set.exclude(id__in = stickied_notes)
 	
 	stickied_examples = current_class.stickied_examples.filter(atom=current_atom)
-	examples = current_atom.example_set.exclude(id__in = stickied_examples.value_list('example__id', flat=True))
+	examples = current_atom.example_set.exclude(id__in = stickied_examples)
 
 	t = loader.get_template('web/home/class/category.html')
 	c = RequestContext(request, {
