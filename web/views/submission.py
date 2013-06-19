@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
-from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, DeleteForm, testModalForm
+from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, testModalForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
 class PlainErrorList(ErrorList):
@@ -245,135 +245,6 @@ def exposition(request, eid):
 			form = ExpoForm(user=request.user) # Create an unbound form
 	
 	return render(request, 'web/home/expo_submit.html', {
-		'form': form,
-		'top_level_categories': top_level_categories,
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-	})
-
-@login_required()
-def delete_exposition(request, eid):
-	r"""
-		This is the view for the exposition delete feature.
-	"""
-	redirect_to = request.REQUEST.get('next','')
-	expo = Exposition.objects.get(pk=eid)
-	
-	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == expo.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
-	
-	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST.get('yes'):
-				expo.delete()
-			return HttpResponseRedirect(redirect_to) #should change this
-				
-	else:
-		form = DeleteForm()
-		
-	return render(request, 'web/home/delete.html', {
-		'name': expo.title,
-		'form': form,
-		'top_level_categories': top_level_categories,
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-	})
-	
-@login_required()
-def delete_example(request, exid):
-	r"""
-		This is the view for the exposition delete feature.
-	"""
-	redirect_to = request.REQUEST.get('next','')
-	example = Example.objects.get(pk=exid)
-	
-	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == example.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
-	
-	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST.get('yes'):
-				example.delete()
-			return HttpResponseRedirect(redirect_to) #should change this
-				
-	else:
-		form = DeleteForm()
-		
-	return render(request, 'web/home/delete.html', {
-		'name': example.filename,
-		'form': form,
-		'top_level_categories': top_level_categories,
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-	})
-	
-@login_required()
-def delete_note(request, nid):
-	r"""
-		This is the view for the exposition delete feature.
-	"""
-	redirect_to = request.REQUEST.get('next','')
-	note = LectureNote.objects.get(pk=nid)
-	
-	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == note.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
-	
-	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST.get('yes'):
-				note.delete()
-			return HttpResponseRedirect(redirect_to) #should change this
-				
-	else:
-		form = DeleteForm()
-		
-	return render(request, 'web/home/delete.html', {
-		'name': note.filename,
-		'form': form,
-		'top_level_categories': top_level_categories,
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-	})
-	
-@login_required()
-def delete_video(request, sid):
-	r"""
-		This is the view for the exposition delete  .
-	"""
-	redirect_to = request.REQUEST.get('next','')
-	sub = Submission.objects.get(pk=sid)
-	
-	# Check to see if user has permission to view this, redirect if they don't
-	if not (request.user.is_staff or request.user.is_superuser or request.user == sub.owner):
-		return HttpResponseRedirect(reverse('home')) #should change this
-	
-	# Get "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	if request.method == 'POST':
-		form = DeleteForm(request.POST)
-		if form.is_valid():
-			if request.POST.get('yes'):
-				sub.delete()
-			return HttpResponseRedirect(redirect_to) #should change this
-
-				
-	else:
-		form = DeleteForm()
-
-	return render(request, 'web/home/delete.html', {
-		'name': sub.title,
 		'form': form,
 		'top_level_categories': top_level_categories,
 		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],

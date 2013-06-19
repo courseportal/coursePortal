@@ -138,11 +138,3 @@ class ExpoForm(forms.Form):
 	
 	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission', required=True)
 	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
-	
-class DeleteForm(forms.Form):
-	r"""
-	This is a generic form to confirm the deletion of an Exposition, LectureNote, Example or Submission.
-	"""
-	
-	
-
