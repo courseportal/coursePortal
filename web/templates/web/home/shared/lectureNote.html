@@ -11,7 +11,7 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-<table class="tablesorter">
+<table id="notes" class="tablesorter">
   <thead>
     <tr>
       <th data-sorter="false"> </th>
@@ -19,10 +19,11 @@ OPTIONAL context:
       <th>Created By</th>
       <th>Votes</th>
       <th data-sorter="false">Options</th>
+      <th style="display:none;">Is Stickied</th>
     </tr>
   </thead>
   <tbody>
-    {% for e in notes %}
+    {% for e in stickied_notes %}
       <tr>
           <td style="width:10px">
               <div class="arrow-up" item-type="2" vote-example-id="{{e.id}}" vote-type="1">
@@ -34,7 +35,9 @@ OPTIONAL context:
           </td>
         <td>
         	<a target="_blank" href="{{ e.file.url }}">
-            {{ e.filename }}
+            <div class="name-2-{{ e.id }}">
+              {{ e.filename }} [stickied]
+            </div>
           </a>
         </td>
         <td>
@@ -50,6 +53,7 @@ OPTIONAL context:
             <a href="#myModal{{e.id}}" data-toggle="modal">
                 <i class="icon-flag"></i>
             </a>
+            {% include "web/home/shared/sticky.html" with type=2 %}
         {% if user.is_staff or user.is_superuser or e.owner == user %}
           <a href="{% url "note_submit" e.id %}">
             <i class="icon-edit"></i>
@@ -57,13 +61,78 @@ OPTIONAL context:
           <a href="{% url "delete_note" e.id %}">
             <i class="icon-remove"></i>
           </a>
-        {% else %}
-          None
         {% endif %}
         </td>
+        <td style="display:none;"><div class="stickied-2-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <form class="testForm" method="post" action="{{form_action}}">
+              {% csrf_token %}
+              <div class="form-actions">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Make a Report: </h3>
+                  </div>
+                  <div class="modal-body">
+                      {% include "web/form_template.html" with form=form %}
+                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
+                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                      <button class="btn btn-primary">Submit</button>
+                  </div>
+              </div>
+          </form>
+      </div>
+      <!--End of Modal-->
+    {% endfor %}
+    
+    {% for e in notes %}
+      <tr>
+          <td style="width:10px">
+              <div class="arrow-up" item-type="2" vote-example-id="{{e.id}}" vote-type="1">
+                  <i class="icon-arrow-up"></i>
+              </div>
+              <div class="arrow-down" item-type="2" vote-example-id="{{e.id}}" vote-type="0">
+                  <i class="icon-arrow-down"></i>
+              </div>
+          </td>
+        <td>
+        	<a target="_blank" href="{{ e.file.url }}">
+            <div class="name-2-{{ e.id }}">
+              {{ e.filename }}
+            </div>
+          </a>
+        </td>
+        <td>
+          {{ e.owner }}
+        </td>
+        <td style="width:75px">
+            <div class="votes-sum-2-{{e.id}}">
+                {{e.votes}}
+            </div>
+        </td>
+        <td>
+            <!-- Button to trigger modal -->
+            <a href="#myModalLecNote{{e.id}}" data-toggle="modal">
+                <i class="icon-flag"></i>
+            </a>
+            {% include "web/home/shared/sticky.html" with type=2 %}
+        {% if user.is_staff or user.is_superuser or e.owner == user %}
+          <a href="{% url "note_submit" e.id %}?next={{request.path}}">
+            <i class="icon-edit"></i>
+          </a>
+          <a href="{% url "delete_note" e.id %}?next={{request.path}}">
+            <i class="icon-remove"></i>
+          </a>
+        {% endif %}
+        </td>
+        <td style="display:none;"><div class="stickied-2-{{ e.id }}">0</div></td>
+      </tr>
+      <!-- Modal -->
+      <div id="myModalLecNote{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
           <form class="testForm" method="post" action="{{form_action}}">
               {% csrf_token %}
               <div class="form-actions">
@@ -117,7 +186,7 @@ $(function() {
   });
 
   // call the tablesorter plugin and apply the uitheme widget
-  $("table").tablesorter({
+  $("#notes").tablesorter({
     // this will apply the bootstrap theme if "uitheme" widget is included
     // the widgetOptions.uitheme is no longer required to be set
     theme : "bootstrap",
@@ -125,11 +194,14 @@ $(function() {
     widthFixed: true,
 
     headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
-    // Set to sort initially by votes in descending order and name in ascending order
-    sortList : [[3,1]],
+   
+    // Set to always prepend a sort by stickied/not stickied in descending order on all user sorting
+    sortForce : [[5,1]],
+    
+    // Set to sort initially by stickied then votes in descending order and name in ascending order
+    sortList : [[5,1],[3,1]],
     
     // Set to always append a sort by votes in descending order on all user sorting
-    
     sortAppend : [[3,1]],
     
     

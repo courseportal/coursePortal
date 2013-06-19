@@ -90,6 +90,7 @@ def addA(request):
     context = {'breadcrumbs':breadcrumbs, "question_list":list(Question.objects.all())}
     return render(request, 'assignment/addAssignment.html', context)
 
+
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
     assign_data = json.loads(assignment.data)

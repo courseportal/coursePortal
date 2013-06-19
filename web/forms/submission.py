@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
 from web.models import *
 import re
-from knoatom.settings import ALLOWED_FILE_EXTENTIONS
+from knoatom.settings import ALLOWED_FILE_EXTENTIONS, MAX_UPLOAD_SIZE
+from django.template.defaultfilters import filesizeformat
 
 class PlainErrorList(ErrorList):
 	def __unicode__(self):
@@ -36,16 +37,18 @@ class SubmissionForm(forms.Form):
 ##		self.fields['tags'].queryset = Atom.objects.filter(category__parent_class = class_id).distinct()
 
 def validate_file_extension(value):
-	r"""
-	Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS``.
-	"""
-	
-	valid = False
-	for ext in ALLOWED_FILE_EXTENTIONS:
-		if value.name.endswith(ext):
-			valid = True
-	if not valid:
-		raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
+    r"""
+    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
+    """
+    valid = False
+    for ext in ALLOWED_FILE_EXTENTIONS:
+        if value.name.endswith(ext):
+            if value.size < int(MAX_UPLOAD_SIZE):
+                valid = True
+            else:
+                raise forms.ValidationError((u'Please keep filesize under %s. Current filesize %s') % (filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
+    if not valid:
+        raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
 		
 def validate_link(value):
 	r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""

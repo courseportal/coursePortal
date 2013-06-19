@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
     url(r'^ajax/voteGeneral/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.voteGeneral', name='voteGeneral'),                   
-
+	url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'),
 
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
 

@@ -18,7 +18,6 @@ class ExpositionAdmin(admin.ModelAdmin):
     exclude = ('owner','votes',)
     
     def save_model(self, request, obj, form, change):
-        print("I am in save_model function!!!")
         if not change:
 			obj.owner = request.user
 			obj.save()
@@ -26,8 +25,21 @@ class ExpositionAdmin(admin.ModelAdmin):
 
 
 class ExposInline(admin.StackedInline):
-	model = Exposition
-	extra = 3
+    model = Exposition
+    exclude = ('votes',)
+    extra = 1
+
+class LecNoteInline(admin.StackedInline):
+    model = LectureNote
+    exclude = ('votes',)
+    extra = 1
+
+class ExampleInline(admin.StackedInline):
+    model = Example
+    exclude = ('votes',)
+    extra = 1
+
+
 	
 class FileUploadForm(forms.ModelForm):
 	r"""
@@ -66,53 +78,57 @@ class ExampleAdmin(admin.ModelAdmin):
 		super(ExampleAdmin, self).save_model(request, obj, form, change)
 
 class AtomAdmin(admin.ModelAdmin):
-	"""
-	Admin for the Atom model, automatically creates/updates/deletes the coorsponding forum when the Atom gets created/updated/deleted.
-	"""
-	inlines = [ExposInline]
+    """
+        Admin for the Atom model, automatically creates/updates/deletes the coorsponding forum when the Atom gets created/updated/deleted.
+    """
+    inlines = [ExposInline, LecNoteInline, ExampleInline]
 	
-	def save_model(self, request, obj, form, change):
-		"""
-		If the model is already created we update the coorsponding forum, or if there is none, we create it.
-		"""
-		cat = Category.objects.get_or_create(name="Atoms")[0]
-		if change:
-			try:
-				forum = Forum.objects.get(atom=obj)
-			except ObjectDoesNotExist:
-					forum = Forum.objects.create(
-						atom=obj,
-						category=cat,
-						name=obj.name,
-						description=obj.summary # Add when we have field
+
+    def save_model(self, request, obj, form, change):
+        """
+            If the model is already created we update the coorsponding forum, or if there is none, we create it.
+        """
+    
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        if change:
+            try:
+                forum = Forum.objects.get(atom=obj)
+            except ObjectDoesNotExist:
+                    forum = Forum.objects.create(
+                        atom=obj,
+                        category=cat,
+                        name=obj.name,
+                        description=obj.summary # Add when we have field
 					)
-					forum.save()
-					forum.moderators.add(request.user)
+                    forum.save()
+                    forum.moderators.add(request.user)
 				
-			forum.name = obj.name
-			forum.save()
+            forum.name = obj.name
+            forum.save()
 			#forum.moderators.add(request.user)
 			#obj.forum.description = obj.description
-		obj.save()
+        obj.save()
+    
 	
-	def log_addition(self, request, obj):
-		"""
-		If a forum does not exist for the Atom we create it.
+    def log_addition(self, request, obj):
+        """
+        If a forum does not exist for the Atom we create it.
 		
-		This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
-		"""
-		cat = Category.objects.get_or_create(name="Atoms")[0]
-		try:
-			forum = Forum.objects.get(atom=obj)
-		except ObjectDoesNotExist:
-				forum = Forum.objects.create(
+        This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
+        """
+        print("I am inside.............")
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        try:
+            forum = Forum.objects.get(atom=obj)
+        except ObjectDoesNotExist:
+            forum = Forum.objects.create(
 					atom=obj,
 					category=cat,
 					name=obj.name,
 					description=obj.summary # Add when we have field
 				)
-				forum.save()
-				forum.moderators.add(request.user)
+            forum.save()
+            forum.moderators.add(request.user)
 	
 						
 		

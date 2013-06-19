@@ -12,21 +12,6 @@ STATUS_CHOICES = (
 	('N', 'Not active'),
 )
 
-
-
-class Class(models.Model):
-	name = models.CharField(max_length=100)
-	allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
-	students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
-	author = models.ForeignKey(User, related_name = 'author')
-	status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
-	summary = models.TextField(default="There is no summary added at this time.")
-	def __unicode__(self):
-		return self.name
-	class Meta:
-		ordering = ['name']
-		verbose_name_plural = "Classes"
-
 class BaseCategory(models.Model):
 	name = models.CharField(max_length=200)
 	summary = models.TextField(default="There is no summary added at this time.")
@@ -49,19 +34,7 @@ class Atom(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
-class AtomCategory(models.Model):
-	name = models.CharField(max_length=200)
-	parent_class = models.ForeignKey(Class)
-	child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
-	child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
-	class Meta:
-		ordering = ['name']
-		verbose_name_plural = "Categories"
-
-	def __unicode__(self):
-		return self.name
-
+		
 class Submission(models.Model):
     owner = models.ForeignKey(User, related_name="video_owner")
     date = models.DateTimeField(auto_now_add=True, blank=True)
@@ -95,7 +68,6 @@ class Vote(models.Model):
 
 	def __unicode__(self):
 		return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
-
 
 class Exposition(models.Model):
 	title = models.CharField(max_length=100) # title of the article or website
@@ -135,6 +107,42 @@ class Example(models.Model):
 	def __unicode__(self):
 		return self.filename
 
+class Class(models.Model):
+	r"""
+	This is the model for the class feature of the site which allows professors to create their own class pages which they can customize to fit their needs.  They can sticky content to force that material to stay at the top of the content display lists.
+	
+	"""
+	name = models.CharField(max_length=100)
+	allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
+	students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
+	author = models.ForeignKey(User, related_name = 'author')
+	status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
+	summary = models.TextField(default="There is no summary added at this time.")
+	
+	# Stickied Content
+	stickied_videos = models.ManyToManyField(Submission, blank=True, related_name='classes_stickied_in')
+	stickied_expos = models.ManyToManyField(Exposition, blank=True, related_name='classes_stickied_in')
+	stickied_notes = models.ManyToManyField(LectureNote, blank=True, related_name='classes_stickied_in')
+	stickied_examples = models.ManyToManyField(Example, blank=True, related_name = 'classes_stickied_in')
+	
+	def __unicode__(self):
+		return self.name
+	class Meta:
+		ordering = ['name']
+		verbose_name_plural = "Classes"
+
+class AtomCategory(models.Model):
+	name = models.CharField(max_length=200)
+	parent_class = models.ForeignKey(Class)
+	child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
+	child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
+	class Meta:
+		ordering = ['name']
+		verbose_name_plural = "Categories"
+
+	def __unicode__(self):
+		return self.name
+		
 class VoteVideo(models.Model):
 	user = models.ForeignKey(User)
 	example = models.ForeignKey(Submission)
