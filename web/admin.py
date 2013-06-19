@@ -110,24 +110,25 @@ class AtomAdmin(admin.ModelAdmin):
         obj.save()
     
 	
-	def log_addition(self, request, obj):
-		"""
-		If a forum does not exist for the Atom we create it.
+    def log_addition(self, request, obj):
+        """
+        If a forum does not exist for the Atom we create it.
 		
-		This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
-		"""
-		cat = Category.objects.get_or_create(name="Atoms")[0]
-		try:
-			forum = Forum.objects.get(atom=obj)
-		except ObjectDoesNotExist:
-				forum = Forum.objects.create(
+        This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
+        """
+        print("I am inside.............")
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        try:
+            forum = Forum.objects.get(atom=obj)
+        except ObjectDoesNotExist:
+            forum = Forum.objects.create(
 					atom=obj,
 					category=cat,
 					name=obj.name,
 					description=obj.summary # Add when we have field
 				)
-				forum.save()
-				forum.moderators.add(request.user)
+            forum.save()
+            forum.moderators.add(request.user)
 	
 						
 		
