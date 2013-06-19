@@ -71,7 +71,7 @@ OPTIONAL context:
         <!-- end Votes -->
         <td>
             <!-- Button to trigger modal -->
-            <a href="#myModal{{c.id}}" data-toggle="modal">
+            <a href="#myModalVideo{{c.id}}" data-toggle="modal">
                 <i class="icon-flag"></i>
             </a>
             {% include "web/home/shared/sticky.html" with type=4 e=c %}
@@ -87,26 +87,7 @@ OPTIONAL context:
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">1</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModal{{c.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{c|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{c.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
       <!--End of Modal-->
     {% endfor %}
     
@@ -174,26 +155,7 @@ OPTIONAL context:
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">0</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModalVideo{{c.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{c|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{c.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>

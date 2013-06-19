@@ -54,7 +54,7 @@ OPTIONAL context:
         </td>
         <td>
         <!-- Button to trigger modal -->
-          <a href="#myModal{{e.id}}" data-toggle="modal">
+          <a href="#myModalExample{{e.id}}" data-toggle="modal">
             <i class="icon-flag"></i>
           </a>
           {% include "web/home/shared/sticky.html" with type=3 %}
@@ -70,26 +70,7 @@ OPTIONAL context:
         <td style="display:none;"><div class="stickied-3-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModal{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Example" %}
       <!--End of Modal-->
     {% endfor %}
     
@@ -140,26 +121,7 @@ OPTIONAL context:
         <td style="display:none;"><div class="stickied-3-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModalExample{{e.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Example" %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>
