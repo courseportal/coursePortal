@@ -258,8 +258,7 @@ def base_atom(request, cat_id, atom_id):
 		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
 	breadcrumbs.append({'url': reverse('base_atom', args=[current_category.id, current_atom.id]), 'title': current_atom})
 
-	
-    content = Submission.objects.filter(tags=current_atom).distinct()
+	content = Submission.objects.filter(tags=current_atom).distinct()
     
 	
 	forum = Forum.objects.get(atom=current_atom)
