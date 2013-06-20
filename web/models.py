@@ -218,15 +218,8 @@ def add_example_rate(sender, **kwargs):
 
 @receiver(post_save, sender=User)
 def create_uservotes(sender, **kwargs):
-	if UserRating.objects.filter(user=kwargs['instance']).count()==1:
-		print("This user already has one uservotes table~!")
-	else:
-		print(kwargs['instance'])
-		UserRating.objects.create(user=kwargs['instance'])
-		user_rate = UserRating.objects.get(user=kwargs['instance'])
-		user_rate.rating = 200
-		user_rate.save()
-		print("created one just now!!")
+	if not UserRating.objects.filter(user=kwargs['instance']).exists():
+		UserRating.objects.create(user=kwargs['instance'], rating=200)
 
 
 @receiver(pre_delete, sender=Submission)
