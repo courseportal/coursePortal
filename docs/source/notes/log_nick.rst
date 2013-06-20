@@ -30,6 +30,14 @@ So far this week I have:
             *   Otherwise it shows all the classes that they are the ``author`` of or an ``allowed_user`` in and allows them to select the classes they wish the submission to be stickied in
             
     *   Abstracted the modal for reporting content to another template because it was repeated 8 times.
+    *   Changed the deletion of content from linking users to a new page and instead use AJAX and a modal
+    
+        *   When a user tries to delete an object a confirmation modal pops up
+        *   If they click yes an AJAX script fires that calls the view and deletes the object and it returns the required variables
+        *   Then the function deletes the row from the table that the content was in and updates the table data
+        
+    *   Changed some minor aesthetic stuff in the content list templates so that weird underlines don't show up when hovering over the icons
+    *   Added tooltips to the option icons
 
 Goals
 -----
@@ -76,7 +84,7 @@ So far this week so far I have:
         *   The class author
         *   The allowed users of the class
             
-        If a user tries to access the class by typing in the URL and they don't have access then they will be redirected to the ``'class_index'`` page.
+    *   If a user tries to access the class by typing in the URL and they don't have access then they will be redirected to the ``'class_index'`` page.
 
 Week of June 3-7
 ================
