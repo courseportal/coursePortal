@@ -396,7 +396,7 @@ function loadTemplate(){
 	   $(this).remove();
 	});
 	//Load in template details (title)
-	$('#assigntitle').val($('#'+aid+'title').val());
+	$('#assigntitle').attr("value",$('#'+aid+'title').attr("value"));
 	//Load in questions
 	var data = jQuery.parseJSON($("#"+aid+"data").val()).questions;
 	for(var qid in data){
