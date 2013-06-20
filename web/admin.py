@@ -28,6 +28,7 @@ class ExposInline(admin.StackedInline):
     model = Exposition
     exclude = ('votes',)
     extra = 1
+    raw_id_fields = ("owner",)
 
 class LecNoteInline(admin.StackedInline):
     model = LectureNote
@@ -38,6 +39,12 @@ class ExampleInline(admin.StackedInline):
     model = Example
     exclude = ('votes',)
     extra = 1
+
+
+    #class VideoInline(admin.StackedInline):
+    #model = Submission.tags.through
+#extra = 1
+
 
 
 	
@@ -373,17 +380,20 @@ class ClassAdmin(admin.ModelAdmin):
 
 class SubmissionAdminForm(forms.ModelForm):
 	
-	def clean(self):
-		cleaned_data = super(SubmissionAdminForm, self).clean()
-		video = cleaned_data.get("video")
-		if video.startswith("[\"") and video.endswith("\"]"):
-			video_raw_num = video.strip('["]')
-			print(video_raw_num)
-		else:
-			video_raw_num = video
-		if not video_raw_num.isalnum() or not len(video_raw_num)==11:
-			raise forms.ValidationError("Something wrong with the 11 character or [\"VIDEO_ID\"]!")
-		return cleaned_data
+    def clean(self):
+        cleaned_data = super(SubmissionAdminForm, self).clean()
+        video = cleaned_data.get("video")
+        if video.startswith("[\"") and video.endswith("\"]"):
+            video_raw_num = video.strip('["]')
+            #print(" I am WITH [""] ")
+            #print(video_raw_num)
+        else:
+            video_raw_num = video
+            #print(" I am WITHOUT [""] ")
+            #print(video_raw_num)
+        if not video_raw_num.isalnum() or not len(video_raw_num)==11:
+            raise forms.ValidationError("Something wrong with the 11 character or [\"VIDEO_ID\"]!")
+        return cleaned_data
 
 
 class SubmissionAdmin(admin.ModelAdmin):
@@ -391,15 +401,15 @@ class SubmissionAdmin(admin.ModelAdmin):
     exclude = ('votes',)
 
     def save_model(self, request, obj, form, change):
-		if change:
-			if not obj.video.startswith("[\""):
-				print("I am NOT with [\" ")
-				print(obj.video)
-				obj.video = "[\""+obj.video+"\"]"
-				obj.save()
-				print(obj.video)
-			print("I am with [\" ")
-		super(SubmissionAdmin, self).save_model(request, obj, form, change)
+		#if change:
+        if not obj.video.startswith("[\""):
+            print("I am NOT with [\" ")
+            print(obj.video)
+            obj.video = "[\""+obj.video+"\"]"
+            obj.save()
+            print(obj.video)
+        print("I am with [\" ")
+        super(SubmissionAdmin, self).save_model(request, obj, form, change)
 
 admin.site.register(Example, ExampleAdmin)
 admin.site.register(BaseCategory,BaseCategoryAdmin)

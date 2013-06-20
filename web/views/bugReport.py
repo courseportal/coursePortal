@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404
 import json
-from web.forms.bugReport import bugReportForm
+from web.forms.submission import bugReportForm
 from web.models import AtomCategory, Submission, Class, BaseCategory, BugReport
 from django.core.mail import send_mail, BadHeaderError
 

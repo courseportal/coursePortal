@@ -23,6 +23,13 @@ So far this week I have:
         
             *   I used AJAX to have the (not) stickied change be reflected in the table without reloading the page
             *   Then I added automatic table updating and resorting when the votes or sticky status is changed
+        
+        *   When users are creating new content there is a new field ``classes_to_sticky_in``
+            
+            *   If the user isn't the ``author`` or an ``allowed_user`` of any class then the field is hidden
+            *   Otherwise it shows all the classes that they are the ``author`` of or an ``allowed_user`` in and allows them to select the classes they wish the submission to be stickied in
+            
+    *   Abstracted the modal for reporting content to another template because it was repeated 8 times.
 
 Goals
 -----
@@ -32,9 +39,7 @@ New Todo:
     *   Documentation
     *   More validation for uploaded file types
     *   Implement the vote ranking system from content into the forums
-    *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.
     *   Put a delete option in the submit form for user uploaded content
-    *   Add a report feature for all content/posts so malicious/disrespectful content can be removed
     *   Integrate forum into Atom better
 
 

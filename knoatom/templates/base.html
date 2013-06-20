@@ -137,7 +137,8 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                                 </ul>
                             </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>
-                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
+                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
+                                
 							{% else %}
 								<li><a href="{% url 'login' %}">Login</a></li>
 								<li><a href="{% url 'register' %}">Register</a></li>
@@ -173,7 +174,11 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	</div> <!-- end .row -->
 </div> <!-- end .container -->
 
-
+<!-- Modal -->
+{% include "web/home/shared/bugReport_modal.html" %}
+    
+    
+    
 <!-- What are these doing here? -->
 <div class="modal fade" id="global_modal" >
 	<div class="modal-header">

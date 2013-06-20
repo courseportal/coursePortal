@@ -23,7 +23,7 @@ OPTIONAL context:
     </thead>
   <tbody>
     {% for e in stickied_expositions %}
-      <tr>
+      <tr id="row-1-{{ e.id }}">
           <td style="width:10px">
               <div class="arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1">
                   <i class="icon-arrow-up"></i>
@@ -50,28 +50,23 @@ OPTIONAL context:
           </td>
         <td>
         <!-- Button to trigger modal -->
-        <a href="#myModalExpo{{e.id}}" data-toggle="modal">
-            <i class="icon-flag"></i>
-        </a>
-        {% include "web/home/shared/sticky.html" with type=1 %}
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "expo_submit" e.id %}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_expo" e.id %}">
-            <i class="icon-remove"></i>
-          </a>
-        {% endif %}
+          <i class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal"></i>
+          {% include "web/home/shared/sticky.html" with type=1 %}
+          {% if user.is_superuser or e.owner == user %}
+            <i class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}"></i>
+            <i class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal"></i>
+          {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-1-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Expo" %}
+      {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
     {% endfor %}
     
     
     {% for e in expositions %}
-      <tr>
+      <tr id="row-1-{{ e.id }}">
           <td style="width:10px">
               <div class="arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1">
                   <i class="icon-arrow-up"></i>
@@ -99,23 +94,18 @@ OPTIONAL context:
           </td>
         <td>
         <!-- Button to trigger modal -->
-        <a href="#myModalExpo{{e.id}}" data-toggle="modal">
-            <i class="icon-flag"></i>
-        </a>
-        {% include "web/home/shared/sticky.html" with type=1 %}
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "expo_submit" e.id %}?next={{request.path}}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_expo" e.id %}?next={{request.path}}">
-            <i class="icon-remove"></i>
-          </a>
-        {% endif %}
+          <i class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal"></i>
+          {% include "web/home/shared/sticky.html" with type=1 %}
+          {% if user.is_superuser or e.owner == user %}
+            <i class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}"></i>
+            <i class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal"></i>
+          {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-1-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
      {% include "web/home/shared/report_modal.html" with type="Expo" %}
+     {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
     {% endfor %}
   </tbody>
 </table>

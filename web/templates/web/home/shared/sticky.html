@@ -1,14 +1,10 @@
 {% if selected_class %}
   {% if user.is_staff or user.is_superuser or selected_class.author == user %}
-    <a class="sticky" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}">
-      <i class="icon-file"></i>
-    </a>
+    <i class="sticky icon-file" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}"></i>
   {% else %}
     {% for allowed in selected_class.allowed_users %}
       {% if user == allowed %}
-        <a class="sticky" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}">
-          <i class="icon-file"></i>
-        </a>
+        <i class="sticky icon-file" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}"></i>
       {% endif %}
     {% endfor %}
   {% endif %}
