@@ -7,8 +7,8 @@ def check_in(dict, index):
 
 @register.filter(name='lookup')
 def lookup(dict, index):
-    if index in dict:
-        return dict[index]
+    if str(index) in dict:
+        return dict[str(index)]
     return ''
 
 @register.filter
