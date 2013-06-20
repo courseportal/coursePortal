@@ -39,7 +39,8 @@ BLOCKS(Including inherited blocks):
 {% csrf_token %}
 
 {% include "web/form_template.html" with form=login_form %}
-
+<input type="hidden" id="test" name="contentType" value="login_form"/>
+    
 <div class="form-actions">
 <input class="btn btn-primary" type="submit" value="Submit" />
 <input class="btn" type="reset" value="Clear" />

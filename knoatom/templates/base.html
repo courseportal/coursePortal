@@ -140,9 +140,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                                 <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
                                 
 							{% else %}
-								<li><a href="{% url 'login' %}">Login</a></li>
+								<li><a href="{% url 'login' %}?next={{request.path}}">Login</a></li>
 								<li><a href="{% url 'register' %}">Register</a></li>
-                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
+                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
+                                <!--<li><a href="{% url 'bugReport' %}">Report A Bug</a></li>-->
 							{% endif %}
 						</ul>
 					{% endblock %} <!-- end .sidebar -->

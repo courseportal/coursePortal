@@ -39,6 +39,7 @@ BLOCKS(Including inherited blocks):
 {% csrf_token %}
 
 {% include "web/form_template.html" with form=register_form %}
+<input type="hidden" id="test" name="contentType" value="register_form"/>
 
 <div class="form-actions">
 <input class="btn btn-primary" type="submit" value="Register" />
