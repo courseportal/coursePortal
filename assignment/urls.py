@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'grades/?$', 'assignment.views.student.grades', name='grades'),
     url(r'list/?$', 'assignment.views.student.list', name='list'),
 
+    url(r'assign/preview/(?P<a>\d+)/?$', 'assignment.views.staff.previewTemplate', name='preview_assignment2'),
     url(r'assign/preview/?$', 'assignment.views.staff.previewAssignment', name='preview_assignment'),
     url(r'assign/qpreview/?$', 'assignment.views.staff.previewQuestion', name='preview_question'),
     url(r'assign/create/?$', 'assignment.views.assign.create', name='create_assignment'),    

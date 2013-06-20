@@ -114,7 +114,13 @@ function init(){
 		height: document.body.clientHeight*0.7,
 		modal: true,
 		autoOpen: false,
-	})
+	});
+	$('#template-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+	});
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -127,6 +133,10 @@ function init(){
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
+	$('#loadA').attr('onclick', "$('#template-zone').dialog('open')");
+	$('.template-row').attr('onclick', "selectRow($(this))");
+	$('.cancel-template-load').attr('onclick', "clearTemplateLoad();");
+	$('.load-template').attr('onclick','loadTemplate();');
 	$("#previewform").nm();
 }
 
@@ -212,36 +222,7 @@ function save_question(num){
 	//if a new question, add to the question list
 	numQuestions = $('#questionsList').children().length;
 	if(num > numQuestions){
-		questionHTML = 
-			'<div id="question'+num+'" class="question-whole">\
-				<div class="row-fluid questionMenu">\
-					<input type="hidden"></input>\
-					<div class="span5 question-description">'+
-						$('#questiontitle').val()+
-					'</div>\
-					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
-						<i class="icon-edit-sign"> Edit</i>\
-					</div>\
-					<div class="span1 question-pts">\
-						<input type="text" class="input-fit" value="0"></input>\
-					</div>\
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
-						<i class="icon-remove-sign"></i>\
-					</div>\
-				</div>\
-				<div class="row-fluid">\
-					<div class="span10 offset1">\
-						Question:\
-						<div class="textPreview"></div>\
-					<div>\
-				</div>\
-				<div class="row-fluid">\
-					<div class="span10 offset1">\
-						Solutions:\
-						<div class="solnsPreview"></div>\
-					</div>\
-				</div>\
-			</div>';
+		questionHTML = questionstring(num, $('#questiontitle').val());
 		$('#questionsList').append(questionHTML);
 	}
 
@@ -280,36 +261,36 @@ function save(){
 		due: '',
 		questions: [],		
 	}
+	//Test required forms
+		assignment.title = $('#assigntitle').val();
+		if(assignment.title == ''){
+			redo+="Title\n";
+		}
+		else
+			$('#assigntitle').style="";
 
-	assignment.title = $('#assigntitle').val();
-	if(assignment.title == ''){
-		redo+="Title\n";
-	}
-	else
-		$('#assigntitle').style="";
+		assignment.start = $('#assigndate').datepicker('getDate');
+		if(assignment.start == null){
+			redo+="Assign date\n";
+		}
+		else
+			$('#assigndate').style="";
 
-	assignment.start = $('#assigndate').datepicker('getDate');
-	if(assignment.start == null){
-		redo+="Assign date\n";
-	}
-	else
-		$('#assigndate').style="";
+		assignment.due = $('#duedate').datepicker('getDate');
+		if(assignment.due == null){
+			redo+="Due date\n";
+		}
+		else
+			$('#duedate').style="";
 
-	assignment.due = $('#duedate').datepicker('getDate');
-	if(assignment.due == null){
-		redo+="Due date\n";
-	}
-	else
-		$('#duedate').style="";
+		if(redo!=''){
+			var msg = "The following fields are required:\n"
+			msg+=redo
+			alert(msg);
+			return false;
+		}
 
-	if(redo!=''){
-		var msg = "The following fields are required:\n"
-		msg+=redo
-		alert(msg);
-		return false;
-	}
-
-	$('#questionsList>.row-fluid').each(function(index){
+	$('#questionsList>.question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
@@ -353,7 +334,7 @@ function previewA(){
 	assignment.start = $('#assigndate').datepicker('getDate');
 	assignment.due = $('#duedate').datepicker('getDate');
 
-	$('#questionsList>.question-whole').each(function(index){
+	$('#questionsList > .question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
@@ -363,6 +344,11 @@ function previewA(){
 
    $('#previewdata').val(JSON.stringify(assignment, undefined, 2));
    $('#previewform').submit();
+}
+
+function previewT(aid){
+	previewHTML='<iframe class="iframe" src="assignment/assign/preview/'+aid+'"></iframe>';
+	$(".template-area").append(previewHTML);
 }
 
 function iframe_preview(qid){
@@ -396,42 +382,82 @@ function loadExisting(){
 		//append question data to list
 		num = $('#questionsList').children().length+1;
 		var data = $(ID+"data").attr("value");
-		questionHTML=
-			'<div id="question'+num+'" class="question-whole">\
-				<div class="row-fluid questionMenu">\
-					<input type="hidden"></input>\
-				<div class="span5 question-description">'+
-						$(ID+"title").attr("value")+
-					'</div>\
-					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
-						<i class="icon-edit-sign"> Edit</i>\
-					</div>\
-					<div class="span1 question-pts">\
-						<input type="text" class="input-fit" value="0"></input>\
-					</div>\
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
-						<i class="icon-remove-sign"></i>\
-					</div>\
-				</div>\
-				<div class="row-fluid">\
-					<div class="span10 offset1">\
-						Question:\
-						<div class="textPreview"></div>\
-					<div>\
-				</div>\
-				<div class="row-fluid">\
-					<div class="span10 offset1">\
-						Solutions:\
-						<div class="solnsPreview"></div>\
-					</div>\
-				</div>\
-			</div>';
+		questionHTML=questionstring(num, $(ID+"title").attr("value"));
 		$('#questionsList').append(questionHTML);
 		$('#question'+num).find('input[type=hidden]').attr("value",data);
 	});
 }
 
+function loadTemplate(){
+	//Get assignment
+	aid = $(".icon-ok").parent().parent().attr("id");
+	//Clear current questions
+	$('#questionsList>.question-whole').each(function(){
+	   $(this).remove();
+	});
+	//Load in template details (title)
+	$('#assigntitle').val($('#'+aid+'title').val());
+	//Load in questions
+	var data = jQuery.parseJSON($("#"+aid+"data").val()).questions;
+	for(var qid in data){
+		if(!data.hasOwnProperty(qid)) continue;
+		num = $('#questionsList').children().length+1;
+		var points = data[qid];
+		var data = $('#'+qid+"data").attr("value");
+		questionHTML=questionstring(num, $('#'+qid+"title").attr("value"));
+		$('#questionsList').append(questionHTML);
+		$('#question'+num).find('input[type=hidden]').attr("value",data);
+		$('#question'+num).find('input[type=text]').attr("value",points);
+	}
+	//Delete evidence
+	clearTemplateLoad();
 
+}
+
+function selectRow(element){
+	$('.icon-ok').remove();
+	$(element).children(".first-cell").append('<i class="icon-ok"></i>');
+}
+
+function clearTemplateLoad(){
+	$(".iframe").remove();
+	$('.icon-ok').remove();
+	$( '#template-zone' ).dialog('close');
+}
+
+function questionstring(num, title){
+	questionHTML=
+		'<div id="question'+num+'" class="question-whole">\
+			<div class="row-fluid questionMenu">\
+				<input type="hidden"></input>\
+			<div class="span5 question-description">'+
+					title+
+				'</div>\
+				<div class="span1 btn question-edit" onclick="load_question('+num+')">\
+					<i class="icon-edit-sign"> Edit</i>\
+				</div>\
+				<div class="span1 question-pts">\
+					<input type="text" class="input-fit" value="0"></input>\
+				</div>\
+				<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+					<i class="icon-remove-sign"></i>\
+				</div>\
+			</div>\
+			<div class="row-fluid">\
+				<div class="span10 offset1">\
+					Question:\
+					<div class="textPreview"></div>\
+				<div>\
+			</div>\
+			<div class="row-fluid">\
+				<div class="span10 offset1">\
+					Solutions:\
+					<div class="solnsPreview"></div>\
+				</div>\
+			</div>\
+		</div>';
+	return questionHTML;
+}
 // function add_question(){
 // 	//wipe out the form
 // 	$('#questiontitle').val('');
