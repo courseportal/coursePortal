@@ -48,7 +48,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="stylesheet" href="{{ STATIC_PREFIX }}/css/theme.bootstrap.css" rel="stylesheet">
+<link href="stylesheet" href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -120,9 +120,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 								<li>
                                     <div>
                                         <a href="{% url 'account' %}">{{ user }}</a>
-                                        <span class="cur-user-rate">{% for i in user.ratingUser.all %}
-                                            {{i.rating}}
-                                        {% endfor %}
+                                        <span class="cur-user-rate">
+                                          {% for i in user.rating_set.all %}
+                                            {{ i.rating }}
+                                          {% endfor %}
                                         </span>
                                     </div>
                                 </li>

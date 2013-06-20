@@ -38,6 +38,8 @@ So far this week I have:
         
     *   Changed some minor aesthetic stuff in the content list templates so that weird underlines don't show up when hovering over the icons
     *   Added tooltips to the option icons
+    *   Changed the vote system so that the values are abstracted into one place so that it is easy to change in the future
+    *   Added some code to my delete content AJAX function to update the user rating when you delete the object so it is reflected on the screen without refreshing.
 
 Goals
 -----

@@ -119,14 +119,13 @@ init_delete_content = function() {
 			'context': this,
 			'statusCode' : {
 				200: function(data) {
-					console.log(data)
+					console.log(data);
 					if (data.result == true) {
-						console.log(this)
+						console.log(this);
 						var row = '#row-' + data.itemType + '-' + data.id;
-						
 						$(row).remove();
-						
 						$("table").trigger("update");
+						$('.cur-user-rate').text(data.requestUserRating);
 					}
 					else {
 						alert("Failed to delete object!")

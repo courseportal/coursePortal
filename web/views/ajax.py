@@ -6,6 +6,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404
 import json
 from web.models import *
+from web.rating import *
 
 @login_required()
 def vote(request, submission_id, vote_category, vote_value):
@@ -67,9 +68,9 @@ def delete_content(request, item, item_id):
 	# We are authorized to perform this action
 	obj_id = obj.id
 	obj.delete()
-	
+	cur_user_rate = UserRating.objects.get(user=request.user).rating
 	# Return and report a success with the correct response variables
-	return HttpResponse(json.dumps({'result': True, 'itemType': item, 'id':obj_id}), mimetype="application/json")
+	return HttpResponse(json.dumps({'result': True, 'itemType': item, 'id':obj_id, 'requestUserRating':cur_user_rate}), mimetype="application/json")
 
 @login_required()
 def sticky_content(request, class_id, item, item_id):
@@ -143,18 +144,20 @@ def voteGeneral(request,item ,item_id, vote_type):
 		# Check if the previous vote arees with the new vote
 		# Update e.votes and vote_example accordingly
 			if vote_type == '1':
-				if vote_example.vote == 1:
+				if vote_example.vote == vote_up_delta_rating():
 					return HttpResponse(json.dumps({'result': False, 'votes': e.votes,'id':e.id}), mimetype="application/json")
-				elif vote_example.vote == -1:
-					vote_example.vote = 1
+				elif vote_example.vote == vote_down_delta_rating():
+					vote_example.vote = vote_up_delta_rating()
 					vote_example.save()
-					e.votes +=2
+					e.votes -= vote_down_delta_rating()
+					e.votes += vote_up_delta_rating()
 					e.save()
 					# update user_rate as well
 					user_rate = UserRating.objects.get(user=e.owner)
-					user_rate.VoteUp += 1
-					user_rate.VoteDown += 1
-					user_rate.rating += 2
+					user_rate.VoteUp += vote_up_delta_rating()
+					user_rate.VoteDown -= vote_down_delta_rating()
+					user_rate.rating -= vote_down_delta_rating()
+					user_rate.rating += vote_up_delta_rating()
 					user_rate.save()
 					# update current user rating
 					cur_user_rate = UserRating.objects.get(user=request.user)
@@ -162,18 +165,20 @@ def voteGeneral(request,item ,item_id, vote_type):
 					return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 
 			elif vote_type == '0':
-				if vote_example.vote == -1:
+				if vote_example.vote == vote_down_delta_rating():
 					return HttpResponse(json.dumps({'result': False, 'votes': e.votes,'id':e.id}), mimetype="application/json")
-				elif vote_example.vote == 1:
-					vote_example.vote = -1
+				elif vote_example.vote == vote_up_delta_rating():
+					vote_example.vote = vote_down_delta_rating()
 					vote_example.save()
-					e.votes -=2
+					e.votes -= vote_up_delta_rating()
+					e.votes += vote_down_delta_rating()
 					e.save()
 					# update user_rate as well
 					user_rate = UserRating.objects.get(user=e.owner)
-					user_rate.VoteUp -= 1
-					user_rate.VoteDown -= 1
-					user_rate.rating -= 2
+					user_rate.VoteUp -= vote_up_delta_rating()
+					user_rate.VoteDown += vote_down_delta_rating()
+					user_rate.rating -= vote_up_delta_rating()
+					user_rate.rating += vote_down_delta_rating()
 					user_rate.save()
 					# update current user rating
 					cur_user_rate = UserRating.objects.get(user=request.user)
@@ -192,28 +197,28 @@ def voteGeneral(request,item ,item_id, vote_type):
 				vote_example = VoteVideo.objects.create(user=request.user,example=e, vote=1)
 
 			if vote_type == '1':
-				vote_example.vote = 1
+				vote_example.vote = vote_up_delta_rating()
 				vote_example.save()
-				e.votes +=1
+				e.votes += vote_up_delta_rating()
 				e.save()
 				# update user_rate as well
 				user_rate = UserRating.objects.get(user=e.owner)
-				user_rate.VoteUp += 1
-				user_rate.rating += 1
+				user_rate.VoteUp += vote_up_delta_rating()
+				user_rate.rating += vote_up_delta_rating()
 				user_rate.save()
 				# update current user rating
 				cur_user_rate = UserRating.objects.get(user=request.user)
 				rating = cur_user_rate.rating
 				return HttpResponse(json.dumps({'result': True,'requestUserRating': rating ,'votes': e.votes,'id':e.id, 'itemType':item,}), mimetype="application/json")
 			elif vote_type == '0':
-				vote_example.vote = -1
+				vote_example.vote = vote_down_delta_rating()
 				vote_example.save()
-				e.votes -=1
+				e.votes += vote_down_delta_rating()
 				e.save()
 				# update user_rate as well
 				user_rate = UserRating.objects.get(user=e.owner)
-				user_rate.VoteDown -= 1
-				user_rate.rating -= 1
+				user_rate.VoteDown += vote_down_delta_rating()
+				user_rate.rating += vote_down_delta_rating()
 				user_rate.save()
 				# update current user rating
 				cur_user_rate = UserRating.objects.get(user=request.user)
