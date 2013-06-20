@@ -36,48 +36,104 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 
-def class_index(request):
+def testBugForm(request, class_id, cat_id, atom_id, bid ):
+    if request.method == 'POST': # If the form has been submitted...
+        if request.POST.get('contentType') == 'bugReport':
+            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
+            if bid:
+                if bugReportform.is_valid():
+                    b = BugReport.objects.get(pk=bid)
+                    b.subject = bugReportform.cleaned_data['subject']
+                    b.content = bugReportform.cleaned_data['content']
+                    b.email = bugReportform.cleaned_data['email']
+                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
+                    b.save()
+                    messages.warning(request, 'Report has been successfully submitted. Thank you!')
+                    return bugReportform
+                messages.warning(request, 'Error submitting. Fields might be invalid.')
+            else:
+                if bugReportform.is_valid():
+                    b = BugReport()
+                    b.subject = bugReportform.cleaned_data['subject']
+                    b.content = bugReportform.cleaned_data['content']
+                    b.email = bugReportform.cleaned_data['email']
+                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
+                    b.save()
+                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
+                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
+                
+                    if bugReportform.cleaned_data['cc_myself']:
+                        try:
+                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
+                        except BadHeaderError:
+                            return HttpResponse('Invalid header found.')
+                    else:
+                        try:
+                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+                        except BadHeaderError:
+                            return HttpResponse('Invalid header found.')
+                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
+                    # The return is fake
+                    return bugReportform
+                messages.warning(request, 'Error submitting.')
+        else:
+            return
+    else:
+        bugReportform = bugReportForm()
+        return bugReportform
+
+
+
+def class_index(request, bid):
+    
+    bugReportform = testBugForm(request,None,None, None,bid)
 	
 	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-	class_list = Class.objects.all()
+    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+    class_list = Class.objects.all()
 	
-	template = loader.get_template('web/home/class_index.html')
-	context = RequestContext(request, {
-		'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
+    template = loader.get_template('web/home/class_index.html')
+    context = RequestContext(request, {
+        'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
 		'class_list': class_list,
 		'top_level_categories': top_level_base_categories,
+        'bugReportform': bugReportform,
 	})
-	return HttpResponse(template.render(context))
+    return HttpResponse(template.render(context))
 
-def index(request):
-	"""
-	This is the home view for categories when you aren't in a class and haven't clicked on a category/atom yet.
+def index(request, bid):
+    """
+        This is the home view for categories when you aren't in a class and haven't clicked on a category/atom yet.
 	
-	For now this displays the top ranked videos for all of the categories, we need to change it eventually.
-	"""
+        For now this displays the top ranked videos for all of the categories, we need to change it eventually.
+    """
+    
+    bugReportform = testBugForm(request,None,None, None,bid)
+
+        
 	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 
 	# get the highest ranked submissions
-	top_ranked_videos = cache.get('top_ranked_videos')
-	if not top_ranked_videos:
-		top_ranked_videos = []
-		for category in VoteCategory.objects.all():
+    top_ranked_videos = cache.get('top_ranked_videos')
+    if not top_ranked_videos:
+        top_ranked_videos = []
+        for category in VoteCategory.objects.all():
 			# for now, calculate an average for each video
-			top_ranked_videos.append({
-				'vote_category': category,
-				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
+            top_ranked_videos.append({
+                'vote_category': category,
+                'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
 			})
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
+        cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 		
-	template = loader.get_template('web/home/base/index.html')
-	context = RequestContext(request, {
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+    template = loader.get_template('web/home/base/index.html')
+    context = RequestContext(request, {
+        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
 		'top_level_categories': top_level_base_categories,
 		'top_ranked_videos': top_ranked_videos,
+        'bugReportform': bugReportform,
 	})
-	return HttpResponse(template.render(context))
+    return HttpResponse(template.render(context))
 
 
 def get_content_for_category(current_category, mode, content_list=[]):
@@ -170,7 +226,6 @@ def base_category(request, cat_id, bid):
         -	Use memcached to save the popular video rankings to save a lot of time
     """
     if request.method == 'POST': # If the form has been submitted...
-        print(request.POST.get('contentType'))
         if request.POST.get('contentType') != 'bugReport':
             form = testModalForm(request.POST)
             if form.is_valid():	# All validation rules pass
@@ -290,7 +345,7 @@ def base_atom(request, cat_id, atom_id, bid):
         - Creates the breadcrumbs for the page
     """
     if request.method == 'POST': # If the form has been submitted...
-        print(request.POST.get('contentType'))
+        #print(request.POST.get('contentType'))
         if request.POST.get('contentType') != 'bugReport':
             form = testModalForm(request.POST)
             if form.is_valid():	# All validation rules pass
@@ -406,7 +461,7 @@ def category(request, class_id, cat_id, bid):
         - Use memcached to save the popular video rankings to save a lot of time
     """
     if request.method == 'POST': # If the form has been submitted...
-        print(request.POST.get('contentType'))
+        #print(request.POST.get('contentType'))
         if request.POST.get('contentType') != 'bugReport':
             form = testModalForm(request.POST)
             if form.is_valid():	# All validation rules pass
@@ -705,45 +760,49 @@ def atom(request, class_id, cat_id, atom_id, bid):
 	return HttpResponse(t.render(c))
 
 
-def classes(request, class_id):
-	"""
-	-	Generates the home page
-	-	Generates a list of the most popular videos for each category of rating
-	-	Use memcached to save the popular video rankings to save a lot of time
-	"""
+def classes(request, class_id, bid):
+    """
+        -	Generates the home page
+        -	Generates a list of the most popular videos for each category of rating
+        -	Use memcached to save the popular video rankings to save a lot of time
+    """
+
+    bugReportform = testBugForm(request,class_id,None, None,bid)
+    
 	#Get the class that we are in
-	current_class = get_object_or_404(Class, id=class_id)
+    current_class = get_object_or_404(Class, id=class_id)
 	
-	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
-		return HttpResponseRedirect(reverse('class_index'))
+    if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
+        return HttpResponseRedirect(reverse('class_index'))
 	
 	#Get categories that are in the current_class
-	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
+    categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
 	#Get the "top level" categories
-	top_level_categories = categories_in_class.filter(parent_categories=None)
+    top_level_categories = categories_in_class.filter(parent_categories=None)
 	
 	# get the highest ranked submissions
-	top_ranked_videos = cache.get('top_ranked_videos')
-	if not top_ranked_videos:
-		top_ranked_videos = []
-		for category in VoteCategory.objects.all():
+    top_ranked_videos = cache.get('top_ranked_videos')
+    if not top_ranked_videos:
+        top_ranked_videos = []
+        for category in VoteCategory.objects.all():
 			# for now, calculate an average for each video
-			top_ranked_videos.append({
+            top_ranked_videos.append({
 				'vote_category': category, 
 				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
 			})
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
+        cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
 
-	t = loader.get_template('web/home/class/index.html')
-	c = RequestContext(request, {
+    t = loader.get_template('web/home/class/index.html')
+    c = RequestContext(request, {
 		'breadcrumbs': [{'url':reverse('classes', args=[current_class.id]), 'title': current_class.name}],
 		'top_level_categories': top_level_categories,
 		'top_ranked_videos': top_ranked_videos,
 		'vote_categories': VoteCategory.objects.all(),
 		'selected_class':current_class,
+        'bugReportform': bugReportform,
 	})
-	return HttpResponse(t.render(c))
+    return HttpResponse(t.render(c))
 
 def post(request, sid):
 	"""

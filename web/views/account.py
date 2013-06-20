@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
 from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,10 +12,14 @@ import hashlib
 import logging
 import random, string
 from web.forms.account import *
-from web.models import AtomCategory, UserRating
+from web.forms.submission import bugReportForm
+from web.models import AtomCategory, UserRating, BugReport
+from web.views.home import testBugForm
+from knoatom.settings import EMAIL_HOST_USER
 
 @login_required()
-def index(request):
+def index(request, bid):
+    bugReportform = testBugForm(request,None,None, None,bid)
     user_rate = UserRating.objects.get(user=request.user)
     password_form = ChangePasswordForm(error_class=PlainErrorList)
     username_form = ChangeUsernameForm(error_class=PlainErrorList)
@@ -71,10 +75,12 @@ def index(request):
         'username_form': username_form,
         'delete_account_form': delete_account_form,
         'user_rate': user_rate,
+        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
-def forgot_password(request):
+def forgot_password(request, bid):
+    bugReportform = testBugForm(request,None,None, None,bid)
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
@@ -104,37 +110,63 @@ def forgot_password(request):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
+        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
-def login(request):
+def testLoginForm(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('home'))
+        return "Login Already"
     if request.method == 'POST':
-        form = LoginForm(request.POST, error_class=PlainErrorList)
-        if form.is_valid():
-            logging.debug('Trying to log in %s: %s' % (form.cleaned_data['email'], form.cleaned_data['password']))
-            users = User.objects.filter(email=form.cleaned_data['email'].strip())
-            if users.count() == 1:
-                u = users[0]
-                user = authenticate(username=u.username, password=form.cleaned_data['password'])
-                if user is not None:
-                    logging.debug('Trying to log in user %s' % user)
-                    if user.is_active == 0:
-                        messages.warning(request, 'Please activate your account before you log in. Contact knoatom-webmaster@umich.edu if you need further assistance.')
-                        return HttpResponseRedirect(reverse('login'))
-                    auth_login(request, user)
-                    if form.cleaned_data['redirect']: return HttpResponseRedirect(form.cleaned_data['redirect'])
-                    return HttpResponseRedirect(reverse('home'))
-		logging.debug('Could not find account %s' % form.cleaned_data['email'])
-        messages.warning(request, 'Could not authenticate you. Try again.')
+        if request.POST.get('contentType') == 'login_form':
+            form = LoginForm(request.POST, error_class=PlainErrorList)
+            print(request.POST)
+            if form.is_valid():
+                logging.debug('Trying to log in %s: %s' % (form.cleaned_data['email'], form.cleaned_data['password']))
+                users = User.objects.filter(email=form.cleaned_data['email'].strip())
+                if users.count() == 1:
+                    u = users[0]
+                    user = authenticate(username=u.username, password=form.cleaned_data['password'])
+                    if user is not None:
+                        logging.debug('Trying to log in user %s' % user)
+                        if user.is_active == 0:
+                            messages.warning(request, 'Please activate your account before you log in. Contact knoatom-webmaster@umich.edu if you need further assistance.')
+                            return "Not Activate"
+                        auth_login(request, user)
+                        if form.cleaned_data['redirect']:
+                            return form
+                        return form
+            logging.debug('Could not find account %s' % form.cleaned_data['email'])
+            messages.warning(request, 'Could not authenticate you. Try again.')
+        form = LoginForm()
     else:
         form = LoginForm(initial={'redirect': request.GET.get('next', None),}, error_class=PlainErrorList)
+    return form
 
+
+
+def login(request, bid):
+    #print(request.GET)
+    bugReportform = testBugForm(request,None,None, None,bid)
+    form = testLoginForm(request)
+    if request.POST.get('contentType') == 'login_form':
+        if form == "Login Already":
+            return HttpResponseRedirect(reverse('home'))
+        if form == "Not Activate":
+            return HttpResponseRedirect(reverse('home'))
+        if form.is_valid():
+            print(form)
+            if form.cleaned_data['redirect'] != '':
+                return HttpResponseRedirect(form.cleaned_data['redirect'])
+            else:
+                return HttpResponseRedirect(reverse('home'))
+
+    
     t = loader.get_template('web/account/login.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
+        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
@@ -143,41 +175,85 @@ def logout(request):
     auth_logout(request)
     return HttpResponseRedirect(reverse('login'))
 
-def register(request):
+def register(request, bid):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
-        form = RegisterForm(request.POST, error_class=PlainErrorList)
-        if form.is_valid():
-            email_search = User.objects.filter(email=form.cleaned_data['email'])
-            if len(email_search) > 0:
-                messages.warning(request, 'Could not register you. Email is already registered.')
-            if form.cleaned_data['password'] != form.cleaned_data['password_confirmation']:
-                messages.warning(request, 'Passwords did not match. Please try again.')
-            if len(email_search) == 0 and form.cleaned_data['password'] == form.cleaned_data['password_confirmation']:
-                user = User.objects.create_user(form.cleaned_data['email'], form.cleaned_data['email'], form.cleaned_data['password']);
-                user.first_name = form.cleaned_data['firstname']
-                user.last_name = form.cleaned_data['lastname']
-                user.is_active = False
-                user.save()
-                m = hashlib.md5()
-                m.update(user.email + str(user.date_joined).split('.')[0])
-                send_mail(
-                    subject='KnoAtom Registration', 
-                    message='You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management',
-                    from_email='knoatom-noreply@gmail.com', 
-                    recipient_list=[user.email, EMAIL_HOST_USER], 
-                    fail_silently=False)
-                messages.success(request, 'You have been registered. Please login to continue.')
-                return HttpResponseRedirect(reverse('login'))
-        messages.warning(request, 'Could not register you. Try again.')
+        if request.POST.get('contentType') == 'register_form':
+            bugReportform = bugReportForm()
+            form = RegisterForm(request.POST, error_class=PlainErrorList)
+            if form.is_valid():
+                email_search = User.objects.filter(email=form.cleaned_data['email'])
+                if len(email_search) > 0:
+                    messages.warning(request, 'Could not register you. Email is already registered.')
+                if form.cleaned_data['password'] != form.cleaned_data['password_confirmation']:
+                    messages.warning(request, 'Passwords did not match. Please try again.')
+                if len(email_search) == 0 and form.cleaned_data['password'] == form.cleaned_data['password_confirmation']:
+                    user = User.objects.create_user(form.cleaned_data['email'], form.cleaned_data['email'], form.cleaned_data['password']);
+                    user.first_name = form.cleaned_data['firstname']
+                    user.last_name = form.cleaned_data['lastname']
+                    user.is_active = False
+                    user.save()
+                    m = hashlib.md5()
+                    m.update(user.email + str(user.date_joined).split('.')[0])
+                    send_mail(
+                            subject='KnoAtom Registration', 
+                            message='You have successfully registered at knoatom.eecs.umich.edu with the username ' + user.username + '. Please validate your account by going to ' + request.build_absolute_uri('validate') + '?email=' + user.email + '&validation=' + m.hexdigest() + ' . If you did not process this registration, please contact us as soon as possible.\n\n-- The Management',
+                            from_email='knoatom-noreply@gmail.com', 
+                            recipient_list=[user.email, EMAIL_HOST_USER], 
+                            fail_silently=False)
+                    messages.success(request, 'You have been registered. Please login to continue.')
+                    return HttpResponseRedirect(reverse('login'))
+            messages.warning(request, 'Could not register you. Try again.')
+        elif request.POST.get('contentType') == 'bugReport':
+            form = RegisterForm()
+            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
+            if bid:
+                if bugReportform.is_valid():
+                    b = BugReport.objects.get(pk=bid)
+                    b.subject = bugReportform.cleaned_data['subject']
+                    b.content = bugReportform.cleaned_data['content']
+                    b.email = bugReportform.cleaned_data['email']
+                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
+                    b.save()
+                    messages.warning(request, 'Report has been successfully submitted. Thank you!')
+                    return HttpResponseRedirect(reverse('register'))
+                messages.warning(request, 'Error submitting. Fields might be invalid.')
+            else:
+                if bugReportform.is_valid():
+                    b = BugReport()
+                    b.subject = bugReportform.cleaned_data['subject']
+                    b.content = bugReportform.cleaned_data['content']
+                    b.email = bugReportform.cleaned_data['email']
+                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
+                    b.save()
+                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
+                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
+                        
+                    if bugReportform.cleaned_data['cc_myself']:
+                        try:
+                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
+                        except BadHeaderError:
+                            return HttpResponse('Invalid header found.')
+                    else:
+                        try:
+                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+                        except BadHeaderError:
+                            return HttpResponse('Invalid header found.')
+                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
+                        # The return is fake
+                    return HttpResponseRedirect(reverse('register'))
+                messages.warning(request, 'Error submitting.')
     else:
+        print("111111")
         form = RegisterForm(error_class=PlainErrorList)
+        bugReportform = bugReportForm()
 
     t = loader.get_template('web/account/register.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('register'), 'title': 'Register'}],
         'register_form': form,
+        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
