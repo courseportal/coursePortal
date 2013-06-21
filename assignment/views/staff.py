@@ -25,7 +25,7 @@ def previewQuestion(request):
 	q = json.loads(request.POST['questiondata'])
 
 	preview = dict()
-	preview['errors'] = ''
+	preview['text'] = ''
 
 	q['solution']= q['solution'].replace('<br>', '\n')
 	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
@@ -41,7 +41,7 @@ def previewQuestion(request):
 		preview['text'] = Template(q['text']).substitute(local_dict)
 
 	except Exception as ex:
-		preview['errors'] += str(ex)
+		preview['text'] += str(ex)
 
 	return HttpResponse(json.dumps(preview))
 

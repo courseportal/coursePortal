@@ -1,3 +1,5 @@
+
+//this is ajax CSRF certificate stuff.  ignore
 $(document).ajaxSend(function(event, xhr, settings) {
     function getCookie(name) {
         var cookieValue = null;
@@ -35,10 +37,6 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 });
 
-$(init);
-
-
-
 CodeMirrorSettings = {
 	mode: 'python',
 	tabSize: 2,
@@ -54,6 +52,8 @@ text = {};
 preview = {};
 
 
+
+$(init); //runs init after DOM is loaded
 function init(){
 
 	//create sortable
@@ -70,16 +70,27 @@ function init(){
 
 	//init the dialog
 	$( '#dialog' ).dialog({ 
-		width: document.body.clientWidth*0.50,
+		width: document.body.clientWidth*0.8,
 		height: document.body.clientHeight*0.5,
-		overflow: scroll,
 		modal: true,
+		overflow: scroll,
 		autoOpen: false,
+		draggable: false,
+		resizable: false,
 		open: function(event, ui){
+			$('#dialogPreview').height($('#dialog').height()*0.75);
+			$('#dialogPreview').width($('#dialog').width()*0.39);
+			previewOffsetLeft = $('#editDiv').offset().left+$('#editDiv').width()*1.05
+			$( '.previewDiv').offset({
+				left: previewOffsetLeft,
+			})
+
 			//codemirrors are always reconstructed so they animate correctly
 			code = CodeMirror($('#codediv').get(0), CodeMirrorSettings);
 			solution = CodeMirror($('#solndiv').get(0), CodeMirrorSettings);
 			load_question_helper();
+
+
 		},
 		focus: function(event, ui){
 			//disable parent scrolling
@@ -126,6 +137,8 @@ function init(){
 	   selector: 'textarea#text',
 	   force_p_newlines : false 
 	});
+	//init dialogPreview height
+	 	
 
 	//initalize datepickers
 	$('#assigndate').datepicker();
@@ -186,11 +199,11 @@ function load_question_helper(){
 	}
 }
 
-function save_question(num){
 
+function preview_question(){
 	//create question object
 	question = {
-		choices: [],
+		choices: []
 	};
 	question.title = $('#questiontitle').val();
 	question.code = code.getValue();
@@ -200,24 +213,26 @@ function save_question(num){
 	}
 	question.text = tinymce.activeEditor.getContent();
 	questiondata = JSON.stringify(question);
-
-
-	//attempt to preview the question
+	//make post object
 	questionPOST = {
 		questiondata: questiondata
 	};
+	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
 	$.ajax('/assignment/assign/qpreview', {
 		type: 'POST',
 		async: false,
 		data: questionPOST,
 	}).done(function(response){
-		alert(response);
 		preview = jQuery.parseJSON(response)
+		$('#dialogPreview').html(preview.text);
+		$('#preview-button').html('Preview');
 	});
-	if(preview.errors){ //tell them they have an error and quit
-		alert(preview.errors);
-		return;
-	}
+	return questiondata;
+}
+
+function save_question(num){
+	//attempt to preview the question
+	questiondata = preview_question();
 
 	//if a new question, add to the question list
 	numQuestions = $('#questionsList').children().length;
@@ -231,10 +246,7 @@ function save_question(num){
 	datafield.val(questiondata);
 
 	//fill out the preview
-	textPreview = $('#question'+num).find('.textPreview');
-	textPreview.html(preview.text);
-	solnsPreview = $('#question'+num).find('.solnsPreview');
-	solnsPreview.html(preview.soln);
+	$('#question'+num).find('.preview-row').html(preview.text);
 
 	//close the dialog
 	$( '#dialog' ).dialog('close');
@@ -442,36 +454,25 @@ function clearTemplateLoad(){
 }
 
 function questionstring(num, title){
-	questionHTML=
-		'<div id="question'+num+'" class="question-whole">\
-			<div class="row-fluid questionMenu">\
-				<input type="hidden"></input>\
-			<div class="span5 question-description">'+
-					title+
-				'</div>\
-				<div class="span1 btn question-edit" onclick="load_question('+num+')">\
-					<i class="icon-edit-sign"> Edit</i>\
+	questionHTML = 
+		'<div id="question'+num+'">\
+				<div class="row-fluid questionMenu">\
+					<input type="hidden"></input>\
+				<div class="span5 question-description">'+
+						$('#questiontitle').val()+
+					'</div>\
+					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
+						<i class="icon-edit-sign"> Edit</i>\
+					</div>\
+					<div class="span1 question-pts">\
+						<input type="text" class="input-fit" value="0"></input>\
+					</div>\
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+						<i class="icon-remove-sign"></i>\
+					</div>\
 				</div>\
-				<div class="span1 question-pts">\
-					<input type="text" class="input-fit" value="0"></input>\
-				</div>\
-				<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
-					<i class="icon-remove-sign"></i>\
-				</div>\
-			</div>\
-			<div class="row-fluid">\
-				<div class="span10 offset1">\
-					Question:\
-					<div class="textPreview"></div>\
-				<div>\
-			</div>\
-			<div class="row-fluid">\
-				<div class="span10 offset1">\
-					Solutions:\
-					<div class="solnsPreview"></div>\
-				</div>\
-			</div>\
-		</div>';
+				<div class="row-fluid preview-row"></div>\
+			</div>';
 	return questionHTML;
 }
 // function add_question(){
