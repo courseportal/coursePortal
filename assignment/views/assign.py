@@ -114,10 +114,14 @@ def editA(request, id):
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
     #Search for assignment by same name, delete it if found
-    current=request.user.templates.get(title = a['title'])
-    for q in current.questions.all():
-        q.delete();
-    current.delete();
+    current=''
+    try:
+        current=request.user.templates.get(title = a['title'])
+    except:
+        pass
+    if current!='':
+        for q in current.questions.all():
+            q.delete();
     #create new assignment
     assignment = Assignment(title = a["title"], data='')
     assignment.save()
@@ -126,12 +130,20 @@ def create(request):
     data['due']=a['due']
     data['start']=a['start']
     questions=dict()
-    assignment.owners.add(request.user)
+    #save owners
+    if current!='': 
+        for x in current.owners.all():
+            assignment.owners.add(x)
+        current.delete();
+    else:
+        assignment.owners.add(request.user)
+    #Add questions
     for q in a['questions']:
         temp=createQ(q)
         assignment.questions.add(temp)
         questions[str(temp)]=q['points']
     data['questions']=questions
+    #Finish
     assignment.data=json.dumps(data)
     assignment.save()
     return main(request)
