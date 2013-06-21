@@ -259,7 +259,7 @@ function save(){
 		title: '',
 		start: '',
 		due: '',
-		questions: [],		
+		questions: [],
 	}
 	//Test required forms
 		assignment.title = $('#assigntitle').val();
@@ -297,6 +297,22 @@ function save(){
 		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
+	var overwrite;
+	$.ajax('/assignment/utility/checktitle/', {
+		type: 'POST',
+		async: false,
+		data: assignment,
+	}).done(function(response){
+		overwrite=jQuery.parseJSON(response);
+	});
+
+	if(overwrite.overwrite == true){
+		if(confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?")){
+			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+   		$('#assignmentForm').submit();
+   	}
+   	else return;
+	}
 
    $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
    $('#assignmentForm').submit();

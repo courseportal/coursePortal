@@ -113,6 +113,12 @@ def editA(request, id):
 
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
+    #Search for assignment by same name, delete it if found
+    current=request.user.templates.get(title = a['title'])
+    for q in current.questions.all():
+        q.delete();
+    current.delete();
+    #create new assignment
     assignment = Assignment(title = a["title"], data='')
     assignment.save()
     #save start and end date

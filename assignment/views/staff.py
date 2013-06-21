@@ -72,7 +72,7 @@ def previewAssignment(request):
 		except Exception as ex:
 			test += errorMsg(q['title'], ex, 'solution')
 
-		#Format chice texts
+		#Format choice texts
 		for integer_index in range(len(q['choices'])):
 			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
 			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
