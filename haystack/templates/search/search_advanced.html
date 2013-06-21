@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Search in the Site</h2>
+<form method="get" action=".">
+    <table>
+        <tbody>
+            {% for field in form %}
+            {% if field.label_tag %}
+            <tr>
+                {{field}}
+            <tr>
+            {% endif %}
+            {% endfor %}
+            <tr>
+                <td>&nbsp;</td>
+                <td><input type="submit" value="Search"></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+{# {% if query %} #}
+    <div class="span9">
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab1" data-toggle="tab">Class</a></li>
+                <li><a href="#tab2" data-toggle="tab">Base Category</a></li>
+                <li><a href="#tab3" data-toggle="tab">Atom</a></li>
+                <li><a href="#tab4" data-toggle="tab">Forum</a></li>
+                <li><a href="#tab5" data-toggle="tab">Topic</a></li>
+                <li><a href="#tab6" data-toggle="tab">Post</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <p>for classes..</p>
+                    {% for result in page.object_list %}
+                        {% if result.model_name == 'class' %}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No class results found.</p>
+                    {% endfor %}
+
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <p>for basic categories..</p>
+                    {% for result in page.object_list %}
+                        {% if result.model_name == 'basecategory' %}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No category results found.</p>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane" id="tab3">
+                    <p>for atoms..</p>
+                    {% for result in page.object_list %}
+                        {% if result.model_name == 'atom' %}
+                            {% include 'search/result_object.html' %}
+                        {% endif %}
+                    {% empty %}
+                    <p>No atom results found.</p>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane" id="tab4">
+                    <p>for Forum..</p>
+                    {% for result in page.object_list %}
+                    {% if result.model_name == 'forum' %}
+                    {% include 'search/result_forum.html' %}
+                    {% endif %}
+                    {% empty %}
+                    <p>No class results found.</p>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane" id="tab5">
+                    <p>for Topic..</p>
+                    {% for result in page.object_list %}
+                    {% if result.model_name == 'topic' %}
+                    {% include 'search/result_forum.html' %}
+                    {% endif %}
+                    {% empty %}
+                    <p>No class results found.</p>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane" id="tab6">
+                    <p>for Post..</p>
+                    {% for result in page.object_list %}
+                    {% if result.model_name == 'post' %}
+                    {% include 'search/result_forum.html' %}
+                    {% endif %}
+                    {% empty %}
+                    <p>No class results found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# {% endif %} #}
+{% endblock %}
