@@ -29,12 +29,13 @@ OPTIONAL context:
       <tr id="row-4-{{ c.id }}">
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
-            <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
-            <i class="icon-arrow-up"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1" title="Vote Up"></a>
           </div>
-          <div class="arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0">
-            <i class="icon-arrow-down"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
           </div>
+          
           <!-- End Implement Voting -->
         </td>
         
@@ -70,19 +71,21 @@ OPTIONAL context:
         </td>
         <!-- end Votes -->
         <td>
-            <!-- Button to trigger modal -->
-          <i class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal"></i>
+          <!-- Button to trigger modal -->
+          <a rel="tooltip" class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal" title="Report"></a>
+      
           {% include "web/home/shared/sticky.html" with type=4 e=c %}
           {% if user.is_superuser or e.owner == user %}
-            <i class="icon-edit" href="{% url "submit" c.id %}"></i>
-            <i class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal"></i>
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
+            {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+            {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
           {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
-      {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
       <!--End of Modal-->
     {% endfor %}
     
@@ -92,12 +95,13 @@ OPTIONAL context:
       <tr id="row-4-{{ c.id }}">
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
-            <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
-            <i class="icon-arrow-up"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1" title="Vote Up"></a>
           </div>
-          <div class="arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0">
-            <i class="icon-arrow-down"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
           </div>
+            
           <!-- End Implement Voting -->
         </td>
         
@@ -134,19 +138,20 @@ OPTIONAL context:
         <!-- end Votes -->
         <td>
             <!-- Button to trigger modal -->
-          <i class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal"></i>
+          <a rel="tooltip" class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal" title="Report"></a>
         
           {% include "web/home/shared/sticky.html" with type=4 e=c %}
           {% if user.is_superuser or e.owner == user %}
-            <i class="icon-edit" href="{% url "submit" c.id %}"></i>
-            <i class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal"></i>
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
+            {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+            {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
           {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-4-{{ c.id }}">0</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
-      {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>

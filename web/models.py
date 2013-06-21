@@ -5,6 +5,7 @@ from haystack import indexes
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
+from web.rating import *
 
 
 STATUS_CHOICES = (
@@ -162,9 +163,9 @@ class VoteExample(models.Model):
 	user = models.ForeignKey(User)
 	example = models.ForeignKey(Example)
 	vote = models.IntegerField(default=0)
-
+	
 class UserRating(models.Model):
-    user = models.ForeignKey(User, related_name="ratingUser")
+    user = models.ForeignKey(User, related_name="rating_set")
     ExpoRating = models.IntegerField(default=0)
     LecNoteRating = models.IntegerField(default=0)
     ExampleRating = models.IntegerField(default=0)
@@ -172,76 +173,59 @@ class UserRating(models.Model):
     VoteUp = models.IntegerField(default=0)
     VoteDown = models.IntegerField(default=0)
     rating = models.IntegerField(default=0)
+	
+	
+@receiver(post_save, sender=User)
+def create_uservotes(sender, **kwargs):
+	if not UserRating.objects.filter(user=kwargs['instance']).exists():
+		UserRating.objects.create(user=kwargs['instance'], rating=INITIAL_RATING)
 
 @receiver(post_save, sender=Submission)
 def add_submission_rate(sender, **kwargs):
-	all_videos = Submission.objects.filter(owner=kwargs['instance'].owner).all()
-	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-	user_rate.VideoRating = 0
-	for video in all_videos:
-		user_rate.VideoRating += 10
-		user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VideoRating + user_rate.VoteUp + user_rate.VoteDown + 200
+	if kwargs['created']:
+		user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+		user_rate.VideoRating += video_object_delta_rating()
+		user_rate.rating += video_object_delta_rating()
 		user_rate.save()
 
 
 @receiver(post_save, sender=Exposition)
 def add_expo_rate(sender, **kwargs):
-	all_expos = Exposition.objects.filter(owner=kwargs['instance'].owner).all()
-	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-	user_rate.ExpoRating = 0
-	for expo in all_expos:
-		user_rate.ExpoRating += 10
-		user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VideoRating + user_rate.VoteUp + user_rate.VoteDown + 200
+	if kwargs['created']:
+		user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+		user_rate.ExpoRating += expo_object_delta_rating()
+		user_rate.rating += expo_object_delta_rating()
 		user_rate.save()
-
 
 @receiver(post_save, sender=LectureNote)
 def add_note_rate(sender, **kwargs):
-	all_lecNote = LectureNote.objects.filter(owner=kwargs['instance'].owner).all()
-	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-	user_rate.LecNoteRating = 0
-	for lecNote in all_lecNote:
-		user_rate.LecNoteRating += 10
-		user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VideoRating + user_rate.VoteUp + user_rate.VoteDown + 200
+	if kwargs['created']:
+		user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+		user_rate.LecNoteRating += note_object_delta_rating()
+		user_rate.rating += note_object_delta_rating()
 		user_rate.save()
-
 
 @receiver(post_save, sender=Example)
 def add_example_rate(sender, **kwargs):
-	all_example = Example.objects.filter(owner=kwargs['instance'].owner).all()
-	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-	user_rate.ExampleRating = 0
-	for example in all_example:
-		user_rate.ExampleRating += 10
-		user_rate.rating = user_rate.ExpoRating+ user_rate.LecNoteRating + user_rate.ExampleRating + user_rate.VideoRating + user_rate.VoteUp + user_rate.VoteDown + 200
+	if kwargs['created']:
+		user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
+		user_rate.ExampleRating += example_object_delta_rating()
+		user_rate.rating += example_object_delta_rating()
 		user_rate.save()
-
-@receiver(post_save, sender=User)
-def create_uservotes(sender, **kwargs):
-    if UserRating.objects.filter(user=kwargs['instance']).count()==1:
-        return
-        #print("This user already has one uservotes table~!")
-    else:
-        UserRating.objects.create(user=kwargs['instance'])
-        user_rate = UserRating.objects.get(user=kwargs['instance'])
-        user_rate.rating = 200
-        user_rate.save()
-        #print("created one just now!!")
-
 
 @receiver(pre_delete, sender=Submission)
 def delete_video_rate(sender, **kwargs):
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.VideoRating -= 10
-    user_rate.rating -= 10
+    user_rate.VideoRating -= video_object_delta_rating()
+    user_rate.rating -= video_object_delta_rating()
     user_vote = VoteVideo.objects.filter(example=kwargs['instance'])
     for v in user_vote:
-        if v.vote == 1:
-            user_rate.VoteUp -=1
-            user_rate.rating -=1
-        elif v.vote == -1:
-            user_rate.VoteDown +=1
-            user_rate.rating +=1
+        if v.vote == vote_up_delta_rating():
+            user_rate.VoteUp -= vote_up_delta_rating()
+            user_rate.rating -= vote_up_delta_rating()
+        elif v.vote == vote_down_delta_rating():
+            user_rate.VoteDown -= vote_down_delta_rating()
+            user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
 
 
@@ -251,16 +235,16 @@ def delete_exposition_rate(sender, **kwargs):
         This adds the functionality to remove the file upon deletion.
     """
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.ExpoRating -= 10
-    user_rate.rating -= 10
+    user_rate.ExpoRating -= expo_object_delta_rating()
+    user_rate.rating -= expo_object_delta_rating()
     user_vote = VoteExposition.objects.filter(example=kwargs['instance'])
     for v in user_vote:
-        if v.vote == 1:
-            user_rate.VoteUp -=1
-            user_rate.rating -=1
-        elif v.vote == -1:
-            user_rate.VoteDown +=1
-            user_rate.rating +=1
+        if v.vote == vote_up_delta_rating():
+            user_rate.VoteUp -= vote_up_delta_rating()
+            user_rate.rating -= vote_up_delta_rating()
+        elif v.vote == vote_down_delta_rating():
+            user_rate.VoteDown -= vote_down_delta_rating()
+            user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
 
 
@@ -272,16 +256,16 @@ def delete_note_rate(sender, **kwargs):
     """
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.LecNoteRating -= 10
-    user_rate.rating -= 10
+    user_rate.LecNoteRating -= note_object_delta_rating()
+    user_rate.rating -= note_object_delta_rating()
     user_vote = VoteLectureNote.objects.filter(example=kwargs['instance'])
     for v in user_vote:
-        if v.vote == 1:
-            user_rate.VoteUp -=1
-            user_rate.rating -=1
-        elif v.vote == -1:
-            user_rate.VoteDown +=1
-            user_rate.rating +=1
+        if v.vote == vote_up_delta_rating():
+            user_rate.VoteUp -= vote_up_delta_rating()
+            user_rate.rating -= vote_up_delta_rating()
+        elif v.vote == vote_down_delta_rating():
+            user_rate.VoteDown -= vote_down_delta_rating()
+            user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
 
 
@@ -292,16 +276,16 @@ def delete_example_rate(sender, **kwargs):
     """
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.ExampleRating -= 10
-    user_rate.rating -= 10
+    user_rate.ExampleRating -= example_object_delta_rating()
+    user_rate.rating -= example_object_delta_rating()
     user_vote = VoteExample.objects.filter(example=kwargs['instance'])
     for v in user_vote:
-        if v.vote == 1:
-            user_rate.VoteUp -=1
-            user_rate.rating -=1
-        elif v.vote == -1:
-            user_rate.VoteDown +=1
-            user_rate.rating +=1
+        if v.vote == vote_up_delta_rating():
+            user_rate.VoteUp -= vote_up_delta_rating()
+            user_rate.rating -= vote_up_delta_rating()
+        elif v.vote == vote_down_delta_rating():
+            user_rate.VoteDown -= vote_down_delta_rating()
+            user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
 
 #bugReport

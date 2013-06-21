@@ -32,10 +32,6 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <!doctype html>
 <html lang="en">
 <head>
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-
 {% block extra_style %}{% endblock %}
 	
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,9 +48,15 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="stylesheet" href="{{ STATIC_PREFIX }}/css/theme.bootstrap.css" rel="stylesheet">
+<link href="stylesheet" href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.widgets.min.js"></script>
+
 
 {% block head %}
 {% endblock %}
@@ -118,9 +120,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 								<li>
                                     <div>
                                         <a href="{% url 'account' %}">{{ user }}</a>
-                                        <span class="cur-user-rate">{% for i in user.ratingUser.all %}
-                                            {{i.rating}}
-                                        {% endfor %}
+                                        <span class="cur-user-rate">
+                                          {% for i in user.rating_set.all %}
+                                            {{ i.rating }}
+                                          {% endfor %}
                                         </span>
                                     </div>
                                 </li>

@@ -25,16 +25,17 @@ OPTIONAL context:
     {% for e in stickied_expositions %}
       <tr id="row-1-{{ e.id }}">
           <td style="width:10px">
-              <div class="arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1">
-                  <i class="icon-arrow-up"></i>
-              </div>
-              <div class="arrow-down" item-type="1" vote-example-id="{{e.id}}" vote-type="0">
-                  <i class="icon-arrow-down"></i>
-              </div>
+            <div>
+              <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1" title="Vote Up"></a>
+            </div>
+            <div>
+              <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="1" vote-example-id="{{e.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
+            </div>
+              
           </td>
 
         <td>
-        	<a class="expo_link" data-toggle="modal" href="expo_modal">
+        	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">
             <div class="name-1-{{ e.id }}">
               {{ e.title }} [stickied]
             </div>
@@ -50,34 +51,36 @@ OPTIONAL context:
           </td>
         <td>
         <!-- Button to trigger modal -->
-          <i class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal"></i>
+          <a rel="tooltip" class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal" title="Report"></a>
           {% include "web/home/shared/sticky.html" with type=1 %}
           {% if user.is_superuser or e.owner == user %}
-            <i class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}"></i>
-            <i class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal"></i>
+            <a rel="tooltip" class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}" title="Edit"></a>
+            <a rel="tooltip" class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal" title="Delete"></a>
+            {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+            {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
           {% endif %}
         </td>
         <td style="display:none;"><div class="stickied-1-{{ e.id }}">1</div></td>
       </tr>
       <!-- Modal -->
       {% include "web/home/shared/report_modal.html" with type="Expo" %}
-      {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
     {% endfor %}
     
     
     {% for e in expositions %}
       <tr id="row-1-{{ e.id }}">
           <td style="width:10px">
-              <div class="arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1">
-                  <i class="icon-arrow-up"></i>
-              </div>
-              <div class="arrow-down" item-type="1" vote-example-id="{{e.id}}" vote-type="0">
-                  <i class="icon-arrow-down"></i>
-              </div>
+            <div>
+              <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="1" vote-example-id="{{e.id}}" vote-type="1" title="Vote Up"></a>
+            </div>
+            <div>
+              <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="1" vote-example-id="{{e.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
+            </div>
+              
           </td>
 
         <td>
-        	<a class="expo_link" data-toggle="modal" href="expo_modal">
+        	<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ e.link }}">
             <div class="name-1-{{ e.id }}">
               {{ e.title }}
             </div>
@@ -92,20 +95,21 @@ OPTIONAL context:
                   {{e.votes}}
               </div>
           </td>
-        <td>
-        <!-- Button to trigger modal -->
-          <i class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal"></i>
-          {% include "web/home/shared/sticky.html" with type=1 %}
-          {% if user.is_superuser or e.owner == user %}
-            <i class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}"></i>
-            <i class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal"></i>
-          {% endif %}
-        </td>
+          <td>
+          <!-- Button to trigger modal -->
+            <a rel="tooltip" class="icon-flag" href="#myModalExpo{{e.id}}" data-toggle="modal" title="Report"></a>
+            {% include "web/home/shared/sticky.html" with type=1 %}
+            {% if user.is_superuser or e.owner == user %}
+              <a rel="tooltip" class="icon-edit" href="{% url "expo_submit" e.id %}?next={{request.path}}" title="Edit"></a>
+              <a rel="tooltip" class="icon-remove" href="#deleteModal1{{ e.id }}" data-toggle="modal" title="Delete"></a>
+              {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+              {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
+            {% endif %}
+          </td>
         <td style="display:none;"><div class="stickied-1-{{ e.id }}">0</div></td>
       </tr>
       <!-- Modal -->
      {% include "web/home/shared/report_modal.html" with type="Expo" %}
-     {% include "web/home/shared/delete_modal.html" with type=1 name=e.title %}
     {% endfor %}
   </tbody>
 </table>
@@ -172,7 +176,6 @@ $(function() {
 
 
 
-<!-- Including a stylesheet here seems a bit hacky to me... -->
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />
 <script type="text/javascript">
     $('textarea').addClass('span6').wysihtml5();
