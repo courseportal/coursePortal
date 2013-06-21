@@ -28,6 +28,7 @@ class ExposInline(admin.StackedInline):
     model = Exposition
     exclude = ('votes',)
     extra = 1
+    raw_id_fields = ("owner",)
 
 class LecNoteInline(admin.StackedInline):
     model = LectureNote
@@ -38,6 +39,12 @@ class ExampleInline(admin.StackedInline):
     model = Example
     exclude = ('votes',)
     extra = 1
+
+
+    #class VideoInline(admin.StackedInline):
+    #model = Submission.tags.through
+#extra = 1
+
 
 
 	
@@ -110,24 +117,25 @@ class AtomAdmin(admin.ModelAdmin):
         obj.save()
     
 	
-	def log_addition(self, request, obj):
-		"""
-		If a forum does not exist for the Atom we create it.
+    def log_addition(self, request, obj):
+        """
+        If a forum does not exist for the Atom we create it.
 		
-		This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
-		"""
-		cat = Category.objects.get_or_create(name="Atoms")[0]
-		try:
-			forum = Forum.objects.get(atom=obj)
-		except ObjectDoesNotExist:
-				forum = Forum.objects.create(
+        This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
+        """
+        print("I am inside.............")
+        cat = Category.objects.get_or_create(name="Atoms")[0]
+        try:
+            forum = Forum.objects.get(atom=obj)
+        except ObjectDoesNotExist:
+            forum = Forum.objects.create(
 					atom=obj,
 					category=cat,
 					name=obj.name,
 					description=obj.summary # Add when we have field
 				)
-				forum.save()
-				forum.moderators.add(request.user)
+            forum.save()
+            forum.moderators.add(request.user)
 	
 						
 		
@@ -372,17 +380,20 @@ class ClassAdmin(admin.ModelAdmin):
 
 class SubmissionAdminForm(forms.ModelForm):
 	
-	def clean(self):
-		cleaned_data = super(SubmissionAdminForm, self).clean()
-		video = cleaned_data.get("video")
-		if video.startswith("[\"") and video.endswith("\"]"):
-			video_raw_num = video.strip('["]')
-			print(video_raw_num)
-		else:
-			video_raw_num = video
-		if not video_raw_num.isalnum() or not len(video_raw_num)==11:
-			raise forms.ValidationError("Something wrong with the 11 character or [\"VIDEO_ID\"]!")
-		return cleaned_data
+    def clean(self):
+        cleaned_data = super(SubmissionAdminForm, self).clean()
+        video = cleaned_data.get("video")
+        if video.startswith("[\"") and video.endswith("\"]"):
+            video_raw_num = video.strip('["]')
+            #print(" I am WITH [""] ")
+            #print(video_raw_num)
+        else:
+            video_raw_num = video
+            #print(" I am WITHOUT [""] ")
+            #print(video_raw_num)
+        if not video_raw_num.isalnum() or not len(video_raw_num)==11:
+            raise forms.ValidationError("Something wrong with the 11 character or [\"VIDEO_ID\"]!")
+        return cleaned_data
 
 
 class SubmissionAdmin(admin.ModelAdmin):
@@ -390,15 +401,15 @@ class SubmissionAdmin(admin.ModelAdmin):
     exclude = ('votes',)
 
     def save_model(self, request, obj, form, change):
-		if change:
-			if not obj.video.startswith("[\""):
-				print("I am NOT with [\" ")
-				print(obj.video)
-				obj.video = "[\""+obj.video+"\"]"
-				obj.save()
-				print(obj.video)
-			print("I am with [\" ")
-		super(SubmissionAdmin, self).save_model(request, obj, form, change)
+		#if change:
+        if not obj.video.startswith("[\""):
+            print("I am NOT with [\" ")
+            print(obj.video)
+            obj.video = "[\""+obj.video+"\"]"
+            obj.save()
+            print(obj.video)
+        print("I am with [\" ")
+        super(SubmissionAdmin, self).save_model(request, obj, form, change)
 
 admin.site.register(Example, ExampleAdmin)
 admin.site.register(BaseCategory,BaseCategoryAdmin)

@@ -12,6 +12,35 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 Week of June 17-21
 ==================
 
+So far this week I have:
+    *   Added custom validation to the exposition form to ensure that the link begins with ``http://`` or ``https://``
+    *   Changed the video display list to a sortable table to be consistent with the rest of the content display lists
+    *   Added a sticky feature for content lists in classes
+        
+        *   First I added a sticky field for each content type in the Class model
+        *   Then I added functionality to force the table sort to be prepended by a sort on sticky/not stickied by adding a hidden column for sticky status
+        *   Then I added a button for ``authors`` and ``allowed_users`` of a class to be able to sticky content in the content list for videos, expositions, notes and examples.
+        
+            *   I used AJAX to have the (not) stickied change be reflected in the table without reloading the page
+            *   Then I added automatic table updating and resorting when the votes or sticky status is changed
+        
+        *   When users are creating new content there is a new field ``classes_to_sticky_in``
+            
+            *   If the user isn't the ``author`` or an ``allowed_user`` of any class then the field is hidden
+            *   Otherwise it shows all the classes that they are the ``author`` of or an ``allowed_user`` in and allows them to select the classes they wish the submission to be stickied in
+            
+    *   Abstracted the modal for reporting content to another template because it was repeated 8 times.
+    *   Changed the deletion of content from linking users to a new page and instead use AJAX and a modal
+    
+        *   When a user tries to delete an object a confirmation modal pops up
+        *   If they click yes an AJAX script fires that calls the view and deletes the object and it returns the required variables
+        *   Then the function deletes the row from the table that the content was in and updates the table data
+        
+    *   Changed some minor aesthetic stuff in the content list templates so that weird underlines don't show up when hovering over the icons
+    *   Added tooltips to the option icons
+    *   Changed the vote system so that the values are abstracted into one place so that it is easy to change in the future
+    *   Added some code to my delete content AJAX function to update the user rating when you delete the object so it is reflected on the screen without refreshing.
+
 Goals
 -----
     
@@ -20,9 +49,7 @@ New Todo:
     *   Documentation
     *   More validation for uploaded file types
     *   Implement the vote ranking system from content into the forums
-    *   Allow professors to "sticky" content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.
     *   Put a delete option in the submit form for user uploaded content
-    *   Add a report feature for all content/posts so malicious/disrespectful content can be removed
     *   Integrate forum into Atom better
 
 
@@ -59,7 +86,7 @@ So far this week so far I have:
         *   The class author
         *   The allowed users of the class
             
-        If a user tries to access the class by typing in the URL and they don't have access then they will be redirected to the ``'class_index'`` page.
+    *   If a user tries to access the class by typing in the URL and they don't have access then they will be redirected to the ``'class_index'`` page.
 
 Week of June 3-7
 ================

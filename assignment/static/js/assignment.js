@@ -71,8 +71,9 @@ function init(){
 	//init the dialog
 	$( '#dialog' ).dialog({ 
 		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.7,
+		height: document.body.clientHeight*0.5,
 		modal: true,
+		overflow: scroll,
 		autoOpen: false,
 		draggable: false,
 		resizable: false,
@@ -118,6 +119,19 @@ function init(){
 		},
 		//dialogClass: 'no-close',
 	});
+
+	$('#loading-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+	});
+	$('#template-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+	});
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -131,14 +145,12 @@ function init(){
 	$('#duedate').datepicker();
 
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
-
-	//set the offset for the left thing
-	// $('#dialog').scroll(function(event){
-	// 	newPosition = $(this).offset().top + 25;
-	// 	$('.previewDiv').offset({
-	// 		top: newPosition	
-	// 	});
-	// });
+	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
+	$('#loadA').attr('onclick', "$('#template-zone').dialog('open')");
+	$('.template-row').attr('onclick', "selectRow($(this))");
+	$('.cancel-template-load').attr('onclick', "clearTemplateLoad();");
+	$('.load-template').attr('onclick','loadTemplate();');
+	$("#previewform").nm();
 }
 
 function add_choice_div(){
@@ -172,7 +184,6 @@ function load_question_helper(){
 		//load the data from the text
 		questiondata = $('#questionsList :nth-child('+num+')').find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
-
 		//replace the fields
 		$('#questiontitle').val(question.title);
 		code.setValue(question.code);
@@ -226,25 +237,7 @@ function save_question(num){
 	//if a new question, add to the question list
 	numQuestions = $('#questionsList').children().length;
 	if(num > numQuestions){
-		questionHTML = 
-			'<div id="question'+num+'">\
-				<div class="row-fluid questionMenu">\
-					<input type="hidden"></input>\
-				<div class="span5 question-description">'+
-						$('#questiontitle').val()+
-					'</div>\
-					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
-						<i class="icon-edit-sign"> Edit</i>\
-					</div>\
-					<div class="span1 question-pts">\
-						<input type="text" class="input-fit" value="0"></input>\
-					</div>\
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
-						<i class="icon-remove-sign"></i>\
-					</div>\
-				</div>\
-				<div class="row-fluid preview-row"></div>\
-			</div>';
+		questionHTML = questionstring(num, $('#questiontitle').val());
 		$('#questionsList').append(questionHTML);
 	}
 
@@ -273,24 +266,65 @@ function remove_question(num){
 
 function save(){
 	//empty object
+	var redo='';
 	assignment = {
 		title: '',
 		start: '',
 		due: '',
-		questions: [],		
+		questions: [],
 	}
+	//Test required forms
+		assignment.title = $('#assigntitle').val();
+		if(assignment.title == ''){
+			redo+="Title\n";
+		}
+		else
+			$('#assigntitle').style="";
 
-	assignment.title = $('#assigntitle').val();
-	assignment.start = $('#assigndate').datepicker('getDate');
-	assignment.due = $('#duedate').datepicker('getDate');
+		assignment.start = $('#assigndate').datepicker('getDate');
+		if(assignment.start == null){
+			redo+="Assign date\n";
+		}
+		else
+			$('#assigndate').style="";
 
-	$('#questionsList>.row-fluid').each(function(index){
+		assignment.due = $('#duedate').datepicker('getDate');
+		if(assignment.due == null){
+			redo+="Due date\n";
+		}
+		else
+			$('#duedate').style="";
+
+		if(redo!=''){
+			var msg = "The following fields are required:\n"
+			msg+=redo
+			alert(msg);
+			return false;
+		}
+
+	$('#questionsList>.question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
 		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
+	var overwrite;
+	$.ajax('/assignment/utility/checktitle/', {
+		type: 'POST',
+		async: false,
+		data: assignment,
+	}).done(function(response){
+		overwrite=jQuery.parseJSON(response);
+	});
+
+	if(overwrite.overwrite == true){
+		if(confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?")){
+			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+   		$('#assignmentForm').submit();
+   	}
+   	else return;
+	}
 
    $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
    $('#assignmentForm').submit();
@@ -315,20 +349,20 @@ function previewQ(questiondata){
 
 }
 
-function preview(){
+function previewA(){
 	//empty object
 	assignment = {
 		title: '',
 		start: '',
 		due: '',
 		questions: [],		
-	}
+	};
 
 	assignment.title = $('#assigntitle').val();
 	assignment.start = $('#assigndate').datepicker('getDate');
 	assignment.due = $('#duedate').datepicker('getDate');
 
-	$('#questionsList>.row-fluid').each(function(index){
+	$('#questionsList > .question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
@@ -340,6 +374,107 @@ function preview(){
    $('#previewform').submit();
 }
 
+function previewT(aid){
+	previewHTML='<iframe class="iframe" src="assignment/assign/preview/'+aid+'"></iframe>';
+	$(".template-area").append(previewHTML);
+}
+
+function iframe_preview(qid){
+  previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
+  var ID="#";
+  ID+=qid;
+  $(ID).attr("class", "icon-eye-close");
+  $(ID).attr("onclick", "iframe_close("+qid+")");
+  $(".preview-area").append(previewHTML)
+}
+function iframe_close(qid){
+  var ID = "#";
+  ID+=qid;
+  $("#iframepreview"+qid).remove();
+  $(ID).attr("class", "icon-eye-open");
+  $(ID).attr("onclick", "iframe_preview("+qid+")");
+}
+function loadExisting(){
+	var ID='';
+	var questionHTML='';
+	//Close dialog box
+	$( '#loading-zone' ).dialog('close');
+	//Loop through selected elements
+	$('.icon-eye-close').each(function(){
+		ID='#';
+		ID+=$(this).attr("id");
+		//reset preview, eye
+		$(ID).attr("class", "icon-eye-open");
+  		$(ID).attr("onclick", "iframe_preview("+$(this).attr("id")+")")
+  		$("#iframepreview"+$(this).attr("id")).remove();
+		//append question data to list
+		num = $('#questionsList').children().length+1;
+		var data = $(ID+"data").attr("value");
+		questionHTML=questionstring(num, $(ID+"title").attr("value"));
+		$('#questionsList').append(questionHTML);
+		$('#question'+num).find('input[type=hidden]').attr("value",data);
+	});
+}
+
+function loadTemplate(){
+	//Get assignment
+	aid = $(".icon-ok").parent().parent().attr("id");
+	//Clear current questions
+	$('#questionsList>.question-whole').each(function(){
+	   $(this).remove();
+	});
+	//Load in template details (title)
+	$('#assigntitle').attr("value",$('#'+aid+'title').attr("value"));
+	//Load in questions
+	var data = jQuery.parseJSON($("#"+aid+"data").val()).questions;
+	for(var qid in data){
+		if(!data.hasOwnProperty(qid)) continue;
+		num = $('#questionsList').children().length+1;
+		var points = data[qid];
+		var data = $('#'+qid+"data").attr("value");
+		questionHTML=questionstring(num, $('#'+qid+"title").attr("value"));
+		$('#questionsList').append(questionHTML);
+		$('#question'+num).find('input[type=hidden]').attr("value",data);
+		$('#question'+num).find('input[type=text]').attr("value",points);
+	}
+	//Delete evidence
+	clearTemplateLoad();
+
+}
+
+function selectRow(element){
+	$('.icon-ok').remove();
+	$(element).children(".first-cell").append('<i class="icon-ok"></i>');
+}
+
+function clearTemplateLoad(){
+	$(".iframe").remove();
+	$('.icon-ok').remove();
+	$( '#template-zone' ).dialog('close');
+}
+
+function questionstring(num, title){
+	questionHTML = 
+		'<div id="question'+num+'">\
+				<div class="row-fluid questionMenu">\
+					<input type="hidden"></input>\
+				<div class="span5 question-description">'+
+						$('#questiontitle').val()+
+					'</div>\
+					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
+						<i class="icon-edit-sign"> Edit</i>\
+					</div>\
+					<div class="span1 question-pts">\
+						<input type="text" class="input-fit" value="0"></input>\
+					</div>\
+					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+						<i class="icon-remove-sign"></i>\
+					</div>\
+				</div>\
+				<div class="row-fluid preview-row"></div>\
+			</div>';
+	return questionHTML;
+}
 // function add_question(){
 // 	//wipe out the form
 // 	$('#questiontitle').val('');

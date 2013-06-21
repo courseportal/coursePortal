@@ -93,6 +93,12 @@ class PostIndex(RenderableItemIndex, indexes.Indexable):
     def get_model(self):
         return Post
 
+            #class LectureNoteIndex(indexes.SearchIndex, indexes.Indexable):
+            # text = indexes.EdgeNgramField(document=True, use_template=True)
+#  LecNoteTitle = indexes.CharField(model_attr='filename')
+    
+    
+
 
 
 

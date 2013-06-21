@@ -13,7 +13,7 @@ RESULTS_PER_PAGE = getattr(settings, 'HAYSTACK_SEARCH_RESULTS_PER_PAGE', 20)
 
 
 class SearchView(object):
-    template = 'search/search.html'
+    template = 'search/search_advanced.html'
     extra_context = {}
     query = ''
     results = EmptySearchQuerySet()
@@ -128,7 +128,7 @@ class SearchView(object):
         """
         Generates the actual HttpResponse to send back to the user.
         """
-        print("I am giving result!!!!!")
+        #print("I am giving result!!!!!")
         (paginator, page) = self.build_page()
 
         context = {
@@ -187,7 +187,7 @@ class FacetedSearchView(SearchView):
         extra = super(FacetedSearchView, self).extra_context()
         extra['request'] = self.request
         extra['facets'] = self.results.facet_counts()
-        print("I am printing extra!!!!!")
+        #print("I am printing extra!!!!!")
         return extra
 
 

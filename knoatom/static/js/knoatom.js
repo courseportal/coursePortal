@@ -73,6 +73,69 @@ init_rating_stars = function() {
 };
 
 /*
+	Sticking AJAX funcitonality
+*/
+init_sticking = function() {
+	$('.sticky').click(function() {
+		$.ajax({
+			'url': '/ajax/sticking/' + $(this).attr('class-id') + '/' + $(this).attr('item-type') + '/' + $(this).attr('item-id') + '/',
+			'context': this,
+			'statusCode': {
+				200: function(data) {
+					console.log(data)
+					if(data.result == true) {
+						console.log(this)
+						var nametag = '.name-' + data.itemType + '-' + data.id;
+						var sticktag = '.stickied-' + data.itemType + '-' + data.id;
+
+						if (data.stickied) {
+							$(nametag).text(data.name + ' [stickied]');
+							$(sticktag).text(1)
+						}
+						else
+						{
+							$(nametag).text(data.name);
+							$(sticktag).text(0)
+						}
+						$("table").trigger("update");
+					}
+					else
+					{
+						alert("Sticking or Unsticking this content failed.")
+					}
+				}
+			}
+		});
+	});
+};
+
+/*
+	Delete object AJAX functionality
+*/
+init_delete_content = function() {
+	$('.delete-content').click(function() {
+		$.ajax({
+			'url': '/ajax/delete/' + $(this).attr('item-type') + '/' + $(this).attr('item-id') + '/',
+			'context': this,
+			'statusCode' : {
+				200: function(data) {
+					console.log(data);
+					if (data.result == true) {
+						console.log(this);
+						var row = '#row-' + data.itemType + '-' + data.id;
+						$(row).remove();
+						$("table").trigger("update");
+						$('.cur-user-rate').text(data.requestUserRating);
+					}
+					else {
+						alert("Failed to delete object!")
+					}
+				}
+			},
+		});
+	});
+};
+/*
  * Vote_up initialization
  */
 init_vote_up = function() {
@@ -89,6 +152,7 @@ init_vote_up = function() {
                                 var s = '.votes-sum-'+data.itemType+'-'+data.id;
                                 $('.cur-user-rate').text(data.requestUserRating);
                                 $(s).text(data.votes);
+								$("table").trigger("update");
                                 }else{
                                 alert("You have already voted!");
                                 }
@@ -117,6 +181,7 @@ init_vote_down = function() {
                                 var s = '.votes-sum-'+data.itemType+'-'+data.id;
                                 $('.cur-user-rate').text(data.requestUserRating);
                                 $(s).text(data.votes);
+								$("table").trigger("update");
                                 }else{
                                 alert("You have already voted!");
                                 }
@@ -161,6 +226,8 @@ init_video_viewer = function() {
  * Call all the initialization functions
  */
 $(document).ready(function() {
+	init_delete_content();
+	init_sticking();
     init_sidebar();
     init_rating_stars();
     init_vote_up();

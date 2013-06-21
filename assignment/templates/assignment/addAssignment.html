@@ -1,5 +1,6 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
+{% load my_filters %}
 
 <!-- TINY MCE -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
@@ -30,20 +31,21 @@
 <html>
 
 <body>
+	<button class="btn btn-success" id="loadA">Load Assignment</button>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
-			<input type="text" id="assigntitle"></input>
+			<input type="text" id="assigntitle" value="{{assignment.title}}"></input>
 		</div>
 	</div>
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate"></input>
+			<input type="text" id="assigndate" value="{{start_date}}"></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate"></input>
+			<input type="text" id="duedate" value="{{due_date}}"></input>
 		</div>
 	</div>
 	<div class="row-fluid">
@@ -57,6 +59,24 @@
 				<input type="hidden" id="questionNum"></input>
 			</div>
 			<div id="questionsList">
+				{% for q in assignment.questions.all %}
+				<div class="row-fluid question-whole" id="question{{forloop.counter}}"> 
+					<input type="hidden" value = "{{q.data}}"></input> 
+					<div class="span5 question-description">{{q.title}}
+					</div> 
+					<div class="span1 question-edit btn" onclick="load_question({{forloop.counter}})">
+						<i class="icon-edit-sign"> Edit</i> 
+					</div> 
+					{% with id=q.id %}
+					<div class="span1 question-pts"> 
+						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input> 
+					</div>
+					{% endwith %}
+					<div class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
+						<i class="icon-remove-sign"></i> 
+					</div> 
+				</div>
+				{%endfor%}
 			</div>
 		</div>
 	</div>
@@ -64,6 +84,8 @@
 	<button class="btn btn-inverse" id="opener">
 		<i class="icon-plus"></i> Add Question </button>
 
+	<button class="btn" id="listingQ">
+		<i class="icon-plus"></i> Load Existing Question</button>
 	<div id="dialog" class="row-fluid">
 		<div class="span7" id="editDiv">
 			<div class="row-fluid">
@@ -78,7 +100,6 @@
 				<h3>Solution:</h3>
 				<div id="solndiv" class="span12 answer"></div>
 			</div>
-
 			<div class="row-fluid">
 				<h3>Other choices:</h3>
 				<div class="span12" id="choicediv"></div>
@@ -113,14 +134,80 @@
 	<form action="{% url "preview_assignment" %}" method="post" id="previewform">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="previewdata" name="previewdata"></input>
-		<button  class="btn" onclick="preview()">Preview</button>
+		<button  class="btn" onclick="previewA()">Preview</button>
 	</form>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
+<div id="loading-zone">
+	{% if question_list %}
+	<div class="lookyhere">
+   	<body>  
+		<table class="table">  
+      	<thead>  
+        		<tr>  
+           		<th>Title</th>
+           		<th>Subject</th>
+           		<th>Author</th>
+           		<th>Rating</th>
+        		</tr>  
+      	</thead> 
+      	<tbody>
+   	{% for question in question_list %}
+   		<tr>
+   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
+			</tr>
+		
+	   {% endfor %}
+   	   </tbody>  
+   	</table>  
+	</div>
+	{% else %}
+   	<p>No questions exist!</p>
+	{% endif %}
+	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
+	<div class="preview-area">
+	</div>
+</div>
 
-
+<div id="template-zone">
+	<div class="lookyhere"> 
+		<table class="table">  
+      	<thead>  
+        		<tr>  
+           		<th>Title</th>
+           		<th>Subject</th>
+           		<th>Author</th>
+           		<th>Rating</th>
+        		</tr>  
+      	</thead> 
+      	<tbody>
+   	{% for a in assignment_list %}
+   		<tr class="template-row" id="{{a.id}}T">
+   			<td class="first-cell" id="{{a.id}}Ttitle" value="{{a.title}}">{{ a.title }}</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><i onclick="previewT({{a.id}})" class="icon-eye-open"></i></a></td>
+				<input type="hidden" id="{{a.id}}Tdata" value="{{a.data}}"></div>
+			</tr>
+	   {% endfor %}
+   	   </tbody>  
+   	</table>  
+	</div>
+	<div class="row-fluid">
+		<button class="btn btn-success load-template">Load</button>
+		<button class="btn btn-warning cancel-template-load">Cancel</button>
+	</div>
+	<div class="template-area">
+	</div>
+</div>
 </body>
 {% endblock %}

@@ -87,7 +87,11 @@ def instantiate(request):
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
-    context = {'breadcrumbs':breadcrumbs}
+    context = {
+        'breadcrumbs':breadcrumbs,
+        "question_list":Question.objects.all(),
+        "assignment_list":Assignment.objects.all()
+    }
     return render(request, 'assignment/addAssignment.html', context)
 
 
@@ -100,13 +104,21 @@ def editA(request, id):
         'assignment': assignment,
         'start_date': assign_data['start'],
         'due_date': assign_data['due'],
-        'point_list': assign_data['questions'],
+        'question_list':Question.objects.all(),
+        'assignment_list':Assignment.objects.all(),
+        'assign_data': assign_data,
         'breadcrumbs': breadcrumbs,
     }
-    return render(request, 'assignment/editAssignment.html', context)
+    return render(request, 'assignment/addAssignment.html', context)
 
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
+    #Search for assignment by same name, delete it if found
+    current=request.user.templates.get(title = a['title'])
+    for q in current.questions.all():
+        q.delete();
+    current.delete();
+    #create new assignment
     assignment = Assignment(title = a["title"], data='')
     assignment.save()
     #save start and end date
@@ -116,8 +128,9 @@ def create(request):
     questions=dict()
     assignment.owners.add(request.user)
     for q in a['questions']:
-        assignment.questions.add(createQ(q))
-        questions[q['title']]=q['points']
+        temp=createQ(q)
+        assignment.questions.add(temp)
+        questions[str(temp)]=q['points']
     data['questions']=questions
     assignment.data=json.dumps(data)
     assignment.save()
@@ -135,4 +148,4 @@ def createQ(x):
     data['choices']=x['choices']
     question.data = json.dumps(data)
     question.save()
-    return question
+    return question.id

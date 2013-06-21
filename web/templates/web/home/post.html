@@ -52,8 +52,9 @@ BLOCKS(Including inherited blocks):
   				{% if user.is_staff or user.is_superuser or c.owner == user %}
   					<div class="edit">
   						<p><a href="{% url 'submit' c.id %}">Edit</a></p>
-              <p><a href="{% url 'delete_video' c.id %}">Delete</a></p>
+              <p><a href="#deleteModal4{{ c.id }}" data-toggle="modal">Delete</a></p>
   					</div>
+            {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
   				{% endif %}
   				{% if user.is_authenticated %}
   					{% for v in vote_categories %}

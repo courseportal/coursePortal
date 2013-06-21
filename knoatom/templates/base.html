@@ -32,10 +32,6 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <!doctype html>
 <html lang="en">
 <head>
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-
 {% block extra_style %}{% endblock %}
 	
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,9 +48,15 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="stylesheet" href="{{ STATIC_PREFIX }}/css/theme.bootstrap.css" rel="stylesheet">
+<link href="stylesheet" href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.widgets.min.js"></script>
+
 
 {% block head %}
 {% endblock %}
@@ -118,9 +120,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 								<li>
                                     <div>
                                         <a href="{% url 'account' %}">{{ user }}</a>
-                                        <span class="cur-user-rate">{% for i in user.ratingUser.all %}
-                                            {{i.rating}}
-                                        {% endfor %}
+                                        <span class="cur-user-rate">
+                                          {% for i in user.rating_set.all %}
+                                            {{ i.rating }}
+                                          {% endfor %}
                                         </span>
                                     </div>
                                 </li>
@@ -137,11 +140,13 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                                 </ul>
                             </li>
 								<li><a href="{% url 'logout' %}">Logout</a></li>
-                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
+                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
+                                
 							{% else %}
-								<li><a href="{% url 'login' %}">Login</a></li>
+								<li><a href="{% url 'login' %}?next={{request.path}}">Login</a></li>
 								<li><a href="{% url 'register' %}">Register</a></li>
-                                <li><a href="{% url 'bugReport'%}">Report A Bug</a></li>
+                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
+                                <!--<li><a href="{% url 'bugReport' %}">Report A Bug</a></li>-->
 							{% endif %}
 						</ul>
 					{% endblock %} <!-- end .sidebar -->
@@ -173,8 +178,12 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	</div> <!-- end .row -->
 </div> <!-- end .container -->
 
-
-<!-- What the fuck are these doing here? -->
+<!-- Modal -->
+{% include "web/home/shared/bugReport_modal.html" %}
+    
+    
+    
+<!-- What are these doing here? -->
 <div class="modal fade" id="global_modal" >
 	<div class="modal-header">
 		<a class="close" data-dismiss="modal">x</a><h3>Video Preview</h3>

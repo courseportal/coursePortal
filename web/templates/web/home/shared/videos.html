@@ -12,7 +12,7 @@ OPTIONAL context:
 -->
 {% load my_filters %}
 
-<table class="tablesorter">
+<table id="videos" class="tablesorter">
   <thead>
     <th data-sorter="false"> </th>
     <th>Video</th>
@@ -20,27 +20,99 @@ OPTIONAL context:
     <th>Created By</th>
     <th>Votes</th>
     <th data-sorter="false">Options</th>
+    <th style="display:none;">Is Stickied</th>
   </thead>
   <tbody>
-    {% for c in content %}
+    {% for c in stickied_content %}
       
       
-      <tr>
+      <tr id="row-4-{{ c.id }}">
         <td style="vertical-align:middle">
           <!-- Implement voting here -->
-            <div class="arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1">
-            <i class="icon-arrow-up"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1" title="Vote Up"></a>
           </div>
-          <div class="arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0">
-            <i class="icon-arrow-down"></i>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
           </div>
+          
           <!-- End Implement Voting -->
         </td>
         
         <td style="text-align:center">
           
           <div id="title">
-            <strong><a href="{% url 'post' c.id %}">{{ c }}</a></strong>
+            <strong><a href="{% url 'post' c.id %}">
+              <div class="name-4-{{ c.id }}">
+                {{ c }} [stickied]
+              </div>
+            </a></strong>
+          </div>
+          {% for v in c.video %}
+            <div id="Video">
+              <img style="margin-bottom: 5px;" src="https://img.youtube.com/vi/{{ v }}/default.jpg" width="120" alt="Video Thumbnail" />
+            </div>
+          {% endfor %}
+        	
+        </td>
+        <td>
+          {% autoescape off %}
+            <p>{{ c.content }}</p>
+          {% endautoescape %}
+        </td>
+        <td>
+          {{ c.owner }}
+        </td>
+        <!-- Votes -->
+        <td style="width:75px">
+            <div class="votes-sum-4-{{c.id}}">
+            {{c.votes}}
+            </div>
+        </td>
+        <!-- end Votes -->
+        <td>
+          <!-- Button to trigger modal -->
+          <a rel="tooltip" class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal" title="Report"></a>
+      
+          {% include "web/home/shared/sticky.html" with type=4 e=c %}
+          {% if user.is_superuser or e.owner == user %}
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
+            {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+            {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
+          {% endif %}
+        </td>
+        <td style="display:none;"><div class="stickied-4-{{ c.id }}">1</div></td>
+      </tr>
+      <!-- Modal -->
+      {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
+      <!--End of Modal-->
+    {% endfor %}
+    
+    {% for c in content %}
+      
+      
+      <tr id="row-4-{{ c.id }}">
+        <td style="vertical-align:middle">
+          <!-- Implement voting here -->
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="4" vote-example-id="{{c.id}}" vote-type="1" title="Vote Up"></a>
+          </div>
+          <div>
+            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="4" vote-example-id="{{c.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
+          </div>
+            
+          <!-- End Implement Voting -->
+        </td>
+        
+        <td style="text-align:center">
+          
+          <div id="title">
+            <strong><a href="{% url 'post' c.id %}">
+              <div class="name-4-{{ c.id }}">
+                {{ c }}
+              </div>
+            </a></strong>
           </div>
           {% for v in c.video %}
             <div id="Video">
@@ -66,43 +138,20 @@ OPTIONAL context:
         <!-- end Votes -->
         <td>
             <!-- Button to trigger modal -->
-            <a href="#myModalVideo{{c.id}}" data-toggle="modal">
-                <i class="icon-flag"></i>
-            </a>
-
-        {% if user.is_staff or user.is_superuser or e.owner == user %}
-          <a href="{% url "submit" c.id %}?next={{request.path}}">
-            <i class="icon-edit"></i>
-          </a>
-          <a href="{% url "delete_video" c.id %}?next={{request.path}}">
-            <i class="icon-remove"></i>
-          </a>
-        {% else %}
-          None
-        {% endif %}
+          <a rel="tooltip" class="icon-flag" href="#myModalVideo{{c.id}}" data-toggle="modal" title="Report"></a>
+        
+          {% include "web/home/shared/sticky.html" with type=4 e=c %}
+          {% if user.is_superuser or e.owner == user %}
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
+            {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
+            {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
+          {% endif %}
         </td>
+        <td style="display:none;"><div class="stickied-4-{{ c.id }}">0</div></td>
       </tr>
       <!-- Modal -->
-      <div id="myModalVideo{{c.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <form class="testForm" method="post" action="{{form_action}}">
-              {% csrf_token %}
-              <div class="form-actions">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Make a Report: </h3>
-                  </div>
-                  <div class="modal-body">
-                      {% include "web/form_template.html" with form=form %}
-                      <input type="hidden" id="test" name="contentType" value="{{c|to_class_name}}"/>
-                      <input type="hidden" id="test2" name="contentId" value="{{c.id}}"/>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      <button class="btn btn-primary">Submit</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+      {% include "web/home/shared/report_modal.html" with type="Video" e=c %}
       <!--End of Modal-->
     {% endfor %}
   </tbody>
@@ -136,7 +185,7 @@ $(function() {
   });
 
   // call the tablesorter plugin and apply the uitheme widget
-  $("table").tablesorter({
+  $("#videos").tablesorter({
     // this will apply the bootstrap theme if "uitheme" widget is included
     // the widgetOptions.uitheme is no longer required to be set
     theme : "bootstrap",
@@ -144,8 +193,12 @@ $(function() {
     widthFixed: true,
 
     headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+    
+    // Set to always prepend a sort by stickied/not stickied in descending order on all user sorting
+    sortForce : [[6,1]],
+    
     // Set to sort initially by votes in descending order and name in ascending order
-    sortList : [[4,1]],
+    sortList : [[6,1],[4,1]],
     
     // Set to always append a sort by votes in descending order on all user sorting
     
