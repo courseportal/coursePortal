@@ -15,7 +15,7 @@ def viewStudent(request):
 	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
 	breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
 	context = {
-   	'class_list': user.author.all() | user.allowed_classes.all(),
+   	'class_list': user.classes_authored.all() | user.allowed_classes.all(),
    	'user': user,
    	'breadcrumbs':breadcrumbs
    }
@@ -25,7 +25,7 @@ def previewQuestion(request):
 	q = json.loads(request.POST['questiondata'])
 
 	preview = dict()
-	preview['errors'] = ''
+	preview['text'] = ''
 
 	q['solution']= q['solution'].replace('<br>', '\n')
 	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
@@ -41,7 +41,7 @@ def previewQuestion(request):
 		preview['text'] = Template(q['text']).substitute(local_dict)
 
 	except Exception as ex:
-		preview['errors'] += str(ex)
+		preview['text'] += str(ex)
 
 	return HttpResponse(json.dumps(preview))
 
@@ -72,7 +72,7 @@ def previewAssignment(request):
 		except Exception as ex:
 			test += errorMsg(q['title'], ex, 'solution')
 
-		#Format chice texts
+		#Format choice texts
 		for integer_index in range(len(q['choices'])):
 			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
 			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
@@ -178,7 +178,7 @@ def metrics(request):
 	stat_set=[]
 	maxPossible=0
 	achieved=0
-	for c in user.allowed_classes.all() | user.author.all():
+	for c in user.allowed_classes.all() | user.classes_authored.all():
 		stats=ClassStats();
 		stats.className=c.name
 		stats.classid=c.id
