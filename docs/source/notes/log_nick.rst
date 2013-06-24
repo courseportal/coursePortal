@@ -45,6 +45,7 @@ Goals
 -----
     
 New Todo:
+    *   Use formsets for submitting content so the user can submit more than one at a time.
     *   Testing
     *   Documentation
     *   More validation for uploaded file types

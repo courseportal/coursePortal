@@ -12,14 +12,11 @@ import hashlib
 import logging
 import random, string
 from web.forms.account import *
-from web.forms.submission import bugReportForm
-from web.models import AtomCategory, UserRating, BugReport
-from web.views.home import testBugForm
+from web.models import AtomCategory, UserRating
 from knoatom.settings import EMAIL_HOST_USER
 
 @login_required()
 def index(request, bid):
-    bugReportform = testBugForm(request,None,None, None,bid)
     user_rate = UserRating.objects.get(user=request.user)
     password_form = ChangePasswordForm(error_class=PlainErrorList)
     username_form = ChangeUsernameForm(error_class=PlainErrorList)
@@ -75,12 +72,10 @@ def index(request, bid):
         'username_form': username_form,
         'delete_account_form': delete_account_form,
         'user_rate': user_rate,
-        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
 def forgot_password(request, bid):
-    bugReportform = testBugForm(request,None,None, None,bid)
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
@@ -110,7 +105,6 @@ def forgot_password(request, bid):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
-        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
@@ -147,7 +141,6 @@ def testLoginForm(request):
 
 def login(request, bid):
     #print(request.GET)
-    bugReportform = testBugForm(request,None,None, None,bid)
     form = testLoginForm(request)
     if request.POST.get('contentType') == 'login_form':
         if form == "Login Already":
@@ -166,7 +159,6 @@ def login(request, bid):
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('login'), 'title': 'Login'}],
         'login_form': form,
-        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 
@@ -180,7 +172,6 @@ def register(request, bid):
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
         if request.POST.get('contentType') == 'register_form':
-            bugReportform = bugReportForm()
             form = RegisterForm(request.POST, error_class=PlainErrorList)
             if form.is_valid():
                 email_search = User.objects.filter(email=form.cleaned_data['email'])
@@ -205,55 +196,14 @@ def register(request, bid):
                     messages.success(request, 'You have been registered. Please login to continue.')
                     return HttpResponseRedirect(reverse('login'))
             messages.warning(request, 'Could not register you. Try again.')
-        elif request.POST.get('contentType') == 'bugReport':
-            form = RegisterForm()
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('register'))
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                        
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                        # The return is fake
-                    return HttpResponseRedirect(reverse('register'))
-                messages.warning(request, 'Error submitting.')
+       
     else:
-        print("111111")
         form = RegisterForm(error_class=PlainErrorList)
-        bugReportform = bugReportForm()
 
     t = loader.get_template('web/account/register.html')
     c = RequestContext(request, {
         'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}, {'url':reverse('register'), 'title': 'Register'}],
         'register_form': form,
-        'bugReportform': bugReportform,
     })
     return HttpResponse(t.render(c))
 

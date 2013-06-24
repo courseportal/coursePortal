@@ -110,6 +110,12 @@ init_sticking = function() {
 };
 
 /*
+	Bug Report AJAX functionality
+*/
+
+
+
+/*
 	Delete object AJAX functionality
 */
 init_delete_content = function() {

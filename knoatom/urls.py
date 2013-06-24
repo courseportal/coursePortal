@@ -10,6 +10,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'', include(web_urls)),
+    url(r'^ajax/bugReport/?$', 'knoatom.views.bug_report_view', name='bugReport'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^assignment/', include(assignment_urls)),
     url(r'^search/', include(haystack_urls)),

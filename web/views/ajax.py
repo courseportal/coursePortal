@@ -1,10 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseServerError, HttpResponseBadRequest
 from django.template import RequestContext, loader
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.core.mail import send_mail, BadHeaderError
 import json
+from web.forms.submission import testModalForm
 from web.models import *
 from web.rating import *
 

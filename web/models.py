@@ -287,17 +287,3 @@ def delete_example_rate(sender, **kwargs):
             user_rate.VoteDown -= vote_down_delta_rating()
             user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
-
-#bugReport
-class BugReport(models.Model):
-	subject = models.CharField(max_length=100)
-	content = models.TextField()
-	email = models.EmailField()
-	cc_myself = models.BooleanField(default=False)
-	def __unicode__(self):
-		return self.subject
-	class Meta:
-		ordering = ['subject']
-		verbose_name_plural = "BugReports"
-
-	

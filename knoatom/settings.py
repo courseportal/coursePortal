@@ -155,6 +155,7 @@ INSTALLED_APPS = (
                   #'django_authopenid',
                   'haystack',
                   #'django_messages',
+				  'knoatom',
                   'web',
                   'assignment',
                   'django_wysiwyg',

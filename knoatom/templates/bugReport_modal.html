@@ -1,0 +1,44 @@
+<script>
+$(document).ready(function() {
+	$('#bug-report-form').submit(function() {
+		$("#submit-report").attr('disabled', true);
+		$.ajax({
+			data: $(this).serialize(), // get the form data
+			type: $(this).attr('method'), // GET or POST
+			url: $(this).attr('action'),
+			success: function(response) {
+        if (response.success) {
+          $('#myModalBug').modal('hide');
+          $('#messages').html(response.message)
+        }
+        $('.myForm').html(response.html);
+        $("#submit-report").attr('disabled', false);
+			}
+		});
+		return false;
+	});
+});
+</script>
+{% load my_tags %}
+<div id="myModalBug" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <form id="bug-report-form" method="POST" action="{% url "bugReport" %}">
+        {% csrf_token %}
+        <div class="form-actions">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel">Bug Report: </h3>
+            </div>
+            <div class="modal-body">
+              <div class="myForm"> 
+                  {% bug_form as form %} {% comment %} This loads the bug report form as 'form' for including "web/form_template.html" {% endcomment %}
+                  {% include "web/form_template.html" %}
+              </div>
+                <input type="hidden" id="test" name="contentType" value="bugReport"/>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                <input type="submit" class="btn btn-primary" value="Submit" id="submit-report"></input>
+            </div>
+        </div>
+    </form>
+</div>
