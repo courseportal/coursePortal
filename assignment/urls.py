@@ -1,6 +1,9 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('',
+    url(r'template/add/?$', 'assignment.views.template.addT', name="add_template"),
+    url(r'template/create/?$', 'assignment.views.template.create', name="create_template"),
+
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
 
     url(r'add_question/?$', 'assignment.views.question.addQ', name='add_question'),

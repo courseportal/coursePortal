@@ -33,7 +33,7 @@ body.dialog-open { overflow: hidden; }
   height: 25px;
 }
 
-.lookyhere {
+.list-table {
 	height:250px;
 	overflow:scroll;
 }

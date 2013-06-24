@@ -43,6 +43,7 @@ def assign(request):
         'breadcrumbs': breadcrumbs,
         'assignments': assignments,
         'assignment_list': assignment_list,
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
     }
     return render(request, 'assignment/assign.html', context)
 

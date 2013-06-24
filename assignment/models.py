@@ -6,6 +6,14 @@ import random
 from django.utils import simplejson as json
 
 
+
+class Template(models.Model):
+    title = models.CharField(max_length=200)
+    data = models.TextField()
+    def __unicode__(self):
+        return self.tltle
+
+
 class Question(models.Model):
     title = models.CharField(max_length=200)
     data = models.TextField()
