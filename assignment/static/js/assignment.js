@@ -73,6 +73,7 @@ function init(){
 		width: document.body.clientWidth*0.8,
 		height: document.body.clientHeight*0.5,
 		modal: true,
+		distance: 10,
 		overflow: scroll,
 		autoOpen: false,
 		draggable: false,
@@ -89,8 +90,6 @@ function init(){
 			code = CodeMirror($('#codediv').get(0), CodeMirrorSettings);
 			solution = CodeMirror($('#solndiv').get(0), CodeMirrorSettings);
 			load_question_helper();
-
-
 		},
 		focus: function(event, ui){
 			//disable parent scrolling
@@ -178,6 +177,7 @@ function load_question_helper(){
 		$('#choicediv').html(''); //wipe out choices
 		choices = [];
 		tinymce.activeEditor.setContent('');
+		$('#dialogPreview').html(''); //wipe out preview
 	}
 
 	else{
@@ -196,11 +196,13 @@ function load_question_helper(){
 			choices[i].setValue(question.choices[i]);
 		}
 		tinymce.activeEditor.setContent(question.text);
+		//clear up preview
+		$('#dialogPreview').html('');
 	}
 }
 
 
-function preview_question(){
+function preview_question(num){
 	//create question object
 	question = {
 		choices: []
@@ -220,20 +222,21 @@ function preview_question(){
 	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
 	$.ajax('/assignment/assign/qpreview', {
 		type: 'POST',
-		async: false,
+		async: true,
 		data: questionPOST,
 	}).done(function(response){
+		//fill out the preview
 		preview = jQuery.parseJSON(response)
+		$('#question'+num).find('.preview-row').html(preview.text);
 		$('#dialogPreview').html(preview.text);
+
+		//make the button normal again
 		$('#preview-button').html('Preview');
 	});
 	return questiondata;
 }
 
 function save_question(num){
-	//attempt to preview the question
-	questiondata = preview_question();
-
 	//if a new question, add to the question list
 	numQuestions = $('#questionsList').children().length;
 	if(num > numQuestions){
@@ -241,12 +244,12 @@ function save_question(num){
 		$('#questionsList').append(questionHTML);
 	}
 
+	//preview the question
+	questiondata = preview_question(num);
+
 	//save the data to a hidden field
 	datafield = $('#question'+num).find('input[type=hidden]');
 	datafield.val(questiondata);
-
-	//fill out the preview
-	$('#question'+num).find('.preview-row').html(preview.text);
 
 	//close the dialog
 	$( '#dialog' ).dialog('close');
