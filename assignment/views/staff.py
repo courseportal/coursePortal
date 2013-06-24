@@ -15,7 +15,7 @@ def viewStudent(request):
 	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
 	breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
 	context = {
-   	'class_list': user.author.all() | user.allowed_classes.all(),
+   	'class_list': user.classes_authored.all() | user.allowed_classes.all(),
    	'user': user,
    	'breadcrumbs':breadcrumbs
    }
@@ -178,7 +178,7 @@ def metrics(request):
 	stat_set=[]
 	maxPossible=0
 	achieved=0
-	for c in user.allowed_classes.all() | user.author.all():
+	for c in user.allowed_classes.all() | user.classes_authored.all():
 		stats=ClassStats();
 		stats.className=c.name
 		stats.classid=c.id

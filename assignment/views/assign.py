@@ -69,7 +69,7 @@ def instantiate(request):
 
             local_dict = dict(locals())
             text = Template(text).substitute(local_dict)
-            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][question.title]), assignmentInstance=instance)
+            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][str(question.id)]), assignmentInstance=instance)
             question_instance.save()
 
             for choice in q['choices']:

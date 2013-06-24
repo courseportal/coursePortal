@@ -427,6 +427,7 @@ function loadTemplate(){
 	$('#assigntitle').attr("value",$('#'+aid+'title').attr("value"));
 	//Load in questions
 	var data = jQuery.parseJSON($("#"+aid+"data").val()).questions;
+	alert(JSON.stringify(data));
 	for(var qid in data){
 		if(!data.hasOwnProperty(qid)) continue;
 		num = $('#questionsList').children().length+1;
@@ -439,7 +440,6 @@ function loadTemplate(){
 	}
 	//Delete evidence
 	clearTemplateLoad();
-
 }
 
 function selectRow(element){
@@ -455,11 +455,11 @@ function clearTemplateLoad(){
 
 function questionstring(num, title){
 	questionHTML = 
-		'<div id="question'+num+'">\
+		'<div class="question-whole" id="question'+num+'">\
 				<div class="row-fluid questionMenu">\
 					<input type="hidden"></input>\
 				<div class="span5 question-description">'+
-						$('#questiontitle').val()+
+						title+
 					'</div>\
 					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
 						<i class="icon-edit-sign"> Edit</i>\
