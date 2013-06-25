@@ -12,7 +12,8 @@ import hashlib
 import logging
 import random, string
 from web.forms.account import *
-from web.models import AtomCategory, UserRating
+from web.models import AtomCategory
+from rating.models import UserRating
 from knoatom.settings import EMAIL_HOST_USER
 
 @login_required()

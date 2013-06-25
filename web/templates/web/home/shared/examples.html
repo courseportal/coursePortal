@@ -29,13 +29,7 @@ OPTIONAL context:
       
       <tr id="row-3-{{ e.id }}">
         <td style="width:10px">
-          <div>
-            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="3" vote-example-id="{{e.id}}" vote-type="1" title="Vote Up"></a>
-          </div>
-          <div>
-            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="3" vote-example-id="{{e.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
-          </div>
-            
+          {% include "rating/vote_arrows.html" with item=3 id=e.id %}
         </td>
         <td>
           
@@ -77,13 +71,7 @@ OPTIONAL context:
       
       <tr id="row-3-{{ e.id }}">
         <td style="width:10px">
-          <div>
-            <a rel="tooltip" href="javascript:void(0);" class="arrow-up icon-arrow-up" item-type="3" vote-example-id="{{e.id}}" vote-type="1" title="Vote Up"></a>
-          </div>
-          <div>
-            <a rel="tooltip" href="javascript:void(0);" class="arrow-down icon-arrow-down" item-type="3" vote-example-id="{{e.id}}" vote-type="0" title="Vote Down" data-placement="bottom"></a>
-          </div>
-            
+          {% include "rating/vote_arrows.html" with item=3 id=e.id %}
         </td>
         <td>
           

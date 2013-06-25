@@ -3,12 +3,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from web import urls as web_urls
 from assignment import urls as assignment_urls
+from rating import urls as rating_urls
 from haystack import urls as haystack_urls
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+	url(r'vote/', include(rating_urls)),
     url(r'', include(web_urls)),
     url(r'^ajax/bugReport/?$', 'knoatom.views.bug_report_view', name='bugReport'),
     url(r'^admin/', include(admin.site.urls)),

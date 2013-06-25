@@ -9,6 +9,13 @@ Nick's Development Log
 
 This is where I will keep a log of what I'm working on, problems I'm having, or just notes in general.
 
+Week of June 24-28
+==================
+
+*   Moved all functionality related to bug reports from ``web/`` to ``knoatom/``.
+*   Added a custom templatetag in ``knoatom/templatetags/`` to import the bug report form and abstract that functionality out of the views
+*   Now the bug report should work for every view that extends ``base.html`` automatically
+
 Week of June 17-21
 ==================
 

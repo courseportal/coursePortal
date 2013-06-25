@@ -155,6 +155,7 @@ INSTALLED_APPS = (
                   #'django_authopenid',
                   'haystack',
                   #'django_messages',
+				  'rating',
 				  'knoatom',
                   'web',
                   'assignment',
@@ -167,7 +168,6 @@ INSTALLED_APPS = (
                   # For PYBBM
                   'pybb',
                   'sorl.thumbnail',
-                  #'rating'
                   )
 
 

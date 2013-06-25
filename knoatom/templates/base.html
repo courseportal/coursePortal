@@ -48,7 +48,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="stylesheet" href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -68,8 +68,9 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
-    <script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/voting.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}pybb/js/pybbjs.js"></script>
     {% block extra_script %}
     {% endblock %}
 
