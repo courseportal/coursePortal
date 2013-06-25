@@ -17,16 +17,18 @@ Week of June 24-28
 *   Now the bug report should work for every view that extends ``base.html`` automatically
 *   Moved the rating system into a seperate app
 *   Added rating for topics in forum
+*   Forum now orders topics by votes
 
 Goals
 -----
     
 New Todo:
+    *   Move class creation out of the admin site
+    *   Implement ajax table updating in the topic list
     *   Use formsets for submitting content so the user can submit more than one at a time.
     *   Testing
     *   Documentation
     *   More validation for uploaded file types
-    *   Implement the vote ranking system from content into the forums
     *   Put a delete option in the submit form for user uploaded content
     *   Integrate forum into Atom better
 

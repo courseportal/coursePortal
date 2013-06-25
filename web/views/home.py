@@ -35,7 +35,7 @@ class PlainErrorList(ErrorList):
 		if not self: return u''
 		return u'<br/>'.join([ e for e in self ])
 
-def class_index(request, bid):	
+def class_index(request):	
 	#Get the "top level" categories
 	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 	class_list = Class.objects.all()
@@ -48,7 +48,7 @@ def class_index(request, bid):
 	})
 	return HttpResponse(template.render(context))
 
-def index(request, bid):
+def index(request):
 	"""
 		This is the home view for categories when you aren't in a class and haven't clicked on a category/atom yet.
 	
@@ -161,7 +161,7 @@ def findChildAtom(current_category, atom_list):
 				findChildAtom(a, atom_list)
 	return atom_list
 
-def base_category(request, cat_id, bid):
+def base_category(request, cat_id):
 	"""
 		-	Generates the category page
 		-	Generates a list of the most popular videos for each category of rating
@@ -241,7 +241,7 @@ def base_category(request, cat_id, bid):
 	})
 	return HttpResponse(t.render(c))
 
-def base_atom(request, cat_id, atom_id, bid):
+def base_atom(request, cat_id, atom_id):
 	"""
 		- Generates the view for a specific category
 		- Creates the breadcrumbs for the page
@@ -315,7 +315,7 @@ def base_atom(request, cat_id, atom_id, bid):
 	return HttpResponse(t.render(c))
 	
 
-def category(request, class_id, cat_id, bid):
+def category(request, class_id, cat_id):
 	"""
 		- Generates the category page
 		- Generates a list of the most popular videos for each category of rating
@@ -440,7 +440,7 @@ def category(request, class_id, cat_id, bid):
 	return HttpResponse(t.render(c))
 
 
-def atom(request, class_id, cat_id, atom_id, bid):
+def atom(request, class_id, cat_id, atom_id):
 	"""
 		- Generates the view for a specific category
 		- Creates the breadcrumbs for the page
@@ -540,7 +540,7 @@ def atom(request, class_id, cat_id, atom_id, bid):
 	return HttpResponse(t.render(c))
 
 
-def classes(request, class_id, bid):
+def classes(request, class_id):
 	"""
 		-	Generates the home page
 		-	Generates a list of the most popular videos for each category of rating
@@ -612,3 +612,9 @@ def post(request, sid):
 		'vote_categories': VoteCategory.objects.all(),
 	})
 	return HttpResponse(t.render(c))
+
+
+##### Editing Classes #####
+
+def edit_class(request, class_id):
+	return HttpResponse()

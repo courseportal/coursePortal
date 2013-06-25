@@ -17,7 +17,7 @@ from rating.models import UserRating
 from knoatom.settings import EMAIL_HOST_USER
 
 @login_required()
-def index(request, bid):
+def index(request):
     user_rate = UserRating.objects.get(user=request.user)
     password_form = ChangePasswordForm(error_class=PlainErrorList)
     username_form = ChangeUsernameForm(error_class=PlainErrorList)
@@ -76,7 +76,7 @@ def index(request, bid):
     })
     return HttpResponse(t.render(c))
 
-def forgot_password(request, bid):
+def forgot_password(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
@@ -140,7 +140,7 @@ def testLoginForm(request):
 
 
 
-def login(request, bid):
+def login(request):
     #print(request.GET)
     form = testLoginForm(request)
     if request.POST.get('contentType') == 'login_form':
@@ -168,7 +168,7 @@ def logout(request):
     auth_logout(request)
     return HttpResponseRedirect(reverse('login'))
 
-def register(request, bid):
+def register(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('home'))
     if request.method == 'POST':
