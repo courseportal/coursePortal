@@ -120,7 +120,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
         if not perms.may_view_forum(self.request.user, self.forum):
             raise PermissionDenied
 
-        qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
+        qs = self.forum.topics.order_by('-sticky', '-votes').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
                 qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
