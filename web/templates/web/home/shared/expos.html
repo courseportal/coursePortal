@@ -24,7 +24,7 @@ OPTIONAL context:
   <tbody>
     {% for e in stickied_expositions %}
       <tr id="row-1-{{ e.id }}">
-          <td style="width:10px">
+          <td>
             {% include "rating/vote_arrows.html" with item=1 id=e.id %}
           </td>
 
@@ -38,7 +38,7 @@ OPTIONAL context:
         <td>
           {{ e.owner }}
         </td>
-          <td style="width:75px">
+          <td>
               <div class="votes-sum-1-{{e.id}}">
                   {{e.votes}}
               </div>
@@ -63,7 +63,7 @@ OPTIONAL context:
     
     {% for e in expositions %}
       <tr id="row-1-{{ e.id }}">
-          <td style="width:10px">
+          <td>
             {% include "rating/vote_arrows.html" with item=1 id=e.id %}
           </td>
 
@@ -78,7 +78,7 @@ OPTIONAL context:
         <td>
           {{ e.owner }}
         </td>
-          <td style="width:75px">
+          <td>
               <div class="votes-sum-1-{{e.id}}">
                   {{e.votes}}
               </div>
