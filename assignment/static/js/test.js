@@ -97,6 +97,7 @@ function template(){
   		template.choices.push(solutions[i].getValue());
   	}
   	template.text = tinymce.activeEditor.getContent({format : 'raw'});
+  	template.title = $('#title').val();
   	
   	//evaluate templated vars
 	$('#templatename').val($('#title').val());
