@@ -3,11 +3,15 @@
 <table class="table topic-list">
     <thead>
         <tr class="topic-row head-row">
+            <th class="voting"> </th>
             <th class="topic-name">
                 {% trans "Topic" %}
             </th>
             <th class="topic-post-count">
                 {% trans "Posts" %}
+            </th>
+            <th class="votes">
+                {% trans "Votes" %}
             </th>
             <th class="topic-view-count">
                 {% trans "Views" %}
@@ -20,6 +24,9 @@
     <tbody>
     {% for topic in topic_list|pybb_topic_unread:user %}
         <tr class="topic-row {% if topic.sticky %} sticky {% endif %} {% cycle "odd" "even" %} {% if topic.on_moderation %} on-moderation {% endif %}">
+            <td style="width:10px">
+                {% include "rating/vote_arrows.html" with item=5 id=topic.id %}
+            </td>
             <td class="topic-name{% if topic.unread %} topic-unread{% endif %}">
                 <div class="state-indicator"></div>
                 <a href="{{ topic.get_absolute_url }}">{{ topic.name|truncatewords:10 }}</a>
@@ -45,6 +52,11 @@
             </td>
             <td class="topic-post-count">
                 {{ topic.post_count }}
+            </td>
+            <td style="width:75px">
+                <div class="votes-sum-5-{{topic.id}}">
+                    {{ topic.votes }}
+                </div>
             </td>
             <td class="topic-view-count">
                 {{ topic.views }}
