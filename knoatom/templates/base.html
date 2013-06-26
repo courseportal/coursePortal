@@ -48,7 +48,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="stylesheet" href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -68,8 +68,9 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
     <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
-    <script src="{{ STATIC_URL }}/js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}/pybb/js/pybbjs.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/voting.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}pybb/js/pybbjs.js"></script>
     {% block extra_script %}
     {% endblock %}
 
@@ -119,34 +120,34 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 							{% if user.is_authenticated %}
 								<li>
                                     <div>
-                                        <a href="{% url 'account' %}">{{ user }}</a>
-                                        <span class="cur-user-rate">
-                                          {% for i in user.rating_set.all %}
+                            			<a href="{% url 'account' %}">{{ user }}</a>
+                                		<span class="cur-user-rate">
+                                       	{% for i in user.rating_set.all %}
                                             {{ i.rating }}
-                                          {% endfor %}
+                                        {% endfor %}
                                         </span>
                                     </div>
                                 </li>
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    Submit New Content
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <a href="{% url "submit" %}">Video</a>
-                                    <a href="{% url "expo_submit" %}">Exposition</a>
-                                    <a href="{% url "note_submit" %}">Lecture Notes</a>
-                                    <a href="{% url "example_submit" %}">Example</a>
-                                </ul>
-                            </li>
-								<li><a href="{% url 'logout' %}">Logout</a></li>
-                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
+								<li><a href="{% url "edit_class" %}">Create New Class</a></li>
+	                            <li class="dropdown">
+	                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	                                    Submit New Content
+	                                    <b class="caret"></b>
+	                                </a>
+	                                <ul class="dropdown-menu">
+	                                    <a href="{% url "submit" %}">Video</a>
+	                                    <a href="{% url "expo_submit" %}">Exposition</a>
+	                                    <a href="{% url "note_submit" %}">Lecture Notes</a>
+	                                    <a href="{% url "example_submit" %}">Example</a>
+	                                </ul>
+	                            </li>
+									<li><a href="{% url 'logout' %}">Logout</a></li>
+	                <li><a href="#myModalBug" data-toggle="modal">Report a Bug</a></li>
                                 
 							{% else %}
 								<li><a href="{% url 'login' %}?next={{request.path}}">Login</a></li>
 								<li><a href="{% url 'register' %}">Register</a></li>
-                                <li><a href="#myModalBug" data-toggle="modal">Report A Bug</a></li>
-                                <!--<li><a href="{% url 'bugReport' %}">Report A Bug</a></li>-->
+                <li><a href="#myModalBug" data-toggle="modal">Report a Bug</a></li>
 							{% endif %}
 						</ul>
 					{% endblock %} <!-- end .sidebar -->
@@ -154,6 +155,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 		</div> <!-- end .span3 -->
 		<div class="span9">
 			{% block message %}
+      <div id="messages"></div>
 				<!-- This block is the messages that show up at the top of the screen -->
 			{% endblock %}
 			
@@ -179,7 +181,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 </div> <!-- end .container -->
 
 <!-- Modal -->
-{% include "web/home/shared/bugReport_modal.html" %}
+{% include "bugReport_modal.html" %}
     
     
     

@@ -9,6 +9,30 @@ Nick's Development Log
 
 This is where I will keep a log of what I'm working on, problems I'm having, or just notes in general.
 
+Week of June 24-28
+==================
+
+*   Moved all functionality related to bug reports from ``web/`` to ``knoatom/``.
+*   Added a custom templatetag in ``knoatom/templatetags/`` to import the bug report form and abstract that functionality out of the views
+*   Now the bug report should work for every view that extends ``base.html`` automatically
+*   Moved the rating system into a seperate app
+*   Added rating for topics in forum
+*   Forum now orders topics by votes
+
+Goals
+-----
+    
+New Todo:
+    *   Move class creation out of the admin site
+    *   Implement ajax table updating in the topic list
+    *   Use formsets for submitting content so the user can submit more than one at a time.
+    *   Testing
+    *   Documentation
+    *   More validation for uploaded file types
+    *   Put a delete option in the submit form for user uploaded content
+    *   Integrate forum into Atom better
+
+
 Week of June 17-21
 ==================
 
@@ -40,18 +64,6 @@ So far this week I have:
     *   Added tooltips to the option icons
     *   Changed the vote system so that the values are abstracted into one place so that it is easy to change in the future
     *   Added some code to my delete content AJAX function to update the user rating when you delete the object so it is reflected on the screen without refreshing.
-
-Goals
------
-    
-New Todo:
-    *   Testing
-    *   Documentation
-    *   More validation for uploaded file types
-    *   Implement the vote ranking system from content into the forums
-    *   Put a delete option in the submit form for user uploaded content
-    *   Integrate forum into Atom better
-
 
 Week of June 9-14
 ==================

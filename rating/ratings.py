@@ -20,3 +20,6 @@ def example_object_delta_rating():
 	
 def video_object_delta_rating():
 	return object_delta_rating()
+	
+def topic_object_delta_rating():
+	return 0
