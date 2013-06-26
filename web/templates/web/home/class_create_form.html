@@ -1,8 +1,6 @@
 {% extends "web/home/home.html" %}
 
-
 {% comment %}
-<!--
 
 To EXTEND/USE this file:
 
@@ -12,10 +10,11 @@ To EXTEND/USE this file:
 		form
 
 	OPTIONAL context:
-		messages
+		top_ranked_videos
 		selected_class
 		selected_categories
 		selected_atom
+		messages
 		form_action
 
 BLOCKS(Including inherited blocks):
@@ -32,20 +31,18 @@ BLOCKS(Including inherited blocks):
 	page_title
 	title
 
--->
 {% endcomment %}
 
 {% block content %}
-  <h2>Create New Example Submission</h2>
-
-  <form enctype="multipart/form-data" class="form-horizontal" action="{{ form_action }}" method="post">
-    {% csrf_token %}
-    {% include "web/form_template.html" with form=form %}
-
-    <div class="form-actions">
-      <input class="btn btn-primary" type="submit" value="Submit" />
-      <input class="btn" type="reset" value="Clear" />
-    </div>
-  
-  </form>
+	<h2>Create New Class</h2>
+		<form class="form-horizontal" action="{{ form_action}}" method="POST">
+			{% csrf_token %}
+			{% include "web/form_template.html" %}
+			
+			<div class="form-actions">
+				<input class="btn btn-primary" type="submit" value="Submit" />
+				<input class="btn" type="reset" value="Clear" />
+			</div>
+		</form>
+	</h2>
 {% endblock %}

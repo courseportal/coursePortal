@@ -29,7 +29,7 @@ def validate_umich_email(value):
 
 class testModalForm(forms.Form):
     subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
-    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff 24/7 to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
+    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
 
 class SubmissionForm(forms.Form):
 	

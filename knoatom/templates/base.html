@@ -1,4 +1,4 @@
-<!-- 
+{% comment %}<!-- 
 
 To EXTEND/USE this file:
 
@@ -27,7 +27,7 @@ BLOCKS:
 
 This is the base html file.  ALL of the style and theme stuff should go here.  Every other file should EXTEND this, but not neccessarily directly.
 
--->
+-->{% endcomment %}
 
 <!doctype html>
 <html lang="en">
@@ -78,7 +78,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 	<div class="row-fluid">
 		<div class="span12">
-			<!-- I really need to change the way breadcrumbs work -->
+			{% comment %}<!-- I really need to change the way breadcrumbs work -->{% endcomment %}
 		{% block breadcrumb %}
 		<ul class="breadcrumb">
 		    <li>
@@ -98,7 +98,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well">
-					{% block sidebar %} <!-- I don't intend on ever replacing the whole thing, but its good to have the option just incase -->
+					{% block sidebar %} {% comment %}<!-- I don't intend on ever replacing the whole thing, but its good to have the option just incase -->{% endcomment %}
 						<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
 							<!-- Default Navigation -->
 							<li class="nav-header">Navigation</li>
@@ -113,7 +113,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 							<li class="divider"></li>
 
 							{% block navbar_content %}
-								<!-- There should be a divider at the end of any content that goes here! -->
+								{% comment %}<!-- There should be a divider at the end of any content that goes here! -->{% endcomment %}
 							{% endblock %}
 
 							<li class="nav-header">Meta</li>
@@ -128,7 +128,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
                                         </span>
                                     </div>
                                 </li>
-								<li><a href="{% url "edit_class" %}">Create New Class</a></li>
+								<li><a href="{% url "create_class" %}">Create New Class</a></li>
 	                            <li class="dropdown">
 	                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
 	                                    Submit New Content
