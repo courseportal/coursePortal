@@ -6,6 +6,7 @@ from django.db.models.signals import pre_delete, post_delete, pre_save, post_sav
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
 from web.rating import *
+from subprocess import Popen
 
 
 STATUS_CHOICES = (
@@ -86,15 +87,17 @@ class Exposition(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-	file = models.FileField(upload_to='lecture_notes/')
-	owner = models.ForeignKey(User, related_name="lecturenote_set")
-	filename = models.CharField(max_length=200)
-	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
-	votes = models.IntegerField(default=0)
-	date_created = models.DateTimeField(auto_now=True)
+    file = models.FileField(upload_to='lecture_notes/')
+    owner = models.ForeignKey(User, related_name="lecturenote_set")
+    filename = models.CharField(max_length=200)
+    atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
+    votes = models.IntegerField(default=0)
+    date_created = models.DateTimeField(auto_now=True)
+
 	
-	def __unicode__(self):
-		return self.filename
+    def __unicode__(self):
+        return self.filename
+        
 
 
 class Example(models.Model):
@@ -254,6 +257,9 @@ def delete_note_rate(sender, **kwargs):
     """
         This adds the functionality to remove the file upon deletion.
     """
+    print("*******************")
+    print(kwargs['instance'].file)
+    print("*******************")
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
     user_rate.LecNoteRating -= note_object_delta_rating()
@@ -274,6 +280,9 @@ def delete_example_rate(sender, **kwargs):
     """
     This adds the functionality to remove the file upon deletion.
     """
+    print("*******************")
+    print(kwargs['instance'].file)
+    print("*******************")
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
     user_rate.ExampleRating -= example_object_delta_rating()

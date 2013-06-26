@@ -13,7 +13,7 @@ RESULTS_PER_PAGE = getattr(settings, 'HAYSTACK_SEARCH_RESULTS_PER_PAGE', 20)
 
 
 class SearchView(object):
-    template = 'search/search_advanced.html'
+    template = 'search/search.html'
     extra_context = {}
     query = ''
     results = EmptySearchQuerySet()
@@ -122,6 +122,7 @@ class SearchView(object):
 
         Must return a dictionary.
         """
+        
         return {}
 
     def create_response(self):
@@ -130,6 +131,33 @@ class SearchView(object):
         """
         #print("I am giving result!!!!!")
         (paginator, page) = self.build_page()
+        class_tab = False,
+        atom_tab = False,
+        base_category_tab = False,
+        forum_tab = False,
+        topic_tab = False,
+        post_tab = False,
+        note_tab = False,
+        example_tab = False,
+        for result in page.object_list:
+            if result.model_name == 'class':
+                class_tab = True
+            if result.model_name == 'atom':
+                atom_tab = True
+            if result.model_name == 'basecategory':
+                base_category_tab = True
+            if result.model_name == 'forum':
+                forum_tab = True
+            if result.model_name == 'post':
+                post_tab = True
+            if result.model_name == 'lecturenote':
+                note_tab = True
+            if result.model_name == 'example':
+                example_tab = True
+        if page.object_list:
+            active_tab = page.object_list[0].model_name
+        else:
+            active_tab = None
 
         context = {
             'query': self.query,
@@ -137,6 +165,15 @@ class SearchView(object):
             'page': page,
             'paginator': paginator,
             'suggestion': None,
+            'class_tab': class_tab,
+            'atom_tab': atom_tab,
+            'base_category_tab': base_category_tab,
+            'forum_tab': forum_tab,
+            'topic_tab': topic_tab,
+            'post_tab': post_tab,
+            'note_tab': note_tab,
+            'example_tab': example_tab,
+            'active_tab': active_tab,
         }
 
         if self.results and hasattr(self.results, 'query') and self.results.query.backend.include_spelling:
@@ -191,7 +228,7 @@ class FacetedSearchView(SearchView):
         return extra
 
 
-def basic_search(request, template='search/search.html', load_all=True, form_class=ModelSearchForm, searchqueryset=None, context_class=RequestContext, extra_context=None, results_per_page=None):
+def basic_search(request, template='search/search_advanced.html', load_all=True, form_class=ModelSearchForm, searchqueryset=None, context_class=RequestContext, extra_context=None, results_per_page=None):
     """
     A more traditional view that also demonstrate an alternative
     way to use Haystack.

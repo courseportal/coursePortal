@@ -52,6 +52,9 @@ ALLOWED_FILE_EXTENTIONS = ['.pdf']
 MAX_UPLOAD_SIZE = "5242880"
 
 
+FILE_UPLOAD_HANDLERS= ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+                       "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

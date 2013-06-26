@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
+    url(r'^test_json/?$', 'web.views.home.test_json', name='test_json'),
     url(r'^login/(?P<bid>\d+)?/?$', 'web.views.account.login', name='login'),
     url(r'^logout/', 'web.views.account.logout', name='logout'),
     url(r'^register/(?P<bid>\d+)?/?$', 'web.views.account.register', name='register'),

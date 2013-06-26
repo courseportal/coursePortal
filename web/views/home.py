@@ -35,6 +35,15 @@ class PlainErrorList(ErrorList):
         if not self: return u''
         return u'<br/>'.join([ e for e in self ])
 
+def test_json(request):
+    test_json = "This is a json test"
+    template = loader.get_template('web/test_json.html')
+    context = RequestContext(request, {
+                             'test': test_json,
+
+                             })
+    return HttpResponse(template.render(context))
+
 
 def testBugForm(request, class_id, cat_id, atom_id, bid ):
     if request.method == 'POST': # If the form has been submitted...
