@@ -22,6 +22,43 @@ def create(request):
 	# return HttpResponse(request.REQUEST['questiondata'])
 	return render(request, 'assignment_nav.html')
 
+def create_assignment(request):
+	a=json.loads(request.POST['assignmentdata'])
+   #Search for assignment by same name, delete it if found
+   #create new assignment
+	assignment = ATemplate(title = a["title"], data='')
+	assignment.save()
+   #save start and end date
+	data=dict()
+	data['due']=a['due']
+	data['start']=a['start']
+	questions=dict()
+   #save owners
+	assignment.owners.add(request.user)
+   #Add questions
+	for q in a['questions']:
+		temp=createQT(q)
+		assignment.questions.add(temp)
+		questions[str(temp)]=q['points']
+	data['questions']=questions
+   #Finish
+	assignment.data=json.dumps(data)
+	assignment.save()
+	return main(request)
+
+def createQT(data):
+	question = Template()
+	question.title = x['title']
+	data=dict()
+	data['title']=x['title']
+	data['code']=x['code']
+	data['text']=x['text']
+	data['solution']=x['solution']
+	data['choices']=x['choices']
+	question.data = json.dumps(data)
+	question.save()
+	return question.id
+
 def genQ(request):
 	t = Template.objects.get(pk=request.POST["tid"])
 	q = Question()

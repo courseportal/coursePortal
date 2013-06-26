@@ -219,6 +219,9 @@ function preview_question(num){
 	questionPOST = {
 		questiondata: questiondata
 	};
+
+	//Check if code contains template-like text
+
 	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
 	$.ajax('/assignment/assign/qpreview', {
 		type: 'POST',
@@ -229,7 +232,6 @@ function preview_question(num){
 		preview = jQuery.parseJSON(response)
 		$('#question'+num).find('.preview-row').html(preview.text);
 		$('#dialogPreview').html(preview.text);
-
 		//make the button normal again
 		$('#preview-button').html('Preview');
 	});
@@ -305,6 +307,7 @@ function save(){
 			return false;
 		}
 
+	
 	$('#questionsList>.question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
@@ -312,6 +315,26 @@ function save(){
 		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
+
+   var test=false;
+	//Check if data indicates a template
+	for(q in assignment.questions){
+		if(checkForTemplate(assignment.questions[q]))
+			test=true;
+	}
+	//If template:
+	if(test == true){
+		//Warn user that this will save as template
+		if(confirm("This will save as a template due to the presense of @")){
+			//If user assents, save as template, otherwise exit
+			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+			$('#assignmentFomr').attr('action', '{% url "create_assignment_template" %}')
+			$('#assignmentForm').submit();
+		}
+		else
+			return false;
+	}
+
 	var overwrite;
 	$.ajax('/assignment/utility/checktitle/', {
 		type: 'POST',
@@ -321,13 +344,9 @@ function save(){
 		overwrite=jQuery.parseJSON(response);
 	});
 
-	if(overwrite.overwrite == true){
-		if(confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?")){
-			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-   		$('#assignmentForm').submit();
-   	}
-   	else return;
-	}
+	if(overwrite.overwrite == true)
+		if(!confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?"))
+			return;
 
    $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
    $('#assignmentForm').submit();
@@ -477,6 +496,12 @@ function questionstring(num, title){
 				<div class="row-fluid preview-row"></div>\
 			</div>';
 	return questionHTML;
+}
+
+function checkForTemplate(question){
+	var text = question.text;
+	var code = question.code;
+	return text.indexOf("@") >= 0 || code.indexOf("@") >= 0;
 }
 // function add_question(){
 // 	//wipe out the form

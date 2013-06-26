@@ -13,6 +13,13 @@ class Template(models.Model):
     def __unicode__(self):
         return self.tltle
 
+class ATemplate(models.Model):
+    title = models.CharField(max_length=100, default = '')
+    data = models.TextField(default='', null=True, blank=True)
+    questions = models.ManyToManyField(Template)
+    owners = models.ManyToManyField(User, related_name='owned_templates', blank=True, null=True)
+    def __unicode__(self):
+        return self.title
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
@@ -24,7 +31,7 @@ class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
     data = models.TextField(default='', null=True, blank=True)
     questions = models.ManyToManyField(Question)
-    owners = models.ManyToManyField(User, related_name='templates', blank=True, null=True)
+    owners = models.ManyToManyField(User, related_name='owned_assignments', blank=True, null=True)
     def __unicode__(self):
         return self.title
 
