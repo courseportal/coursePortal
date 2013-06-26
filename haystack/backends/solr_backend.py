@@ -493,6 +493,7 @@ class SolrSearchBackend(BaseSearchBackend):
                         key:value pairs of text strings
         """
 
+        print("I am inside extract_file_contents function ~!!!!!")
         try:
             return self.conn.extract(file_obj)
         except StandardError, e:

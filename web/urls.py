@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^forgot_password/?$', 'web.views.account.forgot_password', name='forgot_password'),
     url(r'^account/?$', 'web.views.account.index', name='account'),
 
+
     url(r'^batch_add/?$', 'web.views.admin.batch_add', name='batch_add'),
     url(r'^view_videos/?$', 'web.views.admin.list_videos', name='list_videos'),
 

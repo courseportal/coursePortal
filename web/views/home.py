@@ -19,23 +19,27 @@ for m in get_models():
 
 
 class PlainErrorList(ErrorList):
-	"""
-		Look at this amazing class documentation
-		
-		"""
-	def __unicode__(self):
-		"""This function returns the unicode name of the class"""
-		return self.as_plain()
-	def as_plain(self):
-		"""This function returns the error message
-			
-			**Not sure**
-			
-			"""
-		if not self: return u''
-		return u'<br/>'.join([ e for e in self ])
+
+    """
+        Look at this amazing class documentation
+        
+        """
+    def __unicode__(self):
+        """This function returns the unicode name of the class"""
+        return self.as_plain()
+    def as_plain(self):
+        """This function returns the error message
+            
+            **Not sure**
+            
+            """
+        if not self: return u''
+        return u'<br/>'.join([ e for e in self ])
+
+
 
 def class_index(request):	
+
 	#Get the "top level" categories
 	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 	class_list = Class.objects.all()
