@@ -12,3 +12,14 @@ function changeGroup(val, elename){
 	});
 }
 
+function validateSubmit(){
+	formdata = $("#templateForm").serializeArray();
+	for(var x=0; x<formdata.length; x++){
+		if(formdata[x].value == null || formdata[x].value == ''){
+			alert("Input field "+formdata[x].name+" is empty!");
+			return false;
+		}
+	}
+	$("#templateForm").submit();
+}
+

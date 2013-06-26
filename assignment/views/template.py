@@ -22,6 +22,24 @@ def create(request):
 	# return HttpResponse(request.REQUEST['questiondata'])
 	return render(request, 'assignment_nav.html')
 
+def genQ(request):
+	t = Template.objects.get(pk=request.POST["tid"])
+	q = Question()
+	q.title = t.title
+	#replae @ symbols
+	data = json.loads(t.data)
+	data['code']=string.replace(data['code'], "@",'')
+	data['text']=string.replace(data['text'],'@','$')
+	#prepend assignment statements
+	for key in request.POST.keys():
+		if key=="tid" or key=="csrfmiddlewaretoken":
+			continue
+		data['code']=key+"="+request.POST[key]+"\n"+data['code'];
+	q.data = json.dumps(data)
+	q.save()
+	return HttpResponse(q.data)
+
+
 def detail(request,id):
 	t=Template.objects.get(pk=id)
 	data = json.loads(t.data)
@@ -33,7 +51,7 @@ def detail(request,id):
 	while string.find(data['text'], "@")>=0:
 		toReplace=""
 		index=string.find(data['text'], "@")+1
-		while data['text'][index] in string.ascii_letters+string.digits+"_":
+		while index<len(data['text']) and data['text'][index] in string.ascii_letters+string.digits+"_":
 			toReplace+=data['text'][index]
 			index=index+1
 		data['text']=string.replace(data['text'], "@"+toReplace, replace1+toReplace+replace2)
@@ -44,7 +62,7 @@ def detail(request,id):
 	while string.find(data['code'], "@")>=0:
 		toReplace=""
 		index=string.find(data['code'], "@")+1
-		while data['code'][index] in string.ascii_letters+string.digits+"_":
+		while index<len(data['code']) and data['code'][index] in string.ascii_letters+string.digits+"_":
 			toReplace+=data['code'][index]
 			index=index+1
 		data['code']=string.replace(data['code'], "@"+toReplace, replace1+toReplace+replace2)

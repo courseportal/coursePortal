@@ -4,6 +4,7 @@ urlpatterns = patterns('',
     url(r'template/add/?$', 'assignment.views.template.addT', name="add_template"),
     url(r'template/create/?$', 'assignment.views.template.create', name="create_template"),
     url(r'template/view/(?P<id>\d+)/?$', 'assignment.views.template.detail', name='view_template'),
+    url(r'template/generate/?$', 'assignment.views.template.genQ', name='genQ'),
 
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
 
