@@ -28,7 +28,9 @@ BLOCKS(Including inherited blocks):
 
 {% block message %}
 	<!-- This is the block for messages -->
-	{% include "web/message.html" %}
+  <div id="messages">
+	  {% include "web/message.html" %}
+  </div>
 {% endblock %}
 
 {% block page_title %}

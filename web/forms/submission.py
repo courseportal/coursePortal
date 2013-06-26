@@ -27,13 +27,6 @@ def validate_umich_email(value):
     if not regex_umich_email.match(value):
         raise ValidationError(u'%s is not a valid University of Michigan email address.' % value)
 
-class bugReportForm(forms.Form):
-    subject = forms.CharField(max_length=100)
-    content = forms.CharField(widget=forms.Textarea, required=True)
-    email = forms.EmailField(max_length=100, required=True, validators=[validate_umich_email], help_text='Only University of Michigan email addresses are currently allowed to be used.')
-    cc_myself = forms.BooleanField(required=False)
-
-
 class testModalForm(forms.Form):
     subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
     content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff 24/7 to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')

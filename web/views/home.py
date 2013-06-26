@@ -11,7 +11,7 @@ import json
 
 from pybb.models import Forum
 from django.core.mail import send_mail, BadHeaderError
-from web.forms.submission import testModalForm, bugReportForm
+from web.forms.submission import testModalForm
 from django.forms.util import ErrorList
 
 for m in get_models():
@@ -19,6 +19,7 @@ for m in get_models():
 
 
 class PlainErrorList(ErrorList):
+
     """
         Look at this amazing class documentation
         
@@ -36,104 +37,50 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 
-def testBugForm(request, class_id, cat_id, atom_id, bid ):
-    if request.method == 'POST': # If the form has been submitted...
-        if request.POST.get('contentType') == 'bugReport':
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                    return bugReportform
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                    # The return is fake
-                    return bugReportform
-                messages.warning(request, 'Error submitting.')
-        else:
-            return
-    else:
-        bugReportform = bugReportForm()
-        return bugReportform
 
+def class_index(request):	
 
-
-def class_index(request, bid):
-    
-    bugReportform = testBugForm(request,None,None, None,bid)
-	
 	#Get the "top level" categories
-    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-    class_list = Class.objects.all()
+	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+	class_list = Class.objects.all()
 	
-    template = loader.get_template('web/home/class_index.html')
-    context = RequestContext(request, {
-        'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
+	template = loader.get_template('web/home/class_index.html')
+	context = RequestContext(request, {
+		'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
 		'class_list': class_list,
 		'top_level_categories': top_level_base_categories,
-        'bugReportform': bugReportform,
 	})
-    return HttpResponse(template.render(context))
+	return HttpResponse(template.render(context))
 
-def index(request, bid):
-    """
-        This is the home view for categories when you aren't in a class and haven't clicked on a category/atom yet.
+def index(request):
+	"""
+		This is the home view for categories when you aren't in a class and haven't clicked on a category/atom yet.
 	
-        For now this displays the top ranked videos for all of the categories, we need to change it eventually.
-    """
-    
-    bugReportform = testBugForm(request,None,None, None,bid)
-
-        
+		For now this displays the top ranked videos for all of the categories, we need to change it eventually.
+	"""
+		
 	#Get the "top level" categories
-    top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
+	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 
 	# get the highest ranked submissions
-    top_ranked_videos = cache.get('top_ranked_videos')
-    if not top_ranked_videos:
-        top_ranked_videos = []
-        for category in VoteCategory.objects.all():
+	top_ranked_videos = cache.get('top_ranked_videos')
+	if not top_ranked_videos:
+		top_ranked_videos = []
+		for category in VoteCategory.objects.all():
 			# for now, calculate an average for each video
-            top_ranked_videos.append({
-                'vote_category': category,
-                'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
+			top_ranked_videos.append({
+				'vote_category': category,
+				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
 			})
-        cache.set('top_ranked_videos', top_ranked_videos, 60*10)
+		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 		
-    template = loader.get_template('web/home/base/index.html')
-    context = RequestContext(request, {
-        'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
+	template = loader.get_template('web/home/base/index.html')
+	context = RequestContext(request, {
+		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
 		'top_level_categories': top_level_base_categories,
 		'top_ranked_videos': top_ranked_videos,
-        'bugReportform': bugReportform,
 	})
-    return HttpResponse(template.render(context))
+	return HttpResponse(template.render(context))
 
 
 def get_content_for_category(current_category, mode, content_list=[]):
@@ -218,64 +165,24 @@ def findChildAtom(current_category, atom_list):
 				findChildAtom(a, atom_list)
 	return atom_list
 
-
-def base_category(request, cat_id, bid):
-    """
-        -	Generates the category page
-        -	Generates a list of the most popular videos for each category of rating
-        -	Use memcached to save the popular video rankings to save a lot of time
-    """
-    if request.method == 'POST': # If the form has been submitted...
-        if request.POST.get('contentType') != 'bugReport':
-            form = testModalForm(request.POST)
-            if form.is_valid():	# All validation rules pass
-                subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-                content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-                send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                return HttpResponseRedirect(reverse('base_category', args=(cat_id,)))
-            else:
-                messages.warning(request, 'Error saving. Fields might be invalid.')
-        else:
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('base_category', args=(cat_id,)))
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                        
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('base_category', args=(cat_id,)))
-                messages.warning(request, 'Error submitting.')
-    else:
-        form = testModalForm()
-        bugReportform = bugReportForm()
+def base_category(request, cat_id):
+	"""
+		-	Generates the category page
+		-	Generates a list of the most popular videos for each category of rating
+		-	Use memcached to save the popular video rankings to save a lot of time
+	"""
+	if request.method == 'POST': # If the form has been submitted...
+		form = testModalForm(request.POST)
+		if form.is_valid():	# All validation rules pass
+			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+			messages.warning(request, 'Report has been successfully submitted. Thank you!')
+			return HttpResponseRedirect(reverse('base_category', args=(cat_id,)))
+		else:
+			messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = testModalForm()
 	
 	#get category we are in
 	current_category = get_object_or_404(BaseCategory, id=cat_id)
@@ -335,68 +242,27 @@ def base_category(request, cat_id, bid):
 		'notes': notes,
 		'examples': examples,
 		'form': form,
-        'bugReportform': bugReportform,
 	})
 	return HttpResponse(t.render(c))
 
-def base_atom(request, cat_id, atom_id, bid):
-    """
-        - Generates the view for a specific category
-        - Creates the breadcrumbs for the page
-    """
-    if request.method == 'POST': # If the form has been submitted...
-        #print(request.POST.get('contentType'))
-        if request.POST.get('contentType') != 'bugReport':
-            form = testModalForm(request.POST)
-            if form.is_valid():	# All validation rules pass
-                subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-                content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-                send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                return HttpResponseRedirect(reverse('base_atom', args=(cat_id, atom_id)))
-            else:
-                messages.warning(request, 'Error saving. Fields might be invalid.')
-        else:
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.success(request, 'Successfully sent out, thanks!!! ')
-                    return HttpResponseRedirect(reverse('bugReport', args=[bid]))
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                            
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('base_atom', args=(cat_id, atom_id)))
-                messages.warning(request, 'Error submitting.')
-    else:
-        form = testModalForm()
-        bugReportform = bugReportForm()
-
+def base_atom(request, cat_id, atom_id):
+	"""
+		- Generates the view for a specific category
+		- Creates the breadcrumbs for the page
+	"""
+	if request.method == 'POST': # If the form has been submitted...
+		form = testModalForm(request.POST)
+		if form.is_valid():	# All validation rules pass
+			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+			messages.warning(request, 'Report has been successfully submitted. Thank you!')
+			return HttpResponseRedirect(reverse('base_atom', args=(cat_id, atom_id)))
+		else:
+			messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = testModalForm()
+		
 	#Get atom we are in
 	current_atom = get_object_or_404(Atom, id=atom_id)
 	#get category we are in
@@ -412,7 +278,7 @@ def base_atom(request, cat_id, atom_id, bid):
 	breadcrumbs.append({'url': reverse('base_atom', args=[current_category.id, current_atom.id]), 'title': current_atom})
 
 	content = Submission.objects.filter(tags=current_atom).distinct()
-    
+	
 	
 	forum = Forum.objects.get(atom=current_atom)
 
@@ -449,69 +315,29 @@ def base_atom(request, cat_id, atom_id, bid):
 		'notes': notes,
 		'examples': examples,
 		'form': form,
-        'bugReportform': bugReportform,
 	})
 	return HttpResponse(t.render(c))
 	
 
-def category(request, class_id, cat_id, bid):
-    """
-        - Generates the category page
-        - Generates a list of the most popular videos for each category of rating
-        - Use memcached to save the popular video rankings to save a lot of time
-    """
-    if request.method == 'POST': # If the form has been submitted...
-        #print(request.POST.get('contentType'))
-        if request.POST.get('contentType') != 'bugReport':
-            form = testModalForm(request.POST)
-            if form.is_valid():	# All validation rules pass
-                subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-                content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-                send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                return HttpResponseRedirect(reverse('category', args=(class_id, cat_id)))
-            else:
-                messages.warning(request, 'Error saving. Fields might be invalid.')
-        else:
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.success(request, 'Successfully sent out, thanks!!! ')
-                    return HttpResponseRedirect(reverse('bugReport', args=[bid]))
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                            
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('category', args=(class_id, cat_id)))
-                messages.warning(request, 'Error submitting.')
-    else:
-        form = testModalForm()
-        bugReportform = bugReportForm()
+def category(request, class_id, cat_id):
+	"""
+		- Generates the category page
+		- Generates a list of the most popular videos for each category of rating
+		- Use memcached to save the popular video rankings to save a lot of time
+	"""
+	if request.method == 'POST': # If the form has been submitted...
+	#print(request.POST.get('contentType'))
+		form = testModalForm(request.POST)
+		if form.is_valid():	# All validation rules pass
+			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+			messages.warning(request, 'Report has been successfully submitted. Thank you!')
+			return HttpResponseRedirect(reverse('category', args=(class_id, cat_id)))
+		else:
+			messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = testModalForm()
 	
 	#get category we are in
 	current_category = get_object_or_404(AtomCategory, id=cat_id)
@@ -614,68 +440,27 @@ def category(request, class_id, cat_id, bid):
 		'notes': notes,
 		'examples': examples,
 		'form': form,
-        'bugReportform': bugReportform,
 	})
 	return HttpResponse(t.render(c))
 
 
-def atom(request, class_id, cat_id, atom_id, bid):
-    """
-        - Generates the view for a specific category
-        - Creates the breadcrumbs for the page
-    """
-    if request.method == 'POST': # If the form has been submitted...
-        print(request.POST.get('contentType'))
-        if request.POST.get('contentType') != 'bugReport':
-            form = testModalForm(request.POST)
-            if form.is_valid():	# All validation rules pass
-                subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-                content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-                send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                messages.warning(request, 'Report has been successfully submitted. Thank you!')
-                return HttpResponseRedirect(reverse('atom', args=(class_id, cat_id, atom_id)))
-            else:
-                messages.warning(request, 'Error saving. Fields might be invalid.')
-        else:
-            bugReportform = bugReportForm(request.POST, error_class=PlainErrorList)
-            if bid:
-                if bugReportform.is_valid():
-                    b = BugReport.objects.get(pk=bid)
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    messages.success(request, 'Successfully sent out, thanks!!! ')
-                    return HttpResponseRedirect(reverse('bugReport', args=[bid]))
-                messages.warning(request, 'Error submitting. Fields might be invalid.')
-            else:
-                if bugReportform.is_valid():
-                    b = BugReport()
-                    b.subject = bugReportform.cleaned_data['subject']
-                    b.content = bugReportform.cleaned_data['content']
-                    b.email = bugReportform.cleaned_data['email']
-                    b.cc_myself = bugReportform.cleaned_data['cc_myself']
-                    b.save()
-                    subject = "[Bug Report]:  " + bugReportform.cleaned_data['subject']
-                    content = "From \"" + bugReportform.cleaned_data['email'] + "\" : \n\nBug Report:\n" + bugReportform.cleaned_data['content']
-                            
-                    if bugReportform.cleaned_data['cc_myself']:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com','tyan@umich.edu'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    else:
-                        try:
-                            send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-                        except BadHeaderError:
-                            return HttpResponse('Invalid header found.')
-                    messages.warning(request, 'Bug Report has been successfully submitted. Thank you!')
-                    return HttpResponseRedirect(reverse('atom', args=(class_id, cat_id, atom_id)))          
-                messages.warning(request, 'Error submitting.')
-    else:
-        form = testModalForm()
-        bugReportform = bugReportForm()
+def atom(request, class_id, cat_id, atom_id):
+	"""
+		- Generates the view for a specific category
+		- Creates the breadcrumbs for the page
+	"""
+	if request.method == 'POST': # If the form has been submitted...
+		form = testModalForm(request.POST)
+		if form.is_valid():	# All validation rules pass
+			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
+			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
+			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+			messages.warning(request, 'Report has been successfully submitted. Thank you!')
+			return HttpResponseRedirect(reverse('atom', args=(class_id, cat_id, atom_id)))
+		else:
+			messages.warning(request, 'Error saving. Fields might be invalid.')
+	else:
+		form = testModalForm()
 
 
 	#Get atom we are in
@@ -754,55 +539,51 @@ def atom(request, class_id, cat_id, atom_id, bid):
 		'expositions': expositions,
 		'notes': notes,
 		'examples': examples,
-        'form': form,
-        'bugReportform': bugReportform,
+		'form': form,
 	})
 	return HttpResponse(t.render(c))
 
 
-def classes(request, class_id, bid):
-    """
-        -	Generates the home page
-        -	Generates a list of the most popular videos for each category of rating
-        -	Use memcached to save the popular video rankings to save a lot of time
-    """
-
-    bugReportform = testBugForm(request,class_id,None, None,bid)
-    
+def classes(request, class_id):
+	"""
+		-	Generates the home page
+		-	Generates a list of the most popular videos for each category of rating
+		-	Use memcached to save the popular video rankings to save a lot of time
+	"""
+		
 	#Get the class that we are in
-    current_class = get_object_or_404(Class, id=class_id)
+	current_class = get_object_or_404(Class, id=class_id)
 	
-    if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
-        return HttpResponseRedirect(reverse('class_index'))
+	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
+		return HttpResponseRedirect(reverse('class_index'))
 	
 	#Get categories that are in the current_class
-    categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
+	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
 	#Get the "top level" categories
-    top_level_categories = categories_in_class.filter(parent_categories=None)
+	top_level_categories = categories_in_class.filter(parent_categories=None)
 	
 	# get the highest ranked submissions
-    top_ranked_videos = cache.get('top_ranked_videos')
-    if not top_ranked_videos:
-        top_ranked_videos = []
-        for category in VoteCategory.objects.all():
+	top_ranked_videos = cache.get('top_ranked_videos')
+	if not top_ranked_videos:
+		top_ranked_videos = []
+		for category in VoteCategory.objects.all():
 			# for now, calculate an average for each video
-            top_ranked_videos.append({
+			top_ranked_videos.append({
 				'vote_category': category, 
 				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
 			})
-        cache.set('top_ranked_videos', top_ranked_videos, 60*10)
+		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
 
 
-    t = loader.get_template('web/home/class/index.html')
-    c = RequestContext(request, {
+	t = loader.get_template('web/home/class/index.html')
+	c = RequestContext(request, {
 		'breadcrumbs': [{'url':reverse('classes', args=[current_class.id]), 'title': current_class.name}],
 		'top_level_categories': top_level_categories,
 		'top_ranked_videos': top_ranked_videos,
 		'vote_categories': VoteCategory.objects.all(),
 		'selected_class':current_class,
-        'bugReportform': bugReportform,
 	})
-    return HttpResponse(t.render(c))
+	return HttpResponse(t.render(c))
 
 def post(request, sid):
 	"""
@@ -837,17 +618,7 @@ def post(request, sid):
 	return HttpResponse(t.render(c))
 
 
+##### Editing Classes #####
 
-
-def bugReportConfirm(request, bid):
-	b = BugReport.objects.get(id=bid)
-	subject = b.subject
-	content = b.content
-	email= b.email
-	t = loader.get_template('web/home/confirm.html')
-	c = RequestContext(request, {
-					   'subject': subject,
-					   'content': content,
-					   'email': email,
-					   })
-	return HttpResponse(t.render(c))
+def edit_class(request, class_id):
+	return HttpResponse()

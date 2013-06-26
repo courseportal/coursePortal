@@ -5,7 +5,9 @@ from haystack import indexes
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
-from web.rating import *
+from rating.models import *
+from rating.ratings import *
+
 
 
 STATUS_CHOICES = (
@@ -86,15 +88,17 @@ class Exposition(models.Model):
 
 #Lecture Note
 class LectureNote(models.Model):
-	file = models.FileField(upload_to='lecture_notes/')
-	owner = models.ForeignKey(User, related_name="lecturenote_set")
-	filename = models.CharField(max_length=200)
-	atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
-	votes = models.IntegerField(default=0)
-	date_created = models.DateTimeField(auto_now=True)
+    file = models.FileField(upload_to='lecture_notes/')
+    owner = models.ForeignKey(User, related_name="lecturenote_set")
+    filename = models.CharField(max_length=200)
+    atom = models.ForeignKey(Atom, related_name = "lecturenote_set")
+    votes = models.IntegerField(default=0)
+    date_created = models.DateTimeField(auto_now=True)
+
 	
-	def __unicode__(self):
-		return self.filename
+    def __unicode__(self):
+        return self.filename
+        
 
 
 class Example(models.Model):
@@ -143,42 +147,6 @@ class AtomCategory(models.Model):
 
 	def __unicode__(self):
 		return self.name
-		
-class VoteVideo(models.Model):
-	user = models.ForeignKey(User)
-	example = models.ForeignKey(Submission)
-	vote = models.IntegerField(default=0)
-
-class VoteExposition(models.Model):
-	user = models.ForeignKey(User)
-	example = models.ForeignKey(Exposition)
-	vote = models.IntegerField(default=0)
-
-class VoteLectureNote(models.Model):
-	user = models.ForeignKey(User)
-	example = models.ForeignKey(LectureNote)
-	vote = models.IntegerField(default=0)
-
-class VoteExample(models.Model):
-	user = models.ForeignKey(User)
-	example = models.ForeignKey(Example)
-	vote = models.IntegerField(default=0)
-	
-class UserRating(models.Model):
-    user = models.ForeignKey(User, related_name="rating_set")
-    ExpoRating = models.IntegerField(default=0)
-    LecNoteRating = models.IntegerField(default=0)
-    ExampleRating = models.IntegerField(default=0)
-    VideoRating = models.IntegerField(default=0)
-    VoteUp = models.IntegerField(default=0)
-    VoteDown = models.IntegerField(default=0)
-    rating = models.IntegerField(default=0)
-	
-	
-@receiver(post_save, sender=User)
-def create_uservotes(sender, **kwargs):
-	if not UserRating.objects.filter(user=kwargs['instance']).exists():
-		UserRating.objects.create(user=kwargs['instance'], rating=INITIAL_RATING)
 
 @receiver(post_save, sender=Submission)
 def add_submission_rate(sender, **kwargs):
@@ -254,6 +222,9 @@ def delete_note_rate(sender, **kwargs):
     """
         This adds the functionality to remove the file upon deletion.
     """
+    print("*******************")
+    print(kwargs['instance'].file)
+    print("*******************")
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
     user_rate.LecNoteRating -= note_object_delta_rating()
@@ -274,6 +245,9 @@ def delete_example_rate(sender, **kwargs):
     """
     This adds the functionality to remove the file upon deletion.
     """
+    print("*******************")
+    print(kwargs['instance'].file)
+    print("*******************")
     kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
     user_rate.ExampleRating -= example_object_delta_rating()
@@ -287,17 +261,3 @@ def delete_example_rate(sender, **kwargs):
             user_rate.VoteDown -= vote_down_delta_rating()
             user_rate.rating -= vote_down_delta_rating()
     user_rate.save()
-
-#bugReport
-class BugReport(models.Model):
-	subject = models.CharField(max_length=100)
-	content = models.TextField()
-	email = models.EmailField()
-	cc_myself = models.BooleanField(default=False)
-	def __unicode__(self):
-		return self.subject
-	class Meta:
-		ordering = ['subject']
-		verbose_name_plural = "BugReports"
-
-	

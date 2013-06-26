@@ -1,0 +1,65 @@
+{% with obj=result.object %}
+
+
+
+{% if result.model_name == 'lecturenote' %}
+<tr id="row-3-{{ result.object.file.id }}">
+    <td>
+        <a target="_blank" href="{{ result.object.file.url }}">
+            <div class="name-3-{{ result.object.id }}">
+                {{ result.object.filename }}
+            </div>
+        </a>
+    </td>
+    <td>
+        {{ result.object.owner }}
+    </td>
+    <td style="width:75px">
+        <div class="votes-sum-3-{{result.object.id}}">
+            {{result.object.votes}}
+        </div>
+    </td>
+    <td>
+        <div class="dateCreated-3-{{ result.object.id }}">
+            {{result.object.date_created}}
+        </div>
+    </td>
+    <td style="width:75px">
+        <div class="score-sum-3-{{result.object.id}}">
+            {{result.score}}
+        </div>
+    </td>
+</tr>
+
+{% else %}
+    {% if result.model_name == 'example' %}
+<tr id="row-3-{{ result.object.file.id }}">
+    <td>
+        <a target="_blank" href="{{ result.object.file.url }}">
+            <div class="name-3-{{ result.object.id }}">
+                {{ result.object.filename }}
+            </div>
+        </a>
+    </td>
+    <td>
+        {{ result.object.owner }}
+    </td>
+    <td style="width:75px">
+        <div class="votes-sum-3-{{result.object.id}}">
+            {{result.object.votes}}
+        </div>
+    </td>
+    <td>
+        <div class="dateCreated-3-{{ result.object.id }}">
+            {{result.object.date_created}}
+        </div>
+    </td>
+    <td style="width:75px">
+        <div class="score-sum-3-{{result.object.id}}">
+            {{result.score}}
+        </div>
+    </td>
+</tr>
+    {% endif %}
+{% endif %}
+{% endwith %}

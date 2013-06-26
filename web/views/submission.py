@@ -11,6 +11,8 @@ import json
 from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, testModalForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
+from rating.models import UserRating
+
 class PlainErrorList(ErrorList):
 	"""
 	Look at this amazing class documentation
