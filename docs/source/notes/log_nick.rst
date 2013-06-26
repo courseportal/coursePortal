@@ -23,7 +23,7 @@ Goals
 -----
     
 New Todo:
-    *   Move class creation out of the admin site
+    *   Move class creation out of the admin site [First]
     *   Implement ajax table updating in the topic list
     *   Use formsets for submitting content so the user can submit more than one at a time.
     *   Testing
