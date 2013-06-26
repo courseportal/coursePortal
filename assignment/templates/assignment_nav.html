@@ -50,7 +50,7 @@ I have changed this file a bit, you should use this as the template you extend. 
         <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
         <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
         <ul class="nav nav-list">
-        {%for t in user.templates.all%}
+        {%for t in user.owned_assignments.all%}
             <li><a href="assignment/assign/edit/{{t.id}}">{{t}}</a></li>
         {%endfor%}
         </ul>
@@ -63,8 +63,10 @@ I have changed this file a bit, you should use this as the template you extend. 
 	<li><a href="{% url "assign" %}">Assign something</a></li>
 	<li><a href="{% url "view_student" %}">View Students</a></li>
 	<li><a href="{% url "metrics" %}">Class Performance</a></li>
+  <li><a href="{% url "add_template" %}">Create Template</a></li>
 	<li class="divider"></li>
 {% endif %}
+
 {% if user.is_active %}
    <li class "nav-header">Student Affairs</li>
    <li class="{% if grade_check == 1 %}active{%endif%}">

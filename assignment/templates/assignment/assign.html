@@ -29,9 +29,16 @@
 		<input type="radio" name="assignment" value={{a.pk}}>{{a.title}}<br>
 	{%endfor%}
 	<br><strong>Assigned to:</strong><br>
+	<hr>
+	Users:<br>
 	{% for u in users %}
 		<input type="checkbox" name="users" value={{u.id}}>{{u}} <br>
 	{% endfor %}
+	<hr>
+	Classes:<br>
+	{% for c in class_list %}
+		<input type="checkbox" name="class" value={{c.id}}>{{c}}<br>
+	{%endfor%}
 	<button type="submit" class="btn">Submit</button>
 <form>
 {% else %}
