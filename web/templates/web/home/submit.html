@@ -80,8 +80,9 @@ $(document).ready(function() {
 {% include "web/form_template.html" with form=form %}
 
 <div class="form-actions">
-<input class="btn btn-primary" type="submit" value="Submit" />
-<a class="btn" id="preview_video">Preview Video</a>
+    <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
+    <input class="btn" type="submit" name="submitOne" value="Submit" />
+    <a class="btn" id="preview_video">Preview Video</a>
 </div>
 </form>
 
