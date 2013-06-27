@@ -1,11 +1,15 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('',
+    url(r'template/?$', 'assignment.views.template.indexA', name="template_index"),
+    url(r'template/?$', 'assignment.views.template.indexQ', name="qtemplate_index"),
     url(r'template/add/?$', 'assignment.views.template.addT', name="add_template"),
     url(r'template/create/?$', 'assignment.views.template.create', name="create_template"),
-    url(r'template/create/?$', 'assignment.views.template.create_assignment', name="create_assignment_template"),
-    url(r'template/view/(?P<id>\d+)/?$', 'assignment.views.template.detail', name='view_template'),
+    url(r'template/createA/?$', 'assignment.views.template.create_assignment', name="create_assignment_template"),
+    url(r'template/view/(?P<id>\d+)/?$', 'assignment.views.template.detailQ', name='view_template'),
+    url(r'template/viewA/(?P<id>\d+)/?$', 'assignment.views.template.detailA', name='view_assignment_template'),
     url(r'template/generate/?$', 'assignment.views.template.genQ', name='genQ'),
+    url(r'template/generateA/?$', 'assignment.views.template.genA', name='genA'),
 
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
 

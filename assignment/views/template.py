@@ -7,9 +7,23 @@ from django.utils import simplejson as json
 from random import *
 from math import *
 import string
+from assignment.views.utility import replaceX
+
+def indexA(request):
+	context = {
+		'user':request.user,
+		'template_list': ATemplate.objects.all(),
+	}
+	return render(request, 'template/index.html', context)
+
+def indexQ(request):
+	context = {
+		'user':request.user,
+		'template_list': Template.objects.all(),
+	}
 
 def addT(request):
-	context= {
+	context = {
 		'user':request.user,
 	}
 	return render(request, 'template/addT.html', context);
@@ -24,8 +38,6 @@ def create(request):
 
 def create_assignment(request):
 	a=json.loads(request.POST['assignmentdata'])
-   #Search for assignment by same name, delete it if found
-   #create new assignment
 	assignment = ATemplate(title = a["title"], data='')
 	assignment.save()
    #save start and end date
@@ -44,9 +56,9 @@ def create_assignment(request):
    #Finish
 	assignment.data=json.dumps(data)
 	assignment.save()
-	return main(request)
+	return HttpResponse(assignment)
 
-def createQT(data):
+def createQT(x):
 	question = Template()
 	question.title = x['title']
 	data=dict()
@@ -64,45 +76,53 @@ def genQ(request):
 	q = Question()
 	q.title = t.title
 	#replae @ symbols
-	data = json.loads(t.data)
-	data['code']=string.replace(data['code'], "@",'')
-	data['text']=string.replace(data['text'],'@','$')
+	data = t.data
 	#prepend assignment statements
 	for key in request.POST.keys():
 		if key=="tid" or key=="csrfmiddlewaretoken":
 			continue
-		data['code']=key+"="+request.POST[key]+"\n"+data['code'];
-	q.data = json.dumps(data)
+		data=string.replace(data, "@"+key, request.POST[key]);
+	q.data = data
 	q.save()
 	return HttpResponse(q.data)
 
+def genA(request):
+	template = ATemplate.objects.get(pk=request.POST['tid'])
+	data=dict()
+	data["start"] = json.loads(template.data)['start']
+	data["due"] =json.loads(template.data)['due']
+	assignment = Assignment(title=template.title, data=json.dumps(data));
+	assignment.save()
+	assignment.owners.add(request.user)
+	questions = list(template.questions.all());
+	
+	#Parse inputs
+	for key in request.POST.keys():
+		if key=="tid" or key=="csrfmiddlewaretoken":
+			continue
+		questions[int(key[0])-1].data = string.replace(questions[int(key[0])-1].data, "@"+key[1:], request.POST[key])
 
-def detail(request,id):
+	#create questions
+	for question in questions:
+		q = Question(title = question.title, data=question.data)
+		q.save();
+		assignment.questions.add(q)
+		data=json.loads(assignment.data)
+		data[q.id]=0
+		assignment.data=json.dumps(data)
+	assignment.save()
+
+	return HttpResponse(assignment.data)
+
+
+def detailQ(request,id):
 	t=Template.objects.get(pk=id)
 	data = json.loads(t.data)
-	replace1="<input type=\"text\" name=\""
-	replace2="\" class=\"t_input\"></input>"
-	toReplace=""
-	index=0
 	#Go through text, replace @ with "<input type="text" name=" + characters + "></input>"
-	while string.find(data['text'], "@")>=0:
-		toReplace=""
-		index=string.find(data['text'], "@")+1
-		while index<len(data['text']) and data['text'][index] in string.ascii_letters+string.digits+"_":
-			toReplace+=data['text'][index]
-			index=index+1
-		data['text']=string.replace(data['text'], "@"+toReplace, replace1+toReplace+replace2)
+	data['text']=replaceX(data['text'])
 
 	#go through code, replace @ with "<input type="text" name=" + characters + "></input>"
-	#replace "\n" with "<br>"
-	data['code'] = string.replace(data['code'], "\n","<br>")
-	while string.find(data['code'], "@")>=0:
-		toReplace=""
-		index=string.find(data['code'], "@")+1
-		while index<len(data['code']) and data['code'][index] in string.ascii_letters+string.digits+"_":
-			toReplace+=data['code'][index]
-			index=index+1
-		data['code']=string.replace(data['code'], "@"+toReplace, replace1+toReplace+replace2)
+	data['code'] = string.replace(replaceX(data['code']), "\n","<br>")
 
 	context={
 		'user':request.user,
@@ -110,3 +130,23 @@ def detail(request,id):
 		'template':t,
 	}
 	return render(request, 'template/view.html', context)
+
+def detailA(request, id):
+	t=ATemplate.objects.get(pk=id)
+	question_list=[];
+
+	for q in t.questions.all():
+		data = json.loads(q.data)
+		#Go through text, replace @ with "<input type="text" name=" + characters + "></input>"
+		data['text']=replaceX(data['text'])
+		#go through code, replace @ with "<input type="text" name=" + characters + "></input>"
+		data['code'] = string.replace(replaceX(data['code']), "\n","<br>")
+		question_list.append({'title':q.title, 'data':data})
+
+	context={
+		'user':request.user,
+		'question_list':question_list,
+		'template':t,
+	}
+
+	return render(request, 'template/viewA.html', context)

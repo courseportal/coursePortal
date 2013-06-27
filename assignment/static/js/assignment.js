@@ -328,7 +328,8 @@ function save(){
 		if(confirm("This will save as a template due to the presense of @")){
 			//If user assents, save as template, otherwise exit
 			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-			$('#assignmentFomr').attr('action', '{% url "create_assignment_template" %}')
+			$('#assignmentForm').attr('action', 'assignment/template/createA');
+			alert($('#assignmentForm').attr('action'));
 			$('#assignmentForm').submit();
 		}
 		else
@@ -503,17 +504,4 @@ function checkForTemplate(question){
 	var code = question.code;
 	return text.indexOf("@") >= 0 || code.indexOf("@") >= 0;
 }
-// function add_question(){
-// 	//wipe out the form
-// 	$('#questiontitle').val('');
-// 	code.setValue('');
-// 	solution.setValue('');
-// 	$('#choicediv').html('');
-// 	tinymce.activeEditor.setContent('');
 
-// 	//change save destination
-// 	$('#question-save-button').attr('onclick', 'save_question(-1)');
-
-// 	//open form
-// 	$( '#dialog' ).dialog('open');
-// }
