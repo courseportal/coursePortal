@@ -79,3 +79,28 @@ function preview(){
 	$('#previewname').val($('#title').val());
   	$('#previewdata').val(JSON.stringify(question));
 }
+
+function template(){
+	//empty object
+	template = {
+		title: '',
+		code: '',
+		solution: {},
+		choices: [],
+		text: ''
+	};
+
+	template.title = $('#title').val();
+	template.code = code.getValue();
+	template.solution = solutions[0].getValue();
+	for (var i = 1; i < solutions.length; i++) {
+  		template.choices.push(solutions[i].getValue());
+  	}
+  	template.text = tinymce.activeEditor.getContent({format : 'raw'});
+  	template.title = $('#title').val();
+  	
+  	//evaluate templated vars
+	$('#templatename').val($('#title').val());
+  	$('#templatedata').val(JSON.stringify(template));
+  	$('#templateForm').submit();
+}

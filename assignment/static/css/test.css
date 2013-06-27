@@ -26,6 +26,8 @@ body.dialog-open { overflow: hidden; }
 
 .soln {
 	padding: 0px 0px 10px 0px;
+	height:50px;
+	overflow: hidden;
 }
 
 .answer .CodeMirror {
@@ -33,7 +35,7 @@ body.dialog-open { overflow: hidden; }
   height: 25px;
 }
 
-.lookyhere {
+.list-table {
 	height:250px;
 	overflow:scroll;
 }

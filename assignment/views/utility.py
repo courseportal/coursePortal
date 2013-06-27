@@ -7,17 +7,19 @@ from web.models import *
 from django.contrib.auth.models import User
 from math import *
 from random import *
+from string import find
 
 
 def checkAssignmentTitle(request):
 	user = request.user
 	title = request.POST['title']
 
-	value = ''
+	value = False
 	overwrite=dict()
-	if user.templates.filter(title=title):
-		value=True
-	else:
-		value=False
+	try:
+		if user.templates.filter(title=title):
+			value=True
+	except:
+		pass
 	overwrite['overwrite'] = value
 	return HttpResponse(json.dumps(overwrite))

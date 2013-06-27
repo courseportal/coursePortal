@@ -1,4 +1,6 @@
-<!--
+{% extends "web/web_base.html" %} {% comment %}<!-- Include the base template --> {% endcomment %}
+
+{% comment %}
 
 To EXTEND/USE this file:
 
@@ -27,12 +29,10 @@ BLOCKS(Including inherited blocks):
 	page_title
 	title
 
--->
-
-{% extends "web/web_base.html" %} <!-- Include the base template -->
+{% endcomment %}
 
 {% block navbar_content %}
-	<!-- This is the navbar content that is app specific -->
+	{% comment %}<!-- This is the navbar content that is app specific -->{% endcomment %}
 	{% include "web/navbar.html" %}
-	<!-- "class_nav.html requires top_level_categories to be set" -->
+	{% comment %}<!-- "class_nav.html requires top_level_categories to be set" -->{% endcomment %}
 {% endblock %}

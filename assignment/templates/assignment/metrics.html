@@ -10,12 +10,11 @@
 </div>
 {% for stats in stat_set %}
 	<div class="row-fluid">
-		<div class="span5"><h3>Class:{{stats.className}}</div>
-		<div class="span1">
+		<div class="row-fluid"><h3>Class:{{stats.className}}
 			<button 
 				id="plot"
 				type="btn" 
-				onclick="return display({{stats.data}},{{stats.classid}},{{user.id}});" >	Plot
+				onclick="return display({{stats.data}},{{stats.classid}},{{user.id}});" >Plot</h3>
 		</div>
 	</div>
 	<div>Average: {{stats.average}}</div>
