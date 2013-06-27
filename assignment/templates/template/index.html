@@ -1,0 +1,32 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+
+
+<div class="list-table"> 
+	<table class="table">  
+     	<thead>  
+     		<tr>  
+        		<th>Title</th>
+        		<th>Subject</th>
+        		<th>Author</th>
+        		<th>Rating</th>
+     		</tr>  
+    	</thead> 
+     	<tbody>
+   	{% for t in template_list %}
+   		<tr class="template-row" id="{{t.id}}T">
+   			<td id="{{t.id}}Ttitle">{{ t.title }}</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><a href="{% url 'view_assignment_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
+			</tr>
+		{% endfor %}
+      </tbody>  
+   </table>  
+</div>
+{% endblock %}
