@@ -6,6 +6,7 @@ from django.db.models.signals import pre_delete, post_delete, pre_save, post_sav
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from knoatom.settings import MEDIA_ROOT
 from rating.models import *
 from rating.ratings import *
@@ -143,7 +144,7 @@ class Class(models.Model):
 
 class AtomCategory(models.Model):
 	name = models.CharField(max_length=200)
-	parent_class = models.ForeignKey(Class)
+	parent_class = models.ForeignKey(Class, default=None, blank=True, null=True)
 	child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 	child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
 	class Meta:
@@ -152,7 +153,20 @@ class AtomCategory(models.Model):
 
 	def __unicode__(self):
 		return self.name
+		
+	def clean(self):
+		r"""Checks to make sure that no categories in the same class have the same name."""
+		super(AtomCategory, self).clean()
+		qs = self.__class__.objects.filter(parent_class=self.parent_class, name=self.name)
+		
+		if not self._state.adding and self.pk is not None:
+			qs = qs.exclude(pk=self.pk)
 
+		if qs.exists():
+			raise ValidationError(_("Category name must be unique in this class."), code="duplicate")
+			
+		
+		
 @receiver(post_save, sender=Submission)
 def add_submission_rate(sender, **kwargs):
 	if kwargs['created']:

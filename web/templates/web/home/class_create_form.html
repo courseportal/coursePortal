@@ -35,14 +35,31 @@ BLOCKS(Including inherited blocks):
 
 {% block content %}
 	<h2>Create New Class</h2>
-		<form class="form-horizontal" action="{{ form_action}}" method="POST">
+		<form id="myForm" class="form-horizontal" action="{{ form_action}}" method="POST">
 			{% csrf_token %}
 			{% include "web/form_template.html" %}
-			
+			<div id="category-formset">
+				<h3>Categories</h3>
+				{{ formset.management_form }}
+				{{ formset.non_form_errors }}
+				{% for form in formset %}
+					<div class="category-form">
+						{% include "web/form_template.html" %}
+					</div>
+				{% endfor %}
+			</div>
 			<div class="form-actions">
 				<input class="btn btn-primary" type="submit" value="Submit" />
 				<input class="btn" type="reset" value="Clear" />
 			</div>
 		</form>
 	</h2>
+	
+	<script type="text/javascript">
+	window.onload = function() {
+		$('div#category-formset div.category-form').formset({
+			prefix:'{{ formset.prefix }}'
+		});
+	};
+	</script>
 {% endblock %}

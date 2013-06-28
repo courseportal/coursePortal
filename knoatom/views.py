@@ -23,21 +23,14 @@ def bug_report_view(request):
 		b.subject = form.cleaned_data['subject']
 		b.content = form.cleaned_data['content']
 		b.email = form.cleaned_data['email']
-		b.cc_myself = form.cleaned_data['cc_myself']
 		b.save()
 		subject = "[Bug Report]:  " + form.cleaned_data['subject']
 		content = "From \"" + form.cleaned_data['email'] + "\" : \n\nBug Report:\n" + form.cleaned_data['content']
-			
-		if form.cleaned_data['cc_myself']:
-			try:
-				send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			except BadHeaderError:
-				return HttpResponse('Invalid header found.')
-		else:
-			try:
-				send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			except BadHeaderError:
-				return HttpResponse('Invalid header found.')
+		
+		try:
+			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+		except BadHeaderError:
+			return HttpResponse('Invalid header found.')
 
 		data = json.dumps({'success':True, 'message': '<div class="alert alert-success">Successfully submitted bug report!</div>', 'html':render(request, 'web/form_template.html', {'form': bugReportForm()}).content})
 		#return HttpResponse(context={'bugReportform':form})
