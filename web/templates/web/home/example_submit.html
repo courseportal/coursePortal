@@ -1,3 +1,7 @@
+{% extends "web/home/home.html" %}
+
+
+{% comment %}
 <!--
 
 To EXTEND/USE this file:
@@ -12,6 +16,7 @@ To EXTEND/USE this file:
 		selected_class
 		selected_categories
 		selected_atom
+		form_action
 
 BLOCKS(Including inherited blocks):
   extra_style
@@ -28,8 +33,7 @@ BLOCKS(Including inherited blocks):
 	title
 
 -->
-
-{% extends "web/home/home.html" %}
+{% endcomment %}
 
 {% block content %}
   <h2>Create New Example Submission</h2>
@@ -39,8 +43,9 @@ BLOCKS(Including inherited blocks):
     {% include "web/form_template.html" with form=form %}
 
     <div class="form-actions">
-      <input class="btn btn-primary" type="submit" value="Submit" />
-      <input class="btn" type="reset" value="Clear" />
+        <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
+        <input class="btn" type="submit" name="submitOne" value="Submit" />
+        <input class="btn" type="reset" value="Clear" />
     </div>
   
   </form>

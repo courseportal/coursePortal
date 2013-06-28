@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
+from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 from django.dispatch import receiver
 from knoatom.settings import MEDIA_ROOT
 from rating.models import *
@@ -117,12 +119,12 @@ class Class(models.Model):
 	This is the model for the class feature of the site which allows professors to create their own class pages which they can customize to fit their needs.  They can sticky content to force that material to stay at the top of the content display lists.
 	
 	"""
-	name = models.CharField(max_length=100)
-	allowed_users = models.ManyToManyField(User, blank=True, related_name='allowed_classes')
-	students = models.ManyToManyField(User, blank=True, related_name = 'enrolled_classes')
-	author = models.ForeignKey(User, related_name = 'classes_authored')
-	status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
-	summary = models.TextField(default="There is no summary added at this time.")
+	name = models.CharField(verbose_name=_('Class Name'), max_length=100)
+	allowed_users = models.ManyToManyField(User,verbose_name=_('Instructors'), blank=True, related_name='allowed_classes')
+	students = models.ManyToManyField(User, verbose_name=_('Students'), blank=True, related_name = 'enrolled_classes')
+	author = models.ForeignKey(User, verbose_name=_('Professor'), related_name = 'classes_authored')
+	status = models.CharField(verbose_name=_('Status'), max_length=1, choices=STATUS_CHOICES, default='N')
+	summary = models.TextField(verbose_name=_('Class Description'), default="There is no summary added at this time.")
 	
 	# Stickied Content
 	stickied_videos = models.ManyToManyField(Submission, blank=True, related_name='classes_stickied_in')
@@ -135,6 +137,9 @@ class Class(models.Model):
 	class Meta:
 		ordering = ['name']
 		verbose_name_plural = "Classes"
+		
+	def get_absolute_url(self):
+		return reverse('classes', args=[self.pk])
 
 class AtomCategory(models.Model):
 	name = models.CharField(max_length=200)

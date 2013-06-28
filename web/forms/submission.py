@@ -7,6 +7,8 @@ from web.models import *
 import re
 from knoatom.settings import ALLOWED_FILE_EXTENTIONS, MAX_UPLOAD_SIZE
 from django.template.defaultfilters import filesizeformat
+from django.forms.formsets import formset_factory
+
 
 class PlainErrorList(ErrorList):
 	def __unicode__(self):
@@ -29,27 +31,27 @@ def validate_umich_email(value):
 
 class testModalForm(forms.Form):
     subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
-    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff 24/7 to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
+    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
 
 class SubmissionForm(forms.Form):
 	
-	def __init__(self, *args, **kwargs):
-		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
-		user = kwargs.pop('user')
-		super(SubmissionForm, self).__init__(*args, **kwargs)
-		if user.is_superuser:
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
-		elif user.classes_authored.exists() or user.allowed_classes.exists():
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-		else:
-			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+    def __init__(self, *args, **kwargs):
+        r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
+        user = kwargs.pop('user')
+        super(SubmissionForm, self).__init__(*args, **kwargs)
+        if user.is_superuser:
+            self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+        elif user.classes_authored.exists() or user.allowed_classes.exists():
+            self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
+        else:
+            self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
 	
-	title = forms.CharField(max_length=100, required=True)
-	content = forms.CharField(widget=forms.Textarea, required=True)
-	video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
-	tags = forms.ModelMultipleChoiceField(queryset = Atom.objects.all(), widget = forms.SelectMultiple(attrs={'size':'8'}), help_text = 'Please select relevant tags for your submission.')
+    title = forms.CharField(max_length=100, required=True)
+    content = forms.CharField(widget=forms.Textarea, required=True)
+    video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
+    tags = forms.ModelMultipleChoiceField(queryset = Atom.objects.all(), widget = forms.SelectMultiple(attrs={'size':'8'}), help_text = 'Please select relevant tags for your submission.')
 	
-	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
+    classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
 
 	
 ##	def __init__(self, *args, **kwargs):

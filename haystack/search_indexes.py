@@ -102,17 +102,21 @@ class LectureNoteIndex(indexes.SearchIndex, indexes.Indexable):
     
     def prepare(self, obj):
         data = super(LectureNoteIndex, self).prepare(obj)
-        if obj.file:
-            file_path = obj.file.path
-            file_obj = open(file_path, "r+")
-            extracted_data = self._get_backend(None).extract_file_contents(file_obj)
+        try:
+            if obj.file:
+                file_path = obj.file.path
+                file_obj = open(file_path, "r+")
+                extracted_data = self._get_backend(None).extract_file_contents(file_obj)
     
     # Now we'll finally perform the template processing to render the
     # text field with *all* of our metadata visible for templating:
-            t = loader.select_template(('search/indexes/web/lecturenote_text.txt', ))
-            data['text'] = t.render(Context({'object': obj,
+                t = loader.select_template(('search/indexes/web/lecturenote_text.txt', ))
+                data['text'] = t.render(Context({'object': obj,
                                     'extracted': extracted_data}))
-        return data
+            return data
+        except:
+            print("FileIndex: error accessing "+ obj.file.path+ " [Solr may not be open].")
+            return data
 
 
 class ExampleIndex(indexes.SearchIndex, indexes.Indexable):
@@ -125,17 +129,21 @@ class ExampleIndex(indexes.SearchIndex, indexes.Indexable):
     
     def prepare(self, obj):
         data = super(ExampleIndex, self).prepare(obj)
-        if obj.file:
-            file_path = obj.file.path
-            file_obj = open(file_path, "r+")
-            extracted_data = self._get_backend(None).extract_file_contents(file_obj)
+        try:
+            if obj.file:
+                file_path = obj.file.path
+                file_obj = open(file_path, "r+")
+                extracted_data = self._get_backend(None).extract_file_contents(file_obj)
             
             # Now we'll finally perform the template processing to render the
             # text field with *all* of our metadata visible for templating:
-            t = loader.select_template(('search/indexes/web/example_text.txt', ))
-            data['text'] = t.render(Context({'object': obj,
+                t = loader.select_template(('search/indexes/web/example_text.txt', ))
+                data['text'] = t.render(Context({'object': obj,
                                             'extracted': extracted_data}))
-        return data
+            return data
+        except:
+            print("FileIndex: error accessing " + obj.file.path + " [Solr may not be open].")
+            return data
     
     
 

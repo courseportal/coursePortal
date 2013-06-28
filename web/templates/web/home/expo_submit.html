@@ -39,18 +39,30 @@ $(document).ready(function() {
 
     $('#preview_expo').click(function() {
         var expo_id = $('#id_link').val();
-        $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+ expo_id +'">Loading...</iframe>');
-        $('#expo_modal').modal('toggle').css({
-            width:'auto',
-            'margin-left':function(){
-                return -($(this).width()/2);
-            }
-        });
+        if (expo_id != "http://") {
+            $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+ expo_id +'">Loading...</iframe>');
+            $('#expo_modal').modal('toggle').css({
+                width:'auto',
+                'margin-left':function(){
+                    return -($(this).width()/2);
+                }
+            });
 
         $('#preview_modal').modal('show');
+         }else{
+                             $($('#expo_modal').children()[1]).html('<div>Exposition Link is invalid.</div>');
+                             $('#expo_modal').modal('toggle').css({
+                                                                  width:'40%',
+                                                                  'margin-left':function(){
+                                                                  return -($(this).width()/2);
+                                                                  }
+                                                                  });
+                             
+                             $('#preview_modal').modal('show');
+        }
                              });
-                  
-});
+                 
+                  });
 </script>
 
 
@@ -59,13 +71,17 @@ $(document).ready(function() {
 
   <form class="form-horizontal" action="{{ form_action }}" method="post">
     {% csrf_token %}
+      
     {% include "web/form_template.html" with form=form %}
 
     <div class="form-actions">
-      <input class="btn btn-primary" type="submit" value="Submit" />
+    <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
+      <input class="btn" type="submit" name="submitOne" value="Submit" />
       <input class="btn" type="reset" value="Clear" />
       <a class="btn" id="preview_expo">Preview</a>
     </div>
 
   </form>
+
+
 {% endblock %}

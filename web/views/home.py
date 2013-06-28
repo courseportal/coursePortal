@@ -616,9 +616,3 @@ def post(request, sid):
 		'vote_categories': VoteCategory.objects.all(),
 	})
 	return HttpResponse(t.render(c))
-
-
-##### Editing Classes #####
-
-def edit_class(request, class_id):
-	return HttpResponse()
