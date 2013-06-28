@@ -215,26 +215,32 @@ function preview_question(num){
 	}
 	question.text = tinymce.activeEditor.getContent();
 	questiondata = JSON.stringify(question);
-	//make post object
-	questionPOST = {
-		questiondata: questiondata
-	};
-
+	
 	//Check if code contains template-like text
-
 	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
-	$.ajax('/assignment/assign/qpreview', {
-		type: 'POST',
-		async: true,
-		data: questionPOST,
-	}).done(function(response){
-		//fill out the preview
-		preview = jQuery.parseJSON(response)
-		$('#question'+num).find('.preview-row').html(preview.text);
-		$('#dialogPreview').html(preview.text);
-		//make the button normal again
+	if(!checkForTemplate(question)){
+		//make post object
+		questionPOST = {
+			questiondata: questiondata
+		};
+		$.ajax('/assignment/assign/qpreview', {
+			type: 'POST',
+			async: true,
+			data: questionPOST,
+		}).done(function(response){
+			//fill out the preview
+			preview = jQuery.parseJSON(response)
+			$('#question'+num).find('.preview-row').html(preview.text);
+			$('#dialogPreview').html(preview.text);
+			//make the button normal again
+			$('#preview-button').html('Preview');
+		});
+	}
+	else{
 		$('#preview-button').html('Preview');
-	});
+		$('#dialogPreview').html('@ symbol indicates template');
+	}
+
 	return questiondata;
 }
 
@@ -312,7 +318,6 @@ function save(){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
-		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
 
@@ -336,6 +341,7 @@ function save(){
 			return false;
 	}
 
+	//Check if already own assignment by same name
 	var overwrite;
 	$.ajax('/assignment/utility/checktitle/', {
 		type: 'POST',
@@ -389,7 +395,6 @@ function previewA(){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		question.points = $(this).find('input[type=text]').val();
-		console.log($(this).find('input[type=text]'))
 		assignment.questions.push(question);
    });
 

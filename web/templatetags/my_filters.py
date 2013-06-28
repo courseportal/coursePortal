@@ -14,3 +14,12 @@ def lookup(dict, index):
 @register.filter
 def to_class_name(value):
     return value.__class__.__name__
+
+@register.filter(name="student_performance")
+def performance(student):
+	achieved=0.0
+	possible=0.0
+	for i in student.assignmentInstances.all():
+		achieved+=i.score
+		possible+=i.max_score
+	return float((achieved/possible)*100)

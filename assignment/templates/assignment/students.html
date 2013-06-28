@@ -1,14 +1,31 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
+{% load my_filters %}
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+
 <div class="row">
 	<h1><div class="span3 offset3">Students Enrolled</div></h1>
 </div>
 {% for c in class_list %}
 	<h3>{{c}}:</h3>
+	<table class="table">
+	<thead>
+		<th>Student Name</th>
+		<th>Username</th>
+		<th>Performance</th>
+	</thead>
+	<tbody>
 	{% for s in c.students.all %}
 		{% if s.is_active and not s.is_staff %}
-			<li>{{s}}</li>
+		<tr>
+			<td>{{s.first_name}} {{s.last_name}}</td>
+			<td>{{s.username}}</td>
+			<td>{{s|student_performance}}%</td>
+		</tr>
 		{%endif%}
 	{%endfor%}
+	</tbody>
+	</table>
 {%endfor%}
 {% endblock %}

@@ -112,7 +112,19 @@ def genA(request):
 		assignment.data=json.dumps(data)
 	assignment.save()
 
-	return HttpResponse(assignment.data)
+	assign_data = json.loads(assignment.data)
+	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+	breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
+	context = {
+		'assignment': assignment,
+		'start_date': assign_data['start'],
+		'due_date': assign_data['due'],
+		'question_list':Question.objects.all(),
+		'assignment_list':Assignment.objects.all(),
+		'assign_data': assign_data,
+		'breadcrumbs': breadcrumbs,
+	}
+	return render(request, 'assignment/addassignment.html', context)
 
 
 def detailQ(request,id):
