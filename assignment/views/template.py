@@ -13,6 +13,7 @@ def indexA(request):
 	context = {
 		'user':request.user,
 		'template_list': ATemplate.objects.all(),
+		'atemplate_index': 1,
 	}
 	return render(request, 'template/index.html', context)
 
@@ -21,6 +22,7 @@ def indexQ(request):
 		'user':request.user,
 		'template_list': Template.objects.all(),
 	}
+	return render(request, 'template/index.html', context)
 
 def addT(request):
 	context = {

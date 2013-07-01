@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from django.utils import simplejson as json
 from random import *
 import string
-from datetime import datetime 
 from web.models import Class
 from assignment.models import *
 from math import *
@@ -53,15 +52,20 @@ def instantiate(request):
     assignment = Assignment.objects.get(pk=request.POST['assignment'])
     #get list of users
     users=[]
-
-    for u in User.objects.all().filter(pk=request.POST['users']):
-        if users.count(u.id)==0:
-            users.append(u)
-
-    for c in Class.objects.all().filter(pk=request.POST['class']):
-        for u in c.students.all():
+    try:
+        for u in User.objects.all().filter(pk=request.POST['users']):
             if users.count(u.id)==0:
                 users.append(u)
+    except:
+        pass
+
+    try:
+        for c in Class.objects.all().filter(pk=request.POST['class']):
+            for u in c.students.all():
+                if users.count(u.id)==0:
+                    users.append(u)
+    except:
+        pass
 
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     data=json.loads(assignment.data)
@@ -95,8 +99,8 @@ def instantiate(request):
                 choice_instance.save()
             instance.max_score+=question_instance.value
             instance.save()
-    context = {'breadcrumbs':breadcrumbs,}
-    return render(request, 'assignment/instantiate.html', context)
+    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment succesfully assigned!"]}
+    return render(request, 'assignment_nav.html', context)
 
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]

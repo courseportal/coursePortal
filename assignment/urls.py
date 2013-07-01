@@ -1,7 +1,7 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('',
-    url(r'template/?$', 'assignment.views.template.indexA', name="template_index"),
+    url(r'templateA/?$', 'assignment.views.template.indexA', name="atemplate_index"),
     url(r'template/?$', 'assignment.views.template.indexQ', name="qtemplate_index"),
     url(r'template/add/?$', 'assignment.views.template.addT', name="add_template"),
     url(r'template/create/?$', 'assignment.views.template.create', name="create_template"),
@@ -14,12 +14,9 @@ urlpatterns = patterns('',
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
 
     url(r'add_question/?$', 'assignment.views.question.addQ', name='add_question'),
-    url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.questionInstance.detail', name='question_instance'),
-
+    url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.question.instanceDetail', name='question_instance'),
     url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
     url(r'question/create/?$', 'assignment.views.question.create', name='question'),
-    url(r'question/form/?$', 'assignment.views.question.form', name='question'),
-    url(r'question/?$', 'assignment.views.question.index', name='question'),
     url(r'question/preview/?$', 'assignment.views.question.preview', name='preview'),
     
     url(r'assign/preview/(?P<a>\d+)/?$', 'assignment.views.staff.previewTemplate', name='preview_assignment2'),
