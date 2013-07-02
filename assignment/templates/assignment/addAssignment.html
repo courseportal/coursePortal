@@ -11,9 +11,6 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
 
-<!-- bootstrap js -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
-
 <!-- font awesome -->
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
@@ -32,7 +29,7 @@
 
 <body>
 	<button class="btn btn-success" id="loadA">Load Assignment</button>
-	<a href="{% url 'template_index' %}">Load Assignment Template</a>
+	<a href="{% url 'atemplate_index' %}">Load Assignment Template</a>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
@@ -48,6 +45,7 @@
 			<h3>Due date:</h3>
 			<input type="text" id="duedate" value="{{due_date}}"></input>
 		</div>
+
 	</div>
 	<div class="row-fluid">
 		<div id="questionsDiv" class="span10">
@@ -86,8 +84,8 @@
 		<i class="icon-plus"></i> Add Question </button>
 	<button class="btn" id="listingQ">
 		<i class="icon-plus"></i> Load Existing Question</button>
-	<button class="btn btn-warning" id="Qtemplate" disabled>
-		<i class="icon-plus"></i> Load Question Template</button>
+	<a href="{% url 'qtemplate_index' %}" class="btn btn-warning" id="Qtemplate">
+		<i class="icon-plus"></i> Load Question Template</a>
 
 	<div id="dialog" class="row-fluid">
 		<div class="span7" id="editDiv">

@@ -171,7 +171,6 @@ class ClassStats():
 	deviation=0.0
 	minimum=0.0
 	maximum=0.0
-	plot=None
 
 def metrics(request):
 	user=request.user
@@ -184,9 +183,9 @@ def metrics(request):
 		stats.classid=c.id
 		#Generate data
 		data=[]
-		maxPossible = 0.0
-		achieved = 0.0
 		for s in c.students.all():
+			maxPossible = 0.0
+			achieved = 0.0
 			for i in s.assignmentInstances.all():
 				maxPossible+=i.max_score
 				achieved+=i.score
@@ -199,8 +198,8 @@ def metrics(request):
 		stats.deviation = np.std(stats.data)
 		#Number completed?
 		#Min, Max
-		stats.minimum=np.nanmin(stats.data)
-		stats.maximum=np.nanmax(stats.data)
+		stats.minimum=np.amin(stats.data)
+		stats.maximum=np.amax(stats.data)
 		#median
 		stats.median=np.median(stats.data)
 		stat_set.append(stats)

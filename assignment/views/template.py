@@ -13,6 +13,7 @@ def indexA(request):
 	context = {
 		'user':request.user,
 		'template_list': ATemplate.objects.all(),
+		'atemplate_index': 1,
 	}
 	return render(request, 'template/index.html', context)
 
@@ -21,6 +22,7 @@ def indexQ(request):
 		'user':request.user,
 		'template_list': Template.objects.all(),
 	}
+	return render(request, 'template/index.html', context)
 
 def addT(request):
 	context = {
@@ -112,7 +114,19 @@ def genA(request):
 		assignment.data=json.dumps(data)
 	assignment.save()
 
-	return HttpResponse(assignment.data)
+	assign_data = json.loads(assignment.data)
+	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+	breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
+	context = {
+		'assignment': assignment,
+		'start_date': assign_data['start'],
+		'due_date': assign_data['due'],
+		'question_list':Question.objects.all(),
+		'assignment_list':Assignment.objects.all(),
+		'assign_data': assign_data,
+		'breadcrumbs': breadcrumbs,
+	}
+	return render(request, 'assignment/addassignment.html', context)
 
 
 def detailQ(request,id):

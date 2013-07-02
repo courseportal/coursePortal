@@ -23,10 +23,14 @@
 				<td></td>
 				<td></td>
 				<td></td>
-				<td><a href="{% url 'view_assignment_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
+        {% ifequal atemplate_index 1%}
+				  <td><a href="{% url 'view_assignment_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
+        {% else %}
+          <td><a href="{% url 'view_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
+        {% endifequal %}
 			</tr>
 		{% endfor %}
-      </tbody>  
-   </table>  
-</div>
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

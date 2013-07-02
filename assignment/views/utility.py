@@ -13,7 +13,6 @@ import string
 def checkAssignmentTitle(request):
 	user = request.user
 	title = request.POST['title']
-
 	value = False
 	overwrite=dict()
 	try:

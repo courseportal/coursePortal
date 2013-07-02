@@ -6,7 +6,8 @@ from assignment.models import *
 from django.contrib.auth.models import User
 from django.utils import simplejson as json
 from random import *
-from string import Template
+import string
+from web.models import Class
 from assignment.models import *
 from math import *
 
@@ -49,7 +50,23 @@ def assign(request):
 
 def instantiate(request):
     assignment = Assignment.objects.get(pk=request.POST['assignment'])
-    users = User.objects.all().filter(pk=request.POST['users'])
+    #get list of users
+    users=[]
+    try:
+        for u in User.objects.all().filter(pk=request.POST['users']):
+            if users.count(u.id)==0:
+                users.append(u)
+    except:
+        pass
+
+    try:
+        for c in Class.objects.all().filter(pk=request.POST['class']):
+            for u in c.students.all():
+                if users.count(u.id)==0:
+                    users.append(u)
+    except:
+        pass
+
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     data=json.loads(assignment.data)
     for u in users:
@@ -69,7 +86,7 @@ def instantiate(request):
             text = q['text']
 
             local_dict = dict(locals())
-            text = Template(text).substitute(local_dict)
+            text = string.Template(text).substitute(local_dict)
             question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][str(question.id)]), assignmentInstance=instance)
             question_instance.save()
 
@@ -82,8 +99,8 @@ def instantiate(request):
                 choice_instance.save()
             instance.max_score+=question_instance.value
             instance.save()
-    context = {'breadcrumbs':breadcrumbs,}
-    return render(request, 'assignment/instantiate.html', context)
+    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment succesfully assigned!"]}
+    return render(request, 'assignment_nav.html', context)
 
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
@@ -149,16 +166,10 @@ def create(request):
     assignment.save()
     return main(request)
 
-
 def createQ(x):
     question = Question()
     question.title = x['title']
     data=dict()
-    data['title']=x['title']
-    data['code']=x['code']
-    data['text']=x['text']
-    data['solution']=x['solution']
-    data['choices']=x['choices']
-    question.data = json.dumps(data)
+    question.data = json.dumps(x)
     question.save()
     return question.id

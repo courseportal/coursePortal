@@ -1,6 +1,7 @@
 $(init);
 function init(){
 	$('.t_input').each(function(){
+		$(this).attr("size", "6");
 		$(this).attr("placeholder", $(this).attr("name"));
 		$(this).attr("onchange", "changeGroup($(this).val(), $(this).attr('name'))");
 	});
