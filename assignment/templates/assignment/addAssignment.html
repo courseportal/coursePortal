@@ -32,7 +32,7 @@
 
 <body>
 	<button class="btn btn-success" id="loadA">Load Assignment</button>
-	<button class="btn btn-warning" id="loadT" disabled>Load Assignment Template</button>
+	<a href="{% url 'template_index' %}">Load Assignment Template</a>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
@@ -86,6 +86,8 @@
 		<i class="icon-plus"></i> Add Question </button>
 	<button class="btn" id="listingQ">
 		<i class="icon-plus"></i> Load Existing Question</button>
+	<button class="btn btn-warning" id="Qtemplate" disabled>
+		<i class="icon-plus"></i> Load Question Template</button>
 
 	<div id="dialog" class="row-fluid">
 		<div class="span7" id="editDiv">

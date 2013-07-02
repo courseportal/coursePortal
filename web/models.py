@@ -2,6 +2,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
+from django.http import Http404
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -140,7 +141,10 @@ class Class(models.Model):
 		verbose_name_plural = "Classes"
 		
 	def get_absolute_url(self):
-		return reverse('classes', args=[self.pk])
+		if self.pk is not None:
+			return reverse('classes', args=[self.pk])
+		else:
+			raise Http404
 
 class AtomCategory(models.Model):
 	name = models.CharField(max_length=200)

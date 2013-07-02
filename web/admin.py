@@ -5,7 +5,7 @@ from django import forms
 from django.forms.models import BaseModelFormSet, modelformset_factory, BaseInlineFormSet
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from sets import Set
+#from sets import Set
 from knoatom.settings import ALLOWED_FILE_EXTENTIONS
 
 # Import ForumInlineAdmin

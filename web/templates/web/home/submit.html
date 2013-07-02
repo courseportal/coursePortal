@@ -37,7 +37,7 @@ BLOCKS(Including inherited blocks):
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $('textarea').addClass('span6').wysihtml5();
+    $('#id_content').addClass('span6').wysihtml5();
 
     $('#preview_video').click(function() {
         var video_id = $('#id_video').val();
@@ -80,8 +80,9 @@ $(document).ready(function() {
 {% include "web/form_template.html" with form=form %}
 
 <div class="form-actions">
-<input class="btn btn-primary" type="submit" value="Submit" />
-<a class="btn" id="preview_video">Preview Video</a>
+    <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
+    <input class="btn" type="submit" name="submitOne" value="Submit" />
+    <a class="btn" id="preview_video">Preview Video</a>
 </div>
 </form>
 

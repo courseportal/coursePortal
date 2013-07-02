@@ -25,7 +25,10 @@ class BaseCreateCategoryFormSet(BaseModelFormSet):
 			
 	def clean(self):
 		r"""Disallows categories to have the same name."""
-		super(BaseCreateCategoryFormSet, self).clean()
+		#super(BaseCreateCategoryFormSet, self).clean()
+		# Don't bother cleaning if there are already errors
+		if any(self.errors):
+			return
 		names = []
 		for form in self.forms:
 			name = form.cleaned_data.get('name', None)
@@ -67,15 +70,24 @@ CreateCategoryFormSet = modelformset_factory(
 class CreateClassForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		"""Sets the queryset of 'allowed_users' to exclude the author"""
-		user = kwargs.pop('user')
+		self.user = kwargs.pop('user')
 		super(CreateClassForm, self).__init__(*args, **kwargs)
-		self.fields['allowed_users'].queryset = User.objects.exclude(id=user.id)
+		self.fields['allowed_users'].queryset = User.objects.exclude(id=self.user.id)
 		
 	allowed_users = forms.ModelMultipleChoiceField(label='Instructors', required=False, queryset=User.objects.none())
 	
 	class Meta:
 		model = Class
-		fields = ('name', 'summary', 'status', 'allowed_users', 'students')
+		fields = ('name', 'status', 'summary', 'allowed_users', 'students')
+		
+	def save(self):
+		instance = super(CreateClassForm, self).save(commit=False)
+		instance.author = self.user
+		instance.save()
+		instance.allowed_users = self.cleaned_data['allowed_users']
+		instance.allowed_users.add(self.user)
+		instance.students = self.cleaned_data['students']
+		return instance
 		
 	def save_class(self, user):
 		r"""Saves the model using the self.cleaned_data dictionary and user as the 'author'.  Adds 'author' to 'allowed_users'.  Returns the class that was created."""

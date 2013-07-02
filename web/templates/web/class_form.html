@@ -1,0 +1,99 @@
+{% extends "web/home/home.html" %}
+
+{% comment %}
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+		form
+
+	OPTIONAL context:
+		top_ranked_videos
+		selected_class
+		selected_categories
+		selected_atom
+		messages
+		form_action
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+{% endcomment %}
+
+{% block content %}
+<script type="text/javascript">
+$(document).ready(function() {
+	// Hijack the submission of the form
+	$('#class-form').submit(function() {
+		// Disable buttons
+		$('#submit-class-form').attr('disabled', true);
+		$('#clear-class-form').attr('disabled', true);
+		// Reset the error fields '*[id^="string"]' finds all elements with
+		// id starting in "string".
+		$('*[id^="field"]').removeClass('error')
+		$('*[id^="help-inline"]').empty()
+		$.ajax({
+			async: false, // Set it to be synchronous
+			data: $(this).serialize(), // Get the form data
+			type: $(this).attr('method'), // GET or POST
+			url: $(this).attr('action'), // Get the action (where to send data)
+			success: function(response) {
+				if (response.pk) // If we created an object
+				{
+					// Redirect to class page
+					window.location = '/class/' + response.pk;
+				}
+				else // If there were errors
+				{
+					// Loop through keys in response variable
+					for (var key in response)
+					{
+						$('#field-' + key).addClass('error') // Make it red
+						$('#help-inline-' + key).empty().append(
+							$('<ul>') // Reset the div and add an empty list
+						);
+						// Loop through the error array for key
+						for (i in response[key])
+						{
+							$('#help-inline-' + key + ' ul').append(
+								$('<li>').append( // Add each item to the list
+									response[key][i]
+								)
+							)
+						}
+					}
+					// Enable the buttons again.
+					$('#submit-class-form').attr('disabled', false);
+					$('#clear-class-form').attr('disabled', false);
+				}
+			},
+		});
+		return false;
+	});
+});
+</script>
+
+	<h2>Create New Class</h2>
+		<form id="class-form" class="form-horizontal" action="{{ form_action }}" method="POST">
+			{% csrf_token %}
+			{% include "web/class_form_template.html" %}
+			<div class="form-actions">
+				<input class="btn btn-primary" type="submit" value="Submit" id="submit-class-form" />
+				<input class="btn" type="reset" value="Clear" id="clear-class-form" />
+			</div>
+		</form>
+	</h2>
+{% endblock %}

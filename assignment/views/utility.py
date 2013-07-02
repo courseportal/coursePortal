@@ -7,7 +7,7 @@ from web.models import *
 from django.contrib.auth.models import User
 from math import *
 from random import *
-from string import find
+import string
 
 
 def checkAssignmentTitle(request):
@@ -23,3 +23,16 @@ def checkAssignmentTitle(request):
 		pass
 	overwrite['overwrite'] = value
 	return HttpResponse(json.dumps(overwrite))
+
+def replaceX(data):
+	replace1="<input type=\"text\" name=\""
+	replace2="\" class=\"t_input\"></input>"
+	toReplace=""
+	while string.find(data, "@")>=0:
+		toReplace=""
+		index=string.find(data, "@")+1
+		while index<len(data) and data[index] in string.ascii_letters+string.digits+"_":
+			toReplace+=data[index]
+			index=index+1
+		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2)
+	return data
