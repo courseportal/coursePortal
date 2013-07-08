@@ -125,12 +125,6 @@ function init(){
 		modal: true,
 		autoOpen: false,
 	});
-	$('#template-zone').dialog({
-		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.7,
-		modal: true,
-		autoOpen: false,
-	});
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -142,13 +136,9 @@ function init(){
 	//initalize datepickers
 	$('#assigndate').datepicker();
 	$('#duedate').datepicker();
-
+	
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
-	$('#loadA').attr('onclick', "$('#template-zone').dialog('open')");
-	$('.template-row').attr('onclick', "selectRow($(this))");
-	$('.cancel-template-load').attr('onclick', "clearTemplateLoad();");
-	$('.load-template').attr('onclick','loadTemplate();');
 	$("#previewform").nm();
 }
 
@@ -402,11 +392,6 @@ function previewA(){
    $('#previewform').submit();
 }
 
-function previewT(aid){
-	previewHTML='<iframe class="iframe" src="assignment/assign/preview/'+aid+'"></iframe>';
-	$(".template-area").append(previewHTML);
-}
-
 function iframe_preview(qid){
   previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
   var ID="#";
@@ -442,43 +427,6 @@ function loadExisting(){
 		$('#questionsList').append(questionHTML);
 		$('#question'+num).find('input[type=hidden]').attr("value",data);
 	});
-}
-
-function loadTemplate(){
-	//Get assignment
-	aid = $(".icon-ok").parent().parent().attr("id");
-	//Clear current questions
-	$('#questionsList>.question-whole').each(function(){
-	   $(this).remove();
-	});
-	//Load in template details (title)
-	$('#assigntitle').attr("value",$('#'+aid+'title').attr("value"));
-	//Load in questions
-	var data = jQuery.parseJSON($("#"+aid+"data").val()).questions;
-	alert(JSON.stringify(data));
-	for(var qid in data){
-		if(!data.hasOwnProperty(qid)) continue;
-		num = $('#questionsList').children().length+1;
-		var points = data[qid];
-		var data = $('#'+qid+"data").attr("value");
-		questionHTML=questionstring(num, $('#'+qid+"title").attr("value"));
-		$('#questionsList').append(questionHTML);
-		$('#question'+num).find('input[type=hidden]').attr("value",data);
-		$('#question'+num).find('input[type=text]').attr("value",points);
-	}
-	//Delete evidence
-	clearTemplateLoad();
-}
-
-function selectRow(element){
-	$('.icon-ok').remove();
-	$(element).children(".first-cell").append('<i class="icon-ok"></i>');
-}
-
-function clearTemplateLoad(){
-	$(".iframe").remove();
-	$('.icon-ok').remove();
-	$( '#template-zone' ).dialog('close');
 }
 
 function questionstring(num, title){

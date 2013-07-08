@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     url(r'grades/?$', 'assignment.views.student.grades', name='grades'),
     url(r'list/?$', 'assignment.views.student.list', name='list'),
     
+    url(r'assign/index/?$', 'assignment.views.assign.index', name='assignment_index'),
     url(r'assign/create/?$', 'assignment.views.assign.create', name='create_assignment'),    
     url(r'assign/add/?$', 'assignment.views.assign.addA', name='add_assignment'),
     url(r'assign/edit/(?P<id>\d+)/?$', 'assignment.views.assign.editA', name='edit_assignment'),

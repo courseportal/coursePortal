@@ -18,6 +18,12 @@ def main(request):
 
     return render(request, 'assignment_nav.html', context)
 
+def index(request):
+    assignment_list = Assignment.objects.all()
+    context = {'user':request.user, 'assignment_list':assignment_list}
+
+    return render(request, 'assignment/index.html', context)
+
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)
     question_list = assignment.questions.all()
