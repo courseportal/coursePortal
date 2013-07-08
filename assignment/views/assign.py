@@ -18,6 +18,12 @@ def main(request):
 
     return render(request, 'assignment_nav.html', context)
 
+def index(request):
+    assignment_list = Assignment.objects.all()
+    context = {'user':request.user, 'assignment_list':assignment_list}
+
+    return render(request, 'assignment/index.html', context)
+
 def detail(request, id):
     assignment = request.user.assignmentInstances.get(pk=id)
     question_list = assignment.questions.all()
@@ -58,7 +64,6 @@ def instantiate(request):
                 users.append(u)
     except:
         pass
-
     try:
         for c in Class.objects.all().filter(pk=request.POST['class']):
             for u in c.students.all():
@@ -107,11 +112,10 @@ def addA(request):
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
     context = {
         'breadcrumbs':breadcrumbs,
-        "question_list":Question.objects.all(),
-        "assignment_list":Assignment.objects.all()
+        'question_list':Question.objects.all(),
+        'template_list':Template.objects.all(),
     }
     return render(request, 'assignment/addAssignment.html', context)
-
 
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
@@ -123,7 +127,7 @@ def editA(request, id):
         'start_date': assign_data['start'],
         'due_date': assign_data['due'],
         'question_list':Question.objects.all(),
-        'assignment_list':Assignment.objects.all(),
+        'template_list':Template.objects.all(),
         'assign_data': assign_data,
         'breadcrumbs': breadcrumbs,
     }

@@ -26,7 +26,7 @@
         {% ifequal atemplate_index 1%}
 				  <td><a href="{% url 'view_assignment_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
         {% else %}
-          <td><a href="{% url 'view_template' t.id %}"><i  class="icon-eye-open"></i></a></td>
+          <td><a href="{% url 'view_template' t.id %}"><i  class="icon-eye-open template-eye"></i></a></td>
         {% endifequal %}
 			</tr>
 		{% endfor %}
