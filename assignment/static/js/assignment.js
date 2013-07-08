@@ -125,6 +125,20 @@ function init(){
 		modal: true,
 		autoOpen: false,
 	});
+	$('#template-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+		focus: function(event, ui){
+			//disable parent scrolling
+			$('body').addClass('dialog-open');
+		},
+		close: function(event, ui){
+			//re-enable parent scrolling
+			$('body').removeClass('dialog-open');
+		}
+	});
 	//init wysiwyg
 	tinymce.init({
 	   selector: 'textarea#text',
@@ -136,9 +150,10 @@ function init(){
 	//initalize datepickers
 	$('#assigndate').datepicker();
 	$('#duedate').datepicker();
-	
+	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
+	$('#Qtemplate').attr('onclick', "openTemplates()");
 	$("#previewform").nm();
 }
 
@@ -191,6 +206,47 @@ function load_question_helper(){
 	}
 }
 
+function openTemplates(){
+	//Load index page
+	$("#template-zone").load("assignment/template .list-table", function() {
+		//Change link function of eyes
+		$(".template-eye").each(function(){
+			$(this).attr("onclick", "loadT('"+$(this).parent().attr('href')+"')");
+			$(this).parent().attr("href", "#");
+		});
+		//Open dialog
+		$("#template-zone").dialog("open");
+	});
+}
+
+function loadT(url){
+	//Load template view 
+	$("#template-zone").load(url+" #templateView", function(){
+		$("#template-btn").attr("onclick", "genQ()");
+	});
+}
+
+function genQ(){
+	//Validate input fields, Replace @fields in original data
+	var formdata = $("#templateForm").serializeArray();
+	var templatedata = $("#template_data").attr("value");
+	for(var x=0; x<formdata.length; x++){
+		if(formdata[x].value == null || formdata[x].value == ''){
+			alert("Input field \""+formdata[x].name+"\" is empty!");
+			return false;
+		}
+		else{
+			templatedata=templatedata.replace("@"+formdata[x].name, formdata[x].value);
+		}
+	}
+	//append question data to list
+	num = $('#questionsList').children().length+1;
+	questionHTML=questionstring(num, $("#template_title").attr("value"));
+	$('#questionsList').append(questionHTML);
+	$('#question'+num).find('input[type=hidden]').attr("value",templatedata);
+	//Close dialog
+	$("#template-zone").dialog("close");
+}
 
 function preview_question(num){
 	//create question object
@@ -365,7 +421,6 @@ function previewQ(questiondata){
 		alert(response);
 		return jQuery.parseJSON(response)
 	});
-
 }
 
 function previewA(){
@@ -400,6 +455,7 @@ function iframe_preview(qid){
   $(ID).attr("onclick", "iframe_close("+qid+")");
   $(".preview-area").append(previewHTML)
 }
+
 function iframe_close(qid){
   var ID = "#";
   ID+=qid;
@@ -407,6 +463,7 @@ function iframe_close(qid){
   $(ID).attr("class", "icon-eye-open");
   $(ID).attr("onclick", "iframe_preview("+qid+")");
 }
+
 function loadExisting(){
 	var ID='';
 	var questionHTML='';
