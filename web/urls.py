@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from web.views.edit_class import CreateClassView, OldCreateClassView
+from web.views.edit_class import CreateClassView
 
 urlpatterns = patterns('',
     url(r'^login/?$', 'web.views.account.login', name='login'),
@@ -26,8 +26,8 @@ urlpatterns = patterns('',
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
 	
 	url(r'^create-class/?$', CreateClassView.as_view(), name='create_class'),
-	url(r'^edit-class-old/?$', OldCreateClassView.as_view(), name='edit_class_old'),
-	url(r'^edit-class/?$', 'web.views.edit_class.EditClassView', name='edit_class'),
+	#url(r'^edit-class-old/?$', OldCreateClassView.as_view(), name='edit_class_old'),
+	url(r'^edit-class/(?P<class_id>\d+)/?$', 'web.views.edit_class.EditClassView', name='edit_class'),
 	
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='atom'),
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name = 'category'),

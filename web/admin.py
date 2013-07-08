@@ -203,11 +203,11 @@ class BaseCategoryAdmin(admin.ModelAdmin):
 class AtomCategoryAdminForm(forms.ModelForm):
 	def clean(self):
 		cleaned_data = super(AtomCategoryAdminForm, self).clean()
-		potential_parent_category_name = cleaned_data.get("name")
+		potential_parent_category_name = cleaned_data.get("category_name")
 		potential_child_category = cleaned_data.get("child_categories")
 		temp = potential_child_category
 		if potential_parent_category_name and potential_child_category:
-			potential_parent_category = AtomCategory.objects.filter(name = potential_parent_category_name)
+			potential_parent_category = AtomCategory.objects.filter(category_name = potential_parent_category_name)
 			potential_conflict_category = potential_child_category.filter(child_categories__in = potential_parent_category)
 			while (not potential_conflict_category):
 				for item in potential_child_category.all():
@@ -275,15 +275,15 @@ class AtomCategoryInlineFormSet(BaseInlineFormSet):
 		super(AtomCategoryInlineFormSet, self).clean()
 		AtomCategoryDict = {}
 		for form in self.forms:
-			potential_parent_name = form.cleaned_data.get("name")
-			potential_parent_object = AtomCategory.objects.filter(name = potential_parent_name)
+			potential_parent_name = form.cleaned_data.get("category_name")
+			potential_parent_object = AtomCategory.objects.filter(category_name = potential_parent_name)
 			for p_p_o in potential_parent_object.all():
-				potential_parent = str(p_p_o.name.split('Category:',1))
+				potential_parent = str(p_p_o.category_name.split('Category:',1))
 			potential_children = form.cleaned_data.get("child_categories")
 			if potential_children:
 				S=set()
 				for item in potential_children.all():
-					potential_child = str(item.name.split('Category:',1))
+					potential_child = str(item.category_name.split('Category:',1))
 					for group in AtomCategoryDict.values():
 						for g in group:
 							if potential_parent == g:
