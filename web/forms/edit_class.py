@@ -19,8 +19,10 @@ class CategoryForm(forms.ModelForm):
 		model = AtomCategory
 		fields=('category_name', 'child_categories', 'child_atoms')
 		
+class CreateCategoryForm(CategoryForm):
+	r"""Form for **creating** categories."""
 	def save(self):
-		r"""Save the object this form is editing."""
+		r"""Overrides the save method."""
 		instance = super(CategoryForm, self).save(commit=False)
 		instance.parent_class = self.parent_class
 		instance.save()

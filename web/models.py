@@ -148,7 +148,7 @@ class Class(models.Model):
 
 class AtomCategory(models.Model):
 	category_name = models.CharField(verbose_name=_('Category Name'), max_length=200)
-	parent_class = models.ForeignKey(Class, default=None, blank=True, null=True)
+	parent_class = models.ForeignKey(Class, default=None, blank=True, null=True, related_name="category_set")
 	child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 	child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
 	class Meta:

@@ -9,7 +9,6 @@ from web.models import Class, AtomCategory, BaseCategory
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 
-
 class AjaxableResponseMixin(object):
 	r"""
 	Mixin to add AJAX support to a form.
@@ -58,12 +57,15 @@ class CreateClassView(AjaxableResponseMixin, CreateView):
 		kwargs.update({'user': self.request.user})
 		return kwargs
 		
-def EditClassView(request, class_id):
+def EditClassView(request, class_id, cat_id):
 	r"""View for editing classes."""
 	context = {} # The context data
 	class_object = get_object_or_404(Class, id=class_id) # The class instance
 	class_form_kwargs = {'user':request.user, 'instance':class_object}
 	category_form_kwargs = {'parent_class':class_object}
+	if cat_id: # If we are editing a category
+		category_object = get_object_or_404(AtomCategory, pk=cat_id)
+		category_form_kwargs.update({'instance':category_object})
 	if request.method == 'POST':
 		if request.POST['form-type'] == 'submit-class': # If user pressed the Class submit button
 			class_form = ClassForm(request.POST, **class_form_kwargs) # Bind class the form
@@ -79,6 +81,16 @@ def EditClassView(request, class_id):
 		if request.is_ajax(): # We don't need to return all of the context, just the update stuff
 			return render_to_json_response(context)
 	else: # GET
+		if request.is_ajax(): # Return a category form with initial data or with no data
+			category_form = CategoryForm(**category_form_kwargs)
+			template = loader.get_template('web/category_form_template.html')
+			c = RequestContext(request, {'form':category_form})
+			form_html = template.render(c) # HTML for the form
+			context.update({
+			'category_form':form_html
+			})
+			return render_to_json_response(context) # Return the html for the new form
+			
 		context.update({ # We need to add the forms to the kwargs if its not POST
 			'class_form':ClassForm(**class_form_kwargs),
 			'category_form':CategoryForm(**category_form_kwargs)
@@ -148,6 +160,29 @@ def process_forms(request, class_object, class_form=None, category_form=None):
 				context.update({'category_form':category_form})
 				messages.error(request, 'Error saving category.')
 	return context
+
+# View to get children for columnview
+def get_children(request, is_class, pk):
+	r"""Returns an html list of the child atoms and categories of either the class or category in the correct format for columnview."""
+	is_class = int(is_class)
+	if is_class:
+		cur_class = get_object_or_404(Class, pk=pk)
+		categories = cur_class.category_set.filter(parent_categories=None)
+		atoms = []
+	else:
+		obj = get_object_or_404(AtomCategory, pk=pk)
+		atoms = obj.child_atoms.all()
+		categories = obj.child_categories.all()
+	
+	context = RequestContext(request, {'atoms':atoms, 'categories':categories})
+	template = loader.get_template('web/category_list.html')
+	data = json.dumps(template.render(context))
+	return HttpResponse(data,content_type='application/json')
+	
+def get_category_form(request, pk):
+	r"""Returns the html for a new populated category form."""
+	obj = get_object_or_404(AtomCategory, pk=pk)
+	
 
 def render_to_json_response(context, **response_kwargs):
 	data = json.dumps(context)

@@ -1,0 +1,202 @@
+{% extends "web/home/home.html" %}
+
+{% comment %}
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+		form
+
+	OPTIONAL context:
+		top_ranked_videos
+		selected_class
+		selected_categories
+		selected_atom
+		messages
+		form_action
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+{% endcomment %}
+
+{% block content %}
+<script src="{{ STATIC_URL }}js/jquery.columnview.js" type="text/javascript"></script>
+<script type="text/javascript">
+var atomClicked = function(value, name)
+{
+	return false;
+}
+var categoryClicked = function(value, name)
+{
+	$('#edit-form').attr('action', '/edit-class/{{ pk }}/' + value + '/') // Change action of form
+	$.ajax({
+		type: 'GET',
+		url: '/edit-class/{{pk}}/' + value + '/',
+		success: function(response) {
+			$("#category-form").empty().append(response.category_form)
+		}
+	});
+	return false;
+}
+
+$(document).ready(function() {
+	
+	// Add the buttons that only work when javascript is enabled
+	$('#submit-category-form').removeClass('hidden');
+	$('#submit-class-form').removeClass('hidden');
+	
+	// Generate category list
+	$("ul#cat-list").columnview({
+		preview: false,
+		getSubtree: function(elt, isRoot) {
+			if (isRoot)
+			{
+				var req_url = '/ajax/get-children/1/{{ pk }}/'
+			}
+			else
+			{
+				var req_url = '/ajax/get-children/0/'+elt.attr('elt-id')+'/'
+			}
+			var res = $.ajax({
+				type: 'GET', // GET or POST
+				url: req_url,
+			});
+			return res;
+		}
+	});
+	
+	// Get new category form when the button is pressed
+	$('#new-category-form').click(function() {
+		$.ajax({
+			type: 'GET',
+			url: '/edit-class/{{ pk }}/',
+			success: function(response) {
+				$("#category-form").empty().append(response.category_form)
+			}
+		});
+		return false;
+	});
+	
+	var ajax_submit = function(form, id_insert, success_function) {
+		// Disable buttons
+		$('#submit-'+id_insert+'-form').attr('disabled', true);
+		$('#clear-'+id_insert+'-form').attr('disabled', true);
+		// Reset the error fields '*[id^="string"]' finds all elements with
+		// id starting in "string".
+		$('*[id^='+id_insert+'field]').removeClass('error')
+		$('*[id^='+id_insert+'help-inline]').empty()
+		$.ajax({
+			async: false, // Set it to be synchronous
+			data: form.serialize(), // Get the form data
+			type: form.attr('method'), // GET or POST
+			url: form.attr('action'), // Get the action (where to send data)
+			success: function(response) {
+				if (response.pk) // If we created an object
+				{
+					// Call the success_redirect function
+					success_function(response, form)
+				}
+				else // If there were errors
+				{
+					// Loop through keys in response variable
+					if (response.message)
+					{
+						$("#messages").empty().append('<div class="alert alert-error">'+response.message+'</div>');
+						delete response.message;
+					}
+					for (var key in response)
+					{
+						$('#'+id_insert+'field-' + key).addClass('error') // Make it red
+						$('#'+id_insert+'help-inline-' + key).empty().append(
+							$('<ul>') // Reset the div and add an empty list
+						);
+						// Loop through the error array for key
+						for (i in response[key])
+						{
+							$('#'+id_insert+'help-inline-' + key + ' ul').append(
+								$('<li>').append( // Add each item to the list
+									response[key][i]
+								)
+							)
+						}
+					}
+				}
+			},
+		});
+		// Enable the buttons again.
+		$('#submit-'+id_insert+'-form').attr('disabled', false);
+		$('#clear-'+id_insert+'-form').attr('disabled', false);
+		return false;
+	};
+	
+	var success_function = function(response, form)
+	{
+		window.location = '/class/' + response.pk;
+	};
+	var class_success_function = function(response, form)
+	{
+		$("#messages").empty().append('<div class="alert alert-success">'+response.message+'</div>');
+	};
+	var category_success_function = function(response, form)
+	{
+		if (response.message)
+		{
+			$("#messages").empty().append('<div class="alert alert-success">'+response.message+'</div>')
+		}
+		$("#category-form").empty().append(response.category_form)
+	};
+	
+	$('#submit-class-form').click(function() {
+		$('input[id=form-type]').val('submit-class');
+		var form = $('#edit-form')
+		return ajax_submit(form, 'class', class_success_function)
+	});
+	$('#submit-category-form').click(function() {
+		$('input[id=form-type]').val('submit-category');
+		var form = $('#edit-form')
+		return ajax_submit(form, 'category', category_success_function)
+	});
+});
+</script>
+
+	<div id="messages"></div>
+	<h2>Create New Class</h2>
+		<form id="edit-form" class="form-horizontal" action="{{ form_action }}" method="POST">
+			{% csrf_token %}
+			<input type="hidden" name="form-type" id="form-type" value="">
+			<div id="class-form">
+				{% include "web/class_form_template.html" with form=class_form %}
+			</div>
+			<input class="btn btn-primary hidden" type="submit" name="submit-class" value="Update Class" id="submit-class-form" />
+				<h2>Add Category</h2>
+			<div id="category-form">
+				{% include "web/category_form_template.html" with form=category_form %}
+			</div>
+			<input class="btn btn-primary hidden" type="submit" name="submit-category" value="Add Category" id="submit-category-form" />
+			<input class="btn" type="reset" value="New Category" id="new-category-form" />
+			<div class="form-actions">
+				<input class="btn btn-primary" type="submit" name="submit-all" value="Submit All" id="submit-form" />
+			</div>
+		</form>
+		<div id="category-list">
+			<ul id="cat-list" class="nav nav-pills nav-stacked">
+			</ul>
+		</div>
+		Double click on a category to edit it.
+		
+	</h2>
+{% endblock %}
