@@ -135,7 +135,7 @@ def detailQ(request,id):
 	#Go through text, replace @ with "<input type="text" name=" + characters + "></input>"
 	data['text']=replaceX(data['text'])
 
-	#go through code, replace @ with "<input type="text" name=" + characters + "></input>"
+	#go through code, replace @ with "<input size="6" type="text" name=" + characters + "></input>"
 	data['code'] = string.replace(replaceX(data['code']), "\n","<br>")
 
 	context={

@@ -6,25 +6,14 @@ CodeMirrorSettings = {
 	indentWithTabs: true,
 	theme: 'monokai'
 };
-// render_YUI('solution', solutions);
-// render_YUI('text', texts);
 
 code = CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
 solutions = [];
-// text = render_YUI('text');
 
 tinymce.init({
    selector: "textarea#text",
    force_p_newlines : false
 });
-
-// function add_text(){
-// 	newdiv = '<textarea name="temp" id="temp"></textarea>';
-// 	newdiv = newdiv.replace(/temp/g, 'text'+count);
-// 	$('#alttextlistdiv').append(newdiv);
-// 	render_YUI('text'+count, texts, '60px');
-// 	count++;
-// }
 
 solnIndex = 0;
 

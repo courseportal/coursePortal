@@ -29,7 +29,7 @@
 
 <body>
 	<button class="btn btn-success" id="loadA">Load Assignment</button>
-	<a href="{% url 'atemplate_index' %}">Load Assignment Template</a>
+	<a href="{% url 'atemplate_index' %}" class="btn btn-warning">Load Assignment Template</a>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
@@ -68,7 +68,7 @@
 					</div> 
 					{% with id=q.id %}
 					<div class="span1 question-pts"> 
-						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input> 
+						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input>
 					</div>
 					{% endwith %}
 					<div class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
