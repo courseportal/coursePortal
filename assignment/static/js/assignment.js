@@ -392,7 +392,6 @@ function save(){
 			//If user assents, save as template, otherwise exit
 			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
 			$('#assignmentForm').attr('action', 'assignment/template/createA');
-			alert($('#assignmentForm').attr('action'));
 			$('#assignmentForm').submit();
 		}
 		else
@@ -430,7 +429,6 @@ function previewQ(questiondata){
 		async: false,
 		data: questionPOST,
 	}).done(function(response){
-		alert(response);
 		return jQuery.parseJSON(response)
 	});
 }

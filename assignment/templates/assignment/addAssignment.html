@@ -24,7 +24,6 @@
 <html>
 
 <body>
-{% csrf_token %}
 	<a href="{% url 'assignment_index' %}" class="btn btn-success" id="loadA">Load Assignment</button>
 	<a href="{% url 'atemplate_index' %}" class="btn btn-warning">Load Assignment Template</a>
 	<div class="row-fluid">
@@ -130,9 +129,10 @@
 
 	<hr>
 	<div id="previewform"></div>
-	<button  class="btn" onclick="previewA()">Preview</button>
+	<button  class="btn" margin-bottom='20px' onclick="previewA()">Preview</button>
 
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
+	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>

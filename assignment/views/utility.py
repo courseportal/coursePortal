@@ -17,7 +17,7 @@ def checkAssignmentTitle(request):
 	overwrite=dict()
 	try:
 		if user.templates.filter(title=title):
-			value=True
+			value = True
 	except:
 		pass
 	overwrite['overwrite'] = value
@@ -25,7 +25,7 @@ def checkAssignmentTitle(request):
 
 def replaceX(data):
 	replace1="<input type=\"text\" name=\""
-	replace2="\" class=\"t_input\"></input>"
+	replace2="\" class=\"t_input\" style='width:100px;'></input>"
 	toReplace=""
 	while string.find(data, "@")>=0:
 		toReplace=""
