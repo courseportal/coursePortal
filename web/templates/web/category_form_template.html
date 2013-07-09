@@ -1,0 +1,19 @@
+{% if form.non_field_errors %}
+<div class="alert alert-warning">{{ form.non_field_errors }}</div>
+{% endif %}
+{% for field in form.hidden_fields %}
+{{ field }}
+{% endfor %}
+
+<div class="row-fluid">
+	{% include "web/field_template.html" with field=form.visible_fields.0 id_insert='category' %}
+</div>
+<div class="row-fluid">
+	<div class="span5">
+		{% include "web/field_template.html" with field=form.visible_fields.1 id_insert='category' no_help_text=1 %}
+	</div>
+	<div class="span7">
+		{% include "web/field_template.html" with field=form.visible_fields.2 id_insert='category' no_help_text=1 %}
+	</div>
+	{{ form.visible_fields.1.help_text }}
+</div>

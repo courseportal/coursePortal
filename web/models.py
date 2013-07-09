@@ -2,10 +2,12 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from haystack import indexes
+from django.http import Http404
 from django.db.models.signals import pre_delete, post_delete, pre_save, post_save
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from knoatom.settings import MEDIA_ROOT
 from rating.models import *
 from rating.ratings import *
@@ -139,20 +141,38 @@ class Class(models.Model):
 		verbose_name_plural = "Classes"
 		
 	def get_absolute_url(self):
-		return reverse('classes', args=[self.pk])
+		if self.pk is not None:
+			return reverse('classes', args=[self.pk])
+		else:
+			raise Http404
 
 class AtomCategory(models.Model):
-	name = models.CharField(max_length=200)
-	parent_class = models.ForeignKey(Class)
+	category_name = models.CharField(verbose_name=_('Category Name'), max_length=200)
+	parent_class = models.ForeignKey(Class, default=None, blank=True, null=True, related_name="category_set")
 	child_categories = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="parent_categories")
 	child_atoms = models.ManyToManyField(Atom, blank=True, symmetrical=False)
 	class Meta:
-		ordering = ['name']
+		ordering = ['category_name']
 		verbose_name_plural = "Categories"
 
 	def __unicode__(self):
-		return self.name
-
+		return self.category_name
+		
+	# def clean(self):
+# 		r"""Checks to make sure that no categories in the same class have the same name."""
+# 		super(AtomCategory, self).clean()
+# 		print(self.parent_class)
+# 		print(self.category_name)
+# 		qs = self.__class__.objects.filter(parent_class=self.parent_class, category_name=self.category_name)
+# 		
+# 		if not self._state.adding and self.pk is not None:
+# 			qs = qs.exclude(pk=self.pk)
+# 
+# 		if qs.exists():
+# 			raise ValidationError(_("Category name must be unique in this class."), code="duplicate")
+# 			
+		
+		
 @receiver(post_save, sender=Submission)
 def add_submission_rate(sender, **kwargs):
 	if kwargs['created']:

@@ -1,30 +1,60 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from web.models import Class
+from django.forms.models import modelformset_factory, BaseModelFormSet
+from django.utils.translation import ugettext_lazy as _
+from web.models import Class, AtomCategory
 
-class CreateClassForm(forms.ModelForm):
+
+class CategoryForm(forms.ModelForm):
+	r"""Form for category editing or creation creation from within a class editing view."""
 	def __init__(self, *args, **kwargs):
-		"""Sets the queryset of 'allowed_users' to exclude the author"""
-		user = kwargs.pop('user')
-		super(CreateClassForm, self).__init__(*args, **kwargs)
-		self.fields['allowed_users'].queryset = User.objects.exclude(id=user.id)
+		r"""Sets the queryset of categories to only allow categories in the current class"""
+		self.parent_class = kwargs.pop('parent_class')
+		super(CategoryForm, self).__init__(*args, **kwargs)
 		
-	allowed_users = forms.ModelMultipleChoiceField(label='Instructors', required=False, queryset=User.objects.none())
+		self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class)
 	
 	class Meta:
-		model = Class
-		fields = ('name', 'summary', 'status', 'allowed_users', 'students')
+		r"""Set the model it is attached to and select the fields."""
+		model = AtomCategory
+		fields=('category_name', 'child_categories', 'child_atoms')
 		
-	def save_class(self, user):
-		r"""Saves the model using the self.cleaned_data dictionary and user as the 'author'.  Adds 'author' to 'allowed_users'.  Returns the class that was created."""
-		new_class = Class.objects.create(
-			name=self.cleaned_data['name'],
-			summary=self.cleaned_data['summary'],
-			status=self.cleaned_data['status'],
-			author=user,
-		)
-		new_class.allowed_users = self.cleaned_data['allowed_users']
-		new_class.allowed_users.add(user)
-		new_class.students = self.cleaned_data['students']
-		return new_class
+class CreateCategoryForm(CategoryForm):
+	r"""Form for **creating** categories."""
+	def save(self):
+		r"""Overrides the save method."""
+		instance = super(CategoryForm, self).save(commit=False)
+		instance.parent_class = self.parent_class
+		instance.save()
+		instance.child_categories = self.cleaned_data['child_categories']
+		instance.child_atoms = self.cleaned_data['child_atoms']
+		return instance
+
+class ClassForm(forms.ModelForm):
+	r"""Form for **editing** classes."""
+	def __init__(self, *args, **kwargs):
+		"""Sets the queryset of ``allowed_users`` to exclude the author and save the user to ``self`` and make the ``allowed_users`` field not required."""
+		self.user = kwargs.pop('user')
+		super(ClassForm, self).__init__(*args, **kwargs)
+		self.fields['allowed_users'].queryset = User.objects.exclude(id=self.user.id)
+		self.fields['allowed_users'].required = False
+	
+	class Meta:
+		r"""Set the model the form is attached to and select the fields."""
+		model = Class
+		fields = ('name', 'status', 'summary', 'allowed_users', 'students')
+		
+	#Clean categories so they can't have the same name?
+		
+class CreateClassForm(ClassForm):
+	r"""Form for **creating** classes."""
+	def save(self):
+		r"""Overrides the save to add ``self.user`` to ``allowed_users`` and as an ``author``."""
+		instance = super(CreateClassForm, self).save(commit=False)
+		instance.author = self.user
+		instance.save()
+		instance.allowed_users = self.cleaned_data['allowed_users']
+		instance.allowed_users.add(self.user)
+		instance.students = self.cleaned_data['students']
+		return instance
+		

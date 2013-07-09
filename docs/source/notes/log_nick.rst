@@ -18,6 +18,7 @@ Week of June 24-28
 *   Moved the rating system into a seperate app
 *   Added rating for topics in forum
 *   Forum now orders topics by votes
+*   Creating new view for creating classes
 
 Goals
 -----
