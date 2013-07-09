@@ -6,13 +6,23 @@ from web.models import Class, AtomCategory
 
 
 class CategoryForm(forms.ModelForm):
-	r"""Form for category editing or creation creation from within a class editing view."""
+	r"""
+	Form for category editing or creation creation from within a class editing view.
+	
+	.. warning::
+	
+		This form assumes that you are only editing **one** category at a time.  Otherwise infinite loops can be formed.
+	
+	"""
 	def __init__(self, *args, **kwargs):
 		r"""Sets the queryset of categories to only allow categories in the current class"""
 		self.parent_class = kwargs.pop('parent_class')
 		super(CategoryForm, self).__init__(*args, **kwargs)
+		if self.instance: # Exclude model instance from the queryset to prevent loops
+			self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class).exclude(id=self.instance.id)
+		else:
+			self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class)
 		
-		self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class)
 	
 	class Meta:
 		r"""Set the model it is attached to and select the fields."""

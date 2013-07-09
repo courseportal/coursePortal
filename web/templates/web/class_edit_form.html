@@ -47,7 +47,9 @@ var categoryClicked = function(value, name)
 		type: 'GET',
 		url: '/edit-class/{{pk}}/' + value + '/',
 		success: function(response) {
-			$("#category-form").empty().append(response.category_form)
+			$('div#cat-header').empty().append('Edit Category');
+			$('input#submit-category-form').attr('value', 'Update Category');
+			$("#category-form").empty().append(response.category_form);
 		}
 	});
 	return false;
@@ -81,6 +83,9 @@ $(document).ready(function() {
 	
 	// Get new category form when the button is pressed
 	$('#new-category-form').click(function() {
+		$('div#cat-header').empty().append('Add Category')
+		$('input#submit-category-form').attr('value', 'Add Category')
+		$('#edit-form').attr('action', '');
 		$.ajax({
 			type: 'GET',
 			url: '/edit-class/{{ pk }}/',
@@ -138,8 +143,8 @@ $(document).ready(function() {
 			},
 		});
 		// Enable the buttons again.
-		$('#submit-'+id_insert+'-form').attr('disabled', false);
-		$('#clear-'+id_insert+'-form').attr('disabled', false);
+		$('input#submit-'+id_insert+'-form').attr('disabled', false);
+		$('input#new-'+id_insert+'-form').attr('disabled', false);
 		return false;
 	};
 	
@@ -155,9 +160,13 @@ $(document).ready(function() {
 	{
 		if (response.message)
 		{
-			$("#messages").empty().append('<div class="alert alert-success">'+response.message+'</div>')
+			$("#messages").empty().append('<div class="alert alert-success">'+response.message+'</div>');
 		}
-		$("#category-form").empty().append(response.category_form)
+		$('div#cat-header').empty().append('Add Category');
+		$('input#submit-category-form').attr('value', 'Add Category');
+		$('#edit-form').attr('action', '');
+		$("#category-form").empty().append(response.category_form);
+		$('ul#cat-list').columnview('update');
 	};
 	
 	$('#submit-class-form').click(function() {
@@ -170,11 +179,15 @@ $(document).ready(function() {
 		var form = $('#edit-form')
 		return ajax_submit(form, 'category', category_success_function)
 	});
+	$('input#submit-form').click(function() {
+		$('input[id=form-type]').val('');
+		return true;
+	});
 });
 </script>
 
 	<div id="messages"></div>
-	<h2>Create New Class</h2>
+	<h2>Edit Class</h2>
 		<form id="edit-form" class="form-horizontal" action="{{ form_action }}" method="POST">
 			{% csrf_token %}
 			<input type="hidden" name="form-type" id="form-type" value="">
@@ -182,7 +195,7 @@ $(document).ready(function() {
 				{% include "web/class_form_template.html" with form=class_form %}
 			</div>
 			<input class="btn btn-primary hidden" type="submit" name="submit-class" value="Update Class" id="submit-class-form" />
-				<h2>Add Category</h2>
+			<h2><div id="cat-header">Add Category</div></h2>
 			<div id="category-form">
 				{% include "web/category_form_template.html" with form=category_form %}
 			</div>
@@ -193,7 +206,7 @@ $(document).ready(function() {
 			</div>
 		</form>
 		<div id="category-list">
-			<ul id="cat-list" class="nav nav-pills nav-stacked">
+			<ul id="cat-list">
 			</ul>
 		</div>
 		Double click on a category to edit it.

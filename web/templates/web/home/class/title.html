@@ -1,18 +1,21 @@
+{% comment %}
 <!--
 
 To INCLUDE this file:
 
 	REQUIRED context:
-		current_class
+		selected_class
 
 	OPTIONAL context:
 		None
 
 -->
 <!-- This should be included in the "title" block, but who am I to tell you what to do -->
+{% endcomment %}
+
 <div class="page-header">
 	<span style="font-size: 200%;font-weight:bold;">KnoAtom - {{ selected_class.name }}</span>
-    {% if user.is_staff or user.is_superuser %}
-    <span style="float:right"><a href="{% url 'admin:web_class_change'  selected_class.id %}">[Log into Class Admin Site..]</a></span>
+    {% if user == selected_class.author or user.is_superuser %}
+    <span style="float:right"><a href="{% url 'edit_class'  selected_class.id %}">[Edit Class...]</a></span>
     {% endif %}
 </div>

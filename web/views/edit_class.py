@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import FormView, CreateView
 from django.core.urlresolvers import reverse_lazy, reverse
 from web.forms.edit_class import CreateClassForm, CategoryForm, ClassForm
@@ -80,6 +80,8 @@ def EditClassView(request, class_id, cat_id):
 			context.update(process_forms(request, class_object, class_form, category_form))
 		if request.is_ajax(): # We don't need to return all of the context, just the update stuff
 			return render_to_json_response(context)
+		elif cat_id: # We don't want to allow users to access the page with cat_id, only AJAX	
+			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 	else: # GET
 		if request.is_ajax(): # Return a category form with initial data or with no data
 			category_form = CategoryForm(**category_form_kwargs)
@@ -90,16 +92,19 @@ def EditClassView(request, class_id, cat_id):
 			'category_form':form_html
 			})
 			return render_to_json_response(context) # Return the html for the new form
+		elif cat_id: # We don't allow GET requests with a category already set that aren't AJAX
+			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 			
 		context.update({ # We need to add the forms to the kwargs if its not POST
 			'class_form':ClassForm(**class_form_kwargs),
 			'category_form':CategoryForm(**category_form_kwargs)
 		})
 	# AJAX requests should not reach here because they should all be POST.
+	# Pick the category header
 	context.update({
 		'pk':class_object.id,
 		'top_level_categories':BaseCategory.objects.filter(parent_categories=None),
-		'breadcrumbs':{'url':reverse('edit_class', args=[class_id]), 'title':'Edit Class'}
+		'breadcrumbs':[{'url':reverse('edit_class', args=[class_id]), 'title':'Edit Class'}]
 	})
 	return render(request, 'web/class_edit_form.html', context)
 	
