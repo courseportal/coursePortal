@@ -17,7 +17,6 @@ urlpatterns = patterns('',
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 	url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'),
 	url(r'^ajax/delete/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'),
-	url(r'^ajax/get-children/(?P<is_class>\d+)/(?P<pk>\d+)?/?$', 'web.views.edit_class.get_children', name='get_children'),
 	                    
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
 	url(r'^expo_submit/(?P<eid>\d+)?/?$', 'web.views.submission.exposition', name='expo_submit'),
@@ -25,10 +24,13 @@ urlpatterns = patterns('',
 	url(r'^example_submit/(?P<exid>\d+)?/?$', 'web.views.submission.example_submit', name='example_submit'),
 	       
     url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
-	
+	 
+	# URLs for the class editing form
 	url(r'^create-class/?$', CreateClassView.as_view(), name='create_class'),
-	#url(r'^edit-class-old/?$', OldCreateClassView.as_view(), name='edit_class_old'),
 	url(r'^edit-class/(?P<class_id>\d+)/(?P<cat_id>\d+)?/?$', 'web.views.edit_class.EditClassView', name='edit_class'),
+	# URLs for class editing form that are ONLY used with AJAX
+	url(r'^ajax/get-children/(?P<is_class>\d+)/(?P<pk>\d+)?/?$', 'web.views.edit_class.get_children', name='get_children'),
+	url(r'^ajax/delete-category/(?P<pk>\d+)/?$', 'web.views.edit_class.delete_category', name="delete_category"),
 	
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='atom'),
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name = 'category'),

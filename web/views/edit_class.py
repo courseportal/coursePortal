@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.views.generic.edit import FormView, CreateView
 from django.core.urlresolvers import reverse_lazy, reverse
 from web.forms.edit_class import CreateClassForm, CategoryForm, ClassForm
@@ -165,10 +165,46 @@ def process_forms(request, class_object, class_form=None, category_form=None):
 				context.update({'category_form':category_form})
 				messages.error(request, 'Error saving category.')
 	return context
+	
+# View to delete categories
+def delete_category(request, pk):
+	r"""
+	Deletes the category with pk=pk and returns html for an empty category form.
+	
+	.. warning::
+	
+		This view is designed to only be used with AJAX
+	
+	"""
+	if not request.is_ajax():
+		return HttpResponseBadRequest()
+	category_object = get_object_or_404(AtomCategory, pk=pk)
+	class_object = category_object.parent_class
+	category_object.delete()
+	category_form = CategoryForm(parent_class=class_object)
+	
+	template = loader.get_template('web/category_form_template.html')
+	c = RequestContext(request, {'form':category_form})
+	form_html = template.render(c)
+	context = {
+		'category_form': form_html,
+		'message': 'Successfully deleted category.'
+	}
+	data = json.dumps(context)
+	return HttpResponse(data, content_type='application/json')
 
 # View to get children for columnview
 def get_children(request, is_class, pk):
-	r"""Returns an html list of the child atoms and categories of either the class or category in the correct format for columnview."""
+	r"""
+	Returns an html list of the child atoms and categories of either the class or category in the correct format for columnview.
+	
+	.. warning::
+	
+		This view is designed to only be used with AJAX
+	
+	"""
+	if not request.is_ajax():
+		return HttpResponseBadRequest()
 	is_class = int(is_class)
 	if is_class:
 		cur_class = get_object_or_404(Class, pk=pk)
