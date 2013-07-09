@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.views.generic.edit import FormView, CreateView
 from django.core.urlresolvers import reverse_lazy, reverse
 from web.forms.edit_class import CreateClassForm, CategoryForm, ClassForm
@@ -80,6 +80,8 @@ def EditClassView(request, class_id, cat_id):
 			context.update(process_forms(request, class_object, class_form, category_form))
 		if request.is_ajax(): # We don't need to return all of the context, just the update stuff
 			return render_to_json_response(context)
+		elif cat_id: # We don't want to allow users to access the page with cat_id, only AJAX	
+			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 	else: # GET
 		if request.is_ajax(): # Return a category form with initial data or with no data
 			category_form = CategoryForm(**category_form_kwargs)
@@ -90,16 +92,19 @@ def EditClassView(request, class_id, cat_id):
 			'category_form':form_html
 			})
 			return render_to_json_response(context) # Return the html for the new form
+		elif cat_id: # We don't allow GET requests with a category already set that aren't AJAX
+			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 			
 		context.update({ # We need to add the forms to the kwargs if its not POST
 			'class_form':ClassForm(**class_form_kwargs),
 			'category_form':CategoryForm(**category_form_kwargs)
 		})
 	# AJAX requests should not reach here because they should all be POST.
+	# Pick the category header
 	context.update({
 		'pk':class_object.id,
 		'top_level_categories':BaseCategory.objects.filter(parent_categories=None),
-		'breadcrumbs':{'url':reverse('edit_class', args=[class_id]), 'title':'Edit Class'}
+		'breadcrumbs':[{'url':reverse('edit_class', args=[class_id]), 'title':'Edit Class'}]
 	})
 	return render(request, 'web/class_edit_form.html', context)
 	
@@ -160,10 +165,46 @@ def process_forms(request, class_object, class_form=None, category_form=None):
 				context.update({'category_form':category_form})
 				messages.error(request, 'Error saving category.')
 	return context
+	
+# View to delete categories
+def delete_category(request, pk):
+	r"""
+	Deletes the category with pk=pk and returns html for an empty category form.
+	
+	.. warning::
+	
+		This view is designed to only be used with AJAX
+	
+	"""
+	if not request.is_ajax():
+		return HttpResponseBadRequest()
+	category_object = get_object_or_404(AtomCategory, pk=pk)
+	class_object = category_object.parent_class
+	category_object.delete()
+	category_form = CategoryForm(parent_class=class_object)
+	
+	template = loader.get_template('web/category_form_template.html')
+	c = RequestContext(request, {'form':category_form})
+	form_html = template.render(c)
+	context = {
+		'category_form': form_html,
+		'message': 'Successfully deleted category.'
+	}
+	data = json.dumps(context)
+	return HttpResponse(data, content_type='application/json')
 
 # View to get children for columnview
 def get_children(request, is_class, pk):
-	r"""Returns an html list of the child atoms and categories of either the class or category in the correct format for columnview."""
+	r"""
+	Returns an html list of the child atoms and categories of either the class or category in the correct format for columnview.
+	
+	.. warning::
+	
+		This view is designed to only be used with AJAX
+	
+	"""
+	if not request.is_ajax():
+		return HttpResponseBadRequest()
 	is_class = int(is_class)
 	if is_class:
 		cur_class = get_object_or_404(Class, pk=pk)

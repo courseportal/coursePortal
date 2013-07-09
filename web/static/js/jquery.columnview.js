@@ -239,7 +239,7 @@ jQuery.fn.mapAttributes = function(prefix) {
       if (!attrName) {
         attrName = "name";
       }
-
+		
       var origLinks = origElt.find("[" + attrName + "=" + key + "]").parentsUntil(origElt).filter("li").find(":eq(0)");
       var keys = origLinks.map(function (i, elt) { return $(elt).attr(attrName); }).toArray().reverse();
 
@@ -248,6 +248,21 @@ jQuery.fn.mapAttributes = function(prefix) {
         methods.handleClick(entry);
       });
     },
+		
+		// This function updates the list by calling getSubtree again with the isRoot = true
+		update: function() {
+			var $this = $(this); 
+      var data = $this.data("columnview");
+      if (!data) {
+        return;
+      }
+			$topdiv = $('div.top') // Select the top div, or the first column
+      var container = data.container; // Select the container
+			$topdiv.empty(); // Empty the top div for refreshing
+			$nottopdiv = container.find('div').not('div.top'); // Select columns 2-N
+			$nottopdiv.remove() // Remove them because they could be outdated now
+			submenu(container, $this, $topdiv); // Refresh the first column
+		},
 
     // Event handling functions
     handleEvent: function (event) {
