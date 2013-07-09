@@ -18,16 +18,13 @@
 <!-- JQUERY UI -->
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 
-<!-- nyromodal -->
-<link rel="stylesheet" href="{{STATIC_PREFIX}}nyromodal/styles/nyroModal.css" type="text/css" media="screen" />
-<script type="text/javascript" src="{{STATIC_PREFIX}}nyromodal/js/jquery.nyroModal.custom.js"></script>
-
 <!-- javascript -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
 
 <html>
 
 <body>
+{% csrf_token %}
 	<a href="{% url 'assignment_index' %}" class="btn btn-success" id="loadA">Load Assignment</button>
 	<a href="{% url 'atemplate_index' %}" class="btn btn-warning">Load Assignment Template</a>
 	<div class="row-fluid">
@@ -132,20 +129,17 @@
 	</div>
 
 	<hr>
-	<form action="{% url "preview_assignment" %}" method="post" id="previewform">
-	{% csrf_token %}
-		<input type="text" style="display:none" id="previewdata" name="previewdata"></input>
-		<button  class="btn" onclick="previewA()">Preview</button>
-	</form>
+	<div id="previewform"></div>
+	<button  class="btn" onclick="previewA()">Preview</button>
+
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
-	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
 <div id="loading-zone">
 	{% if question_list %}
 	<div class="list-table">
-   	<body>  
+		<body>  
 		<table class="table">  
       	<thead>  
         		<tr> 
@@ -166,12 +160,12 @@
 				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
 			</tr>
 		
-	   {% endfor %}
-   	   </tbody>  
+		{% endfor %}
+			</tbody>  
    	</table>  
 	</div>
 	{% else %}
-   	<p>No questions exist!</p>
+		<p>No questions exist!</p>
 	{% endif %}
 	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
 	<div class="preview-area">
