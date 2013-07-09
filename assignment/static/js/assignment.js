@@ -115,8 +115,7 @@ function init(){
 				$('#solndiv').html('');
 				return true;
 			}
-		},
-		//dialogClass: 'no-close',
+		}
 	});
 
 	$('#loading-zone').dialog({
@@ -126,6 +125,20 @@ function init(){
 		autoOpen: false,
 	});
 	$('#template-zone').dialog({
+		width: document.body.clientWidth*0.8,
+		height: document.body.clientHeight*0.7,
+		modal: true,
+		autoOpen: false,
+		focus: function(event, ui){
+			//disable parent scrolling
+			$('body').addClass('dialog-open');
+		},
+		close: function(event, ui){
+			//re-enable parent scrolling
+			$('body').removeClass('dialog-open');
+		}
+	});
+	$('#previewform').dialog({
 		width: document.body.clientWidth*0.8,
 		height: document.body.clientHeight*0.7,
 		modal: true,
@@ -154,7 +167,6 @@ function init(){
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
 	$('#Qtemplate').attr('onclick', "openTemplates()");
-	$("#previewform").nm();
 }
 
 function add_choice_div(){
@@ -443,8 +455,17 @@ function previewA(){
 		assignment.questions.push(question);
    });
 
-   $('#previewdata').val(JSON.stringify(assignment, undefined, 2));
-   $('#previewform').submit();
+   data = {
+   	previewdata:JSON.stringify(assignment, undefined, 2),
+   };
+
+   $('#previewform').load('assign/preview/', data, function(response, status, xhr){
+   	if (status == "error") {
+    		var msg = "Sorry but there was an error: ";
+    		$("#previewform").html(msg + xhr.status + " " + xhr.statusText);
+  		}
+   });
+   $('#previewform').dialog('open');
 }
 
 function iframe_preview(qid){
