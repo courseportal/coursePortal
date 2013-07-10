@@ -39,17 +39,12 @@ def detail(request, id):
     return render(request, 'assignment/detail.html', context)
 
 def assign(request):
-    user_list = User.objects.all()
-    assignments = Assignment.objects.all()
-    assignment_list = AssignmentInstance.objects.all()
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('assign'), 'title':'Assign'})
     context = {
-        'user': request.user,
-        'users': user_list,
+        'users': User.objects.all(),
         'breadcrumbs': breadcrumbs,
-        'assignments': assignments,
-        'assignment_list': assignment_list,
+        'assignments': request.user.owned_assignments.all(),
         'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
     }
     return render(request, 'assignment/assign.html', context)
@@ -169,6 +164,36 @@ def create(request):
     assignment.data=json.dumps(data)
     assignment.save()
     return main(request)
+
+def unassign(request):
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url':reverse('unassign'), 'title':'Assign'})
+    context = {
+        'user': request.user,
+        'breadcrumbs': breadcrumbs,
+        'assignments': request.user.owned_assignments.all(),
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
+    }
+    return render(request, 'assignment/unassign.html', context)
+
+def unmake(request):
+    try:
+        instances = request.POST
+        for i in instances:
+            if i=="csrfmiddlewaretoken":
+                continue
+            instance = AssignmentInstance.objects.get(id=request.POST[i])
+            for q in instance.questions.all():
+                for c in q.choiceInstances.all():
+                    c.delete()
+                q.delete()
+            instance.delete()
+    except:
+        pass
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment(s) succesfully unassigned!"]}
+    return render(request, 'assignment_nav.html', context)
+
 
 def createQ(x):
     question = Question()

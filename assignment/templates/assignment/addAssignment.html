@@ -138,17 +138,18 @@
 	</form>
 <div id="loading-zone">
 	{% if question_list %}
-	<div class="list-table">
-		<body>  
-		<table class="table">  
-      	<thead>  
+		<table class="table">
+      	<thead class="fixedHeader">  
         		<tr> 
            		<th>Title</th>
            		<th>Subject</th>
            		<th>Author</th>
            		<th>Rating</th>
         		</tr>  
-      	</thead> 
+      	</thead>
+      </table>
+   <div class="list-table">  
+		<table class="table">  
       	<tbody>
    	{% for question in question_list %}
    		<tr>
