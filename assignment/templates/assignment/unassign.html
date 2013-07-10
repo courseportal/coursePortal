@@ -1,0 +1,44 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+
+<form method = "post" action = "{% url 'unmake' %}">
+{% csrf_token %}
+<table class="table">
+	<thead>
+		<th style="width:10px"></th>
+		<th style="width:80px">Username</th>
+		<th style="width:100px">Name</th>
+		<th style="width:100px">Assignment</th>
+		<th style="width:100px">Class</th>
+	</thead>
+</table>
+<div class="list-table">  
+<table class="table">
+	<thead>
+		<th></th>
+		<th></th>
+		<th></th>
+		<th></th>
+	</thead> 
+	<tbody>
+		{% for a in assignments %}
+			{% for i in a.instances.all %}
+				<tr>
+					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
+					<td style="width:80px">{{i.user.username}}</td>
+					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
+					<td style="width:100px">{{i}}</td>
+					<td style="width:100px"></td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+<input type="submit" class="btn"></input>
+</form>
+{% endblock %}
+

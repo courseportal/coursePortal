@@ -16,11 +16,11 @@
 				onclick="display({{stats.data}},{{stats.classid}});" >Plot</h3>
 		</div>
 	</div>
-	<div>Average: {{stats.average}}</div>
-	<div>Standard Deviation: {{stats.deviation}}</div>
-	<div>Minimum: {{stats.minimum}}</div>
-	<div>Maximum: {{stats.maximum}}</div>
-	<div>Median: {{stats.median}}</div>
+	<div>Average: {{stats.average|floatformat:2}}</div>
+	<div>Standard Deviation: {{stats.deviation|floatformat:2}}</div>
+	<div>Minimum: {{stats.minimum|floatformat:2}}</div>
+	<div>Maximum: {{stats.maximum|floatformat:2}}</div>
+	<div>Median: {{stats.median|floatformat:2}}</div>
 	<div style="display:none">
 		<img  id="dialog{{stats.classid}}" title="Class boxplot"></div>
 	</div>
@@ -40,27 +40,27 @@ function display(data, classid){
 		var chd="t0:"
 		//Organize data in url
 			//minWhisker
-			chd=chd.concat(lowerWhisker,'|');
+			chd=chd.concat('-1,',lowerWhisker,'|');
 			//q1
-			chd=chd.concat(q1,'|');
+			chd=chd.concat('-1,',q1,'|');
 			//q3
-			chd=chd.concat(q3,'|');
+			chd=chd.concat('-1,',q3,'|');
 			//maxwhisker
-			chd=chd.concat(upperWhisker,'|');
+			chd=chd.concat('-1,',upperWhisker,'|');
 			//median
-			chd=chd.concat(median)
+			chd=chd.concat('-1,',median)
 			//outliers
 			for(var x=0; x<mildOutliers.length; x++){
-				chd=chd.concat('|',mildOutliers[x]);
+				chd=chd.concat('|-1,',mildOutliers[x]);
 			}
 			for(var x=0; x<extremeOutliers.length; x++){
-				chd=chd.concat('|',extremeOutliers[x]);
+				chd=chd.concat('|-1,',extremeOutliers[x]);
 			}
 		url=url.concat(chd,"&chm=");
 		//Create markers
 			var chm=''
 			//candle
-			chm=chm.concat("F,0000FF,0,1,20|");
+			chm=chm.concat("F,0000FF,0,1,40|");
 			//min whisker
 			chm=chm.concat("H,0000FF,0,1,1:20|");
 			//max whisker
