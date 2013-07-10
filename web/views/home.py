@@ -577,6 +577,7 @@ def classes(request, class_id):
 
 	t = loader.get_template('web/home/class/index.html')
 	c = RequestContext(request, {
+		'object': current_class,
 		'breadcrumbs': [{'url':reverse('classes', args=[current_class.id]), 'title': current_class.name}],
 		'top_level_categories': top_level_categories,
 		'top_ranked_videos': top_ranked_videos,

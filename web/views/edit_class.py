@@ -176,7 +176,7 @@ def delete_category(request, pk):
 		This view is designed to only be used with AJAX
 	
 	"""
-	if not request.is_ajax():
+	if not request.is_ajax(): # If it is not an AJAX request return a 400 status code
 		return HttpResponseBadRequest()
 	category_object = get_object_or_404(AtomCategory, pk=pk)
 	class_object = category_object.parent_class

@@ -12,8 +12,8 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 Goals
 -----
     
-New Todo:
-    *   Put a delete option in the submit form for user uploaded content [first]
+Todo:
+	*	Change from child class to parent class
     *   Implement ajax table updating in the topic list
     *   Testing
     *   Documentation
@@ -32,6 +32,8 @@ Week of July 8-12
 	*	The 'finder-like' columnview of the categories refreshes when you create/update a category.
 	*	The columnview uses AJAX to get one level of the hierarchy at a time for faster loading. 
 	*	Added delete category button when we are editing a category
+*	Added a delete button to all of the user uploaded submission pages when you are updating.
+*	Put the class summary in the class "home" page.  HTML markup is allowed.
 	
 Week of July 1-5
 ================

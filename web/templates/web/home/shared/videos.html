@@ -68,7 +68,7 @@ OPTIONAL context:
       
           {% include "web/home/shared/sticky.html" with type=4 e=c %}
           {% if user.is_superuser or e.owner == user %}
-            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}?next={{request.path}}" title="Edit"></a>
             <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
             {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
             {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
@@ -126,7 +126,7 @@ OPTIONAL context:
         
           {% include "web/home/shared/sticky.html" with type=4 e=c %}
           {% if user.is_superuser or e.owner == user %}
-            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}" title="Edit"></a>
+            <a rel="tooltip" class="icon-edit" href="{% url "submit" c.id %}?next={{request.path}}" title="Edit"></a>
             <a rel="tooltip" class="icon-remove" href="#deleteModal4{{ c.id }}" data-toggle="modal" title="Delete"></a>
             {% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
             {% include "web/home/shared/delete_modal.html" with type=4 name=c.title e=c %}
