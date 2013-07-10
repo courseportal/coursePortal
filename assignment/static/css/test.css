@@ -37,5 +37,5 @@ body.dialog-open { overflow: hidden; }
 
 .list-table {
 	height:300px;
-	overflow:scroll;
+	overflow-y:scroll;
 }

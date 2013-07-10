@@ -30,10 +30,6 @@ def previewQuestion(request):
 	q['solution']= q['solution'].replace('<br>', '\n')
 	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 	
-	# for integer_index in range(len(q['choices'])):
-	# 	q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-	# 	q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-
 	try: 
 		exec q['code']
 		preview['soln'] = eval(q['solution'])
@@ -44,7 +40,6 @@ def previewQuestion(request):
 		preview['text'] += str(ex)
 
 	return HttpResponse(json.dumps(preview))
-
 
 def previewAssignment(request):
 	assignment = json.loads(request.POST['previewdata'])
@@ -77,7 +72,6 @@ def previewAssignment(request):
 			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
 			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 			
-
 		#q text formatted here
 		local_dict = dict(locals())
 		question['text'] = Template(q['text']).substitute(local_dict)
@@ -92,8 +86,6 @@ def previewAssignment(request):
 		if len(q['choices']) > 0:
 			question['choices'].append(question['solution'])
 		question_list.append(question)
-
-	
 
 	if test!='':
 		return HttpResponse(test)
@@ -210,6 +202,50 @@ def metrics(request):
 	}
 	return render(request, 'assignment/metrics.html', context)
 
-
-
+def deleteA(request):
+	#Delete specified assignment
+	if request.method == "POST":
+		for entry in request.POST:
+			if entry =="csrfmiddlewaretoken":
+				continue
+			assignment = Assignment.objects.get(id=entry)
+			for q in assignment.questions.all():
+				q.delete()
+			assignment.delete()
+			#delete assigned instances?
+	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
+	context = {
+   	'assignment_list': request.user.owned_assignments.all(),
+   	'breadcrumbs':breadcrumbs
+   }
+	if request.method == "POST":
+		context['messages']=['Assignment(s) deleted']
 	
+	#breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
+	return render(request, 'assignment/delete.html', context)
+
+def deleteQ(request):
+	#Delete specified questions
+	if request.method == "POST":
+		for entry in request.POST:
+			if entry =="csrfmiddlewaretoken":
+				continue
+			question = Question.objects.get(id=entry)
+			#Delete data entries in assignments
+			for a in question.assigned_to.all():
+				data = json.loads(a.data)
+				del data['questions'][str(question.id)]
+				a.data = json.dumps(data)
+				a.save()
+			question.delete()
+			#delete assigned instances?
+	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
+	context = {
+   	'question_list': Question.objects.all(),
+   	'breadcrumbs':breadcrumbs
+   }
+	if request.method == "POST":
+		context['messages']=['Question(s) deleted']
+	
+	#breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
+	return render(request, 'question/delete.html', context)

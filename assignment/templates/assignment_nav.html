@@ -48,13 +48,15 @@ I have changed this file a bit, you should use this as the template you extend. 
 {% if user.is_staff %}
         <li class="nav-header">My Class</li>
         <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
-        <li style="blue"><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
+        <li><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
         <ul class="nav nav-list">
         {%for t in user.owned_assignments.all%}
             <li><a href="assignment/assign/edit/{{t.id}}">{{t}}</a></li>
         {%endfor%}
         </ul>
+        <li><a href="{% url "delete_assignment" %}">Delete Assignment</a></li>
         <li><a href="{% url "add_question" %}">Add Question</a></li>
+        <li><a href="{% url 'delete_question' %}">Delete Question</a></li>
         <li class="divider"></li>
 {% endif %}
 
@@ -69,7 +71,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 {% endif %}
 
 {% if user.is_active %}
-   <li class "nav-header">Student Affairs</li>
+   <li class="nav-header">Student Affairs</li>
    <li class="{% if grade_check == 1 %}active{%endif%}">
    <a href="{% url "grades" %}">View grades</a></li>
 

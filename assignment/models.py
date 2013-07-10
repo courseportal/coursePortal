@@ -27,7 +27,7 @@ class Question(models.Model):
 class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
     data = models.TextField(default='', null=True, blank=True)
-    questions = models.ManyToManyField(Question)
+    questions = models.ManyToManyField(Question, related_name='assigned_to')
     owners = models.ManyToManyField(User, related_name='owned_assignments', blank=True, null=True)
     def __unicode__(self):
         return self.title
