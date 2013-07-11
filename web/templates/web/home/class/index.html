@@ -32,7 +32,9 @@ BLOCKS(Including inherited blocks):
 	{% include "web/home/class/title.html" %}
 {% endblock %}
 {% block content %}
-    <p>This is the class index page</p>
+{% autoescape off %}
+	{{ object.summary }}
+{% endautoescape %}
 {% endblock %}
 
 <!--

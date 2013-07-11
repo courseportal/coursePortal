@@ -1,5 +1,5 @@
 {% for atom in atoms.all %}
-	<li><a href="#" hasChildren="false" ondblclick="javascript:atomClicked({{ atom.id }}, '{{ atom.name }}');" name="{{ atom }}">{{ atom }}</a></li>
+	<li><a href="#" style="color:#000000" hasChildren="false" ondblclick="javascript:atomClicked({{ atom.id }}, '{{ atom.name }}');" name="{{ atom }}">{{ atom }}</a></li>
 {% endfor %}
 {% for category in categories.all %}
 	<li hasChildren="true">

@@ -1,0 +1,59 @@
+{% extends "web/home/home.html" %}
+{% comment %}
+<!--
+This is the template for the class list.  It just lists the classes in the content block.
+
+To EXTEND/USE this file:
+
+	REQUIRED context:
+		top_level_categories
+		breadcrumbs
+		class_list
+
+BLOCKS(Including inherited blocks):
+  extra_style
+  extra_head
+  extra_script
+	head
+	breadcrumb
+	sidebar
+	navbar_content
+	message
+	content
+	footer
+	page_title
+	title
+
+-->
+{% endcomment %}
+{% block content %}
+
+<div id="table">
+	<table class="tablesorter">{# The other classes are set in the tablesorter.settings.js file #}
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Instructor</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for class in class_list %}
+
+				{#<!-- If the class is active or user is the author put on the list -->#}
+				{% if class.status == "A" or class.author == user or user.is_superuser or user in class.allowed_users.all %}
+					<tr>
+						<td><a href="{% url "classes" class.id %}">{{ class.name }}</a></td>
+						<td>{{ class.author }}</td>
+					</tr>
+				{% endif %}
+			{% empty %}
+				There are no classes.
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<script>{% include 'js/tablesorter.settings.js' with sortlist='[[0,0]]' %}</script>
+
+
+{% endblock %}

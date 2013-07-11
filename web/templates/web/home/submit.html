@@ -1,4 +1,5 @@
-<!--
+{% extends "web/home/home.html" %}
+{% comment %}<!--
 
 To EXTEND/USE this file:
 
@@ -30,9 +31,7 @@ BLOCKS(Including inherited blocks):
 -->
 
 <!-- Submit form for videos -->
-
-{% extends "web/home/home.html" %}
-
+{% endcomment %}
 {% block content %}
 
 <script type="text/javascript">
@@ -83,8 +82,43 @@ $(document).ready(function() {
     <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
     <input class="btn" type="submit" name="submitOne" value="Submit" />
     <a class="btn" id="preview_video">Preview Video</a>
+	{% if object %}
+		<a class="btn btn-danger" id="delete-modal" href="#deleteModal" data-toggle="modal">Delete</a>
+	{% endif %}
 </div>
 </form>
 
+
+  <div id="deleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Deletion Confirmation</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete {{ object }}?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="delete" object-id="{{ object.id }}" data-dismiss="modal" aria-hidden="true">Yes</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+      </div>
+    </div>
+<script>
+// Set up the listener to listen for the delete button click
+$(document).ready(function() {
+	$('button#delete').click(function() {
+		$('a#delete-modal').attr('disabled', true)
+		$.ajax({
+			// See 'web.ajax.delete_content'
+			url: '/ajax/delete/4/'+ $(this).attr('object-id') // 3 stands for example
+		}).fail(function() {
+			$('div#messages').empty().append("<div class='alert alert-error'>Failed to delete {{object}}.</div>");
+		}).done(function() {
+			window.location = '{{ redirect_to }}'
+		}).always(function() {
+			$('a#delete-modal').attr('disabled', false)
+		})
+	})
+})
+</script>
 {% endblock %}
 
