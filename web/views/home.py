@@ -6,51 +6,41 @@ from django.db.models import Q, Avg
 from django.db.models.loading import get_models
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.template import RequestContext, loader, Context
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import json
 
 from pybb.models import Forum
 from django.core.mail import send_mail, BadHeaderError
 from web.forms.submission import testModalForm
 from django.forms.util import ErrorList
+from knoatom.view_functions import get_breadcrumbs
 
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 
+def get_navbar_context(class_object=None):
+	r"""Returns a dictionary of the required context for the navbar.  If it is being used for a view that is inside a class pass the class id."""
+	context = {}
+	if class_object:
+		context.update({
+			'top_level_categories': class_object.category_set.filter(parent_category=None)
+		})
+	else:
+		context.update({
+			'top_level_categories': BaseCategory.objects.filter(parent_categories=None)
+		})
+	return context
 
-class PlainErrorList(ErrorList):
-
-    """
-        Look at this amazing class documentation
-        
-        """
-    def __unicode__(self):
-        """This function returns the unicode name of the class"""
-        return self.as_plain()
-    def as_plain(self):
-        """This function returns the error message
-            
-            **Not sure**
-            
-            """
-        if not self: return u''
-        return u'<br/>'.join([ e for e in self ])
-
-
-
-def class_index(request):	
-
-	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-	class_list = Class.objects.all()
-	
-	template = loader.get_template('web/home/class_index.html')
-	context = RequestContext(request, {
-		'breadcrumbs': [{'url': reverse('class_index'), 'title': 'Class Index'}],
-		'class_list': class_list,
-		'top_level_categories': top_level_base_categories,
+def class_list(request):	
+	r"""This is the view for the class list."""
+	context = get_navbar_context() # Create the context dict with the navbar context in it.
+	context.update(
+		get_breadcrumbs(request.path, {'class-index': lambda pks: 'Class List'})
+	)
+	context.update({
+		'class_list':	Class.objects.all()
 	})
-	return HttpResponse(template.render(context))
+	return render(request, 'web/home/class_list.html', context)
 
 def index(request):
 	"""
@@ -58,7 +48,7 @@ def index(request):
 	
 		For now this displays the top ranked videos for all of the categories, we need to change it eventually.
 	"""
-		
+	
 	#Get the "top level" categories
 	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
 
@@ -195,6 +185,10 @@ def base_category(request, cat_id):
 	breadcrumbs = []
 	for i in range(1, len(parent_categories)+1):
 		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
+	crumb = get_breadcrumbs(request.path, {
+		'category': lambda pks: AtomCategory.objects.get(pk=pks[0]),
+		'atom': lambda pks: Atom.objects.get(pk=pks[0])
+	})
 
 	#Get collection of videos from all atoms in this category or sub-categories
 	content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
@@ -228,7 +222,7 @@ def base_category(request, cat_id):
 
 	t = loader.get_template('web/home/base/category.html')
 	c = RequestContext(request, {
-		'breadcrumbs': breadcrumbs,
+		#'breadcrumbs': breadcrumbs,
 		'content': content,
 		'expositions': expositions,
 		#'lectureNotes': lectureNotes,
@@ -242,7 +236,7 @@ def base_category(request, cat_id):
 		'notes': notes,
 		'examples': examples,
 		'form': form,
-	})
+	}.update(crumb))
 	return HttpResponse(t.render(c))
 
 def base_atom(request, cat_id, atom_id):

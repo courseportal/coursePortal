@@ -32,6 +32,7 @@ def index(request, sid):
 	"""
 	sub = None
 	redirect_to = request.GET.get('next', '/')
+	print(request.path)
 	#Get the "top level" categories
 	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 	
