@@ -24,7 +24,7 @@
 <html>
 
 <body>
-	<a href="{% url 'assignment_index' %}" class="btn btn-success" id="loadA">Load Assignment</button>
+	<a href="{% url 'assignment_index' %}" style="margin-right:5px" class="btn btn-success" id="loadA">Load Assignment</button>
 	<a href="{% url 'atemplate_index' %}" class="btn btn-warning">Load Assignment Template</a>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
@@ -35,11 +35,11 @@
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate" value="{{start_date}}"></input>
+			<input type="text" id="assigndate" value="{{assignment.start_date}}"></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate" value="{{due_date}}"></input>
+			<input type="text" id="duedate" value="{{assignment.due_date}}"></input>
 		</div>
 
 	</div>
@@ -128,23 +128,23 @@
 	</div>
 
 	<hr>
-	<div id="previewform"></div>
-	<button  class="btn" margin-bottom='20px' onclick="previewA()">Preview</button>
-
-	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm">
+	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm" style="margin-bottom:10px">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
-		<button type="button" class="btn btn-primary" onclick="save()">submit</button>
+		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
+		<input type="checkbox" name="private" value=1>Private?</input>
 	</form>
+	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
+	<div id="previewform"></div>
+
 <div id="loading-zone">
 	{% if question_list %}
 		<table class="table">
-      	<thead class="fixedHeader">  
+      	<thead>  
         		<tr> 
            		<th>Title</th>
            		<th>Subject</th>
            		<th>Author</th>
-           		<th>Rating</th>
         		</tr>  
       	</thead>
       </table>
@@ -155,12 +155,10 @@
    		<tr>
    			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
 				<td></td>
-				<td></td>
-				<td></td>
+				<td>{{question.owners.0}}</td>
 				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
 				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
 			</tr>
-		
 		{% endfor %}
 			</tbody>  
    	</table>  

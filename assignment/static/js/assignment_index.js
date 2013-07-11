@@ -5,7 +5,7 @@ function init(){
 }
 
 function previewL(aid){
-	previewHTML='<iframe class="iframe" src="assignment/assign/preview/'+aid+'"></iframe>';
+	previewHTML='<iframe class="iframe" src="assignment/preview/'+aid+'"></iframe>';
 	$(".assignment-area").html(previewHTML);
 }
 
@@ -20,5 +20,5 @@ function loadAssignment(){
 		alert("No assignment selected to load");
 		return false;
 	}
-	window.location = "assign/edit/"+aid;
+	window.location = "edit/"+aid;
 }

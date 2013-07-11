@@ -36,7 +36,7 @@
 		</div>
 	</div>
 	<hr>
-	<div class="row-fluid">
+	<div class="row-fluid" style = "width:775px">
 		<div id="textdiv" class="span9">
 			TEXT:<br/>
 			<textarea name="text" id="text"></textarea>
@@ -44,17 +44,15 @@
 	</div>
 	<hr>
 
-
-	<div id="previewform"></div>
-	<button onclick="preview()" class="btn">Preview</button>
-
-	<form action="/assignment/question/create" method="post" id="questionForm">
+	<form action="/assignment/question/create" style="margin-bottom:5px" method="post" id="questionForm">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="questionname" name="questionname"></input>
 		<input type="text" style="display:none" id="data" name="questiondata"></input>
-		<button type="button" onclick="save()">submit</button>
+		<button style="width:70px" class="btn btn-primary" onclick="save()">submit</button>
+		<input type="checkbox" name="private">Private?</button>
 	</form>
-
+	<div id="previewform"></div>
+	<button style="width:70px" onclick="preview()" class="btn">Preview</button>
 </body>
 </html>
 

@@ -16,7 +16,7 @@ def checkAssignmentTitle(request):
 	value = False
 	overwrite=dict()
 	try:
-		if user.templates.filter(title=title):
+		if user.owned_assignments.filter(title=title):
 			value = True
 	except:
 		pass
