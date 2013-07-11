@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^ajax/vote/(\d+)/(\d+)/(\d+)/?$', 'web.views.ajax.vote', name='vote'),
 	url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'),
 	url(r'^ajax/delete/(?P<item>\d+)/(?P<item_id>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'),
+	url(r'^ajax/report/?$', 'web.views.home.report', name="report"),
 	                    
     url(r'^submit/(?P<sid>\d+)?/?$', 'web.views.submission.index', name='submit'),
 	url(r'^expo_submit/(?P<eid>\d+)?/?$', 'web.views.submission.exposition', name='expo_submit'),

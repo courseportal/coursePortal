@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
-from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm, testModalForm
+from web.forms.submission import SubmissionForm, ExpoForm, LectureNoteForm, ExampleForm
 from web.models import AtomCategory, LectureNote, Submission, Class, BaseCategory, Exposition, Example
 
 from rating.models import UserRating

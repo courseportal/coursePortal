@@ -13,6 +13,7 @@ Goals
 -----
 	
 Todo:
+	*	Remove old video vote system
 	*	Change from child class to parent class
 	*   Implement ajax table updating in the topic list
 	*   Testing
@@ -36,6 +37,8 @@ Week of July 8-12
 	
 *	Added a delete button to all of the user uploaded submission pages when you are updating.
 *	Put the class summary in the class "home" page.  HTML markup is allowed.
+*	Created a universal breadcrumb generating function to replace old version
+*	Moved the report form to its own view and removed the need for a context variable for an empty ReportForm by using a template tag.
 	
 Week of July 1-5
 ================

@@ -1,11 +1,12 @@
 from django import template
-from knoatom.forms import bugReportForm
+from knoatom.forms import BugReportForm
+from web.forms.submission import ReportForm
 import re
 
 register = template.Library()
 
-@register.tag(name="bug_form")
-def do_bug_form(parser, token):
+@register.tag(name="get_form")
+def get_form(parser, token):
 	r"""
 	This is the compilation function for the bug_form custom templatetag.
 	
@@ -22,27 +23,33 @@ def do_bug_form(parser, token):
 	
 	"""
 	try:
-		tag_name, arg = token.contents.split(None, 1)
+		tag_name, arg, as_var = token.contents.split(None, 2)
 	except ValueError:
 		try:
-			tag_name = token.contents.split_contents()
-			arg = ''
+			tag_name, arg = token.contents.split_contents()
+			as_var = ''
 		except ValueError:
-			raise template.TemplateSyntaxError("{} requires no arguments or just an 'as' argument.".format(token.split_content()[0]))
-	m = re.search(r'(?<=as )\w+', arg)
+			raise template.TemplateSyntaxError("{} requires one argument and an optional ' as var' statement.".format(token.split_content()[0]))
+	m = re.search(r'(?<=as )\w+', as_var)
 	if not m:
-		var_name = 'bug_form'
+		var_name = 'form'
 	else:
 		var_name = m.group(0)
-	return BugFormNode(var_name)
+	return FormNode(var_name, arg)
 	
-class BugFormNode(template.Node):
+class FormNode(template.Node):
 	r"""
-	This is the render function for the bug_form tag.
+	This is the render function for the get_form tag.
 	
 	"""
-	def __init__(self, var_name):
+	def __init__(self, var_name, arg):
 		self.var_name = var_name
+		self.arg = arg
 	def render(self, context):
-		context[self.var_name] = bugReportForm()
+		if self.arg == 'BugReportForm':
+			context[self.var_name] = BugReportForm()
+		elif self.arg == 'ReportForm':
+			context[self.var_name] = ReportForm()
+		else:
+			raise template.TemplateSyntaxError("get_form requires a valid form class name as an argument.")
 		return ''

@@ -8,7 +8,7 @@ import re
 from knoatom.settings import ALLOWED_FILE_EXTENTIONS, MAX_UPLOAD_SIZE
 from django.template.defaultfilters import filesizeformat
 from django.forms.formsets import formset_factory
-
+from django.core.mail import send_mail
 
 class PlainErrorList(ErrorList):
 	def __unicode__(self):
@@ -25,33 +25,42 @@ def validate_youtube_video_id(value):
 
 
 def validate_umich_email(value):
-    regex_umich_email = re.compile('\w*@umich.edu')
-    if not regex_umich_email.match(value):
-        raise ValidationError(u'%s is not a valid University of Michigan email address.' % value)
+	regex_umich_email = re.compile('\w*@umich.edu')
+	if not regex_umich_email.match(value):
+		raise ValidationError(u'%s is not a valid University of Michigan email address.' % value)
 
-class testModalForm(forms.Form):
-    subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
-    content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged contents and users are reviewed by Knoatom staff to determine whether they violate Community Guideline. Accounts are penalized for Community Guidelines violations. ')
+class ReportForm(forms.Form):
+	r"""Form for submitting reports."""
+	subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
+	content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged content is reviewed by Knoatom staff to determine whether it is appropiate. Accounts are penalized for Community Guidelines violations.')
+	contentType = forms.CharField(max_length=100, required=True, widget=forms.HiddenInput)
+	contentId = forms.CharField(max_length=100, required=True, widget=forms.HiddenInput)
+	
+	def submit(self, user):
+		r"""Submits the report to the knoatom email.  It takes in the request from the view it is submitted in."""
+		subject = "[Community Guideline Violation Report]:  " + self.cleaned_data['subject']
+		content = "From \"" + user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + self.cleaned_data['content'] + "\n\nContent Type:\t\t" + self.cleaned_data['contentType']+"\n\nContent Id:\t\t "+self.cleaned_data['contentId']
+		send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
 
 class SubmissionForm(forms.Form):
 	
-    def __init__(self, *args, **kwargs):
-        r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
-        user = kwargs.pop('user')
-        super(SubmissionForm, self).__init__(*args, **kwargs)
-        if user.is_superuser:
-            self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
-        elif user.classes_authored.exists() or user.allowed_classes.exists():
-            self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-        else:
-            self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+	def __init__(self, *args, **kwargs):
+		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
+		user = kwargs.pop('user')
+		super(SubmissionForm, self).__init__(*args, **kwargs)
+		if user.is_superuser:
+			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+		elif user.classes_authored.exists() or user.allowed_classes.exists():
+			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
+		else:
+			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
 	
-    title = forms.CharField(max_length=100, required=True)
-    content = forms.CharField(widget=forms.Textarea, required=True)
-    video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
-    tags = forms.ModelMultipleChoiceField(queryset = Atom.objects.all(), widget = forms.SelectMultiple(attrs={'size':'8'}), help_text = 'Please select relevant tags for your submission.')
+	title = forms.CharField(max_length=100, required=True)
+	content = forms.CharField(widget=forms.Textarea, required=True)
+	video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
+	tags = forms.ModelMultipleChoiceField(queryset = Atom.objects.all(), widget = forms.SelectMultiple(attrs={'size':'8'}), help_text = 'Please select relevant tags for your submission.')
 	
-    classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
+	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
 
 	
 ##	def __init__(self, *args, **kwargs):
@@ -60,18 +69,18 @@ class SubmissionForm(forms.Form):
 ##		self.fields['tags'].queryset = Atom.objects.filter(category__parent_class = class_id).distinct()
 
 def validate_file_extension(value):
-    r"""
-    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
-    """
-    valid = False
-    for ext in ALLOWED_FILE_EXTENTIONS:
-        if value.name.endswith(ext):
-            if value.size < int(MAX_UPLOAD_SIZE):
-                valid = True
-            else:
-                raise forms.ValidationError((u'Please keep filesize under %s. Current filesize %s') % (filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
-    if not valid:
-        raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
+	r"""
+	Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
+	"""
+	valid = False
+	for ext in ALLOWED_FILE_EXTENTIONS:
+		if value.name.endswith(ext):
+			if value.size < int(MAX_UPLOAD_SIZE):
+				valid = True
+			else:
+				raise forms.ValidationError((u'Please keep filesize under %s. Current filesize %s') % (filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
+	if not valid:
+		raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
 		
 def validate_link(value):
 	r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""

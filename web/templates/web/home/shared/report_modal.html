@@ -1,5 +1,7 @@
+{% load my_tags %}
 <div id="myModal{{ type }}{{ e.id }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <form class="testForm" method="post" action="{{form_action}}">
+  <div id="report-messages"></div>
+  <form id="report-form" class="testForm" method="post" action="{{form_action|default:'/ajax/report/'}}">
       {% csrf_token %}
       <div class="form-actions">
           <div class="modal-header">
@@ -7,14 +9,57 @@
               <h3 id="myModalLabel">Make a Report: </h3>
           </div>
           <div class="modal-body">
-              {% include "web/form_template.html" with form=form %}
-              <input type="hidden" id="test" name="contentType" value="{{e|to_class_name}}"/>
-              <input type="hidden" id="test2" name="contentId" value="{{e.id}}"/>
+			  {% get_form ReportForm as form %}{# Loads the form #}
+              {% include "web/form_template.html"%}
           </div>
           <div class="modal-footer">
               <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-              <button class="btn btn-primary">Submit</button>
+              <button id="submit-report" class="btn btn-primary">Submit</button>
           </div>
       </div>
   </form>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$('button#submit-report').click(function() { // Listen for the submit button click
+		$('#id_contentType').val('{{e|to_class_name}}'); // Set the values of the hidden fields
+		$('#id_contentId').val('{{e.id}}');
+		$(this).attr('disabled', true); // Disable the button
+		$('*[id^=field]').removeClass('error') // Remove the error class from all fields
+		$('*[id^=help-inline]').empty() // Remove the error text from all fields
+		$.ajax({
+			url: '/ajax/report/', // The url to submit to
+			type: 'POST',
+			data: $('form#report-form').serialize()
+		}).done(function(data) {
+			if (data.success)
+			{
+				$('#myModal{{ type }}{{ e.id }}').modal('hide')
+			}
+			else // The form is invalid
+			{
+				for (var key in data) // Loop through the errors
+				{
+					$('#field-' + key).addClass('error') // Make it red
+					$('#help-inline-' + key).empty().append(
+						$('<ul>') // Reset the div and add an empty list
+					);
+					// Loop through the error array for key
+					for (i in data[key])
+					{
+						$('#help-inline-' + key + ' ul').append(
+							$('<li>').append( // Add each item to the list
+								data[key][i]
+							)
+						)
+					}
+				}
+			}
+		}).always(function() {
+			$('#submit-report').attr('disabled', false); // Re-enable the button
+		})
+		return false;
+	})
+})
+</script>

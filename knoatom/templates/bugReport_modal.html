@@ -30,7 +30,7 @@ $(document).ready(function() {
             </div>
             <div class="modal-body">
               <div class="myForm"> 
-                  {% bug_form as form %} {% comment %} This loads the bug report form as 'form' for including "web/form_template.html" {% endcomment %}
+                  {% get_form BugReportForm as form %} {# This loads the bug report form as 'form' for including "web/form_template.html" #}
                   {% include "web/form_template.html" %}
               </div>
                 <input type="hidden" id="test" name="contentType" value="bugReport"/>

@@ -4,32 +4,38 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Avg
 from django.db.models.loading import get_models
-from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.template import RequestContext, loader, Context
 from django.shortcuts import get_object_or_404, render
 import json
 
 from pybb.models import Forum
-from django.core.mail import send_mail, BadHeaderError
-from web.forms.submission import testModalForm
+from django.core.mail import send_mail
+from web.forms.submission import ReportForm
 from django.forms.util import ErrorList
-from knoatom.view_functions import get_breadcrumbs
+from knoatom.view_functions import get_breadcrumbs, render_to_json_response # Site wide helper fn's
+from web.views.view_functions import * # Web helper functions
 
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
-
-def get_navbar_context(class_object=None):
-	r"""Returns a dictionary of the required context for the navbar.  If it is being used for a view that is inside a class pass the class id."""
+	
+def report(request):
+	r"""View for processing the report form. It only accepts AJAX requests."""
 	context = {}
-	if class_object:
-		context.update({
-			'top_level_categories': class_object.category_set.filter(parent_category=None)
-		})
+	if not request.is_ajax():
+		return HttpResponseBadRequest()
+	if request.method == 'POST':
+		form = ReportForm(request.POST) # Bind the form
+		if form.is_valid():
+			form.submit(request.user)
+			context.update({	# Add the success message to the context
+				'success': True,
+			})
+		else:
+			context.update(form.errors)
+		return render_to_json_response(context)
 	else:
-		context.update({
-			'top_level_categories': BaseCategory.objects.filter(parent_categories=None)
-		})
-	return context
+		return HttpResponseBadRequest()
 
 def class_list(request):	
 	r"""This is the view for the class list."""
@@ -48,112 +54,18 @@ def index(request):
 	
 		For now this displays the top ranked videos for all of the categories, we need to change it eventually.
 	"""
+	context = {get_navbar_content()} # Add the initial navbar content.  There are no breadcrumbs
 	
-	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-
 	# get the highest ranked submissions
-	top_ranked_videos = cache.get('top_ranked_videos')
-	if not top_ranked_videos:
-		top_ranked_videos = []
-		for category in VoteCategory.objects.all():
-			# for now, calculate an average for each video
-			top_ranked_videos.append({
-				'vote_category': category,
-				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
-			})
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
-		
-	template = loader.get_template('web/home/base/index.html')
-	context = RequestContext(request, {
-		'breadcrumbs': [{'url': reverse('home'), 'title': 'Home'}],
-		'top_level_categories': top_level_base_categories,
+	top_ranked_videos = cache.get('top_ranked_videos') # Try to load the videos from the cache
+	if not top_ranked_videos: # If there is no cached version
+		top_ranked_videos = Submission.objects.all().order_by('-votes')[:5] # Query for top 5 videos
+		cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache to last for 10 mins
+	context.update({
 		'top_ranked_videos': top_ranked_videos,
 	})
-	return HttpResponse(template.render(context))
-
-
-def get_content_for_category(current_category, mode, content_list=[]):
-	"""
-	This function returns the content for a category. Set content_list=[].
 	
-	The mode variable determines what kind of data to return:
-		*	mode = 0
-				Return submission data
-		*	mode = 1
-				Return exposition data
-		*	mode = 2
-				Return lecture note data
-		*	mode = 3
-				Return example data
-		*	else
-				Return an empty list
-	
-	We define content "in this category" if the content belongs to an atom that is in ``current_category`` or any of its sub-categories.  To acchieve this we use recursion.
-	
-	.. warning::
-	
-		You have to input an empty list for content_list when calling this function.  The default argument doesn't work and causes both expositions and Submissions to be added to the same list.
-	
-	"""
-	for atom in current_category.child_atoms.all():
-		
-			# Do something depending on what mode is set
-		if mode == 0:
-			content = Submission.objects.filter(tags = atom).distinct()
-		elif mode == 1:
-			content = atom.exposition_set.all()
-		elif mode == 2:
-			content = atom.lecturenote_set.all()
-		elif mode == 3:
-			content = atom.example_set.all()
-		else:
-			return []
-			
-		for c in content:
-			if not content_list.count(c):
-				content_list.append(c)
-	for child in current_category.child_categories.all():
-		get_content_for_category(current_category=child, mode=mode, content_list=content_list) #recurse
-	return content_list
-
-def get_parent_categories(current_category, current_class=None):
-	"""
-	This function gets all of the parent categories for ``current_category``.
-	
-	If ``current_class`` is not set then it will filter the parent_categories list to only include categories that are in ``current_class``, otherwise it will return all parent categories.
-	
-	.. warning::
-		
-		If there are loops in your categories this will result in infinite loops, but you shouldn't be able to create categories in the admin site that result in infinite loops.
-	
-	"""
-	parent_categories=list()
-	parent_categories.append(current_category)
-	if current_class:
-		tmp_categories = current_category.parent_categories.filter(parent_class=current_class.id)
-	else:
-		tmp_categories = current_category.parent_categories.all()
-	while tmp_categories:
-		parent_categories.append(tmp_categories[0])
-		if current_class:
-			tmp_categories = tmp_categories[0].parent_categories.filter(parent_class = current_class.id)
-		else:
-			tmp_categories = tmp_categories[0].parent_categories.all()
-	return parent_categories
-
-
-def findChildAtom(current_category, atom_list):
-	for c_a in current_category.child_atoms.all():
-		atom_list.append(c_a)
-	for c_c in current_category.child_categories.all():
-		for c in c_c.child_atoms.all():
-			atom_list.append(c)
-		current_category=c_c.child_categories.all()
-		if current_category:
-			for a in current_category.all():
-				findChildAtom(a, atom_list)
-	return atom_list
+	render(request, 'web/home/base/index.html', context)
 
 def base_category(request, cat_id):
 	"""
@@ -161,18 +73,6 @@ def base_category(request, cat_id):
 		-	Generates a list of the most popular videos for each category of rating
 		-	Use memcached to save the popular video rankings to save a lot of time
 	"""
-	if request.method == 'POST': # If the form has been submitted...
-		form = testModalForm(request.POST)
-		if form.is_valid():	# All validation rules pass
-			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			messages.warning(request, 'Report has been successfully submitted. Thank you!')
-			return HttpResponseRedirect(reverse('base_category', args=(cat_id,)))
-		else:
-			messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		form = testModalForm()
 	
 	#get category we are in
 	current_category = get_object_or_404(BaseCategory, id=cat_id)
@@ -245,7 +145,7 @@ def base_atom(request, cat_id, atom_id):
 		- Creates the breadcrumbs for the page
 	"""
 	if request.method == 'POST': # If the form has been submitted...
-		form = testModalForm(request.POST)
+		form = ReportForm(request.POST)
 		if form.is_valid():	# All validation rules pass
 			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
 			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
@@ -255,7 +155,7 @@ def base_atom(request, cat_id, atom_id):
 		else:
 			messages.warning(request, 'Error saving. Fields might be invalid.')
 	else:
-		form = testModalForm()
+		form = ReportForm()
 		
 	#Get atom we are in
 	current_atom = get_object_or_404(Atom, id=atom_id)
@@ -321,7 +221,7 @@ def category(request, class_id, cat_id):
 	"""
 	if request.method == 'POST': # If the form has been submitted...
 	#print(request.POST.get('contentType'))
-		form = testModalForm(request.POST)
+		form = ReportForm(request.POST)
 		if form.is_valid():	# All validation rules pass
 			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
 			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
@@ -331,7 +231,7 @@ def category(request, class_id, cat_id):
 		else:
 			messages.warning(request, 'Error saving. Fields might be invalid.')
 	else:
-		form = testModalForm()
+		form = ReportForm()
 	
 	#get category we are in
 	current_category = get_object_or_404(AtomCategory, id=cat_id)
@@ -444,7 +344,7 @@ def atom(request, class_id, cat_id, atom_id):
 		- Creates the breadcrumbs for the page
 	"""
 	if request.method == 'POST': # If the form has been submitted...
-		form = testModalForm(request.POST)
+		form = ReportForm(request.POST)
 		if form.is_valid():	# All validation rules pass
 			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
 			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
@@ -454,7 +354,7 @@ def atom(request, class_id, cat_id, atom_id):
 		else:
 			messages.warning(request, 'Error saving. Fields might be invalid.')
 	else:
-		form = testModalForm()
+		form = ReportForm()
 
 
 	#Get atom we are in
