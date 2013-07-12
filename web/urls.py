@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name = 'category'),
     url(r'^class/(?P<class_id>\d+)/?$', 'web.views.home.classes', name='classes'),
     url(r'^class-index/?$', 'web.views.home.class_list', name='class_index'),
-    url(r'^category/(?P<cat_id>\d+)/?$', 'web.views.home.base_category', name='base_category'),
+    url(r'^category/(?P<pk>\d+)/?$', 'web.views.home.base_category', name='base_category'),
     url(r'^category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.base_atom', name='base_atom'),
     url(r'^/?$', 'web.views.home.index', name='home'),
 

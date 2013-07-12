@@ -19,6 +19,12 @@ from web.views.view_functions import * # Web helper functions
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 	
+def get_atom_title(pks):
+	return get_object_or_404(Atom, pk=pks[0])
+	
+def get_category_title(pks):
+	return get_object_or_404(AtomCategory, pk=pks[0])
+	
 def report(request):
 	r"""View for processing the report form. It only accepts AJAX requests."""
 	context = {}
@@ -32,7 +38,7 @@ def report(request):
 				'success': True,
 			})
 		else:
-			context.update(form.errors)
+			context.update(form.errors) # Add the errors to the context to be processed by AJAX
 		return render_to_json_response(context)
 	else:
 		return HttpResponseBadRequest()
@@ -54,7 +60,7 @@ def index(request):
 	
 		For now this displays the top ranked videos for all of the categories, we need to change it eventually.
 	"""
-	context = {get_navbar_content()} # Add the initial navbar content.  There are no breadcrumbs
+	context = get_navbar_context() # Add the initial navbar content.  There are no breadcrumbs
 	
 	# get the highest ranked submissions
 	top_ranked_videos = cache.get('top_ranked_videos') # Try to load the videos from the cache
@@ -65,78 +71,54 @@ def index(request):
 		'top_ranked_videos': top_ranked_videos,
 	})
 	
-	render(request, 'web/home/base/index.html', context)
+	return render(request, 'web/home/base/index.html', context)
 
-def base_category(request, cat_id):
+def base_category(request, pk):
 	"""
 		-	Generates the category page
 		-	Generates a list of the most popular videos for each category of rating
 		-	Use memcached to save the popular video rankings to save a lot of time
 	"""
-	
-	#get category we are in
-	current_category = get_object_or_404(BaseCategory, id=cat_id)
-	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	parent_categories = get_parent_categories(current_category=current_category)
+	context = get_navbar_context() # Get the navbar context as the initial context dict
+	category_object = get_object_or_404(BaseCategory, id=pk)
 
-	#Setting breadcrumbs, not perfect, improvements can be made
-	breadcrumbs = []
-	for i in range(1, len(parent_categories)+1):
-		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
-	crumb = get_breadcrumbs(request.path, {
-		'category': lambda pks: AtomCategory.objects.get(pk=pks[0]),
-		'atom': lambda pks: Atom.objects.get(pk=pks[0])
+	context.update({
+		'selected_category':category_object
 	})
+	context.update( # Add the breadcrumbs to the context
+		get_breadcrumbs(request.path, {
+			'category': get_category_title,
+			'atom': get_atom_title,
+		})
+	)
 
 	#Get collection of videos from all atoms in this category or sub-categories
-	content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
-	expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
-	notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
-	examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
+	context.update(
+		get_context_for_category(category_object)
+	)
 	
+	##################################################################################################
+	# un-json-fy the videos					### Do we want to be able to save multiple videos?
+	for c in context['videos']:
+		if c.video: 
+			c.video = [v for v in json.loads(c.video)]
+	##################################################################################################
 	
-	# un-json-fy the videos
-	for c in content:
-		if c.video: c.video = [v for v in json.loads(c.video)]
-
-
-	if request.user.is_authenticated():
-		for c in content:
-			ratings = c.votes_s.filter(user=request.user)
-			c.user_rating = {}
-			if ratings.count() > 0:
-				for r in ratings:
-					c.user_rating[int(r.v_category.id)] = int(r.rating)
 	#get all the atoms in and under the current category
-	atom_list = list()
-	temp_atom_list = findChildAtom(current_category,list())
-	for item in temp_atom_list:
-		if atom_list.count(item)==0:
-			atom_list.append(item)
-	length = int(len(atom_list))/3+1
-	list_1 = atom_list[0:length]
-	list_2 = atom_list[length:length*2]
-	list_3 = atom_list[length*2:]
-
+	# atom_list = list()
+# 	temp_atom_list = findChildAtom(category_object,list())
+# 	for item in temp_atom_list:
+# 		if atom_list.count(item)==0:
+# 			atom_list.append(item)
+# 	length = int(len(atom_list))/3+1
+# 	list_1 = atom_list[0:length]
+# 	list_2 = atom_list[length:length*2]
+# 	list_3 = atom_list[length*2:]
+	context.update({
+			'selected_categories': get_parent_categories(category_object),
+		})
 	t = loader.get_template('web/home/base/category.html')
-	c = RequestContext(request, {
-		#'breadcrumbs': breadcrumbs,
-		'content': content,
-		'expositions': expositions,
-		#'lectureNotes': lectureNotes,
-		'top_level_categories': top_level_base_categories,
-		'selected_categories': parent_categories,
-		#'selected_category': current_category,
-		'atom_list_1': list_1,
-		'atom_list_2': list_2,
-		'atom_list_3': list_3,
-		'vote_categories': VoteCategory.objects.all(),
-		'notes': notes,
-		'examples': examples,
-		'form': form,
-	}.update(crumb))
+	c = RequestContext(request, context)
 	return HttpResponse(t.render(c))
 
 def base_atom(request, cat_id, atom_id):
@@ -198,7 +180,7 @@ def base_atom(request, cat_id, atom_id):
 	t = loader.get_template('web/home/base/atom.html')
 	c = RequestContext(request, {
 		'breadcrumbs': breadcrumbs,
-		'content': content,
+		'videos': content,
 		'expositions': expositions,
 		'top_level_categories': top_level_base_categories,
 		'selected_categories': parent_categories,
@@ -325,11 +307,11 @@ def category(request, class_id, cat_id):
 		'vote_categories': VoteCategory.objects.all(),
 		'selected_class':current_class,
 		
-		'stickied_content': stickied_content,
+		'stickied_videos': stickied_content,
 		'stickied_expositions': stickied_expositions,
 		'stickied_notes': stickied_notes,
 		'stickied_examples': stickied_examples,
-		'content': content,
+		'videos': content,
 		'expositions': expositions,
 		'notes': notes,
 		'examples': examples,
@@ -425,11 +407,11 @@ def atom(request, class_id, cat_id, atom_id):
 		'selected_class':current_class,
 		'forum': forum,
 		
-		'stickied_content': stickied_content,
+		'stickied_videos': stickied_content,
 		'stickied_expositions': stickied_expositions,
 		'stickied_notes': stickied_notes,
 		'stickied_examples': stickied_examples,
-		'content': content,
+		'videos': content,
 		'expositions': expositions,
 		'notes': notes,
 		'examples': examples,

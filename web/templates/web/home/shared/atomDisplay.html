@@ -20,39 +20,52 @@ OPTIONAL context:
 {% if not selected_category.child_categories and selected_category.child_atoms %}
 No Atoms or subcategories exist for this category yet!
 {% endif %}
-
-<div class="row-fluid">
-    <div class="span4">
-        {% for atom in atom_list_1%}
-        {% if selected_class %}
-        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% else %}
-        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% endif %}
-        {% endfor %}
-    </div>
-    <div class="span4">
-        {% for atom in atom_list_2%}
-        {% if selected_class %}
-        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% else %}
-        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% endif %}
-        {% endfor %}
-    </div>
-    <div class="span4">
-        {% for atom in atom_list_3%}
-        {% if selected_class %}
-        <a href="{% url 'atom' selected_class.id atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% else %}
-        <a href="{% url 'base_atom' atom.base_category.id atom.id %}">{{ atom.name }}</a>
-        <br />
-        {% endif %}
-        {% endfor %}
-    </div>
+{% cycle '1' '2' '3' as column silent %}{# Set up the cycling for multiple columns #}
+{% with length=atoms|length %} {# Store the number of atoms #}
+<div class="row-fluid" id="atom-list">
+	{% for atom in atoms %}
+		{% if column == '1' %} {# Pick the column to put the atoms in.  The code in each column #}
+			{% if selected_class %} 											{# is identical #}
+			    <div class="span4">
+					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% else %}
+			    <div class="span4">
+					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% endif %}
+		{% elif column == '2' %}
+			{% if selected_class %}
+			    <div class="span4">
+					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% else %}
+			    <div class="span4">
+					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% endif %}
+		{% else %} {# column == '3' #}
+			{% if selected_class %}
+			    <div class="span4">
+					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% else %}
+			    <div class="span4">
+					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
+					<br />
+			    </div>
+			{% endif %}
+		{% endif %}
+		
+		{% if length >= 12 %} {# If there are 12 or more atoms we want to split it into 3 lists #}
+			{% cycle column %}
+		{% endif %}
+		
+	{% endfor %}
 </div>
+{% endwith %}

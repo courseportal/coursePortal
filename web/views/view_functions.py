@@ -1,4 +1,6 @@
 r"""View helper functions."""
+from itertools import chain
+
 from web.models import Class, AtomCategory, BaseCategory, Atom, Submission, Example, Exposition, LectureNote
 
 def get_navbar_context(class_object=None):
@@ -15,49 +17,32 @@ def get_navbar_context(class_object=None):
 	return context
 	
 	
-def get_content_for_category(current_category, mode, content_list=[]):
+def get_context_for_category(current_category, context=None):
 	"""
-	This function returns the content for a category. Set content_list=[].
-	
-	The mode variable determines what kind of data to return:
-		*	mode = 0
-				Return submission data
-		*	mode = 1
-				Return exposition data
-		*	mode = 2
-				Return lecture note data
-		*	mode = 3
-				Return example data
-		*	else
-				Return an empty list
-	
-	We define content "in this category" if the content belongs to an atom that is in ``current_category`` or any of its sub-categories.  To acchieve this we use recursion.
-	
-	.. warning::
-	
-		You have to input an empty list for content_list when calling this function.  The default argument doesn't work and causes both expositions and Submissions to be added to the same list.
+	This function returns context for category views.  It adds ``'videos'``, ``'expositions'``, ``'notes'``, ``'examples'``, and ``'atoms'`` to the context.  It requires the category you want to get the context for as an input.  ``current_category`` can be either a BaseCategory or an AtomCategory.
 	
 	"""
-	for atom in current_category.child_atoms.all():
-		
-			# Do something depending on what mode is set
-		if mode == 0:
-			content = Submission.objects.filter(tags = atom).distinct()
-		elif mode == 1:
-			content = atom.exposition_set.all()
-		elif mode == 2:
-			content = atom.lecturenote_set.all()
-		elif mode == 3:
-			content = atom.example_set.all()
-		else:
-			return []
-			
-		for c in content:
-			if not content_list.count(c):
-				content_list.append(c)
-	for child in current_category.child_categories.all():
-		get_content_for_category(current_category=child, mode=mode, content_list=content_list) #recurse
-	return content_list
+	if not context:
+		first_call_flag = True # We only convert to list and get the distinct elements once
+		context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[], 'atoms':[]} # Populate
+	else:
+		first_call_flag = False # If its not the first loop we don't want to convert to distinct list
+	temp = {'atoms':current_category.child_atoms.all()}
+	for atom in temp['atoms']: # Only hits dict once to get into loop
+		temp.update({ # Get the content of this atom
+			'videos':Submission.objects.filter(tags=atom).distinct(),
+			'expositions':atom.exposition_set.all(),
+			'notes':atom.lecturenote_set.all(),
+			'examples':atom.example_set.all()
+		})
+		for key in context: # Chain the keys together, chain is faster than using loops b/c it is in C
+			context[key] = chain(context[key],temp[key])
+	for child in current_category.child_categories.all(): # Get content for all child categories
+		get_context_for_category(child, context) #recurse
+	if first_call_flag: # Only do this on the top level of recursion
+		for key in context:
+			context[key] = list(set(context[key]))
+	return context # Return the context
 
 def get_parent_categories(current_category, current_class=None):
 	"""
