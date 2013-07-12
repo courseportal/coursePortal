@@ -5,7 +5,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render
 
 
-from knoatom.forms import bugReportForm
+from knoatom.forms import BugReportForm
 from knoatom.models import BugReport
 
 def bug_report_view(request):

@@ -1,4 +1,12 @@
 import re
+import json
+from django.http import HttpResponse
+
+def render_to_json_response(context, **response_kwargs):
+	r"""Helper function to generate json responses for AJAX requests."""
+	data = json.dumps(context)
+	response_kwargs['content_type'] = 'application/json'
+	return HttpResponse(data, **response_kwargs)
 
 def get_breadcrumbs(path, name_function_dict={}):
 	r"""

@@ -35,7 +35,7 @@ $(function() {
   $.extend($.tablesorter.themes.bootstrap, {
 	// these classes are added to the table. To see other table classes available,
 	// look here: http://twitter.github.com/bootstrap/base-css.html#tables
-	table		: {{ classes|default:'table table-bordered' }},
+	table		: '{{ classes|default:'table table-bordered' }}',
 	header		: 'bootstrap-header', // give the header a gradient background
 	footerRow	: '',
 	footerCells	: '',

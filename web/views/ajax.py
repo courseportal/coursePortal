@@ -7,7 +7,6 @@ from django.template import RequestContext, loader
 from django.shortcuts import get_object_or_404, render
 from django.core.mail import send_mail, BadHeaderError
 import json
-from web.forms.submission import testModalForm
 from web.models import *
 from rating.models import UserRating
 

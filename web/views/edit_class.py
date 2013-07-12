@@ -8,6 +8,8 @@ from django.template import RequestContext, loader
 from web.models import Class, AtomCategory, BaseCategory
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
+from knoatom.view_functions import render_to_json_response
+
 
 class AjaxableResponseMixin(object):
 	r"""
@@ -223,9 +225,3 @@ def get_children(request, is_class, pk):
 def get_category_form(request, pk):
 	r"""Returns the html for a new populated category form."""
 	obj = get_object_or_404(AtomCategory, pk=pk)
-	
-
-def render_to_json_response(context, **response_kwargs):
-	data = json.dumps(context)
-	response_kwargs['content_type'] = 'application/json'
-	return HttpResponse(data, **response_kwargs)
