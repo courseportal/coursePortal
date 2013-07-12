@@ -1,8 +1,10 @@
+{% comment %}
 <!--
 
 To INCLUDE this file:
 
 REQUIRED context:
+	atoms
 
 OPTIONAL context:
 	selected_class
@@ -11,61 +13,41 @@ OPTIONAL context:
 	atom_list_3
 
 -->
-<!--
-
-	I list atom_list_# as optional because the page just won't display anything if you don't have any of the 3.  This is not a failure so you don't need to check for these variables before you include this file.
-
--->
+{% endcomment %}
 
 {% if not selected_category.child_categories and selected_category.child_atoms %}
 No Atoms or subcategories exist for this category yet!
 {% endif %}
-{% cycle '1' '2' '3' as column silent %}{# Set up the cycling for multiple columns #}
-{% with length=atoms|length %} {# Store the number of atoms #}
-<div class="row-fluid" id="atom-list">
-	{% for atom in atoms %}
-		{% if column == '1' %} {# Pick the column to put the atoms in.  The code in each column #}
-			{% if selected_class %} 											{# is identical #}
-			    <div class="span4">
-					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% else %}
-			    <div class="span4">
-					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% endif %}
-		{% elif column == '2' %}
-			{% if selected_class %}
-			    <div class="span4">
-					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% else %}
-			    <div class="span4">
-					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% endif %}
-		{% else %} {# column == '3' #}
-			{% if selected_class %}
-			    <div class="span4">
-					<a href="{% url 'atom' selected_class.id selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% else %}
-			    <div class="span4">
-					<a href="{% url 'base_atom' selected_category.id atom.id %}">{{ atom.name }}</a>
-					<br />
-			    </div>
-			{% endif %}
+<div class="row-fluid" id="atom-list"> {# Populated with javascript #}
+	<div class="span4" id="col1">
+		<ul></ul>
+	</div>
+	<div class="span4" id="col2">
+		<ul></ul>
+	</div>
+	<div class="span4" id="col3">
+		<ul></ul>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+	{% cycle 'col1' 'col2' 'col3' as column silent %}//{# Set up the cycling for multiple columns #}
+	{% with length=atoms|length %} //{# Store the number of atoms #}
+	{% for atom in atoms %} //{# Loop through the atoms #}
+		{% if selected_class %} //{# Save the correct link #}
+			var link = "<a href='{% url 'atom' selected_class.id selected_category.id atom.id %}'>{{ atom.name }}</a>";
+		{% else %}
+			var link = "<a href='{% url 'base_atom' selected_category.id atom.id %}'>{{ atom.name }}</a>";
 		{% endif %}
-		
-		{% if length >= 12 %} {# If there are 12 or more atoms we want to split it into 3 lists #}
+		$('#atom-list #{{column}} ul').append( //{# Append link to the list in the correct column #}
+			$('<li>').append(link)
+		);
+		{% if length >= 12 %} //{# If there are 12 or more atoms we want to split it into 3 lists #}
 			{% cycle column %}
 		{% endif %}
-		
 	{% endfor %}
-</div>
+})
+</script>
+
 {% endwith %}

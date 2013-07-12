@@ -40,25 +40,22 @@ def get_breadcrumbs(path, name_function_dict={}):
 	for arg in argument_list:
 		if type(arg) != str: # We don't want to do anything with ints in outer loop
 			continue
-		crumb = {'url': make_url(argument_list[:i])}
 		pks = []
-		name_function = name_function_dict.get(arg, arg)
+		name_function = name_function_dict.get(arg, None)
 		
-		if type(name_function) == str: # There was no function cooresponding to 'arg' as a key
-			crumb.update({
-				'title': arg # So just make arg the title. 
-			})
-			breadcrumbs.append(crumb)
-			continue # We don't need to do the rest of the loop
-			
-		for pk in argument_list[i:]: # Add following int arguments to pks until we hit a string
-			if type(pk) != int: # Stop when we hit a string
-				break
-			pks.append(pk) # Add the argument to pks
-		crumb.update({
-			'title': name_function(pks) # Add the title to the crumb
-		})
-		breadcrumbs.append(crumb) # Append the crumb dict to the breadcrumbs list
+		if not name_function: # There was no function cooresponding to 'arg' as a key
+			crumb = {'title':arg, 'url': make_url(argument_list[:i])}
+		else:
+			for pk in argument_list[i:]: # Add following int arguments to pks until we hit a string
+				if type(pk) != int: # Stop when we hit a string
+					break
+				i += 1 # We need to increment i because the regular loop will skip it.
+				pks.append(pk) # Add the argument to pks
+			crumb = {
+				'url': make_url(argument_list[:i]),
+				'title': name_function(pks) # Add the title to the crumb
+			}
+		breadcrumbs.append(crumb)
 		i += 1
 	return {'breadcrumbs':breadcrumbs} # Return the dict containing the breadcrumbs.
 			
