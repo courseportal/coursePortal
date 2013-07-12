@@ -1,11 +1,28 @@
 r"""View helper functions."""
 from itertools import chain
-
+from django.shortcuts import get_object_or_404
 from web.models import Class, AtomCategory, BaseCategory, Atom, Submission, Example, Exposition, LectureNote
 
-def get_navbar_context(class_object=None):
-	r"""Returns a dictionary of the required context for the navbar.  If it is being used for a view that is inside a class pass the class id."""
-	context = {}
+# Dict to pass to the breadcrumb function to work with all of web.
+web_breadcrumb_dict = {
+	'class-index': lambda pks: 'Class List',
+	'category': lambda pks: get_object_or_404(AtomCategory, pk=pks[0]),
+	'atom': lambda pks: get_object_or_404(Atom, pk=pks[0]),
+}
+
+def get_navbar_context(category_object=None, class_object=None):
+	r"""
+	Returns a dictionary of the required context for the navbar.  If it is being used for a view that is inside a class pass the class id.
+	
+	If you are in a class view pass it the class_object, if you are in a category view pass it the category_object to generate the context correctly.
+	
+	Adds ``'top_level_categories'`` and ``'selected_categories'`` to the context.
+	
+	"""
+	if category_object: # Find the selected categories
+		context = get_parent_categories(category_object, class_object)
+	else: # Still need to define context otherwise
+		context = {}
 	if class_object:
 		context.update({
 			'top_level_categories': class_object.category_set.filter(parent_category=None)
@@ -44,9 +61,9 @@ def get_context_for_category(current_category, context=None):
 			context[key] = list(set(context[key]))
 	return context # Return the context
 
-def get_parent_categories(current_category, current_class=None):
+def get_parent_categories(current_category, current_class): # Look at for refactoring
 	"""
-	This function gets all of the parent categories for ``current_category``.
+	This function returns a context dictionary with ``'selected_categories'`` as all of the parent categories for ``current_category``.
 	
 	If ``current_class`` is not set then it will filter the parent_categories list to only include categories that are in ``current_class``, otherwise it will return all parent categories.
 	
@@ -67,17 +84,4 @@ def get_parent_categories(current_category, current_class=None):
 			tmp_categories = tmp_categories[0].parent_categories.filter(parent_class = current_class.id)
 		else:
 			tmp_categories = tmp_categories[0].parent_categories.all()
-	return parent_categories
-
-
-def findChildAtom(current_category, atom_list):
-	for c_a in current_category.child_atoms.all():
-		atom_list.append(c_a)
-	for c_c in current_category.child_categories.all():
-		for c in c_c.child_atoms.all():
-			atom_list.append(c)
-		current_category=c_c.child_categories.all()
-		if current_category:
-			for a in current_category.all():
-				findChildAtom(a, atom_list)
-	return atom_list
+	return {'selected_categories':parent_categories}

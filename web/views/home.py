@@ -14,16 +14,10 @@ from django.core.mail import send_mail
 from web.forms.submission import ReportForm
 from django.forms.util import ErrorList
 from knoatom.view_functions import get_breadcrumbs, render_to_json_response # Site wide helper fn's
-from web.views.view_functions import * # Web helper functions
+from web.views.view_functions import get_navbar_context, get_context_for_category, web_breadcrumb_dict
 
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
-	
-def get_atom_title(pks):
-	return get_object_or_404(Atom, pk=pks[0])
-	
-def get_category_title(pks):
-	return get_object_or_404(AtomCategory, pk=pks[0])
 	
 def report(request):
 	r"""View for processing the report form. It only accepts AJAX requests."""
@@ -45,9 +39,9 @@ def report(request):
 
 def class_list(request):	
 	r"""This is the view for the class list."""
-	context = get_navbar_context() # Create the context dict with the navbar context in it.
+	context = get_navbar_context()
 	context.update(
-		get_breadcrumbs(request.path, {'class-index': lambda pks: 'Class List'})
+		get_breadcrumbs(request.path, web_breadcrumb_dict) 
 	)
 	context.update({
 		'class_list':	Class.objects.all()
@@ -79,120 +73,54 @@ def base_category(request, pk):
 		-	Generates a list of the most popular videos for each category of rating
 		-	Use memcached to save the popular video rankings to save a lot of time
 	"""
-	context = get_navbar_context() # Get the navbar context as the initial context dict
 	category_object = get_object_or_404(BaseCategory, id=pk)
-
+	# Get the navbar context as the initial context, ('top_level_categories', 'selected_categories')
+	context = get_navbar_context(category_object)
 	context.update({
 		'selected_category':category_object
 	})
-	context.update( # Add the breadcrumbs to the context
-		get_breadcrumbs(request.path, {
-			'category': get_category_title,
-			'atom': get_atom_title,
-		})
+	context.update( # Adds 'breadcrumbs' to context
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
 	)
-
-	#Get collection of videos from all atoms in this category or sub-categories
-	context.update(
+	#Get collection of videos/expos/notes/examples from all atoms in this category or sub-categories
+	context.update( # And a list of all sub-atoms (including atoms in sub-categories)
 		get_context_for_category(category_object)
 	)
-	
 	##################################################################################################
 	# un-json-fy the videos					### Do we want to be able to save multiple videos?
 	for c in context['videos']:
 		if c.video: 
 			c.video = [v for v in json.loads(c.video)]
 	##################################################################################################
-	
-	#get all the atoms in and under the current category
-	# atom_list = list()
-# 	temp_atom_list = findChildAtom(category_object,list())
-# 	for item in temp_atom_list:
-# 		if atom_list.count(item)==0:
-# 			atom_list.append(item)
-# 	length = int(len(atom_list))/3+1
-# 	list_1 = atom_list[0:length]
-# 	list_2 = atom_list[length:length*2]
-# 	list_3 = atom_list[length*2:]
-	context.update({
-			'selected_categories': get_parent_categories(category_object),
-		})
-	t = loader.get_template('web/home/base/category.html')
-	c = RequestContext(request, context)
-	return HttpResponse(t.render(c))
+	return render(request, 'web/home/base/category.html', context)
 
 def base_atom(request, cat_id, atom_id):
 	"""
 		- Generates the view for a specific category
 		- Creates the breadcrumbs for the page
 	"""
-	if request.method == 'POST': # If the form has been submitted...
-		form = ReportForm(request.POST)
-		if form.is_valid():	# All validation rules pass
-			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			messages.warning(request, 'Report has been successfully submitted. Thank you!')
-			return HttpResponseRedirect(reverse('base_atom', args=(cat_id, atom_id)))
-		else:
-			messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		form = ReportForm()
-		
-	#Get atom we are in
-	current_atom = get_object_or_404(Atom, id=atom_id)
-	#get category we are in
-	current_category = get_object_or_404(BaseCategory, id=cat_id)
-	#Get the "top level" categories
-	top_level_base_categories = BaseCategory.objects.filter(parent_categories=None) #check that this works
-
-	parent_categories = get_parent_categories(current_category=current_category)
-
-	breadcrumbs = []
-	for i in range(1, len(parent_categories)+1):
-		breadcrumbs.append({'url' : reverse('base_category', args=[parent_categories[-i].id]), 'title': parent_categories[-i]})
-	breadcrumbs.append({'url': reverse('base_atom', args=[current_category.id, current_atom.id]), 'title': current_atom})
-
-	content = Submission.objects.filter(tags=current_atom).distinct()
+	category_object = get_object_or_404(BaseCategory, id=cat_id) # Get category we are in
+	atom_object = get_object_or_404(Atom, id=atom_id) # Get atom we are in
 	
-	
-	forum = Forum.objects.get(atom=current_atom)
-
-
-	# un-json-fy the videos
-	for c in content:
-		if c.video: c.video = [v for v in json.loads(c.video)]
-
-	if request.user.is_authenticated():
-		for c in content:
-			ratings = c.votes_s.filter(user=request.user)
-			c.user_rating = {}
-			if ratings.count() > 0:
-				for r in ratings:
-					c.user_rating[int(r.v_category.id)] = int(r.rating)
-
-
-	expositions = current_atom.exposition_set.all()
-	notes = current_atom.lecturenote_set.all()
-	examples = current_atom.example_set.all()
-
-
-	t = loader.get_template('web/home/base/atom.html')
-	c = RequestContext(request, {
-		'breadcrumbs': breadcrumbs,
-		'videos': content,
-		'expositions': expositions,
-		'top_level_categories': top_level_base_categories,
-		'selected_categories': parent_categories,
-		#'selected_category': current_category,
-		'selected_atom': current_atom,
-		'vote_categories': VoteCategory.objects.all(),
-		'forum': forum,
-		'notes': notes,
-		'examples': examples,
-		'form': form,
+	context = get_navbar_context(category_object) #'top_level_base_categories, 'selected_categories'
+	context.update( # Adds 'breadcrumbs' to the context.
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
+	)
+	context.update({ # Get the contents of the atom and add them to the context dict
+	'selected_atom':atom_object,
+	'videos':		Submission.objects.filter(tags=atom_object).distinct(),
+	'expositions':	atom_object.exposition_set.all(),
+	'notes':		atom_object.lecturenote_set.all(),
+	'examples':		atom_object.example_set.all(),
+	'forum':		Forum.objects.get(atom=atom_object),
 	})
-	return HttpResponse(t.render(c))
+	##################################################################################################
+	# un-json-fy the videos					### Do we want to be able to save multiple videos?
+	for c in context['videos']:
+		if c.video: 
+			c.video = [v for v in json.loads(c.video)]
+	##################################################################################################
+	return render(request, 'web/home/base/atom.html', context)
 	
 
 def category(request, class_id, cat_id):
