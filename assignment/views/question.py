@@ -7,6 +7,7 @@ from django.utils import simplejson as json
 from random import *
 from math import *
 from string import Template
+from knoatom.view_functions import get_breadcrumbs	
 import sys
 
 def detail(request, id, newly_added=False):
@@ -49,7 +50,7 @@ def detail(request, id, newly_added=False):
 def addQ(request):
 	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
 	breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
-	context = {'breadcrumbs':breadcrumbs,}
+	context = {'breadcrumbs':get_breadcrumbs(request.path),}
 	return render(request, 'question/addQ.html', context)
 
 def create(request):
