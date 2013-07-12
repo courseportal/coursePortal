@@ -22,4 +22,8 @@ def performance(student):
 	for i in student.assignmentInstances.all():
 		achieved+=i.score
 		possible+=i.max_score
-	return float((achieved/possible)*100)
+	if possible == 0.0:
+		return "No Assignments"
+	value = float((achieved/possible)*100)
+	performance=str(value)+'%'
+	return performance

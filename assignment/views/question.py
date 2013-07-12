@@ -61,7 +61,10 @@ def create(request):
 	if 'private' in request.REQUEST:
 		q.private = True
 	q.save()
-	return detail(request, q.id, True)
+	context={
+		'messages':["Question succesfully made!"],
+	}
+	return render(request, "assignment_nav.html", context)
 
 def preview(request):
 	q = request.POST['previewdata']
@@ -95,7 +98,6 @@ def preview(request):
 		'answer': solution,
 		'choices': choices,
 	}
-
 	return render(request, 'question/preview.html', context)
 
 def instanceDetail(request, pk, id):

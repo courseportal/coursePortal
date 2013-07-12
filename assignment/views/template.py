@@ -44,33 +44,37 @@ def create_assignment(request):
 	assignment.save()
    #save start and end date
 	data=dict()
-	data['due']=a['due']
 	data['start']=a['start']
+	data['due']=a['due']
 	questions=dict()
    #save owners
 	assignment.owners.add(request.user)
    #Add questions
 	for q in a['questions']:
-		temp=createQT(q)
+		temp=createQT(q, request.user)
 		assignment.questions.add(temp)
 		questions[str(temp)]=q['points']
 	data['questions']=questions
    #Finish
 	assignment.data=json.dumps(data)
 	assignment.save()
-	return HttpResponse(assignment)
+	context={
+		'messages':["Assignment template created succesfully!"],
+	}
+	return render(request, 'assignment_nav.html', context)
 
-def createQT(x):
+def createQT(x, user=None):
 	question = Template()
 	question.title = x['title']
 	data=dict()
-	data['title']=x['title']
 	data['code']=x['code']
 	data['text']=x['text']
 	data['solution']=x['solution']
 	data['choices']=x['choices']
 	question.data = json.dumps(data)
 	question.save()
+	if user:
+		question.owners.add(user)
 	return question.id
 
 def genQ(request):
@@ -91,12 +95,10 @@ def genQ(request):
 def genA(request):
 	template = ATemplate.objects.get(pk=request.POST['tid'])
 	data=dict()
-	data["start"] = json.loads(template.data)['start']
-	data["due"] =json.loads(template.data)['due']
-	assignment = Assignment(title=template.title, data=json.dumps(data));
+	assignment = Assignment(title=template.title, data='', due_date=json.loads(template.data)['due'], start_date=json.loads(template.data)['start'])
 	assignment.save()
 	assignment.owners.add(request.user)
-	questions = list(template.questions.all());
+	questions = list(template.questions.all())
 	
 	#Parse inputs
 	for key in request.POST.keys():
@@ -109,9 +111,8 @@ def genA(request):
 		q = Question(title = question.title, data=question.data)
 		q.save();
 		assignment.questions.add(q)
-		data=json.loads(assignment.data)
 		data[q.id]=0
-		assignment.data=json.dumps(data)
+	assignment.data=json.dumps(data)
 	assignment.save()
 
 	assign_data = json.loads(assignment.data)
@@ -119,15 +120,11 @@ def genA(request):
 	breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
 	context = {
 		'assignment': assignment,
-		'start_date': assign_data['start'],
-		'due_date': assign_data['due'],
-		'question_list':Question.objects.all(),
-		'assignment_list':Assignment.objects.all(),
+		'question_list':Question.objects.filter(private=False) | request.user.owned_questions.all(),
 		'assign_data': assign_data,
 		'breadcrumbs': breadcrumbs,
 	}
 	return render(request, 'assignment/addassignment.html', context)
-
 
 def detailQ(request,id):
 	t=Template.objects.get(pk=id)

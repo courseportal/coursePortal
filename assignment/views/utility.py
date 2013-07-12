@@ -25,7 +25,8 @@ def checkAssignmentTitle(request):
 
 def replaceX(data):
 	replace1="<input type=\"text\" name=\""
-	replace2="\" class=\"t_input\" style='width:100px;'></input>"
+	replace2="\" class=\"t_input\" style='max-width:200px;' placeholder='"
+	replace3="'></input>"
 	toReplace=""
 	while string.find(data, "@")>=0:
 		toReplace=""
@@ -33,5 +34,5 @@ def replaceX(data):
 		while index<len(data) and data[index] in string.ascii_letters+string.digits+"_":
 			toReplace+=data[index]
 			index=index+1
-		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2)
+		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2+toReplace+replace3)
 	return data

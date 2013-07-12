@@ -100,21 +100,9 @@ function init(){
 			$('body').removeClass('dialog-open');
 		},
 		beforeClose: function( event, ui ) {
-			warning = "Closing this will not save changes. Proceed?";
-			if ( event.originalEvent && $(event.originalEvent.target).closest(".ui-dialog-titlebar-close").length ) {
-				if(confirm(warning)){
-					$('#codediv').html('');
-					$('#solndiv').html('');
-					return true;
-				}
-				else
-					return false;
-			}
-			else{
-				$('#codediv').html('');
-				$('#solndiv').html('');
-				return true;
-			}
+			$('#codediv').html('');
+			$('#solndiv').html('');
+			return true;
 		}
 	});
 

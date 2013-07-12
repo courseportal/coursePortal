@@ -38,14 +38,15 @@ def detail(request, id):
     }
     return render(request, 'assignment/detail.html', context)
 
-def assign(request):
+def assign(request, messages=[]):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('assign'), 'title':'Assign'})
     context = {
         'users': User.objects.all(),
         'breadcrumbs': breadcrumbs,
         'assignments': request.user.owned_assignments.all(),
-        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all(),
+        'messages':messages
     }
     return render(request, 'assignment/assign.html', context)
 
@@ -99,8 +100,8 @@ def instantiate(request):
                 choice_instance.save()
             instance.max_score+=question_instance.value
             instance.save()
-    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment succesfully assigned!"]}
-    return render(request, 'assignment_nav.html', context)
+    messages=["Assignment succesfully assigned!"]
+    return assign(request, messages)
 
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
@@ -139,7 +140,7 @@ def create(request):
             q.delete();
     #create new assignment
     assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
-    if 'private' in a:
+    if 'private' in request.POST:
         assignment.private = True
     assignment.save()
 
@@ -165,14 +166,15 @@ def create(request):
     assignment.save()
     return main(request)
 
-def unassign(request):
+def unassign(request, messages=[]):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('unassign'), 'title':'Assign'})
     context = {
         'user': request.user,
         'breadcrumbs': breadcrumbs,
         'assignments': request.user.owned_assignments.all(),
-        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all(),
+        'messages':messages
     }
     return render(request, 'assignment/unassign.html', context)
 
@@ -190,9 +192,8 @@ def unmake(request):
             instance.delete()
     except:
         pass
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment(s) succesfully unassigned!"]}
-    return render(request, 'assignment_nav.html', context)
+    messages=["Assignment(s) succesfully unassigned!"]
+    return unassign(request, messages)
 
 def createQ(x, private, users=[]):
     question = Question()

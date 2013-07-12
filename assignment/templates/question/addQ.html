@@ -8,8 +8,6 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
 
-
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
@@ -44,7 +42,7 @@
 	</div>
 	<hr>
 
-	<form action="/assignment/question/create" style="margin-bottom:5px" method="post" id="questionForm">
+	<form action="{% url 'create_question' %}" style="margin-bottom:5px" method="post" id="questionForm">
 	{% csrf_token %}
 		<input type="text" style="display:none" id="questionname" name="questionname"></input>
 		<input type="text" style="display:none" id="data" name="questiondata"></input>

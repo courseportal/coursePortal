@@ -17,3 +17,7 @@
 	!NOT FULLY TESTED YET, EXPECT BUGFIXES IN THE FUTURE
 *Slightly improved addQ HTML
 *improved url system
+
+7/12/2013:
+*Templates can now be deleted
+*More in-depth testing and bugfixing performed
