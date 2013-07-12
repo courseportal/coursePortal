@@ -19,7 +19,7 @@ def main(request):
     return render(request, 'assignment_nav.html', context)
 
 def index(request):
-    assignment_list = Assignment.objects.all()
+    assignment_list = Assignment.objects.filter(private=False) | request.user.owned_assignments.all()
     context = {'user':request.user, 'assignment_list':assignment_list}
 
     return render(request, 'assignment/index.html', context)
@@ -38,14 +38,15 @@ def detail(request, id):
     }
     return render(request, 'assignment/detail.html', context)
 
-def assign(request):
+def assign(request, messages=[]):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('assign'), 'title':'Assign'})
     context = {
         'users': User.objects.all(),
         'breadcrumbs': breadcrumbs,
         'assignments': request.user.owned_assignments.all(),
-        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all(),
+        'messages':messages
     }
     return render(request, 'assignment/assign.html', context)
 
@@ -70,11 +71,11 @@ def instantiate(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     data=json.loads(assignment.data)
     for u in users:
-        instance = AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=data['start'], due_date=data['due'])
+        instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=assignment.start_date, due_date=assignment.due_date)
         instance.save()
         for question in assignment.questions.all():
             q=question.data
-            q = json.loads(q)
+            q=json.loads(q)
             q['solution']= q['solution'].replace('<br>', '\n')
             q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
             for integer_index in range(len(q['choices'])):
@@ -99,15 +100,15 @@ def instantiate(request):
                 choice_instance.save()
             instance.max_score+=question_instance.value
             instance.save()
-    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment succesfully assigned!"]}
-    return render(request, 'assignment_nav.html', context)
+    messages=["Assignment succesfully assigned!"]
+    return assign(request, messages)
 
 def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
     context = {
         'breadcrumbs':breadcrumbs,
-        'question_list':Question.objects.all(),
+        'question_list':request.user.owned_questions.all() | Question.objects.filter(private=False),
         'template_list':Template.objects.all(),
     }
     return render(request, 'assignment/addAssignment.html', context)
@@ -119,8 +120,6 @@ def editA(request, id):
     breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
     context = {
         'assignment': assignment,
-        'start_date': assign_data['start'],
-        'due_date': assign_data['due'],
         'question_list':Question.objects.all(),
         'template_list':Template.objects.all(),
         'assign_data': assign_data,
@@ -133,20 +132,21 @@ def create(request):
     #Search for assignment by same name, delete it if found
     current=''
     try:
-        current=request.user.templates.get(title = a['title'])
+        current=request.user.owned_assignments.get(title = a['title'])
     except:
         pass
     if current!='':
         for q in current.questions.all():
             q.delete();
     #create new assignment
-    assignment = Assignment(title = a["title"], data='')
+    assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
+    if 'private' in request.POST:
+        assignment.private = True
     assignment.save()
-    #save start and end date
+
     data=dict()
-    data['due']=a['due']
-    data['start']=a['start']
     questions=dict()
+
     #save owners
     if current!='': 
         for x in current.owners.all():
@@ -154,9 +154,10 @@ def create(request):
         current.delete();
     else:
         assignment.owners.add(request.user)
+
     #Add questions
     for q in a['questions']:
-        temp=createQ(q)
+        temp=createQ(q, assignment.private, assignment.owners)
         assignment.questions.add(temp)
         questions[str(temp)]=q['points']
     data['questions']=questions
@@ -165,14 +166,15 @@ def create(request):
     assignment.save()
     return main(request)
 
-def unassign(request):
+def unassign(request, messages=[]):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('unassign'), 'title':'Assign'})
     context = {
         'user': request.user,
         'breadcrumbs': breadcrumbs,
         'assignments': request.user.owned_assignments.all(),
-        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all()
+        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all(),
+        'messages':messages
     }
     return render(request, 'assignment/unassign.html', context)
 
@@ -190,15 +192,17 @@ def unmake(request):
             instance.delete()
     except:
         pass
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-    context = {'breadcrumbs':breadcrumbs, 'messages':["Assignment(s) succesfully unassigned!"]}
-    return render(request, 'assignment_nav.html', context)
+    messages=["Assignment(s) succesfully unassigned!"]
+    return unassign(request, messages)
 
-
-def createQ(x):
+def createQ(x, private, users=[]):
     question = Question()
+    question.private = private
     question.title = x['title']
     data=dict()
     question.data = json.dumps(x)
+    question.save()
+    for user in users.all():
+        question.owners.add(user)
     question.save()
     return question.id

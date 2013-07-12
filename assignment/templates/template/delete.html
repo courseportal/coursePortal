@@ -1,0 +1,75 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<script>
+	function confirmDelete(){
+		var msg = "This will delete the following assignments:\n";
+		var data = $("#deleteForm").serializeArray();
+		for(var x=0; x<data.length; x++){
+			if(data[x].name[0]=='a' && data[x].name!="csrfmiddlewaretoken")
+				msg=msg.concat("\t",JSON.stringify(data[x].value),"\n");
+		}
+		msg=msg.concat("And the following questions:\n")
+		for(var x=0; x<data.length; x++){
+			if(data[x].name[0]=='q' && data[x].name!="csrfmiddlewaretoken")
+				msg=msg.concat("\t",JSON.stringify(data[x].value),"\n");
+		}
+		msg=msg.concat("Proceed?");
+		if(confirm(msg) == true){
+			$("#deleteForm").submit();
+		}
+	}
+</script>
+
+<body>
+<form method = "post" id="deleteForm" action = "{% url 'delete_template' %}">
+{% csrf_token %}
+<h2>Template Questions:</h2>
+<table class="table">
+	<thead>
+		<th style="width:5px"></th>
+		<th style="width:80px">Question</th>
+		<th style="width:100px">Last Modified</th>
+	</thead>
+</table>
+<div class="list-table">  
+<table class="table">
+	<tbody>
+		{% for q in question_list %}
+				<tr>
+					<td style="width:10px"><input type="checkbox" name="q{{q.id}}" value="{{q}}"></input></td>
+					<td style="width:80px">{{q}}</td>
+					<td style="width:100px"></td>
+				</tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+<h2>Template Assignments:</h2>
+<table class="table">
+	<thead>
+		<th style="width:5px"></th>
+		<th style="width:80px">Assignment</th>
+		<th style="width:100px">Last Modified</th>
+	</thead>
+</table>
+<div class="list-table">  
+<table class="table">
+	<tbody>
+		{% for a in assignment_list %}
+				<tr>
+					<td style="max-width:5px; width:5px;"><input type="checkbox" name="a{{a.id}}" value="{{a}}"></input></td>
+					<td style="width:80px">{{a}}</td>
+					<td style="width:100px"></td>
+				</tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+</form>
+<button onclick = "confirmDelete()" class="btn">Delete Selected</button>
+</body>
+{% endblock %}

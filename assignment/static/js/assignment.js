@@ -100,21 +100,9 @@ function init(){
 			$('body').removeClass('dialog-open');
 		},
 		beforeClose: function( event, ui ) {
-			warning = "Closing this will not save changes. Proceed?";
-			if ( event.originalEvent && $(event.originalEvent.target).closest(".ui-dialog-titlebar-close").length ) {
-				if(confirm(warning)){
-					$('#codediv').html('');
-					$('#solndiv').html('');
-					return true;
-				}
-				else
-					return false;
-			}
-			else{
-				$('#codediv').html('');
-				$('#solndiv').html('');
-				return true;
-			}
+			$('#codediv').html('');
+			$('#solndiv').html('');
+			return true;
 		}
 	});
 
@@ -161,8 +149,8 @@ function init(){
 	 	
 
 	//initalize datepickers
-	$('#assigndate').datepicker();
-	$('#duedate').datepicker();
+	$('#assigndate').datepicker({ dateFormat: "yy-mm-dd" });
+	$('#duedate').datepicker({ dateFormat: "yy-mm-dd" });
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
@@ -235,6 +223,7 @@ function loadT(url){
 	//Load template view 
 	$("#template-zone").load(url+" #templateView", function(){
 		$("#template-btn").attr("onclick", "genQ()");
+		$("#template-zone").append("<button class='btn' onclick=openTemplates()>Back</button>");
 	});
 }
 
@@ -243,12 +232,17 @@ function genQ(){
 	var formdata = $("#templateForm").serializeArray();
 	var templatedata = $("#template_data").attr("value");
 	for(var x=0; x<formdata.length; x++){
+		if(formdata[x].name == 'csrfmiddlewaretoken' || formdata[x].name == 'tid'){
+			continue;
+		}
 		if(formdata[x].value == null || formdata[x].value == ''){
 			alert("Input field \""+formdata[x].name+"\" is empty!");
 			return false;
 		}
 		else{
-			templatedata=templatedata.replace("@"+formdata[x].name, formdata[x].value);
+			toReplace = "@"+formdata[x].name;
+			while(templatedata.search(toReplace)>=0)
+				templatedata=templatedata.replace(toReplace, formdata[x].value);
 		}
 	}
 	//append question data to list
@@ -281,7 +275,7 @@ function preview_question(num){
 		questionPOST = {
 			questiondata: questiondata
 		};
-		$.ajax('/assignment/assign/qpreview', {
+		$.ajax('/assignment/qpreview/', {
 			type: 'POST',
 			async: true,
 			data: questionPOST,
@@ -424,7 +418,7 @@ function previewQ(questiondata){
 		questiondata: questiondata
 	},
 
-	$.ajax('/assignment/assign/qpreview', {
+	$.ajax('/assignment/qpreview', {
 		type: 'POST',
 		async: false,
 		data: questionPOST,
@@ -457,7 +451,7 @@ function previewA(){
    	previewdata:JSON.stringify(assignment, undefined, 2),
    };
 
-   $('#previewform').load('assign/preview/', data, function(response, status, xhr){
+   $('#previewform').load('preview/', data, function(response, status, xhr){
    	if (status == "error") {
     		var msg = "Sorry but there was an error: ";
     		$("#previewform").html(msg + xhr.status + " " + xhr.statusText);
@@ -533,4 +527,3 @@ function checkForTemplate(question){
 	var code = question.code;
 	return text.indexOf("@") >= 0 || code.indexOf("@") >= 0;
 }
-

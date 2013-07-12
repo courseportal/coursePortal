@@ -6,28 +6,34 @@ from django.utils import simplejson as json
 
 class Template(models.Model):
     title = models.CharField(max_length=200)
+    owners = models.ManyToManyField(User, related_name='owned_template_questions', blank=True, null=True)
     data = models.TextField()
     def __unicode__(self):
-        return self.tltle
+        return self.title
 
 class ATemplate(models.Model):
     title = models.CharField(max_length=100, default = '')
     data = models.TextField(default='', null=True, blank=True)
-    questions = models.ManyToManyField(Template)
+    questions = models.ManyToManyField(Template, related_name='assigned_to')
     owners = models.ManyToManyField(User, related_name='owned_templates', blank=True, null=True)
     def __unicode__(self):
         return self.title
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
+    private = models.BooleanField(default=False)
+    owners = models.ManyToManyField(User, related_name='owned_questions', blank=True, null=True)
     data = models.TextField()
     def __unicode__(self):
         return self.title
 
 class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
+    private = models.BooleanField(default=False)
+    due_date = models.DateTimeField()
+    start_date = models.DateTimeField()
     data = models.TextField(default='', null=True, blank=True)
-    questions = models.ManyToManyField(Question)
+    questions = models.ManyToManyField(Question, related_name='assigned_to')
     owners = models.ManyToManyField(User, related_name='owned_assignments', blank=True, null=True)
     def __unicode__(self):
         return self.title

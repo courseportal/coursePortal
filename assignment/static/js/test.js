@@ -54,6 +54,7 @@ tinymce.init({
 });
 
 solnIndex = 0;
+add_choice();
 
 $(document).ready(function(){
 	$('#previewform').dialog({
@@ -62,7 +63,6 @@ $(document).ready(function(){
 		modal: true,
 		autoOpen: false,
 	});
-	//$("#previewform").nm();
 });
 
 
@@ -83,18 +83,17 @@ function save(){
 		choices: [],
 		text: ''
 	};
-
 	question.title = $('#title').val();
 	question.code = code.getValue();
 	question.solution = solutions[0].getValue();
 	for (var i = 1; i < solutions.length; i++) {
-  		question.choices.push(solutions[i].getValue());
-  	}
-  	question.text = tinymce.activeEditor.getContent({format : 'raw'});
+  	question.choices.push(solutions[i].getValue());
+  }
+  question.text = tinymce.activeEditor.getContent({format : 'raw'});
 
 	$('#questionname').val($('#title').val());
-  	$('#data').val(JSON.stringify(question));
-  	$('#questionForm').submit();
+  $('#data').val(JSON.stringify(question));
+  $('#questionForm').submit();
 }
 
 function preview(){

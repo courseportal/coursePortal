@@ -13,14 +13,12 @@
            		<th>Title</th>
            		<th>Subject</th>
            		<th>Author</th>
-           		<th>Rating</th>
         		</tr>  
       	</thead> 
       	<tbody>
    	{% for a in assignment_list %}
    		<tr class="assignment-row">
    			<td class="first-cell" id="{{a.id}}" value="{{a.title}}">{{ a.title }}</td>
-				<td></td>
 				<td></td>
 				<td></td>
 				<td><i onclick="previewL({{a.id}})" class="icon-eye-open"></i></a></td>
@@ -32,7 +30,7 @@
 	</div>
 	<div class="row-fluid">
 		<button class="btn btn-success load-assignment">Load</button>
-		<button class="btn btn-warning cancel-assignment-load">Cancel</button>
+		<button class="btn btn-warning" onclick="history.go(-1);return true;">Cancel</button>
 	</div>
 	<div class="assignment-area">
 	</div>

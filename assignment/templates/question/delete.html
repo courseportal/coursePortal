@@ -1,0 +1,51 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<script>
+	function confirmDelete(){
+		var msg = "This will delete the following questions:\n";
+		var data = $("#deleteForm").serializeArray();
+		for(var x=0; x<data.length; x++){
+			if(data[x].name!="csrfmiddlewaretoken")
+				msg=msg.concat("\t",JSON.stringify(data[x].value),"\n");
+		}
+		msg=msg.concat("Proceed?");
+		if(confirm(msg) == true){
+			$("#deleteForm").submit();
+		}
+	}
+</script>
+
+
+<body>
+<form method = "post" id="deleteForm" action = "{% url 'delete_question' %}">
+{% csrf_token %}
+<table class="table">
+	<thead>
+		<th style="width:10px"></th>
+		<th style="width:80px">Question</th>
+		<th style="width:100px">Class</th>
+		<th style="width:100px">Last Modified</th>
+	</thead>
+</table>
+<div class="list-table">  
+<table class="table">
+	<tbody>
+		{% for q in question_list %}
+				<tr>
+					<td style="width:10px"><input type="checkbox" name="{{q.id}}" value="{{q}}"></input></td>
+					<td style="width:80px">{{q}}</td>
+					<td style="width:100px"></td>
+					<td style="width:100px"></td>
+				</tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+</form>
+<button onclick = "confirmDelete()" class="btn">Delete Selected</button>
+</body>
+{% endblock %}
