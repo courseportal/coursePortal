@@ -49,13 +49,9 @@ code = {};
 solution = {};
 choices = [];
 text = {};
-preview = {};
-
-
 
 $(init); //runs init after DOM is loaded
 function init(){
-
 	//create sortable
 	$( '#questionsList' ).sortable({
 		update: function(event, ui) {
@@ -281,7 +277,7 @@ function preview_question(num){
 			data: questionPOST,
 		}).done(function(response){
 			//fill out the preview
-			preview = jQuery.parseJSON(response)
+			var preview = jQuery.parseJSON(response)
 			$('#question'+num).find('.preview-row').html(preview.text);
 			$('#dialogPreview').html(preview.text);
 			//make the button normal again

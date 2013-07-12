@@ -16,7 +16,6 @@ urlpatterns = patterns('',
 
     url(r'add_question/?$', 'assignment.views.question.addQ', name='add_question'),
     url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.question.instanceDetail', name='question_instance'),
-    url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
     url(r'question/preview/?$', 'assignment.views.question.preview', name='preview'),
     url(r'question/create/?$', 'assignment.views.question.create', name='create_question'),
     url(r'question/delete/?$', 'assignment.views.staff.deleteQ', name='delete_question'),
