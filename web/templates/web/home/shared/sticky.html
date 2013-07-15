@@ -1,10 +1,10 @@
 {% if selected_class %}
   {% if user.is_staff or user.is_superuser or selected_class.author == user %}
-    <a rel="tooltip" href="javascript:void(0);" class="sticky icon-file" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}" title="Sticky"></a>
+    <a rel='tooltip' href='javascript:void(0);' class='sticky icon-file' class-id='{{ selected_class.id }}' item-type='{{ type }}' item-id='{{ object.id }}' title='Sticky'></a>
   {% else %}
     {% for allowed in selected_class.allowed_users.all %}
       {% if user == allowed %}
-        <a rel="tooltip" href="javascript:void(0);" class="sticky icon-file" class-id="{{ selected_class.id }}" item-type="{{ type }}" item-id="{{ e.id }}" title="Sticky"></a>
+        <a rel='tooltip' href='javascript:void(0);' class='sticky icon-file' class-id='{{ selected_class.id }}' item-type='{{ type }}' item-id='{{ object.id }}' title='Sticky'></a>
       {% endif %}
     {% endfor %}
   {% endif %}

@@ -5,9 +5,10 @@ from web.models import Class, AtomCategory, BaseCategory, Atom, Submission, Exam
 
 # Dict to pass to the breadcrumb function to work with all of web.
 web_breadcrumb_dict = {
-	'class-index': lambda pks: 'Class List',
-	'category': lambda pks: get_object_or_404(AtomCategory, pk=pks[0]),
-	'atom': lambda pks: get_object_or_404(Atom, pk=pks[0]),
+	'class-index':	lambda pks: 'Class List',
+	'class':		lambda pks: get_object_or_404(Class, pk=pks[0]),
+	'category':		lambda pks: get_object_or_404(AtomCategory, pk=pks[0]),
+	'atom':			lambda pks: get_object_or_404(Atom, pk=pks[0]),
 }
 
 def get_navbar_context(category_object=None, class_object=None):
@@ -25,7 +26,7 @@ def get_navbar_context(category_object=None, class_object=None):
 		context = {}
 	if class_object:
 		context.update({
-			'top_level_categories': class_object.category_set.filter(parent_category=None)
+			'top_level_categories': class_object.category_set.filter(parent_categories=None)
 		})
 	else:
 		context.update({
@@ -33,28 +34,49 @@ def get_navbar_context(category_object=None, class_object=None):
 		})
 	return context
 	
+def has_class_access(class_object, user):
+	r"""Returns True if the user is allowed to view the class page, False otherwise."""
+	return (class_object.status == "N" and not (user.is_superuser or
+			class_object.author == user or
+		 	class_object.allowed_users.filter(id=user.id).exists()))
 	
-def get_context_for_category(current_category, context=None):
+def get_context_for_atom(atom_object=None):
+	r"""
+	This function returns the context dictionary containing the context specific to an atom.
+	
+	It takes in the atom you want the context for.  If no input is given it returns a list of the required keys with empty lists as their values.
+	
 	"""
-	This function returns context for category views.  It adds ``'videos'``, ``'expositions'``, ``'notes'``, ``'examples'``, and ``'atoms'`` to the context.  It requires the category you want to get the context for as an input.  ``current_category`` can be either a BaseCategory or an AtomCategory.
+	if not atom_object:
+		context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[]}
+	else:
+		context = {
+			'videos':atom_object.tags.distinct(),
+			'expositions':atom_object.exposition_set.distinct(),
+			'notes':atom_object.lecturenote_set.distinct(),
+			'examples':atom_object.example_set.distinct()
+		}
+	return context
+	
+def get_context_for_category(category_object, context=None):
+	"""
+	This function returns context for category views.  It adds ``'videos'``, ``'expositions'``, ``'notes'``, ``'examples'``, and ``'atoms'`` to the context.  It requires the category you want to get the context for as an input.  ``category_object`` can be either a BaseCategory or an AtomCategory.
 	
 	"""
 	if not context:
 		first_call_flag = True # We only convert to list and get the distinct elements once
-		context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[], 'atoms':[]} # Populate
+		context = get_context_for_atom() # Initialize context to dict of empty lists
+		context.update({'atoms':[]}) # Add 'atoms' to the context which has atom specific keys in it
 	else:
 		first_call_flag = False # If its not the first loop we don't want to convert to distinct list
-	temp = {'atoms':current_category.child_atoms.all()}
+	temp = {'atoms':category_object.child_atoms.all()}
 	for atom in temp['atoms']: # Only hits dict once to get into loop
-		temp.update({ # Get the content of this atom
-			'videos':Submission.objects.filter(tags=atom).distinct(),
-			'expositions':atom.exposition_set.all(),
-			'notes':atom.lecturenote_set.all(),
-			'examples':atom.example_set.all()
-		})
+		temp.update( # Get the context for 'atom'
+			get_context_for_atom(atom)
+		)
 		for key in context: # Chain the keys together, chain is faster than using loops b/c it is in C
 			context[key] = chain(context[key],temp[key])
-	for child in current_category.child_categories.all(): # Get content for all child categories
+	for child in category_object.child_categories.all(): # Get content for all child categories
 		get_context_for_category(child, context) #recurse
 	if first_call_flag: # Only do this on the top level of recursion
 		for key in context:

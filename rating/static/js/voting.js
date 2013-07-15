@@ -52,7 +52,7 @@ init_vote_down = function() {
 	});
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
     init_vote_up();
     init_vote_down();
-});
+}

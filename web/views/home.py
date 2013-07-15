@@ -1,23 +1,18 @@
-from django.contrib import messages
-from django.core.cache import cache
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.db.models import Q, Avg
-from django.db.models.loading import get_models
-from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponseBadRequest
-from django.template import RequestContext, loader, Context
-from django.shortcuts import get_object_or_404, render
 import json
 
-from pybb.models import Forum
-from django.core.mail import send_mail
-from web.forms.submission import ReportForm
-from django.forms.util import ErrorList
-from knoatom.view_functions import get_breadcrumbs, render_to_json_response # Site wide helper fn's
-from web.views.view_functions import get_navbar_context, get_context_for_category, web_breadcrumb_dict, get_parent_categories
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, render
 
-for m in get_models():
-	exec "from %s import %s" % (m.__module__, m.__name__)
+from pybb.models import Forum
+from web.models import BaseCategory, Atom, Submission, Exposition, \
+LectureNote, Example, Class, AtomCategory
+from web.forms.submission import ReportForm
+from knoatom.view_functions import get_breadcrumbs, render_to_json_response
+from web.views.view_functions import get_navbar_context, \
+get_context_for_category, web_breadcrumb_dict, get_parent_categories, \
+get_context_for_atom, has_class_access
 	
 def report(request):
 	r"""View for processing the report form. It only accepts AJAX requests."""
@@ -32,7 +27,7 @@ def report(request):
 				'success': True,
 			})
 		else:
-			context.update(form.errors) # Add the errors to the context to be processed by AJAX
+			context.update(form.errors) # Add errors to be processed by AJAX
 		return render_to_json_response(context)
 	else:
 		return HttpResponseBadRequest()
@@ -54,255 +49,86 @@ def index(request):
 	
 		For now this displays the top ranked videos for all of the categories, we need to change it eventually.
 	"""
-	context = get_navbar_context() # Add the initial navbar content.  There are no breadcrumbs
-	
-	# get the highest ranked submissions
-	top_ranked_videos = cache.get('top_ranked_videos') # Try to load the videos from the cache
+	context = get_navbar_context() # Add the initial navbar content.
+	top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
 	if not top_ranked_videos: # If there is no cached version
-		top_ranked_videos = Submission.objects.all().order_by('-votes')[:5] # Query for top 5 videos
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache to last for 10 mins
-	context.update({
+		top_ranked_videos = Submission.objects.all().order_by('-votes')[:5]
+		cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
+	context.update({ # Add 'top_ranked_videos' to context
 		'top_ranked_videos': top_ranked_videos,
 	})
-	
-	return render(request, 'web/home/base/index.html', context)
+	return render(request, 'web/home/base/index.html', context)	
 
-def base_category(request, pk):
-	"""
-		-	Generates the category page
-		-	Generates a list of the most popular videos for each category of rating
-		-	Use memcached to save the popular video rankings to save a lot of time
-	"""
-	category_object = get_object_or_404(BaseCategory, id=pk)
-	# Get the navbar context as the initial context, ('top_level_categories', 'selected_categories')
-	context = get_navbar_context(category_object)
-	context.update({
-		'selected_category':category_object
-	})
-	context.update( # Adds 'breadcrumbs' to context
-		get_breadcrumbs(request.path, web_breadcrumb_dict)
-	)
-	#Get collection of videos/expos/notes/examples from all atoms in this category or sub-categories
-	context.update( # And a list of all sub-atoms (including atoms in sub-categories)
-		get_context_for_category(category_object)
-	)
-	##################################################################################################
-	# un-json-fy the videos					### Do we want to be able to save multiple videos?
-	for c in context['videos']:
-		if c.video: 
-			c.video = [v for v in json.loads(c.video)]
-	##################################################################################################
-	return render(request, 'web/home/base/category.html', context)
-
-def base_atom(request, cat_id, atom_id):
-	"""
-		- Generates the view for a specific category
-		- Creates the breadcrumbs for the page
-	"""
-	category_object = get_object_or_404(BaseCategory, id=cat_id) # Get category we are in
-	atom_object = get_object_or_404(Atom, id=atom_id) # Get atom we are in
-	
-	context = get_navbar_context(category_object) #'top_level_base_categories, 'selected_categories'
-	context.update( # Adds 'breadcrumbs' to the context.
-		get_breadcrumbs(request.path, web_breadcrumb_dict)
-	)
-	context.update({ # Get the contents of the atom and add them to the context dict
-	'selected_atom':atom_object,
-	'videos':		Submission.objects.filter(tags=atom_object).distinct(),
-	'expositions':	atom_object.exposition_set.all(),
-	'notes':		atom_object.lecturenote_set.all(),
-	'examples':		atom_object.example_set.all(),
-	'forum':		Forum.objects.get(atom=atom_object),
-	})
-	##################################################################################################
-	# un-json-fy the videos					### Do we want to be able to save multiple videos?
-	for c in context['videos']:
-		if c.video: 
-			c.video = [v for v in json.loads(c.video)]
-	##################################################################################################
-	return render(request, 'web/home/base/atom.html', context)
-	
-
-def category(request, class_id, cat_id):
-	"""
+def category(request, cat_id, class_id=None):
+	r"""
 		- Generates the category page
 		- Generates a list of the most popular videos for each category of rating
 		- Use memcached to save the popular video rankings to save a lot of time
 	"""
-	
-	#get category we are in
-	current_category = get_object_or_404(AtomCategory, id=cat_id)
-	#Get the class that we are in
-	current_class = get_object_or_404(Class, id=class_id)
-	#Get categories that are in the current_class
-	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
-	#Get the "top level" categories
-	top_level_categories = categories_in_class.filter(parent_categories=None)
-	
-	context = get_parent_categories(current_category=current_category, current_class=current_class)
+	if class_id:
+		template = 'web/home/class/category.html'
+		category_object = get_object_or_404(AtomCategory, id=cat_id)
+		class_object = get_object_or_404(Class, id=class_id)
+		# Check if user is allowed to see this page
+		if has_class_access(class_object, request.user):
+			return HttpResponseRedirect(reverse('class_index')) # Redirect
+	else:
+		template = 'web/home/base/category.html'
+		category_object = get_object_or_404(BaseCategory, id=cat_id)
+		class_object = None # We aren't in a class
+	context = get_navbar_context(category_object, class_object)
+	context.update( # Add the breadrumbs to the context
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
+	)
+	context.update( # Add the category specific content to the context
+		get_context_for_category(category_object)
+	)
+	# un-json-fy the videos
+	for c in context['videos']:
+		if c.video: c.video = [v for v in json.loads(c.video)]
+	context.update({
+		'selected_class':class_object,
+		'selected_category':category_object,
+	})
 
-	#Setting breadcrumbs, not perfect, improvements can be made
-	breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
+	return render(request, template, context)
 	
-	for i in range(1, len(context['selected_categories'])+1):
-		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, context['selected_categories'][-i].id]), 'title': context['selected_categories'][-i]})
 
-	
-	context.update(get_context_for_category(current_category))
-			
-	
-			
-	
+
+def atom(request, cat_id, atom_id, class_id=None):
+	r"""
+		- Generates the view for a specific category
+		- Creates the breadcrumbs for the page
+	"""
+	if class_id:
+		template = 'web/home/class/category.html'
+		class_object = get_object_or_404(Class, id=class_id)
+		category_object = get_object_or_404(AtomCategory, id=cat_id)
+		# Check if user is allowed to see this page
+		if has_class_access(class_object, request.user):
+			return HttpResponseRedirect(reverse('class_index')) # Redirect
+	else:
+		template = 'web/home/base/category.html'
+		class_object = None
+		category_object = get_object_or_404(BaseCategory, id=cat_id)
+	atom_object = get_object_or_404(Atom, id=atom_id) 
+	context = get_navbar_context(category_object, class_object)
+	context.update( # Add the breadcrumbs to the context
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
+	)
+	context.update( # Add the atom specific content to the context
+		get_context_for_atom(atom_object)
+	)
 	# un-json-fy the videos
 	for c in context['videos']:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
-		if request.user.is_authenticated():
-			for c in context['videos']:
-				ratings = c.votes_s.filter(user=request.user)
-				c.user_rating = {}
-				if ratings.count() > 0:
-					for r in ratings:
-						c.user_rating[int(r.v_category.id)] = int(r.rating)
-					
-					
-	stickied_content = []
-	content = []
-	for vid in context['videos']:
-		if vid.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_content.append(vid)
-		else:
-			content.append(vid)
-					
-	stickied_expositions = []
-	expositions = []
-	for expo in context['expositions']:
-		if expo.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_expositions.append(expo)
-		else:
-			expositions.append(expo)
-			
-	stickied_notes = []
-	notes = []
-	for note in context['notes']:
-		if note.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_notes.append(note)
-		else:
-			notes.append(note)
-			
-	stickied_examples = []
-	examples = []
-	for example in context['examples']:
-		if example.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_examples.append(example)
-		else:
-			examples.append(example)
-			
 	context.update({
-			'breadcrumbs': breadcrumbs,
-			'top_level_categories': top_level_categories,
-			'vote_categories': VoteCategory.objects.all(),
-			'selected_class':current_class,
-			'selected_category':current_category,
-			'stickied_videos': stickied_content,
-			'stickied_expositions': stickied_expositions,
-			'stickied_notes': stickied_notes,
-			'stickied_examples': stickied_examples,
-		
-		})
-
-	t = loader.get_template('web/home/class/category.html')
-	c = RequestContext(request, context)
-	return HttpResponse(t.render(c))
-
-
-def atom(request, class_id, cat_id, atom_id):
-	"""
-		- Generates the view for a specific category
-		- Creates the breadcrumbs for the page
-	"""
-
-
-	#Get atom we are in
-	current_atom = get_object_or_404(Atom, id=atom_id)
-	#get category we are in
-	current_category = get_object_or_404(AtomCategory, id=cat_id)
-##	#Get the parents of the category we are in
-##	parents = current_category.parent_categories.all() #Check that it is correct
-	
-	#Get class we are in
-	current_class = get_object_or_404(Class, id=class_id)
-	#Get categories that are in the current_class
-	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
-	#Get the "top level" categories
-	top_level_categories = categories_in_class.filter(parent_categories=None) #check that this works
-
-	#Get list of parent categories, not perfect, improvements can be made
-	context = get_parent_categories(current_category=current_category, current_class=current_class)
-
-
-	breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-	for i in range(1, len(context['selected_categories'])+1):
-		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, context['selected_categories'][-i].id]), 'title': context['selected_categories'][-i]})
-	breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
-
-	forum = Forum.objects.get(atom=current_atom)
-	
-	all_content = Submission.objects.filter( Q(tags=current_atom) ).distinct()
-	
-	# un-json-fy the videos
-	for c in all_content:
-		if c.video: c.video = [v for v in json.loads(c.video)]
-
-	if request.user.is_authenticated():
-		
-		for c in all_content:
-			ratings = c.votes_s.filter(user=request.user)
-			c.user_rating = {}
-			if ratings.count() > 0:
-				for r in ratings:
-					c.user_rating[int(r.v_category.id)] = int(r.rating)
-
-	stickied_content = []
-	content = []
-	for vid in all_content:
-		if vid.classes_stickied_in.filter(id=current_class.id).exists():
-			stickied_content.append(vid)
-		else:
-			content.append(vid)
-	
-	stickied_expositions = current_class.stickied_expos.filter(atom=current_atom)
-	expositions = current_atom.exposition_set.exclude(id__in = stickied_expositions)
-	
-	stickied_notes = current_class.stickied_notes.filter(atom=current_atom)
-	notes = current_atom.lecturenote_set.exclude(id__in = stickied_notes)
-	
-	stickied_examples = current_class.stickied_examples.filter(atom=current_atom)
-	examples = current_atom.example_set.exclude(id__in = stickied_examples)
-
-	context.update({
-			'breadcrumbs': breadcrumbs,
-			'top_level_categories': top_level_categories,
-			'selected_categories': parent_categories,
-			'selected_atom': current_atom,
-			'vote_categories': VoteCategory.objects.all(),
-			'selected_class':current_class,
-			'forum': forum,
-		
-			'stickied_videos': stickied_content,
-			'stickied_expositions': stickied_expositions,
-			'stickied_notes': stickied_notes,
-			'stickied_examples': stickied_examples,
-			'videos': content,
-			'expositions': expositions,
-			'notes': notes,
-			'examples': examples,
-			'form': form,
-		})
-	t = loader.get_template('web/home/class/category.html')
-	c = RequestContext(request, contexg)
-	return HttpResponse(t.render(c))
-
+		'selected_atom': atom_object,
+		'selected_class':class_object,
+		'forum': Forum.objects.get(atom=atom_object),
+	})
+	return render(request, template, context)
 
 def classes(request, class_id):
 	"""
@@ -310,70 +136,47 @@ def classes(request, class_id):
 		-	Generates a list of the most popular videos for each category of rating
 		-	Use memcached to save the popular video rankings to save a lot of time
 	"""
-		
-	#Get the class that we are in
-	current_class = get_object_or_404(Class, id=class_id)
-	
-	if current_class.status == "N" and not (request.user.is_superuser or current_class.author == request.user or current_class.allowed_users.filter(id=request.user.id).exists()):
-		return HttpResponseRedirect(reverse('class_index'))
-	
-	#Get categories that are in the current_class
-	categories_in_class = AtomCategory.objects.filter(parent_class=current_class.id)
-	#Get the "top level" categories
-	top_level_categories = categories_in_class.filter(parent_categories=None)
-	
-	# get the highest ranked submissions
-	top_ranked_videos = cache.get('top_ranked_videos')
-	if not top_ranked_videos:
-		top_ranked_videos = []
-		for category in VoteCategory.objects.all():
-			# for now, calculate an average for each video
-			top_ranked_videos.append({
-				'vote_category': category, 
-				'submissions': Submission.objects.filter(votes__v_category=category).annotate(average_rating=Avg('votes__rating')).order_by('-average_rating')[:5],
-			})
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10)
-
-
-	t = loader.get_template('web/home/class/index.html')
-	c = RequestContext(request, {
-		'object': current_class,
-		'breadcrumbs': [{'url':reverse('classes', args=[current_class.id]), 'title': current_class.name}],
-		'top_level_categories': top_level_categories,
-		'top_ranked_videos': top_ranked_videos,
-		'vote_categories': VoteCategory.objects.all(),
-		'selected_class':current_class,
+	class_object = get_object_or_404(Class, id=class_id)
+	# Check if user is allowed to see this page
+	if has_class_access(class_object, request.user):
+		return HttpResponseRedirect(reverse('class_index')) # If not redirect
+	context = get_navbar_context(None, class_object)
+	context.update( # Add breadcrumbs to context
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
+	)
+	context.update({ # Add the class_objet to the context
+		'selected_class': class_object
 	})
-	return HttpResponse(t.render(c))
+	return render(request, 'web/home/class/index.html', context)
 
-def post(request, sid):
-	"""
-	-	Generates the view for the specific post (submission) from `sid`
-	-	Creates the appropriate breadcrumbs for the categories
-	"""
-	#Get the "top level" categories
-	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
-	
-	s = Submission.objects.get(id=sid)
-	
-	if s.video:
-		s.video = [v for v in json.loads(s.video)]
-
-	current_atom = s.tags.all()[0]
-	current_category = current_atom.base_category
-	
-	context = get_parent_categories(current_category=current_category,current_class=None)
-	breadcrumbs = []
-	breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
-
-	t = loader.get_template('web/home/post.html')
-	c = RequestContext(request, context.update({
-		'breadcrumbs': breadcrumbs,
-		'content': [s],
-		'top_level_categories': top_level_categories,
-		'selected_categories': parent_categories,
-		#'selected_category': current_category,
-		'selected_atom': current_atom,
-		'vote_categories': VoteCategory.objects.all(),
-	}))
-	return HttpResponse(t.render(c))
+# def post(request, sid):
+# 	"""
+# 	-	Generates the view for the specific post (submission) from `sid`
+# 	-	Creates the appropriate breadcrumbs for the categories
+# 	"""
+# 	#Get the "top level" categories
+# 	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
+# 	
+# 	s = Submission.objects.get(id=sid)
+# 	
+# 	if s.video:
+# 		s.video = [v for v in json.loads(s.video)]
+# 
+# 	current_atom = s.tags.all()[0]
+# 	current_category = current_atom.base_category
+# 	
+# 	context = get_parent_categories(current_category=current_category,current_class=None)
+# 	breadcrumbs = []
+# 	breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
+# 
+# 	t = loader.get_template('web/home/post.html')
+# 	c = RequestContext(request, context.update({
+# 		'breadcrumbs': breadcrumbs,
+# 		'content': [s],
+# 		'top_level_categories': top_level_categories,
+# 		'selected_categories': parent_categories,
+# 		#'selected_category': current_category,
+# 		'selected_atom': current_atom,
+# 		'vote_categories': VoteCategory.objects.all(),
+# 	}))
+# 	return HttpResponse(t.render(c))

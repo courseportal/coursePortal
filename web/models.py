@@ -56,6 +56,7 @@ class Submission(models.Model):
     def __unicode__(self):
         return self.title  
 
+# To delete #####
 class VoteCategory(models.Model):
 	name = models.CharField(max_length=100)
 
@@ -75,6 +76,7 @@ class Vote(models.Model):
 
 	def __unicode__(self):
 		return '%s: %s: %s' % (self.user, self.submission.title, self.v_category.name)
+### End To Delete #####
 
 class Exposition(models.Model):
 	title = models.CharField(max_length=100) # title of the article or website

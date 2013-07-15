@@ -5,7 +5,6 @@ except ImportError:
 from haystack.views import SearchView, search_view_factory, FacetedSearchView
 from haystack.query import SearchQuerySet
 from haystack.forms import AutocompleteModelSearchForm, FacetedSearchForm
-from web.views.home import base_category
 
 
 

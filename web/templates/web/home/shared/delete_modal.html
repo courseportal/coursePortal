@@ -1,13 +1,13 @@
-<div id="deleteModal{{ type }}{{ e.id }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+<div id='deleteModal{{ type }}{{ object.id }}' class='modal hide fade' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+  <div class='modal-header'>
+    <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
     <h3>Deletion Confirmation</h3>
   </div>
-  <div class="modal-body">
-    <p>Are you sure you want to delete {{ name }}?</p>
+  <div class='modal-body'>
+    <p>Are you sure you want to delete {{ object }}?</p>
   </div>
-  <div class="modal-footer">
-    <button class="delete-content btn btn-primary" item-type="{{ type }}" item-id="{{ e.id }}" data-dismiss="modal" aria-hidden="true">Yes</button>
-    <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+  <div class='modal-footer'>
+    <button class='delete-content btn btn-primary' item-type='{{ type }}' item-id='{{ object.id }}' data-dismiss='modal' aria-hidden='true'>Yes</button>
+    <button class='btn' data-dismiss='modal' aria-hidden='true'>No</button>
   </div>
 </div>
