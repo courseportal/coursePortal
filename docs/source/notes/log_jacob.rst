@@ -21,3 +21,11 @@
 7/12/2013:
 *Templates can now be deleted
 *More in-depth testing and bugfixing performed
+
+7/15/2013:
+After discussion with professor, following features have been removed:
+	1.Ability to make things 'private'; everything will be public in some fashion
+	*question and assignment model field 'private' removed
+	2.Current template system. Functionality will be folded into the question system somehow. In the future, templates will be a way of styling a question.
+	*Models 'template' and 'Atemplate' removed
+

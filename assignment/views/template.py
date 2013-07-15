@@ -121,7 +121,7 @@ def genA(request):
 	breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
 	context = {
 		'assignment': assignment,
-		'question_list':Question.objects.filter(private=False) | request.user.owned_questions.all(),
+		'question_list':Question.objects.all(),
 		'assign_data': assign_data,
 		'breadcrumbs': breadcrumbs,
 	}

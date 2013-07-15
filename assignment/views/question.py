@@ -23,8 +23,6 @@ def create(request):
 	q.data = request.REQUEST['questiondata']
 	q.save()
 	q.owners.add(request.user)
-	if 'private' in request.REQUEST:
-		q.private = True
 	q.save()
 	context={
 		'messages':["Question succesfully made!"],

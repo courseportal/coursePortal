@@ -132,7 +132,6 @@
 	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
-		<input type="checkbox" name="private" {%ifequal assignment.private True %}checked{%endifequal%} value=1>Private?</input>
 	</form>
 	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
 	<div id="previewform"></div>

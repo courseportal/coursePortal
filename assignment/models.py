@@ -21,7 +21,6 @@ class ATemplate(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
-    private = models.BooleanField(default=False)
     owners = models.ManyToManyField(User, related_name='owned_questions', blank=True, null=True)
     data = models.TextField()
     def __unicode__(self):
@@ -29,7 +28,6 @@ class Question(models.Model):
 
 class Assignment(models.Model):
     title = models.CharField(max_length=100, default = '')
-    private = models.BooleanField(default=False)
     due_date = models.DateTimeField()
     start_date = models.DateTimeField()
     data = models.TextField(default='', null=True, blank=True)
