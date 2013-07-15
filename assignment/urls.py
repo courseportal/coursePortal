@@ -1,22 +1,10 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('',
-    url(r'template/delete/?$', 'assignment.views.staff.deleteT', name="delete_template"),
-    url(r'templateA/?$', 'assignment.views.template.indexA', name="atemplate_index"),
-    url(r'template/?$', 'assignment.views.template.indexQ', name="qtemplate_index"),
-    url(r'template/add/?$', 'assignment.views.template.addT', name="add_template"),
-    url(r'template/create/?$', 'assignment.views.template.create', name="create_template"),
-    url(r'template/createA/?$', 'assignment.views.template.create_assignment', name="create_assignment_template"),
-    url(r'template/view/(?P<id>\d+)/?$', 'assignment.views.template.detailQ', name='view_template'),
-    url(r'template/viewA/(?P<id>\d+)/?$', 'assignment.views.template.detailA', name='view_assignment_template'),
-    url(r'template/generate/?$', 'assignment.views.template.genQ', name='genQ'),
-    url(r'template/generateA/?$', 'assignment.views.template.genA', name='genA'),
-
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
 
     url(r'add_question/?$', 'assignment.views.question.addQ', name='add_question'),
     url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.question.instanceDetail', name='question_instance'),
-    url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
     url(r'question/preview/?$', 'assignment.views.question.preview', name='preview'),
     url(r'question/create/?$', 'assignment.views.question.create', name='create_question'),
     url(r'question/delete/?$', 'assignment.views.staff.deleteQ', name='delete_question'),

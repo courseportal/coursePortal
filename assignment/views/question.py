@@ -7,49 +7,14 @@ from django.utils import simplejson as json
 from random import *
 from math import *
 from string import Template
+from knoatom.view_functions import get_breadcrumbs	
 import sys
 
 def detail(request, id, newly_added=False):
-	question = Question.objects.get(pk=id)
-	q = json.loads(question.data)
-
-	test = ''
-	try:
-		exec q['code']
-	except Exception as ex:
-		test += str(ex)
-		return HttpResponse(test)
-
-	q['solution']= q['solution'].replace('<br>', '\n')
-	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	for integer_index in range(len(q['choices'])):
-		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	exec q['code']
-	solution = eval(q['solution'])
-	text = q['text']
-
-	local_dict = dict(locals())
-	text = Template(text).substitute(local_dict)
-
-	# #choices formatted here
-	choices = []
-	for choice in q['choices']:
-		choices.append(eval(choice))
-
-	context = {
-		'text': text,
-		'answer': solution,
-		'choices': choices,
-		'newly_added': newly_added,
-	}
-
-	return render(request, 'question/question.html', context)
+	return HttpResponse("This needs to be written if you want to use it!")
 
 def addQ(request):
-	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-	breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
-	context = {'breadcrumbs':breadcrumbs,}
+	context = get_breadcrumbs(request.path)
 	return render(request, 'question/addQ.html', context)
 
 def create(request):
@@ -58,8 +23,6 @@ def create(request):
 	q.data = request.REQUEST['questiondata']
 	q.save()
 	q.owners.add(request.user)
-	if 'private' in request.REQUEST:
-		q.private = True
 	q.save()
 	context={
 		'messages':["Question succesfully made!"],
@@ -73,20 +36,24 @@ def preview(request):
 	try:
 		exec q['code']
 	except Exception as ex:
-		test += str(ex)
+		test += "Error in code section:<br>"+str(ex)
 		return HttpResponse(test)
 
-	q['solution']= q['solution'].replace('<br>', '\n')
-	q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	for integer_index in range(len(q['choices'])):
-		q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-		q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-	exec q['code']
-	solution = eval(q['solution'])
+	try:
+		q['solution']= q['solution'].replace('<br>', '\n')
+		q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+		for integer_index in range(len(q['choices'])):
+			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
+			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+		exec q['code']
+		solution = eval(q['solution'])
+	except Exception as ex:
+		test += "Error in solutions:<br>"+str(ex)
+		return HttpResponse(test)
+
 	text = q['text']
-	
 	local_dict = dict(locals())
-	text = Template(text).substitute(local_dict)
+	text = Template(text).safe_substitute(local_dict)
 
 	# #choices formatted here
 	choices = []

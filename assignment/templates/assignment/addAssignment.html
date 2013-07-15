@@ -25,7 +25,6 @@
 
 <body>
 	<a href="{% url 'assignment_index' %}" style="margin-right:5px" class="btn btn-success" id="loadA">Load Assignment</button>
-	<a href="{% url 'atemplate_index' %}" class="btn btn-warning">Load Assignment Template</a>
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
@@ -80,8 +79,6 @@
 		<i class="icon-plus"></i> Add Question </button>
 	<button class="btn" id="listingQ">
 		<i class="icon-plus"></i> Load Existing Question</button>
-	<button class="btn btn-warning" id="Qtemplate">
-		<i class="icon-plus"></i> Load Question Template</button>
 
 	<div id="dialog" class="row-fluid">
 		<div class="span7" id="editDiv">
@@ -132,7 +129,6 @@
 	{% csrf_token %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
-		<input type="checkbox" name="private" {%ifequal assignment.private True %}checked{%endifequal%} value=1>Private?</input>
 	</form>
 	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
 	<div id="previewform"></div>
@@ -169,9 +165,6 @@
 	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
 	<div class="preview-area">
 	</div>
-</div>
-
-<div id="template-zone">
 </div>
 
 </body>

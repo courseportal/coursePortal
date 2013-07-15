@@ -19,7 +19,7 @@ def main(request):
     return render(request, 'assignment_nav.html', context)
 
 def index(request):
-    assignment_list = Assignment.objects.filter(private=False) | request.user.owned_assignments.all()
+    assignment_list = Assignment.objects.all()
     context = {'user':request.user, 'assignment_list':assignment_list}
 
     return render(request, 'assignment/index.html', context)
@@ -108,8 +108,7 @@ def addA(request):
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
     context = {
         'breadcrumbs':breadcrumbs,
-        'question_list':request.user.owned_questions.all() | Question.objects.filter(private=False),
-        'template_list':Template.objects.all(),
+        'question_list':Question.objects.all(),
     }
     return render(request, 'assignment/addAssignment.html', context)
 
@@ -121,7 +120,6 @@ def editA(request, id):
     context = {
         'assignment': assignment,
         'question_list':Question.objects.all(),
-        'template_list':Template.objects.all(),
         'assign_data': assign_data,
         'breadcrumbs': breadcrumbs,
     }
@@ -140,8 +138,6 @@ def create(request):
             q.delete();
     #create new assignment
     assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
-    if 'private' in request.POST:
-        assignment.private = True
     assignment.save()
 
     data=dict()
@@ -157,7 +153,7 @@ def create(request):
 
     #Add questions
     for q in a['questions']:
-        temp=createQ(q, assignment.private, assignment.owners)
+        temp=createQ(q, assignment.owners)
         assignment.questions.add(temp)
         questions[str(temp)]=q['points']
     data['questions']=questions
@@ -195,9 +191,8 @@ def unmake(request):
     messages=["Assignment(s) succesfully unassigned!"]
     return unassign(request, messages)
 
-def createQ(x, private, users=[]):
+def createQ(x, users=[]):
     question = Question()
-    question.private = private
     question.title = x['title']
     data=dict()
     question.data = json.dumps(x)

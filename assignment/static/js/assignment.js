@@ -48,14 +48,9 @@ CodeMirrorSettings = {
 code = {};
 solution = {};
 choices = [];
-text = {};
-preview = {};
-
-
 
 $(init); //runs init after DOM is loaded
 function init(){
-
 	//create sortable
 	$( '#questionsList' ).sortable({
 		update: function(event, ui) {
@@ -112,20 +107,7 @@ function init(){
 		modal: true,
 		autoOpen: false,
 	});
-	$('#template-zone').dialog({
-		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.7,
-		modal: true,
-		autoOpen: false,
-		focus: function(event, ui){
-			//disable parent scrolling
-			$('body').addClass('dialog-open');
-		},
-		close: function(event, ui){
-			//re-enable parent scrolling
-			$('body').removeClass('dialog-open');
-		}
-	});
+
 	$('#previewform').dialog({
 		width: document.body.clientWidth*0.8,
 		height: document.body.clientHeight*0.7,
@@ -206,27 +188,6 @@ function load_question_helper(){
 	}
 }
 
-function openTemplates(){
-	//Load index page
-	$("#template-zone").load("assignment/template .list-table", function() {
-		//Change link function of eyes
-		$(".template-eye").each(function(){
-			$(this).attr("onclick", "loadT('"+$(this).parent().attr('href')+"')");
-			$(this).parent().attr("href", "#");
-		});
-		//Open dialog
-		$("#template-zone").dialog("open");
-	});
-}
-
-function loadT(url){
-	//Load template view 
-	$("#template-zone").load(url+" #templateView", function(){
-		$("#template-btn").attr("onclick", "genQ()");
-		$("#template-zone").append("<button class='btn' onclick=openTemplates()>Back</button>");
-	});
-}
-
 function genQ(){
 	//Validate input fields, Replace @fields in original data
 	var formdata = $("#templateForm").serializeArray();
@@ -251,7 +212,6 @@ function genQ(){
 	$('#questionsList').append(questionHTML);
 	$('#question'+num).find('input[type=hidden]').attr("value",templatedata);
 	//Close dialog
-	$("#template-zone").dialog("close");
 }
 
 function preview_question(num){
@@ -270,28 +230,22 @@ function preview_question(num){
 	
 	//Check if code contains template-like text
 	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
-	if(!checkForTemplate(question)){
-		//make post object
-		questionPOST = {
-			questiondata: questiondata
-		};
-		$.ajax('/assignment/qpreview/', {
-			type: 'POST',
-			async: true,
-			data: questionPOST,
-		}).done(function(response){
-			//fill out the preview
-			preview = jQuery.parseJSON(response)
-			$('#question'+num).find('.preview-row').html(preview.text);
-			$('#dialogPreview').html(preview.text);
-			//make the button normal again
-			$('#preview-button').html('Preview');
-		});
-	}
-	else{
+	//make post object
+	questionPOST = {
+		questiondata: questiondata
+	};
+	$.ajax('/assignment/qpreview/', {
+		type: 'POST',
+		async: true,
+		data: questionPOST,
+	}).done(function(response){
+		//fill out the preview
+		var preview = jQuery.parseJSON(response)
+		$('#question'+num).find('.preview-row').html(preview.text);
+		$('#dialogPreview').html(preview.text);
+		//make the button normal again
 		$('#preview-button').html('Preview');
-		$('#dialogPreview').html('@ symbol indicates template');
-	}
+	});
 
 	return questiondata;
 }
@@ -372,25 +326,6 @@ function save(){
 		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
    });
-
-   var test=false;
-	//Check if data indicates a template
-	for(q in assignment.questions){
-		if(checkForTemplate(assignment.questions[q]))
-			test=true;
-	}
-	//If template:
-	if(test == true){
-		//Warn user that this will save as template
-		if(confirm("This will save as a template due to the presense of @")){
-			//If user assents, save as template, otherwise exit
-			$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-			$('#assignmentForm').attr('action', 'assignment/template/createA');
-			$('#assignmentForm').submit();
-		}
-		else
-			return false;
-	}
 
 	//Check if already own assignment by same name
 	var overwrite;
@@ -520,10 +455,4 @@ function questionstring(num, title){
 				<div class="row-fluid preview-row"></div>\
 			</div>';
 	return questionHTML;
-}
-
-function checkForTemplate(question){
-	var text = question.text;
-	var code = question.code;
-	return text.indexOf("@") >= 0 || code.indexOf("@") >= 0;
 }
