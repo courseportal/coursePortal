@@ -48,7 +48,6 @@ CodeMirrorSettings = {
 code = {};
 solution = {};
 choices = [];
-text = {};
 
 $(init); //runs init after DOM is loaded
 function init(){

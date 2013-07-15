@@ -67,6 +67,7 @@ def createQT(x, user=None):
 	question = Template()
 	question.title = x['title']
 	data=dict()
+	data['title']=x['title']
 	data['code']=x['code']
 	data['text']=x['text']
 	data['solution']=x['solution']

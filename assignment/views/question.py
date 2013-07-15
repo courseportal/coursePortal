@@ -14,11 +14,7 @@ def detail(request, id, newly_added=False):
 	return HttpResponse("This needs to be written if you want to use it!")
 
 def addQ(request):
-	#breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-	#breadcrumbs.append({'url':reverse('add_question'), 'title':'Add Question'})
-	names=dict()
-	names["add_question"]="Add Question"
-	context = get_breadcrumbs(request.path, names)
+	context = get_breadcrumbs(request.path)
 	return render(request, 'question/addQ.html', context)
 
 def create(request):
