@@ -109,7 +109,6 @@ def addA(request):
     context = {
         'breadcrumbs':breadcrumbs,
         'question_list':Question.objects.all(),
-        'template_list':Template.objects.all(),
     }
     return render(request, 'assignment/addAssignment.html', context)
 
@@ -121,7 +120,6 @@ def editA(request, id):
     context = {
         'assignment': assignment,
         'question_list':Question.objects.all(),
-        'template_list':Template.objects.all(),
         'assign_data': assign_data,
         'breadcrumbs': breadcrumbs,
     }

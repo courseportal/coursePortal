@@ -250,30 +250,3 @@ def deleteQ(request):
 	#breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
 	return render(request, 'question/delete.html', context)
 
-def deleteT(request):
-	#Delete specified questions
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			elif entry[0]=='a':
-				#delete template assignment
-				aid = entry[1:]
-				template = ATemplate.objects.get(id=aid)
-				template.delete()
-			else:
-				#delete question
-				qid = entry[1:]
-				template = Template.objects.get(id=qid)
-				template.delete()
-	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
-	context = {
-   	'question_list': request.user.owned_template_questions.all(),
-   	'assignment_list':request.user.owned_templates.all(),
-   	'breadcrumbs':breadcrumbs
-   }
-	if request.method == "POST":
-		context['messages']=['Template(s) deleted']
-	
-	#breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
-	return render(request, 'template/delete.html', context)

@@ -15,6 +15,7 @@
 *Added owners field to questions
 *Added ability to make questions/assignments private
 	!NOT FULLY TESTED YET, EXPECT BUGFIXES IN THE FUTURE
+	EDIT:DELETED
 *Slightly improved addQ HTML
 *improved url system
 
@@ -27,5 +28,6 @@ After discussion with professor, following features have been removed:
 	1.Ability to make things 'private'; everything will be public in some fashion
 	*question and assignment model field 'private' removed
 	2.Current template system. Functionality will be folded into the question system somehow. In the future, templates will be a way of styling a question.
-	*Models 'template' and 'Atemplate' removed
+	*Models 'template' and 'Atemplate' removed, andd corresponding views/templates
+		
 
