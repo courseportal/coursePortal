@@ -14,7 +14,7 @@ from django.core.mail import send_mail
 from web.forms.submission import ReportForm
 from django.forms.util import ErrorList
 from knoatom.view_functions import get_breadcrumbs, render_to_json_response # Site wide helper fn's
-from web.views.view_functions import get_navbar_context, get_context_for_category, web_breadcrumb_dict
+from web.views.view_functions import get_navbar_context, get_context_for_category, web_breadcrumb_dict, get_parent_categories
 
 for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
@@ -129,19 +129,6 @@ def category(request, class_id, cat_id):
 		- Generates a list of the most popular videos for each category of rating
 		- Use memcached to save the popular video rankings to save a lot of time
 	"""
-	if request.method == 'POST': # If the form has been submitted...
-	#print(request.POST.get('contentType'))
-		form = ReportForm(request.POST)
-		if form.is_valid():	# All validation rules pass
-			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			messages.warning(request, 'Report has been successfully submitted. Thank you!')
-			return HttpResponseRedirect(reverse('category', args=(class_id, cat_id)))
-		else:
-			messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		form = ReportForm()
 	
 	#get category we are in
 	current_category = get_object_or_404(AtomCategory, id=cat_id)
@@ -152,28 +139,26 @@ def category(request, class_id, cat_id):
 	#Get the "top level" categories
 	top_level_categories = categories_in_class.filter(parent_categories=None)
 	
-	parent_categories = get_parent_categories(current_category=current_category, current_class=current_class)
+	context = get_parent_categories(current_category=current_category, current_class=current_class)
 
 	#Setting breadcrumbs, not perfect, improvements can be made
 	breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-	for i in range(1, len(parent_categories)+1):
-		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
+	
+	for i in range(1, len(context['selected_categories'])+1):
+		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, context['selected_categories'][-i].id]), 'title': context['selected_categories'][-i]})
 
-	#Get collection of videos from all atoms in this category or sub-categories
-	all_content = get_content_for_category(current_category=current_category, mode=0, content_list=[])
-	all_expositions = get_content_for_category(current_category=current_category, mode=1, content_list=[])
-	all_notes = get_content_for_category(current_category=current_category, mode=2, content_list=[])
-	all_examples = get_content_for_category(current_category=current_category, mode=3, content_list=[])
+	
+	context.update(get_context_for_category(current_category))
 			
 	
 			
 	
 	# un-json-fy the videos
-	for c in all_content:
+	for c in context['videos']:
 		if c.video: c.video = [v for v in json.loads(c.video)]
 
 		if request.user.is_authenticated():
-			for c in all_content:
+			for c in context['videos']:
 				ratings = c.votes_s.filter(user=request.user)
 				c.user_rating = {}
 				if ratings.count() > 0:
@@ -183,7 +168,7 @@ def category(request, class_id, cat_id):
 					
 	stickied_content = []
 	content = []
-	for vid in all_content:
+	for vid in context['videos']:
 		if vid.classes_stickied_in.filter(id=current_class.id).exists():
 			stickied_content.append(vid)
 		else:
@@ -191,7 +176,7 @@ def category(request, class_id, cat_id):
 					
 	stickied_expositions = []
 	expositions = []
-	for expo in all_expositions:
+	for expo in context['expositions']:
 		if expo.classes_stickied_in.filter(id=current_class.id).exists():
 			stickied_expositions.append(expo)
 		else:
@@ -199,7 +184,7 @@ def category(request, class_id, cat_id):
 			
 	stickied_notes = []
 	notes = []
-	for note in all_notes:
+	for note in context['notes']:
 		if note.classes_stickied_in.filter(id=current_class.id).exists():
 			stickied_notes.append(note)
 		else:
@@ -207,44 +192,27 @@ def category(request, class_id, cat_id):
 			
 	stickied_examples = []
 	examples = []
-	for example in all_examples:
+	for example in context['examples']:
 		if example.classes_stickied_in.filter(id=current_class.id).exists():
 			stickied_examples.append(example)
 		else:
 			examples.append(example)
-
-	#get all the atoms in and under the current category
-	atom_list = list()
-	temp_atom_list = findChildAtom(current_category,list())
-	for item in temp_atom_list:
-		if atom_list.count(item)==0:
-			atom_list.append(item)
-	length = len(atom_list)/3+1
-	list_1 = atom_list[0:length]
-	list_2 = atom_list[length:length*2]
-	list_3 = atom_list[length*2:]
+			
+	context.update({
+			'breadcrumbs': breadcrumbs,
+			'top_level_categories': top_level_categories,
+			'vote_categories': VoteCategory.objects.all(),
+			'selected_class':current_class,
+			'selected_category':current_category,
+			'stickied_videos': stickied_content,
+			'stickied_expositions': stickied_expositions,
+			'stickied_notes': stickied_notes,
+			'stickied_examples': stickied_examples,
+		
+		})
 
 	t = loader.get_template('web/home/class/category.html')
-	c = RequestContext(request, {
-		'breadcrumbs': breadcrumbs,
-		'top_level_categories': top_level_categories,
-		'selected_categories': parent_categories,
-		'atom_list_1': list_1,
-		'atom_list_2': list_2,
-		'atom_list_3': list_3,
-		'vote_categories': VoteCategory.objects.all(),
-		'selected_class':current_class,
-		
-		'stickied_videos': stickied_content,
-		'stickied_expositions': stickied_expositions,
-		'stickied_notes': stickied_notes,
-		'stickied_examples': stickied_examples,
-		'videos': content,
-		'expositions': expositions,
-		'notes': notes,
-		'examples': examples,
-		'form': form,
-	})
+	c = RequestContext(request, context)
 	return HttpResponse(t.render(c))
 
 
@@ -253,18 +221,6 @@ def atom(request, class_id, cat_id, atom_id):
 		- Generates the view for a specific category
 		- Creates the breadcrumbs for the page
 	"""
-	if request.method == 'POST': # If the form has been submitted...
-		form = ReportForm(request.POST)
-		if form.is_valid():	# All validation rules pass
-			subject = "[Community Guideline Violation Report]:  " + form.cleaned_data['subject']
-			content = "From \"" + request.user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + form.cleaned_data['content'] + "\n\nContent Type:\t\t" + request.POST.get('contentType')+"\n\nContent Id:\t\t "+request.POST.get('contentId')
-			send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
-			messages.warning(request, 'Report has been successfully submitted. Thank you!')
-			return HttpResponseRedirect(reverse('atom', args=(class_id, cat_id, atom_id)))
-		else:
-			messages.warning(request, 'Error saving. Fields might be invalid.')
-	else:
-		form = ReportForm()
 
 
 	#Get atom we are in
@@ -282,12 +238,12 @@ def atom(request, class_id, cat_id, atom_id):
 	top_level_categories = categories_in_class.filter(parent_categories=None) #check that this works
 
 	#Get list of parent categories, not perfect, improvements can be made
-	parent_categories = get_parent_categories(current_category=current_category, current_class=current_class)
+	context = get_parent_categories(current_category=current_category, current_class=current_class)
 
 
 	breadcrumbs = [{'url': reverse('classes', args=[current_class.id]), 'title': current_class.name}]
-	for i in range(1, len(parent_categories)+1):
-		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, parent_categories[-i].id]), 'title': parent_categories[-i]})
+	for i in range(1, len(context['selected_categories'])+1):
+		breadcrumbs.append({'url' : reverse('category', args=[current_class.id, context['selected_categories'][-i].id]), 'title': context['selected_categories'][-i]})
 	breadcrumbs.append({'url': reverse('atom', args=[current_class.id, current_category.id, current_atom.id]), 'title': current_atom})
 
 	forum = Forum.objects.get(atom=current_atom)
@@ -324,27 +280,27 @@ def atom(request, class_id, cat_id, atom_id):
 	stickied_examples = current_class.stickied_examples.filter(atom=current_atom)
 	examples = current_atom.example_set.exclude(id__in = stickied_examples)
 
-	t = loader.get_template('web/home/class/category.html')
-	c = RequestContext(request, {
-		'breadcrumbs': breadcrumbs,
-		'top_level_categories': top_level_categories,
-		'selected_categories': parent_categories,
-		#'selected_category': current_category,
-		'selected_atom': current_atom,
-		'vote_categories': VoteCategory.objects.all(),
-		'selected_class':current_class,
-		'forum': forum,
+	context.update({
+			'breadcrumbs': breadcrumbs,
+			'top_level_categories': top_level_categories,
+			'selected_categories': parent_categories,
+			'selected_atom': current_atom,
+			'vote_categories': VoteCategory.objects.all(),
+			'selected_class':current_class,
+			'forum': forum,
 		
-		'stickied_videos': stickied_content,
-		'stickied_expositions': stickied_expositions,
-		'stickied_notes': stickied_notes,
-		'stickied_examples': stickied_examples,
-		'videos': content,
-		'expositions': expositions,
-		'notes': notes,
-		'examples': examples,
-		'form': form,
-	})
+			'stickied_videos': stickied_content,
+			'stickied_expositions': stickied_expositions,
+			'stickied_notes': stickied_notes,
+			'stickied_examples': stickied_examples,
+			'videos': content,
+			'expositions': expositions,
+			'notes': notes,
+			'examples': examples,
+			'form': form,
+		})
+	t = loader.get_template('web/home/class/category.html')
+	c = RequestContext(request, contexg)
 	return HttpResponse(t.render(c))
 
 
@@ -406,12 +362,12 @@ def post(request, sid):
 	current_atom = s.tags.all()[0]
 	current_category = current_atom.base_category
 	
-	parent_categories = get_parent_categories(current_category=current_category)
+	context = get_parent_categories(current_category=current_category,current_class=None)
 	breadcrumbs = []
 	breadcrumbs.append({'url' : reverse('post', args=[s.id]), 'title': s})
 
 	t = loader.get_template('web/home/post.html')
-	c = RequestContext(request, {
+	c = RequestContext(request, context.update({
 		'breadcrumbs': breadcrumbs,
 		'content': [s],
 		'top_level_categories': top_level_categories,
@@ -419,5 +375,5 @@ def post(request, sid):
 		#'selected_category': current_category,
 		'selected_atom': current_atom,
 		'vote_categories': VoteCategory.objects.all(),
-	})
+	}))
 	return HttpResponse(t.render(c))

@@ -11,6 +11,11 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 
 Goals
 -----
+
+Different scores for different atoms
+Multiple tags for everything
+questions are related to atoms like tags? weighted list?
+questions/assignments not related to classes, except professors can assign assignments. But everyone can still see them.
 	
 Todo:
 	*	Remove old video vote system
