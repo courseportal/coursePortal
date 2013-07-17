@@ -18,7 +18,7 @@ def voteGeneral(request, item ,item_id, vote_type):
 		if item == 'exposition':
 			e = get_object_or_404(Exposition, id=item_id)
 		elif item == 'note':
-			e = get_object_or_404(LectureNote, id=item_id)
+			e = get_object_or_404(Note, id=item_id)
 		elif item == 'example':
 			e = get_object_or_404(Example, id=item_id)
 		elif item == 'video':
