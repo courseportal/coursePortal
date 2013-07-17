@@ -7,6 +7,7 @@ from django.utils import simplejson as json
 class Question(models.Model):
     title = models.CharField(max_length=200)
     owners = models.ManyToManyField(User, related_name='owned_questions', blank=True, null=True)
+    atoms = models.ManyToManyField("web.Atom", related_name='assignments', blank=True, null=True)
     data = models.TextField()
     def __unicode__(self):
         return self.title
@@ -50,3 +51,12 @@ class ChoiceInstance(models.Model):
     question = models.ForeignKey(QuestionInstance, related_name = 'choiceInstances')
     def __unicode__(self):
         return self.solution
+
+
+class Variable(models.Model):
+    name = models.CharField(max_length=200)
+    variables = models.TextField(blank=True)
+    validation_code = models.TextField(default="result=0")
+    generated_code = models.TextField(blank=True)
+    def __unicode__(self):
+        return self.name

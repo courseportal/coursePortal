@@ -36,3 +36,31 @@ def replaceX(data):
 			index=index+1
 		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2+toReplace+replace3)
 	return data
+
+def test(request):
+	context = {
+		'type_list': Variable.objects.all(),
+	}
+	return render(request, 'assignment/test.html', context)
+
+def matchType(request):
+	vartype = request.GET['vartype']
+	variable = Variable.objects.get(name=vartype)
+	names = []
+	for word in variable.variables.split():
+		names.append(word)
+	return HttpResponse(json.dumps(names))
+
+def getTypeCode(request):
+	vartype = request.GET['vartype']
+	variable = Variable.objects.get(name=vartype)
+	return HttpResponse(json.dumps(variable.generated_code))
+
+def validate(request):
+	user_input = json.loads(request.GET['input'])
+	vartype=Variable.objects.get(name=request.GET['vartype'])
+	
+	for x in range(0,len(vartype.variables.split())):
+		locals()[vartype.variables.split()[x]]=user_input[x]
+	exec vartype.validation_code
+	return HttpResponse(result)

@@ -29,6 +29,18 @@ def create(request):
 	}
 	return render(request, "assignment_nav.html", context)
 
+def create2(request):
+	q = Question()
+	q.title = request.POST['question_title']
+	data=dict()
+	data['code'] = request.POST['code']
+	data['solution'] = request.POST['answer']
+	data['text'] = request.POST['text']
+	data['choices'] = request.POST['choices']
+	q.save()
+	q.owners.add(request.user)
+	return render(request, "assignnt_nav.html", context)
+
 def preview(request):
 	q = request.POST['previewdata']
 	q = json.loads(q)

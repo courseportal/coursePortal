@@ -1,3 +1,9 @@
+TODO list:
++ Change how questions are made
++ Loaded assignments/questions can't be edited
++ Metrics look at assignments, not classes
+
+
 7/9/2013:
 *Removed Nyromodal from the project, expanded use of jqueryUI
 *Implemented use of google chart API to view boxplots of class performance
@@ -29,5 +35,6 @@ After discussion with professor, following features have been removed:
 	*question and assignment model field 'private' removed
 	2.Current template system. Functionality will be folded into the question system somehow. In the future, templates will be a way of styling a question.
 	*Models 'template' and 'Atemplate' removed, andd corresponding views/templates
+*Classes relate to assignments, questions relate to atoms
 		
 

@@ -42,7 +42,7 @@ CodeMirrorSettings = {
 	tabSize: 2,
 	lineNumbers: true,
 	indentWithTabs: true,
-	theme: 'monokai'
+	theme: 'solarized-light'
 };
 
 code = {};
@@ -136,7 +136,6 @@ function init(){
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
-	$('#Qtemplate').attr('onclick', "openTemplates()");
 }
 
 function add_choice_div(){
@@ -156,7 +155,6 @@ function load_question_helper(){
 	num = $('#questionNum').val();
 	numQuestions = $('#questionsList').children().length;
 	if(num > numQuestions){ //this is a new question
-
 		//wipe out all form fields
 		$('#questiontitle').val('');
 		code.setValue('');
@@ -186,32 +184,6 @@ function load_question_helper(){
 		//clear up preview
 		$('#dialogPreview').html('');
 	}
-}
-
-function genQ(){
-	//Validate input fields, Replace @fields in original data
-	var formdata = $("#templateForm").serializeArray();
-	var templatedata = $("#template_data").attr("value");
-	for(var x=0; x<formdata.length; x++){
-		if(formdata[x].name == 'csrfmiddlewaretoken' || formdata[x].name == 'tid'){
-			continue;
-		}
-		if(formdata[x].value == null || formdata[x].value == ''){
-			alert("Input field \""+formdata[x].name+"\" is empty!");
-			return false;
-		}
-		else{
-			toReplace = "@"+formdata[x].name;
-			while(templatedata.search(toReplace)>=0)
-				templatedata=templatedata.replace(toReplace, formdata[x].value);
-		}
-	}
-	//append question data to list
-	num = $('#questionsList').children().length+1;
-	questionHTML=questionstring(num, $("#template_title").attr("value"));
-	$('#questionsList').append(questionHTML);
-	$('#question'+num).find('input[type=hidden]').attr("value",templatedata);
-	//Close dialog
 }
 
 function preview_question(num){

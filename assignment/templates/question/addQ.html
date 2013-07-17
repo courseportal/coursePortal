@@ -15,18 +15,17 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 
 <body>
-{% csrf_token %}
 	<div class="row-fluid">
-			Title<br/>
-			<input type="text" id="title"></input>
+		Title<br/>
+		<input type="text" id="title"></input>
 	</div>
 	<div class="row-fluid">
-		<div id="solutiondiv" class="span8">
-			CODE:<br/>
+		CODE:<br/>
+		<div id="solutiondiv" style="border:solid" class="span8">
 			<textarea name="solution" id="solution"></textarea>
 		</div>
 		<div class="span4">
-			SOLUTIONS:<br/>
+		SOLUTIONS:<br/>
 			<div id="solnDiv" class="solnDiv">
 			</div>
 			<a class="btn btn-large btn-inverse" href="#" onclick="add_choice()">

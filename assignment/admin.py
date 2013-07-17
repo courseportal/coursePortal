@@ -7,3 +7,4 @@ for m in get_models():
 
 admin.site.register(Question)
 admin.site.register(Assignment)
+admin.site.register(Variable)

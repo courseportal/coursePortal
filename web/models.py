@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from knoatom.settings import MEDIA_ROOT
 from rating.models import *
 from rating.ratings import *
+from assignment.models import Assignment
 
 
 
@@ -133,6 +134,7 @@ class Class(models.Model):
 	stickied_expos = models.ManyToManyField(Exposition, blank=True, related_name='classes_stickied_in')
 	stickied_notes = models.ManyToManyField(LectureNote, blank=True, related_name='classes_stickied_in')
 	stickied_examples = models.ManyToManyField(Example, blank=True, related_name = 'classes_stickied_in')
+	stickied_assignments = models.ManyToManyField(Assignment, blank=True, related_name = 'classes_stickied_in')
 	
 	def __unicode__(self):
 		return self.name

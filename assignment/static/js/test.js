@@ -39,10 +39,10 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 CodeMirrorSettings = {
 	mode: 'python',
-	tabSize: 2,
+	tabSize: 3,
 	lineNumbers: true,
 	indentWithTabs: true,
-	theme: 'monokai'
+  theme: 'solarized',
 };
 
 code = CodeMirror.fromTextArea($('#solution').get(0), CodeMirrorSettings);
@@ -67,7 +67,7 @@ $(document).ready(function(){
 
 
 function add_choice(){
-	newDiv = '<div id="temp" class="soln"></div>';
+	newDiv = '<div id="temp" class="soln" style="border:solid"></div>';
 	newDiv = newDiv.replace(/temp/g, 'soln'+solnIndex);
 	$('#solnDiv').append(newDiv);
 	solutions.push(CodeMirror($('#soln'+solnIndex).get(0), CodeMirrorSettings));
