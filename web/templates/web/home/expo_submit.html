@@ -68,7 +68,7 @@ $(document).ready(function() {
 
 
 
-  <h2>Create New Exposition Submission</h2>
+  <h2>Submit New Exposition</h2>
 
   <form class="form-horizontal" action="{{ form_action }}" method="post">
     {% csrf_token %}
@@ -76,8 +76,8 @@ $(document).ready(function() {
     {% include "web/form_template.html" with form=form %}
 
     <div class="form-actions">
-    <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
-      <input class="btn" type="submit" name="submitOne" value="Submit" />
+    <input class="btn btn-primary" type="submit" name="add-another" value="Submit and Add Another" />
+      <input class="btn" type="submit" name="continue" value="Submit" />
       <input class="btn" type="reset" value="Clear" />
       <a class="btn" id="preview_expo">Preview</a>
 	  
@@ -105,15 +105,16 @@ $(document).ready(function() {
 <script>
 // Set up the listener to listen for the delete button click
 $(document).ready(function() {
+	init_delete_content(); // Function is in knoatom.js
 	$('button#delete').click(function() {
 		$('a#delete-modal').attr('disabled', true)
 		$.ajax({
 			// See 'web.ajax.delete_content'
-			url: '/ajax/delete/1/'+ $(this).attr('object-id') // 3 stands for example
+			url: '/ajax/delete/exposition/'+ $(this).attr('object-id')
 		}).fail(function() {
 			$('div#messages').empty().append("<div class='alert alert-error'>Failed to delete {{object}}.</div>");
 		}).done(function() {
-			window.location = '{{ redirect_to }}'
+			window.location = '{{ success_url }}'
 		}).always(function() {
 			$('a#delete-modal').attr('disabled', false)
 		})

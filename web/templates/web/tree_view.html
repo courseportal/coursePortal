@@ -6,26 +6,26 @@ REQUIRED context:
 	top_level_categories
 
 OPTIONAL context:
-	selected_class
+	class_object
 	selected_categories
-	selected_atom
+	atom_object
 
 -->
 
-<li class="{% for cat in selected_categories %}{% if node.id == cat.id and not is_post %}open{% endif %}{% endfor %}">
-    {% if selected_class %}
-    <a href="{% url "category" selected_class.id node.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{ node }}</a>
+<li class="{% if node in highlighted_categories %}open{% endif %}">
+    {% if class_object %}
+    <a href="{% url "category" class_object.id node.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{ node }}</a>
     {% else %}
     <a href="{% url "base_category" node.id %}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{ node }}</a>
     {% endif %}
     <ul class="nav nav-list">
         {% for atom in node.child_atoms.all %}
-        {% if selected_class %}
-        <li class="{% if atom.id == selected_atom.id %}active{% endif %}">
-            <a href="{% url "atom" selected_class.id node.id atom.id %}">{{ atom }}</a>
+        {% if class_object %}
+        <li class="{% if atom.id == atom_object.id %}active{% endif %}">
+            <a href="{% url "atom" class_object.id node.id atom.id %}">{{ atom }}</a>
         </li>
         {% else %}
-        <li class="{% if atom.id == selected_atom.id %}active{% endif %}">
+        <li class="{% if atom.id == atom_object.id %}active{% endif %}">
             <a href="{% url "base_atom" node.id atom.id %}">{{ atom }}</a>
         </li>
         {% endif %}

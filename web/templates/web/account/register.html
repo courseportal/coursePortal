@@ -33,7 +33,7 @@ BLOCKS(Including inherited blocks):
 {% extends "web/web_base.html" %}
 
 {% block content %}
-<h2>Register</h2>
+<h2>{% trans Register %}</h2>
 
 <form class="form-horizontal" action="{% url 'register' %}" method="post">
 {% csrf_token %}

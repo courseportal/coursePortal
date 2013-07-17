@@ -3,155 +3,189 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
 from django.db.models import Q
-from web.models import *
+from web.models import Class, Example, Note, Exposition, Video
 import re
-from knoatom.settings import ALLOWED_FILE_EXTENTIONS, MAX_UPLOAD_SIZE
+from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
-from django.forms.formsets import formset_factory
 from django.core.mail import send_mail
-
-class PlainErrorList(ErrorList):
-	def __unicode__(self):
-		return self.as_plain()
-	def as_plain(self):
-		if not self: return u''
-		return u'<br/>'.join([ e for e in self ])
-
-def validate_youtube_video_id(value):
-	regex_vid_id = re.compile('[A-Za-z0-9-_]{11}')
-	for v in value.split(' '):
-		if not regex_vid_id.match(v):
-			raise ValidationError(u'%s is not a valid YouTube video id.' % v)
-
 
 def validate_umich_email(value):
 	regex_umich_email = re.compile('\w*@umich.edu')
 	if not regex_umich_email.match(value):
-		raise ValidationError(u'%s is not a valid University of Michigan email address.' % value)
+		raise ValidationError(
+			u'%s is not a valid University of Michigan email address.' % value
+		)
 
 class ReportForm(forms.Form):
 	r"""Form for submitting reports."""
-	subject = forms.CharField(max_length=100, required=True, label='Subject: ( *required)')
-	content = forms.CharField(widget=forms.Textarea, required=True, label='Content: ( *required)', help_text='Flagged content is reviewed by Knoatom staff to determine whether it is appropiate. Accounts are penalized for Community Guidelines violations.')
-	contentType = forms.CharField(max_length=100, required=True, widget=forms.HiddenInput)
-	contentId = forms.CharField(max_length=100, required=True, widget=forms.HiddenInput)
+	subject = forms.CharField(
+		max_length=100,
+		required=True,
+		label=_('Subject')
+	)
+	content = forms.CharField(
+		widget=forms.Textarea,
+		required=True,
+		label=_('Content'),
+		help_text=_('Flagged content is reviewed by Knoatom staff to determine'
+			' whether it is appropiate. Accounts are penalized for Community '
+			'Guidelines violations.')
+	)
+	contentType = forms.CharField(
+		max_length=100,
+		required=True,
+		widget=forms.HiddenInput
+	)
+	contentId = forms.CharField(
+		max_length=100,
+		required=True,
+		widget=forms.HiddenInput
+	)
 	
 	def submit(self, user):
 		r"""Submits the report to the knoatom email.  It takes in the request from the view it is submitted in."""
-		subject = "[Community Guideline Violation Report]:  " + self.cleaned_data['subject']
-		content = "From \"" + user.username + "\" : \n\nCommunity Guideline Violation Report:\t\t" + self.cleaned_data['content'] + "\n\nContent Type:\t\t" + self.cleaned_data['contentType']+"\n\nContent Id:\t\t "+self.cleaned_data['contentId']
-		send_mail(subject, content,'test-no-use@umich.edu', ['knoatom.webmaster@gmail.com'])
+		subject = ("[Community Guideline Violation Report]:  " + 
+			self.cleaned_data['subject'])
+		content = ("From \"" + user.username + 
+			"\" : \n\nCommunity Guideline Violation Report:\t\t" + 
+			self.cleaned_data['content'] + "\n\nContent Type:\t\t" + 
+			self.cleaned_data['contentType']+"\n\nContent Id:\t\t" +
+			self.cleaned_data['contentId'])
+		send_mail(
+			subjet=_(subject),
+			message=_(content),
+			recipient_list=['knoatom.webmaster@gmail.com']
+		)
 
-class SubmissionForm(forms.Form):
+class VideoForm(forms.ModelForm):
 	
 	def __init__(self, *args, **kwargs):
 		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
 		user = kwargs.pop('user')
-		super(SubmissionForm, self).__init__(*args, **kwargs)
+		self.user = user
+		super(VideoForm, self).__init__(*args, **kwargs)
+		# Deal with classes_stickied_in
 		if user.is_superuser:
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+			pass # The queryset is already Class.objects.all()
 		elif user.classes_authored.exists() or user.allowed_classes.exists():
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-		else:
-			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+			self.fields['classes_stickied_in'].queryset = (
+				Class.objects.filter(Q(id__in=user.classes_authored.all()) | 
+				Q(id__in=user.allowed_classes.all())))
+		else: # If the field is empty hide the field unless user.is_superuser
+			self.fields['classes_stickied_in'].widget = forms.HiddenInput()
 	
-	title = forms.CharField(max_length=100, required=True)
-	content = forms.CharField(widget=forms.Textarea, required=True)
-	video = forms.CharField(max_length=100, validators=[validate_youtube_video_id], help_text='Please enter an 11 character YouTube video id (multiple allowed, separated by spaces). e.g. http://www.youtube.com/watch?v=VIDEO_ID')
-	tags = forms.ModelMultipleChoiceField(queryset = Atom.objects.all(), widget = forms.SelectMultiple(attrs={'size':'8'}), help_text = 'Please select relevant tags for your submission.')
-	
-	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
-
-	
-##	def __init__(self, *args, **kwargs):
-##		class_id = kwargs.pop("class_id")
-##		super(SubmissionForm, self).__init__(*args, **kwargs)
-##		self.fields['tags'].queryset = Atom.objects.filter(category__parent_class = class_id).distinct()
-
-def validate_file_extension(value):
-	r"""
-	Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
-	"""
-	valid = False
-	for ext in ALLOWED_FILE_EXTENTIONS:
-		if value.name.endswith(ext):
-			if value.size < int(MAX_UPLOAD_SIZE):
-				valid = True
-			else:
-				raise forms.ValidationError((u'Please keep filesize under %s. Current filesize %s') % (filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
-	if not valid:
-		raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
+	class Meta:
+		model = Video
+		fields = ('title', 'content', 'video', 'atoms', 'classes_stickied_in')
 		
-def validate_link(value):
-	r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""
-	if not (re.match('^http://', value) or re.match('^https://', value)):
-		raise ValidationError(u'The link must begin with http:// or https://.')
+	def save(self, commit=True):
+		instance = super(VideoForm, self).save(commit=False)
+		instance.owner = self.user
+		
+		if commit:
+			instance.save()
+			self.save_m2m()
+		
+		return instance
 
-class LectureNoteForm(forms.Form):
+class NoteForm(forms.ModelForm):
 	r"""
-	This is the form for the lecture note upload system.  The ``classes_to_sticky_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in.
+	This is the form for the lecture note upload system.  The ``classes_stickied_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in or if the user is a superuser.
 	
 	"""
-	
 	def __init__(self, *args, **kwargs):
 		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
 		user = kwargs.pop('user')
-		super(LectureNoteForm, self).__init__(*args, **kwargs)
+		self.user = user
+		super(NoteForm, self).__init__(*args, **kwargs)
+		# Deal with classes_stickied_in
 		if user.is_superuser:
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+			pass # The queryset is already Class.objects.all()
 		elif user.classes_authored.exists() or user.allowed_classes.exists():
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-		else:
-			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+			self.fields['classes_stickied_in'].queryset = (
+				Class.objects.filter(Q(id__in=user.classes_authored.all()) | 
+				Q(id__in=user.allowed_classes.all())))
+		else: # If the field is empty hide the field unless user.is_superuser
+			self.fields['classes_stickied_in'].widget = forms.HiddenInput()
 	
-	filename = forms.CharField(max_length=200, required=True)
-	file = forms.FileField(validators=[validate_file_extension], required=True)
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission', required=True)
-	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
+	class Meta:
+		model = Note
+		fields = ('title', 'file', 'atoms', 'classes_stickied_in')
+		
+	def save(self, commit=True):
+		instance = super(NoteForm, self).save(commit=False)
+		instance.owner = self.user
+		
+		if commit:
+			instance.save()
+			self.save_m2m()
+		
+		return instance
 	
-class ExampleForm(forms.Form):
+class ExampleForm(forms.ModelForm):
 	r"""
-	This is the form for the example upload system.  The ``classes_to_sticky_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in.
+	This is the form for the example upload system.  The ``classes_stickied_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in or if the user is a superuser.
 	
 	"""
-	
 	def __init__(self, *args, **kwargs):
 		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
 		user = kwargs.pop('user')
+		self.user = user
 		super(ExampleForm, self).__init__(*args, **kwargs)
+		# Deal with classes_stickied_in
 		if user.is_superuser:
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+			pass # The queryset is already Class.objects.all()
 		elif user.classes_authored.exists() or user.allowed_classes.exists():
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-		else:
-			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+			self.fields['classes_stickied_in'].queryset = (
+				Class.objects.filter(Q(id__in=user.classes_authored.all()) | 
+				Q(id__in=user.allowed_classes.all())))
+		else: # If the field is empty hide the field unless user.is_superuser
+			self.fields['classes_stickied_in'].widget = forms.HiddenInput()
 	
-	
-	
-	filename = forms.CharField(max_length=200, required=True)
-	file = forms.FileField(validators=[validate_file_extension], required=True)
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text='Please select the relevant atom for your submission', required=True)
-	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
+	class Meta:
+		model = Example
+		fields = ('title', 'file', 'atoms', 'classes_stickied_in')
+		
+	def save(self, commit=True):
+		instance = super(ExampleForm, self).save(commit=False)
+		instance.owner = self.user
+		
+		if commit:
+			instance.save()
+			self.save_m2m()
+		
+		return instance
 
-class ExpoForm(forms.Form):
+class ExpositionForm(forms.ModelForm):
 	r"""	
-	This is the form for the exposition submit page.  The ``classes_to_sticky_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in.
+	This is the form for the exposition submit page.  The ``classes_stickied_in`` is only shown if the ``user`` has any classes and is populated with the classes they are the author of or an allowed_user in or if the user is a superuser.
 	
 	"""
-	
 	def __init__(self, *args, **kwargs):
 		r"""Sets the content of ``classes_to_sticky_in`` to be classes in which the user is the ``author`` or an ``allowed_user``.  If ther user isn't authorized to change any classes then the field is hidden."""
 		user = kwargs.pop('user')
-		super(ExpoForm, self).__init__(*args, **kwargs)
+		self.user = user
+		super(ExpositionForm, self).__init__(*args, **kwargs)
+		# Deal with classes_stickied_in
 		if user.is_superuser:
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.all()
+			pass # The queryset is already Class.objects.all()
 		elif user.classes_authored.exists() or user.allowed_classes.exists():
-			self.fields['classes_to_sticky_in'].queryset = Class.objects.filter(Q(id__in=user.classes_authored.all()) | Q(id__in=user.allowed_classes.all()))
-		else:
-			self.fields['classes_to_sticky_in'].widget = forms.HiddenInput()
+			self.fields['classes_stickied_in'].queryset = (
+				Class.objects.filter(Q(id__in=user.classes_authored.all()) | 
+				Q(id__in=user.allowed_classes.all())))
+		else: # If the field is empty hide the field unless user.is_superuser
+			self.fields['classes_stickied_in'].widget = forms.HiddenInput()
 	
-	title = forms.CharField(max_length=100, required=True)
-	link = forms.CharField(max_length=256, required=True, validators=[validate_link], initial="http://")
-	
-	atom = forms.ModelChoiceField(queryset=Atom.objects.all(), help_text= 'Please select the relevant atom for your submission', required=True)
-	classes_to_sticky_in = forms.ModelMultipleChoiceField(queryset = Class.objects.none(), widget = forms.SelectMultiple(attrs={'size':'8'}), required=False, help_text = 'Please select the class(es) that you want this content to be stickied in.')
+	class Meta:
+		model = Exposition
+		fields = ('title', 'link', 'atoms', 'classes_stickied_in')
+		
+	def save(self, commit=True):
+		instance = super(ExpositionForm, self).save(commit=False)
+		instance.owner = self.user
+		
+		if commit:
+			instance.save()
+			self.save_m2m()
+		
+		return instance

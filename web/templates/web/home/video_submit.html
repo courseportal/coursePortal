@@ -40,28 +40,26 @@ $(document).ready(function() {
 
     $('#preview_video').click(function() {
         var video_id = $('#id_video').val();
-        var v_ids = video_id.split(" ");
-        var video_preview_divs = "";
-        for(var i = 0; i < v_ids.length; i++) {
-            if ( /[A-Za-z0-9-_]{11}/.test(v_ids[i]) == true ) {
-                video_preview_divs += '<div id="video_preview_div_' + v_ids[i] + '">Loading...</div><hr />';
-            } else {
-                video_preview_divs += '<div><p>' + v_ids[i] + ' is an invalid YouTube video id. It should be 11 characters long, and located in the url for your video. e.g. http://www.youtube.com/watch?v=VIDEO_ID</p></div><hr />';
-            }
+        var video_preview_div = "";
+		
+        if ( /[A-Za-z0-9-_]{11}/.test(video_id) == true ) {
+            video_preview_div = '<div id="video_preview_div_' + video_id + '">Loading...</div><hr />';
+        } 
+		else {
+            video_preview_div = '<div><p>' + video_id + ' is an invalid YouTube video id. It should be 11 characters long, and located in the url for your video. e.g. http://www.youtube.com/watch?v=VIDEO_ID</p></div><hr />';
         }
+		
         var params = { allowScriptAccess: "always" };
         var atts = { id: "modal_player", 'wmode': 'opaque' };
         $('body').append(
             '<div class="modal fade" id="preview_modal"><div class="modal-header">' +
             '<a class="close" data-dismiss="modal">x</a><h3>Video Preview</h3>' +
             '</div><div class="modal-body">' +
-            video_preview_divs +
+            video_preview_div +
             '</div></div>'
         );
-        for(var i = 0; i < v_ids.length; i++) {
-            if ( /[A-Za-z0-9-_]{11}/.test(v_ids[i]) == true ) {
-                swfobject.embedSWF("http://www.youtube.com/v/" + v_ids[i] + "?version=3&enablejsapi=1&playerapiid=player1", "video_preview_div_" + v_ids[i], "480", "295", "9", null, null, params, atts);
-            }
+        if ( /[A-Za-z0-9-_]{11}/.test(video_id) == true ) {
+            swfobject.embedSWF("http://www.youtube.com/v/" + video_id + "?version=3&enablejsapi=1&playerapiid=player1", "video_preview_div_" + video_id, "480", "295", "9", null, null, params, atts);
         }
         $('#preview_modal').modal('show');
         $('#preview_modal').on('hidden', function () {
@@ -71,7 +69,7 @@ $(document).ready(function() {
 });
 </script>
 
-<h2>Create New Video Submission</h2>
+<h2>Submit New Video</h2>
 
 <form class="form-horizontal" action="{{ form_action }}" method="post">
 {% csrf_token %}
@@ -79,8 +77,8 @@ $(document).ready(function() {
 {% include "web/form_template.html" with form=form %}
 
 <div class="form-actions">
-    <input class="btn btn-primary" type="submit" name="submitMore" value="Submit and create a new exposition" />
-    <input class="btn" type="submit" name="submitOne" value="Submit" />
+    <input class="btn btn-primary" type="submit" name="add-another" value="Submit and Add Another" />
+    <input class="btn" type="submit" name="continue" value="Submit" />
     <a class="btn" id="preview_video">Preview Video</a>
 	{% if object %}
 		<a class="btn btn-danger" id="delete-modal" href="#deleteModal" data-toggle="modal">Delete</a>
@@ -105,15 +103,16 @@ $(document).ready(function() {
 <script>
 // Set up the listener to listen for the delete button click
 $(document).ready(function() {
+	init_delete_content(); // Function is in knoatom.js
 	$('button#delete').click(function() {
 		$('a#delete-modal').attr('disabled', true)
 		$.ajax({
 			// See 'web.ajax.delete_content'
-			url: '/ajax/delete/4/'+ $(this).attr('object-id') // 3 stands for example
+			url: '/ajax/delete/video/'+ $(this).attr('object-id')
 		}).fail(function() {
 			$('div#messages').empty().append("<div class='alert alert-error'>Failed to delete {{object}}.</div>");
 		}).done(function() {
-			window.location = '{{ redirect_to }}'
+			window.location = '{{ success_url }}'
 		}).always(function() {
 			$('a#delete-modal').attr('disabled', false)
 		})

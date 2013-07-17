@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.forms.models import modelformset_factory, BaseModelFormSet
 from django.utils.translation import ugettext_lazy as _
-from web.models import Class, AtomCategory
+from web.models import Class, ClassCategory
 
 
 class CategoryForm(forms.ModelForm):
@@ -18,51 +17,59 @@ class CategoryForm(forms.ModelForm):
 		r"""Sets the queryset of categories to only allow categories in the current class"""
 		self.parent_class = kwargs.pop('parent_class')
 		super(CategoryForm, self).__init__(*args, **kwargs)
-		if self.instance: # Exclude model instance from the queryset to prevent loops
-			self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class).exclude(id=self.instance.id)
+		if self.instance: # Exclude self to prevent loops
+			self.fields['parent_categories'].queryset = (
+				ClassCategory.objects.filter(parent_class=
+				self.parent_class).exclude(id=self.instance.id)
+			)
 		else:
-			self.fields['child_categories'].queryset = AtomCategory.objects.filter(parent_class=self.parent_class)
+			self.fields['parent_categories'].queryset = (
+				ClassCategory.objects.filter(parent_class=self.parent_class)
+			)
 		
 	
 	class Meta:
 		r"""Set the model it is attached to and select the fields."""
-		model = AtomCategory
-		fields=('category_name', 'child_categories', 'child_atoms')
+		model = ClassCategory
+		fields=('title', 'parent_categories', 'child_atoms')
 		
-	def save(self):
+	def save(self, commit=True):
 		r"""Overrides the save method."""
 		instance = super(CategoryForm, self).save(commit=False)
 		instance.parent_class = self.parent_class
-		instance.save()
-		instance.child_categories = self.cleaned_data['child_categories']
-		instance.child_atoms = self.cleaned_data['child_atoms']
+		if commit:
+			instance.save()
+			self.save_m2m()
+
 		return instance
 
 class ClassForm(forms.ModelForm):
 	r"""Form for **editing** classes."""
 	def __init__(self, *args, **kwargs):
-		"""Sets the queryset of ``allowed_users`` to exclude the author and save the user to ``self`` and make the ``allowed_users`` field not required."""
+		"""Sets the queryset of ``instructors`` to exclude the author and save the user to ``self`` and make the ``instructors`` field not required."""
 		self.user = kwargs.pop('user')
 		super(ClassForm, self).__init__(*args, **kwargs)
-		self.fields['allowed_users'].queryset = User.objects.exclude(id=self.user.id)
-		self.fields['allowed_users'].required = False
+		self.fields['instructors'].queryset = User.objects.exclude(
+			id=self.user.id)
+		self.fields['instructors'].required = False
 	
 	class Meta:
 		r"""Set the model the form is attached to and select the fields."""
 		model = Class
-		fields = ('name', 'status', 'summary', 'allowed_users', 'students')
+		fields = ('title', 'status', 'summary', 'instructors', 'students')
 		
 	#Clean categories so they can't have the same name?
 		
 class CreateClassForm(ClassForm):
 	r"""Form for **creating** classes."""
 	def save(self):
-		r"""Overrides the save to add ``self.user`` to ``allowed_users`` and as an ``author``."""
+		r"""Overrides the save to add ``self.user`` to ``instructors`` and as an ``owner``."""
 		instance = super(CreateClassForm, self).save(commit=False)
-		instance.author = self.user
+		instance.owner = self.user
+		
 		instance.save()
-		instance.allowed_users = self.cleaned_data['allowed_users']
-		instance.allowed_users.add(self.user)
-		instance.students = self.cleaned_data['students']
+		self.save_m2m()
+		instance.instructors.add(self.user)
+			
 		return instance
 		

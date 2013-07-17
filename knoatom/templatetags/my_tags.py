@@ -5,6 +5,20 @@ import re
 
 register = template.Library()
 
+@register.tag(name="removenewline")
+def do_remove(parser, token):
+	r"""Finds all '\n' characters and replaces them with spaces (' ')."""
+	nodelist = parser.parse(('endremovenewline',))
+	parser.delete_first_token()
+	return RemoveNode(nodelist)
+	
+class RemoveNode(template.Node):
+	def __init__(self, nodelist):
+		self.nodelist = nodelist
+	def render(self, context):
+		output = self.nodelist.render(context)
+		return output.replace('\n', ' ')
+
 @register.tag(name="get_form")
 def get_form(parser, token):
 	r"""

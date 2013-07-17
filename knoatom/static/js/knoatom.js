@@ -19,60 +19,6 @@ init_sidebar = function() {
 };
 
 /*
- * Rating stars initialization
- */
-init_rating_stars = function() {
-    $('.rating').each(function() {
-        $(this).children().each(function() {
-            $(this).hover(function() {
-                $(this).addClass('icon-star')
-                    .removeClass('icon-star-empty')
-                    .prevAll()
-                    .addClass('icon-star')
-                    .removeClass('icon-star-empty');
-                $(this).nextAll()
-                    .addClass('icon-star-empty')
-                    .removeClass('icon-star');
-            }, function() {
-                $(this).parent().children().each(function() {
-                    if(!$(this).hasClass('filled')) {
-                        $(this).removeClass('icon-star').addClass('icon-star-empty')
-                    } else {
-                        $(this).removeClass('icon-star-empty').addClass('icon-star')
-                    }
-                });
-            });
-            $(this).click(function() {
-                $.ajax({
-                    'url': '/ajax/vote/' + $(this).parent().attr('data-submission') + '/' + $(this).parent().attr('data-vote-category') + '/' + $(this).attr('data-vote'),
-                    'context': this,
-                    'statusCode': {
-                        200: function(data) {
-                            console.log(data)
-                            if(data.result == true) {
-                                console.log(this)
-                                $(this)
-                                    .addClass('icon-star')
-                                    .removeClass('icon-star-empty')
-                                    .addClass('filled')
-                                $(this).prevAll()
-                                    .addClass('icon-star')
-                                    .removeClass('icon-star-empty')
-                                    .addClass('filled')
-                                $(this).nextAll()
-                                    .addClass('icon-star-empty')
-                                    .removeClass('icon-star')
-                                    .removeClass('filled')
-                            }
-                        }
-                    },
-                });
-            });
-        });
-    });
-};
-
-/*
 	Sticking AJAX funcitonality
 */
 init_sticking = function() {
@@ -85,8 +31,8 @@ init_sticking = function() {
 					console.log(data)
 					if(data.result == true) {
 						console.log(this)
-						var nametag = '.name-' + data.itemType + '-' + data.id;
-						var sticktag = '.stickied-' + data.itemType + '-' + data.id;
+						var nametag = '.name-' + data.item + '-' + data.id;
+						var sticktag = '.stickied-' + data.item + '-' + data.id;
 
 						if (data.stickied) {
 							$(nametag).text(data.name + ' [stickied]');
@@ -110,12 +56,6 @@ init_sticking = function() {
 };
 
 /*
-	Bug Report AJAX functionality
-*/
-
-
-
-/*
 	Delete object AJAX functionality
 */
 init_delete_content = function() {
@@ -128,69 +68,16 @@ init_delete_content = function() {
 					console.log(data);
 					if (data.result == true) {
 						console.log(this);
-						var row = '#row-' + data.itemType + '-' + data.id;
+						var row = '#row-' + data.item + '-' + data.id;
 						$(row).remove();
 						$("table").trigger("update");
-						$('.cur-user-rate').text(data.requestUserRating);
+						$('.cur-user-rate').text(data.user_rating);
 					}
 					else {
 						alert("Failed to delete object!")
 					}
 				}
 			},
-		});
-	});
-};
-/*
- * Vote_up initialization
- */
-init_vote_up = function() {
-    $('.arrow-up').click(function() {
-		$.ajax({
-			'url': '/vote/ajax/' + $(this).attr('item-type')  + '/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
-			'context': this,
-			'statusCode': {
-				200: function(data) {
-					console.log(data)
-					if(data.result == true) {
-						console.log(this);
-						var s = '.votes-sum-'+data.itemType+'-'+data.id;
-						$('.cur-user-rate').text(data.requestUserRating);
-						$(s).text(data.votes);
-						$("table").trigger("update");
-					}
-					else {
-						alert("You have already voted!");
-					}
-				}
-			}
-		});
-	});
-};
-
-/*
- * Vote_down initialization
- */
-init_vote_down = function() {
-    $('.arrow-down').click(function() {
-		$.ajax({
-			'url': '/vote/ajax/'+ $(this).attr('item-type') + '/' + $(this).attr('vote-example-id') + '/' +  $(this).attr('vote-type'),
-			'context': this,
-			'statusCode': {
-				200: function(data) {
-					console.log(data)
-					if(data.result == true) {
-						console.log(this);
-						var s = '.votes-sum-'+data.itemType+'-'+data.id;
-						$('.cur-user-rate').text(data.requestUserRating);
-						$(s).text(data.votes);
-						$("table").trigger("update");
-					}
-					else {
-						alert("You have already voted!");
-					}
-				}
-			}
 		});
 	});
 };
@@ -223,9 +110,7 @@ init_video_viewer = function() {
  * Call all the initialization functions
  */
 $(document).ready(function() {
-	init_delete_content();
-	init_sticking();
     init_sidebar();
-    init_rating_stars();
+	init_sticking();
     init_video_viewer();
 });

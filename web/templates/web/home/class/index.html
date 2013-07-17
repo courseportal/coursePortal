@@ -31,9 +31,10 @@ BLOCKS(Including inherited blocks):
 {% block page_title %}
 	{% include "web/home/class/title.html" %}
 {% endblock %}
+
 {% block content %}
 {% autoescape off %}
-	{{ object.summary }}
+	{{ selected_class.summary }}
 {% endautoescape %}
 {% endblock %}
 

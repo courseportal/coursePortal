@@ -37,28 +37,7 @@ BLOCKS(Including inherited blocks):
 <script src="{{ STATIC_URL }}js/jquery.columnview.js" type="text/javascript"></script>
 <script type="text/javascript">
 var cat_id; // Used to store the category id for later use if we are updating a category
-var atomClicked = function(value, name) //++refactor++ Need to make it listen for the click and get
-{										//the attributes of the elt through 'this'
-	return false;
-}
-var categoryClicked = function(value, name) //++refactor++ Same as above
-{
-	cat_id = value;	// Set global cat_id
-	
-	$('#edit-form').attr('action', '/edit-class/{{ pk }}/' + value + '/') // Change action of form
-	$.ajax({
-		type: 'GET',
-		url: '/edit-class/{{pk}}/' + value + '/',
-	}).done(
-		function (data) {
-			$('div#cat-header').empty().append('Edit Category');
-			$('input#submit-category-form').attr('value', 'Update Category');
-			$("#category-form").empty().append(data.category_form);
-			$('input#delete-category').removeClass('hidden');
-		}
-	);
-	return false;
-}
+
 $(document).ready(function() {
 	
 	// Add the buttons that only work when javascript is enabled
@@ -75,7 +54,7 @@ $(document).ready(function() {
 			}
 			else
 			{
-				var req_url = '/ajax/get-children/0/'+elt.attr('elt-id')+'/'
+				var req_url = '/ajax/get-children/0/'+elt.attr('id')+'/'
 			}
 			var res = $.ajax({
 				type: 'GET', // GET or POST
@@ -128,7 +107,7 @@ $(document).ready(function() {
 					}
 					for (var key in response)
 					{
-						$('#'+id_insert+'field-' + key).addClass('error') // Make it red
+						$('#'+id_insert+'field-' + key).addClass('error')
 						$('#'+id_insert+'help-inline-' + key).empty().append(
 							$('<ul>') // Reset the div and add an empty list
 						);
@@ -175,6 +154,34 @@ $(document).ready(function() {
 		$("#category-form").empty().append(data.category_form);
 		$('ul#cat-list').columnview('update');
 	};
+	
+	
+	//$('div.containerobj a').dblclick(function() {
+	$('div.containerobj').on('dblclick', 'a', function() {
+		if ($(this).attr('type') == 'atom')
+		{
+			return false;
+		}
+		else if ($(this).attr('type') == 'category')
+		{
+			cat_id = $(this).attr('id');	// Set global cat_id
+	
+			$('#edit-form').attr('action', '/edit-class/{{ pk }}/' + cat_id + '/')
+			// Change action of form
+			$.ajax({
+				type: 'GET',
+				url: '/edit-class/{{pk}}/' + cat_id + '/',
+			}).done(
+				function (data) {
+					$('div#cat-header').empty().append('Edit Category');
+					$('input#submit-category-form').attr('value', 'Update Category');
+					$("#category-form").empty().append(data.category_form);
+					$('input#delete-category').removeClass('hidden');
+				}
+			);
+			return false;
+		}
+	})
 	
 	$('#submit-class-form').click(function() {
 		$('input[id=form-type]').val('submit-class');
