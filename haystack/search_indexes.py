@@ -1,12 +1,12 @@
 from haystack import indexes
 from haystack.backends.solr_backend import SolrSearchBackend
 from django.template import RequestContext, loader, Context
-from web.models import Atom, BaseCategory, Class, LectureNote, Example
+from web.models import Atom, BaseCategory, Class, Note, Example
 from pybb.models import Category, Forum, Topic, Post
 
 class AtomIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
-    AtomTitle = indexes.CharField(model_attr='name')
+    AtomTitle = indexes.CharField(model_attr='title')
     AtomSum = indexes.CharField(model_attr='summary')
     AtomSuggestions = indexes.FacetCharField()
     rendered = indexes.CharField(use_template=True, indexed=False)
@@ -23,7 +23,7 @@ class AtomIndex(indexes.SearchIndex, indexes.Indexable):
 
 class BaseCategoryIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
-    BaseCatTitle = indexes.CharField(model_attr='name')
+    BaseCatTitle = indexes.CharField(model_attr='title')
     BaseCatSum = indexes.CharField(model_attr='summary')
     BaseCatSuggestions = indexes.FacetCharField()
     rendered = indexes.CharField(use_template=True, indexed=False)
@@ -40,8 +40,8 @@ class BaseCategoryIndex(indexes.SearchIndex, indexes.Indexable):
 
 class ClassIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
-    ClassTitle = indexes.CharField(model_attr='name')
-    ClassAuthor = indexes.CharField(model_attr='author', faceted=True)
+    ClassTitle = indexes.CharField(model_attr='title')
+    ClassAuthor = indexes.CharField(model_attr='owner', faceted=True)
     ClassStatus = indexes.CharField(model_attr='status', faceted=True)
     #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
 
@@ -95,10 +95,10 @@ class PostIndex(RenderableItemIndex, indexes.Indexable):
 class LectureNoteIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     LecOwner = indexes.CharField(model_attr='owner')
-    LecName = indexes.CharField(model_attr='filename')
+    LecName = indexes.CharField(model_attr='title')
     
     def get_model(self):
-        return LectureNote
+        return Note
     
     def prepare(self, obj):
         data = super(LectureNoteIndex, self).prepare(obj)
@@ -122,7 +122,7 @@ class LectureNoteIndex(indexes.SearchIndex, indexes.Indexable):
 class ExampleIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     ExampleOwner = indexes.CharField(model_attr='owner')
-    ExampleName = indexes.CharField(model_attr='filename')
+    ExampleName = indexes.CharField(model_attr='title')
     
     def get_model(self):
         return Example

@@ -1,8 +1,8 @@
 {% for atom in atoms.all %}
-	<li><a href="#" style="color:#000000" hasChildren="false" ondblclick="javascript:atomClicked({{ atom.id }}, '{{ atom.name }}');" name="{{ atom }}">{{ atom }}</a></li>
+	<li><a href="#" style="color:#000000" hasChildren="false" type="atom" id="{{ atom.id }}" name="{{ atom }}">{{ atom }}</a></li>
 {% endfor %}
 {% for category in categories.all %}
 	<li hasChildren="true">
-		<a href="#" elt-id="{{ category.id }}" ondblclick="javascript:categoryClicked({{ category.id }}, '{{ category }}');">{{ category }}</a>
+		<a href="#" id="{{ category.id }}" type="category" name="{{ category }}">{{ category }}</a>
 	</li>
 {% endfor %}

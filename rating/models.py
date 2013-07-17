@@ -7,7 +7,7 @@ from rating.ratings import INITIAL_RATING
 
 class VoteVideo(models.Model):
 	user = models.ForeignKey(User)
-	example = models.ForeignKey('web.Submission')
+	example = models.ForeignKey('web.Video')
 	vote = models.IntegerField(default=0)
 
 class VoteExposition(models.Model):
@@ -15,9 +15,9 @@ class VoteExposition(models.Model):
 	example = models.ForeignKey('web.Exposition')
 	vote = models.IntegerField(default=0)
 
-class VoteLectureNote(models.Model):
+class VoteNote(models.Model):
 	user = models.ForeignKey(User)
-	example = models.ForeignKey('web.LectureNote')
+	example = models.ForeignKey('web.Note')
 	vote = models.IntegerField(default=0)
 
 class VoteExample(models.Model):

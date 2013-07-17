@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 
 from pybb.models import Forum
-from web.models import BaseCategory, Atom, Submission, Exposition, \
-LectureNote, Example, Class, AtomCategory
+from web.models import BaseCategory, Atom, Video, Exposition, \
+Note, Example, Class, ClassCategory
 from web.forms.submission import ReportForm
 from knoatom.view_functions import get_breadcrumbs, render_to_json_response
 from web.views.view_functions import get_navbar_context, \
@@ -51,8 +51,8 @@ def index(request):
 	"""
 	context = get_navbar_context() # Add the initial navbar content.
 	top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
-	if not top_ranked_videos: # If there is no cached version
-		top_ranked_videos = Submission.objects.all().order_by('-votes')[:5]
+	if top_ranked_videos is None: # If there is no cached version
+		top_ranked_videos = Video.objects.all().order_by('-votes')[:5]
 		cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
 	context.update({ # Add 'top_ranked_videos' to context
 		'top_ranked_videos': top_ranked_videos,
@@ -61,13 +61,11 @@ def index(request):
 
 def category(request, cat_id, class_id=None):
 	r"""
-		- Generates the category page
-		- Generates a list of the most popular videos for each category of rating
-		- Use memcached to save the popular video rankings to save a lot of time
+	This is the view for category and base_category (``/class/<class_id>/category/<cat_id>`` and ``/category/<cat_id>``).  It generates the category page which has a table of all the content in all of its ``child_atoms`` and all of the ``child_atoms`` in all categories under it.
 	"""
-	if class_id:
+	if class_id is not None:
 		template = 'web/home/class/category.html'
-		category_object = get_object_or_404(AtomCategory, id=cat_id)
+		category_object = get_object_or_404(ClassCategory, id=cat_id)
 		class_object = get_object_or_404(Class, id=class_id)
 		# Check if user is allowed to see this page
 		if has_class_access(class_object, request.user):
@@ -83,12 +81,9 @@ def category(request, cat_id, class_id=None):
 	context.update( # Add the category specific content to the context
 		get_context_for_category(category_object)
 	)
-	# un-json-fy the videos
-	for c in context['videos']:
-		if c.video: c.video = [v for v in json.loads(c.video)]
 	context.update({
-		'selected_class':class_object,
-		'selected_category':category_object,
+		'class_object':class_object,
+		'category_object':category_object,
 	})
 
 	return render(request, template, context)
@@ -97,13 +92,12 @@ def category(request, cat_id, class_id=None):
 
 def atom(request, cat_id, atom_id, class_id=None):
 	r"""
-		- Generates the view for a specific category
-		- Creates the breadcrumbs for the page
+	This is the view for both the ``atom`` view and the ``base_atom`` view (``/class/<class_id>/category/<cat_id>/atom/<atom_id>`` and ``/category/<cat_id>/atom/<atom_id>``).  It generates the content that is contained in the atom.
 	"""
-	if class_id:
+	if class_id is not None:
 		template = 'web/home/class/category.html'
 		class_object = get_object_or_404(Class, id=class_id)
-		category_object = get_object_or_404(AtomCategory, id=cat_id)
+		category_object = get_object_or_404(ClassCategory, id=cat_id)
 		# Check if user is allowed to see this page
 		if has_class_access(class_object, request.user):
 			return HttpResponseRedirect(reverse('class_index')) # Redirect
@@ -119,22 +113,16 @@ def atom(request, cat_id, atom_id, class_id=None):
 	context.update( # Add the atom specific content to the context
 		get_context_for_atom(atom_object)
 	)
-	# un-json-fy the videos
-	for c in context['videos']:
-		if c.video: c.video = [v for v in json.loads(c.video)]
-
 	context.update({
-		'selected_atom': atom_object,
-		'selected_class':class_object,
+		'atom_object': atom_object,
+		'class_object':class_object,
 		'forum': Forum.objects.get(atom=atom_object),
 	})
 	return render(request, template, context)
 
 def classes(request, class_id):
-	"""
-		-	Generates the home page
-		-	Generates a list of the most popular videos for each category of rating
-		-	Use memcached to save the popular video rankings to save a lot of time
+	r"""
+	This is the view for the class home page.  It shows the class summary.
 	"""
 	class_object = get_object_or_404(Class, id=class_id)
 	# Check if user is allowed to see this page
@@ -145,7 +133,7 @@ def classes(request, class_id):
 		get_breadcrumbs(request.path, web_breadcrumb_dict)
 	)
 	context.update({ # Add the class_objet to the context
-		'selected_class': class_object
+		'class_object': class_object
 	})
 	return render(request, 'web/home/class/index.html', context)
 
@@ -157,7 +145,7 @@ def classes(request, class_id):
 # 	#Get the "top level" categories
 # 	top_level_categories = BaseCategory.objects.filter(parent_categories=None)
 # 	
-# 	s = Submission.objects.get(id=sid)
+# 	s = Video.objects.get(id=sid)
 # 	
 # 	if s.video:
 # 		s.video = [v for v in json.loads(s.video)]
@@ -175,7 +163,7 @@ def classes(request, class_id):
 # 		'content': [s],
 # 		'top_level_categories': top_level_categories,
 # 		'selected_categories': parent_categories,
-# 		#'selected_category': current_category,
+# 		'selected_category': current_category,
 # 		'selected_atom': current_atom,
 # 		'vote_categories': VoteCategory.objects.all(),
 # 	}))

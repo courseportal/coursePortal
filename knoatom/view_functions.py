@@ -28,7 +28,7 @@ def get_breadcrumbs(path, name_function_dict={}):
 	"""
 	
 	dirty_argument_list = re.split('/', path) # Split the string up into a list of arguments
-	dirty_argument_list = [elt for elt in dirty_argument_list if elt != ''] # Remove all '' from list
+	dirty_argument_list = [elt for elt in dirty_argument_list if elt != '']
 	argument_list = [] # The clean argument list
 	for elt in dirty_argument_list: # Coerce all pk's to strings.
 		try:
@@ -38,29 +38,29 @@ def get_breadcrumbs(path, name_function_dict={}):
 	breadcrumbs = []
 	i = 1 # i will always be the element we are on + 1.
 	for arg in argument_list:
-		if type(arg) != str: # We don't want to do anything with ints in outer loop
+		if type(arg) != str: #Don't want to do anything with ints in outer loop
 			continue
 		pks = []
 		name_function = name_function_dict.get(arg, None)
 		
-		if not name_function: # There was no function cooresponding to 'arg' as a key
-			crumb = {'title':arg, 'url': make_url(argument_list[:i])}
+		if not name_function: # There was no function with 'arg' as its key
+			crumb = {'title':arg, 'url': _make_url(argument_list[:i])}
 		else:
-			for pk in argument_list[i:]: # Add following int arguments to pks until we hit a string
+			for pk in argument_list[i:]: #Add following int to pks until string
 				if type(pk) != int: # Stop when we hit a string
 					break
-				i += 1 # We need to increment i because the regular loop will skip it.
+				i += 1 # Increment i because the regular loop will skip it.
 				pks.append(pk) # Add the argument to pks
 			crumb = {
-				'url': make_url(argument_list[:i]),
+				'url': _make_url(argument_list[:i]),
 				'title': name_function(pks) # Add the title to the crumb
 			}
 		breadcrumbs.append(crumb)
 		i += 1
-	return {'breadcrumbs':breadcrumbs} # Return the dict containing the breadcrumbs.
+	return {'breadcrumbs':breadcrumbs} # Return the dict of the breadcrumbs.
 			
 			
-def make_url(arg_list):
+def _make_url(arg_list):
 	r"""Takes in a list of arguments of a url split by '/' and returns the reformed url."""
 	path = '/'
 	for elt in arg_list:

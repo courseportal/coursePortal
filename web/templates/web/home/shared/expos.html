@@ -25,16 +25,16 @@ OPTIONAL context:
 	</thead>
 	<tbody>
 		{% for expo in expositions %}
-			<tr id="row-1-{{ expo.id }}">
+			<tr id="row-exposition-{{ expo.id }}">
 				<td>
-					{% include "rating/vote_arrows.html" with item=1 id=expo.id %}
+					{% include "rating/vote_arrows.html" with item='exposition' id=expo.id %}
 				</td>
 
 				<td>
 					<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ expo.link }}">
-						<div class="name-1-{{ expo.id }}">
+						<div class="name-exposition-{{ expo.id }}">
 							{{ expo }} 
-							{% if selected_class in expo.classes_stickied_in.all %}
+							{% if class_object in expo.classes_stickied_in.all %}
 								 [stickied]
 							{% endif %}
 						</div>
@@ -45,24 +45,24 @@ OPTIONAL context:
 					{{ expo.owner }}
 				</td>
 				<td>
-					<div class="votes-sum-1-{{ expo.id }}">
+					<div class="votes-sum-exposition-{{ expo.id }}">
 						{{ expo.votes }}
 					</div>
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
 					<a rel="tooltip" class="icon-flag" href="#myModalExpo{{ expo.id }}" data-toggle="modal" title="Report"></a>
-					{% include "web/home/shared/sticky.html" with object=expo type=1 %}
+					{% include "web/home/shared/sticky.html" with object=expo type='exposition' %}
 					{% if user.is_superuser or expo.owner == user %}
 						<a rel="tooltip" class="icon-edit" href="{% url "expo_submit" expo.id %}?next={{request.path}}" title="Edit"></a>
-						<a rel="tooltip" class="icon-remove" href="#deleteModal1{{ expo.id }}" data-toggle="modal" title="Delete"></a>
+						<a rel="tooltip" class="icon-remove" href="#deleteModal-exposition-{{ expo.id }}" data-toggle="modal" title="Delete"></a>
 						{# We only need to include this modal if the user is allowed to delete #}
-						{% include "web/home/shared/delete_modal.html" with object=expo type=1 %}
+						{% include "web/home/shared/delete_modal.html" with object=expo type='exposition' %}
 					{% endif %}
 				</td>
 				<td style="display:none;">
-					<div class="stickied-1-{{ expo.id }}">
-						{% if selected_class in expo.classes_stickied_in.all %}1{% else %}0{% endif %}
+					<div class="stickied-exposition-{{ expo.id }}">
+						{% if class_object in expo.classes_stickied_in.all %}1{% else %}0{% endif %}
 					</div>
 				</td>
 			</tr>

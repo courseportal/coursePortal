@@ -31,10 +31,8 @@ BLOCKS(Including inherited blocks):
 {% block page_title %}
 	{% include "web/home/class/title.html" %}
 {% endblock %}
+
 {% block content %}
-{% for vid in top_ranked_videos %}
-{{ vid}}
-{% endfor %}
 {% autoescape off %}
 	{{ selected_class.summary }}
 {% endautoescape %}

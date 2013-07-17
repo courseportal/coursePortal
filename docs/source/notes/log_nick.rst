@@ -18,6 +18,10 @@ questions are related to atoms like tags? weighted list?
 questions/assignments not related to classes, except professors can assign assignments. But everyone can still see them.
 	
 Todo:
+	*	Work with the url system
+	*	Fix the 'post' view or remove it and reimplement functionality
+	*	Do we want multiple videos?
+	*	Refactor account, put validation in forms
 	*	Remove old video vote system
 	*	Change from child class to parent class
 	*   Implement ajax table updating in the topic list
@@ -26,6 +30,12 @@ Todo:
 	*	Refactor
 	*	More validation for uploaded file types
 	*	Integrate forum into Atom better
+	
+Week of July 15-19
+==================
+
+*	Finished refactoring ``home.py``.  Cut the length from 700+ lines to 150 lines and 100 lines of helper functions in a seperate file
+*	While refactoring ``home.py`` I also started to refactor the templates that it utilizes.
 
 Week of July 8-12
 =================

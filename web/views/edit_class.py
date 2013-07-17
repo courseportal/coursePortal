@@ -1,14 +1,17 @@
 import json
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
-from django.views.generic.edit import FormView, CreateView
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.http import HttpResponse, HttpResponseRedirect,\
+	HttpResponseBadRequest
+from django.views.generic.edit import CreateView
+from django.core.urlresolvers import reverse
 from web.forms.edit_class import CreateClassForm, CategoryForm, ClassForm
 from django.template import RequestContext, loader
-from web.models import Class, AtomCategory, BaseCategory
+from web.models import Class, ClassCategory, BaseCategory
+from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
-from knoatom.view_functions import render_to_json_response
+from knoatom.view_functions import render_to_json_response, get_breadcrumbs
+from web.views.view_functions import get_navbar_context, web_breadcrumb_dict
 
 
 class AjaxableResponseMixin(object):
@@ -59,54 +62,86 @@ class CreateClassView(AjaxableResponseMixin, CreateView):
 		kwargs.update({'user': self.request.user})
 		return kwargs
 		
+	def get_context_data(self, **kwargs):
+		context = super(CreateClassView, self).get_context_data(**kwargs)
+		context.update(
+			get_navbar_context()
+		)
+		context.update(
+			get_breadcrumbs(self.request.path, web_breadcrumb_dict)
+		)
+		return context
+		
 def EditClassView(request, class_id, cat_id):
 	r"""View for editing classes."""
 	context = {} # The context data
 	class_object = get_object_or_404(Class, id=class_id) # The class instance
 	class_form_kwargs = {'user':request.user, 'instance':class_object}
 	category_form_kwargs = {'parent_class':class_object}
+	
 	if cat_id: # If we are editing a category
-		category_object = get_object_or_404(AtomCategory, pk=cat_id)
+		category_object = get_object_or_404(ClassCategory, pk=cat_id)
 		category_form_kwargs.update({'instance':category_object})
+		
 	if request.method == 'POST':
-		if request.POST['form-type'] == 'submit-class': # If user pressed the Class submit button
-			class_form = ClassForm(request.POST, **class_form_kwargs) # Bind class the form
-			dicti = process_forms(request, class_object, class_form=class_form)
-			context.update(dicti)
-		elif request.POST['form-type'] == 'submit-category': # If user pressed Category submit button
-			category_form = CategoryForm(request.POST, **category_form_kwargs) # Bind category form
-			context.update(process_forms(request, class_object, category_form=category_form))
-		else: # If the user pressed the submit everything button
-			class_form = ClassForm(request.POST, **class_form_kwargs) # Bind the class form
-			category_form = CategoryForm(request.POST, **category_form_kwargs) # Bind category form
-			context.update(process_forms(request, class_object, class_form, category_form))
-		if request.is_ajax(): # We don't need to return all of the context, just the update stuff
-			return render_to_json_response(context)
-		elif cat_id: # We don't want to allow users to access the page with cat_id, only AJAX	
+		if request.POST['form-type'] == 'submit-class': # class submit
+			class_form = ClassForm(request.POST, **class_form_kwargs)
+			context.update(
+				process_forms(
+					request=request,
+					class_object=class_object,
+					class_form=class_form
+				)
+			)
+		elif request.POST['form-type'] == 'submit-category': # category submit
+			category_form = CategoryForm(request.POST, **category_form_kwargs)
+			context.update(
+				process_forms(
+					request=request,
+					class_object=class_object,
+					category_form=category_form
+				)
+			)
+		else: # submit all
+			class_form = ClassForm(request.POST, **class_form_kwargs)
+			category_form = CategoryForm(request.POST, **category_form_kwargs)
+			context.update(
+				process_forms(
+					request=request,
+					class_object=class_object,
+					class_form=class_form,
+					category_form=category_form
+				)
+			)
+		if request.is_ajax():
+			return render_to_json_response(context) # Only need part of context
+		elif cat_id is not None: # Non AJAX requests aren't allowed if cat_id
 			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 	else: # GET
-		if request.is_ajax(): # Return a category form with initial data or with no data
-			category_form = CategoryForm(**category_form_kwargs)
+		if request.is_ajax():
+			category_form = CategoryForm(**category_form_kwargs) # Get form
 			template = loader.get_template('web/category_form_template.html')
 			c = RequestContext(request, {'form':category_form})
 			form_html = template.render(c) # HTML for the form
 			context.update({
-			'category_form':form_html
+			'category_form':form_html # New form html will replace the old form
 			})
-			return render_to_json_response(context) # Return the html for the new form
-		elif cat_id: # We don't allow GET requests with a category already set that aren't AJAX
+			return render_to_json_response(context) # html for ne wform
+		elif cat_id is not None: # We don't allow non ajax requests if cat_id
 			return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
 			
-		context.update({ # We need to add the forms to the kwargs if its not POST
+		context.update({ # Add forms to context if not post
 			'class_form':ClassForm(**class_form_kwargs),
 			'category_form':CategoryForm(**category_form_kwargs)
 		})
-	# AJAX requests should not reach here because they should all be POST.
-	# Pick the category header
+	context.update(
+		get_navbar_context()
+	)
+	context.update(
+		get_breadcrumbs(request.path, web_breadcrumb_dict)
+	)
 	context.update({
 		'pk':class_object.id,
-		'top_level_categories':BaseCategory.objects.filter(parent_categories=None),
-		'breadcrumbs':[{'url':reverse('edit_class', args=[class_id]), 'title':'Edit Class'}]
 	})
 	return render(request, 'web/class_edit_form.html', context)
 	
@@ -132,40 +167,46 @@ def process_forms(request, class_object, class_form=None, category_form=None):
 			context.update({'pk':class_object.id})
 			if request.is_ajax():
 				context.update({
-					'message':'Successfully saved class.'
+					'message':_('Successfully saved class.')
 				})
 			else:
-				context.update({'class_form':class_form}) # Return the same form to the context
-				messages.success(request, 'Successfully saved class.')
+				context.update({'class_form':class_form}) # Dont change form
+				messages.success(request, _('Successfully saved class.'))
 		else: #form not valid
 			if request.is_ajax():
 				context.update(class_form.errors)
-				context.update({'message':'Error saving class.'})
+				context.update({'message':_('Error saving class.')})
 			else:
 				context.update({'class_form':class_form})
-				messages.error(request, 'Error saving class.')
+				messages.error(request, _('Error saving class.'))
 	if category_form: # If we were passed an instance of category_form
 		if category_form.is_valid():
 			category_form.save()
 			context.update({'pk':class_object.id})
 			if request.is_ajax():
-				template = loader.get_template('web/category_form_template.html')
-				c = RequestContext(request, {'form':CategoryForm(**category_form_kwargs)})
+				template = loader.get_template(
+					'web/category_form_template.html'
+				)
+				c = RequestContext(request, 
+					{'form':CategoryForm(**category_form_kwargs)}
+				)
 				form_html = template.render(c)
 				context.update({
 					'category_form': form_html,
-					'message':'Successfully saved category.'
+					'message':_('Successfully saved category.')
 				})
 			else:
-				context.update({'category_form':CategoryForm(**category_form_kwargs)}) # Need new form
-				messages.success(request, 'Successfully saved category.')
+				context.update(
+					{'category_form':CategoryForm(**category_form_kwargs)}
+				)
+				messages.success(request, _('Successfully saved category.'))
 		else: # form is not valid
 			if request.is_ajax():
 				context.update(category_form.errors)
-				context.update({'message':'Error saving category.'})
+				context.update({'message':_('Error saving category.')})
 			else:
 				context.update({'category_form':category_form})
-				messages.error(request, 'Error saving category.')
+				messages.error(request, _('Error saving category.'))
 	return context
 	
 # View to delete categories
@@ -178,9 +219,9 @@ def delete_category(request, pk):
 		This view is designed to only be used with AJAX
 	
 	"""
-	if not request.is_ajax(): # If it is not an AJAX request return a 400 status code
+	if not request.is_ajax(): # If it is not an AJAX request return an error
 		return HttpResponseBadRequest()
-	category_object = get_object_or_404(AtomCategory, pk=pk)
+	category_object = get_object_or_404(ClassCategory, pk=pk)
 	class_object = category_object.parent_class
 	category_object.delete()
 	category_form = CategoryForm(parent_class=class_object)
@@ -190,10 +231,9 @@ def delete_category(request, pk):
 	form_html = template.render(c)
 	context = {
 		'category_form': form_html,
-		'message': 'Successfully deleted category.'
+		'message': _('Successfully deleted category.')
 	}
-	data = json.dumps(context)
-	return HttpResponse(data, content_type='application/json')
+	return render_to_json_response(context)
 
 # View to get children for columnview
 def get_children(request, is_class, pk):
@@ -209,19 +249,15 @@ def get_children(request, is_class, pk):
 		return HttpResponseBadRequest()
 	is_class = int(is_class)
 	if is_class:
-		cur_class = get_object_or_404(Class, pk=pk)
-		categories = cur_class.category_set.filter(parent_categories=None)
+		class_object = get_object_or_404(Class, pk=pk)
+		categories = class_object.category_set.filter(parent_categories=None)
 		atoms = []
 	else:
-		obj = get_object_or_404(AtomCategory, pk=pk)
-		atoms = obj.child_atoms.all()
-		categories = obj.child_categories.all()
+		category_object = get_object_or_404(ClassCategory, pk=pk)
+		atoms = category_object.child_atoms.all()
+		categories = category_object.child_categories.all()
 	
 	context = RequestContext(request, {'atoms':atoms, 'categories':categories})
 	template = loader.get_template('web/category_list.html')
 	data = json.dumps(template.render(context))
-	return HttpResponse(data,content_type='application/json')
-	
-def get_category_form(request, pk):
-	r"""Returns the html for a new populated category form."""
-	obj = get_object_or_404(AtomCategory, pk=pk)
+	return HttpResponse(data, content_type='application/json')

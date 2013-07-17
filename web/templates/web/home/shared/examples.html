@@ -7,7 +7,7 @@ REQUIRED context:
 
 OPTIONAL context:
 	examples
-  selected_class
+  	class_object
 
 -->
 
@@ -25,16 +25,16 @@ OPTIONAL context:
 	</thead>
 	<tbody>
 		{% for example in examples %}
-			<tr id="row-3-{{ example.id }}">
+			<tr id="row-example-{{ example.id }}">
 				<td>
-					{% include "rating/vote_arrows.html" with item=3 id=example.id %}
+					{% include "rating/vote_arrows.html" with item='example' id=example.id %}
 				</td>
 				<td>
 
 					<a target="_blank" href="{{ example.file.url }}">
-						<div class="name-3-{{ example.id }}">
-							{{ example.filename }}
-							{% if selected_class in example.classes_stickied_in.all %}
+						<div class="name-example-{{ example.id }}">
+							{{ example }}
+							{% if class_object in example.classes_stickied_in.all %}
 								 [stickied]
 							{% endif %}
 						</div>
@@ -44,24 +44,24 @@ OPTIONAL context:
 					{{ example.owner }}
 				</td>
 				<td>
-					<div class="votes-sum-3-{{ example.id }}">
+					<div class="votes-sum-example-{{ example.id }}">
 						{{ example.votes }}
 					</div>
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
 					<a rel="tooltip" class="icon-flag" href="#myModalExample{{ example.id} }" data-toggle="modal" title="Report"></a>
-					{% include "web/home/shared/sticky.html" with object=example type=3 %}
+					{% include "web/home/shared/sticky.html" with object=example type='example' %}
 					{% if user.is_superuser or example.owner == user %}
 						<a rel="tooltip" class="icon-edit" href="{% url "example_submit" example.id %}?next={{request.path}}" title="Edit"></a>
-						<a rel="tooltip" class="icon-remove" href="#deleteModal3{{ example.id }}" data-toggle="modal" title="Delete"></a>
-						{% comment %} We only need to include this modal if the user is allowed to delete {% endcomment %}
-						{% include "web/home/shared/delete_modal.html" with object=example type=3 %}
+						<a rel="tooltip" class="icon-remove" href="#deleteModal-example-{{ example.id }}" data-toggle="modal" title="Delete"></a>
+						{# We only need to include this modal if the user is allowed to delete #}
+						{% include "web/home/shared/delete_modal.html" with object=example type='example' %}
 					{% endif %}
 				</td>
 				<td style="display:none;">
-					<div class="stickied-3-{{ example.id }}">
-						{% if selected_class in example.classes_stickied_in.all %}
+					<div class="stickied-example-{{ example.id }}">
+						{% if class_object in example.classes_stickied_in.all %}
 							1
 						{% else %}
 							0

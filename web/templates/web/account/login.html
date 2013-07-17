@@ -33,7 +33,7 @@ BLOCKS(Including inherited blocks):
 {% extends "web/web_base.html" %}
 
 {% block content %}
-<h2>Login</h2>
+<h2>{% trans Login %}</h2>
 
 <form class="form-horizontal" action="{% url 'login' %}" method="post">
 {% csrf_token %}
@@ -44,7 +44,7 @@ BLOCKS(Including inherited blocks):
 <div class="form-actions">
 <input class="btn btn-primary" type="submit" value="Submit" />
 <input class="btn" type="reset" value="Clear" />
-<a class="btn" href="{% url 'forgot_password' %}">Forgot Password?</a>
+<a class="btn" href="{% url 'forgot_password' %}">{% trans Forgot Password? %}</a>
 </div>
 </form>
 

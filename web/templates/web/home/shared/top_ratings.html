@@ -21,6 +21,6 @@ I list top_ranked_videos as required because without it this will display some n
 
 <div class="tab-content">
 {% for video in top_ranked_videos %}
-<p><a{# href="{% url "post" video.id %}" #}>{{ video }}</a> <small>({{ video.votes }})</small></p>
+<p><a class="view-video" id="{{ video.video }}">{{ video }}</a> <small>({{ video.votes }})</small></p>
 {% endfor %}
 </div>

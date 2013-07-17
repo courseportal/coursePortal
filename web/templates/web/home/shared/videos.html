@@ -26,28 +26,26 @@ OPTIONAL context:
 		{% for video in videos %}
 
 
-		<tr id="row-4-{{ video.id }}">
+		<tr id="row-video-{{ video.id }}">
 			<td style="vertical-align:middle">
-				{% include "rating/vote_arrows.html" with item=4 id=video.id %}
+				{% include "rating/vote_arrows.html" with item='video' id=video.id %}
 			</td>
 
 			<td style="text-align:center">
 
 				<div id="title">
-					<strong><a>{#<!--<a href="{% url 'post' video.id %}"> -->#}
-						<div class="name-4-{{ video.id }}">
+					<strong><a class="view-video" id="{{ video.video }}">
+						<div class="name-video-{{ video.id }}">
 							{{ video }}
-							{% if selected_class in video.classes_stickied_in.all %}
+							{% if class_object in video.classes_stickied_in.all %}
 								 [stickied]
 							{% endif %}
 						</div>
 					</a></strong>
 				</div>
-				{% for v in video.video %}
-					<div id="Video">
-						<img style="margin-bottom: 5px;" src="https://img.youtube.com/vi/{{ v }}/default.jpg" width="120" alt="Video Thumbnail" />
-					</div>
-				{% endfor %}
+				<div id="Video">
+					<a class="view-video" id="{{ video.video }}"><img style="margin-bottom: 5px;" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="120" alt="Video Thumbnail" /></a>
+				</div>
 
 			</td>
 			<td>
@@ -60,7 +58,7 @@ OPTIONAL context:
 			</td>
 			<!-- Votes -->
 			<td style="width:75px">
-				<div class="votes-sum-4-{{video.id}}">
+				<div class="votes-sum-video-{{video.id}}">
 					{{video.votes}}
 				</div>
 			</td>
@@ -69,17 +67,17 @@ OPTIONAL context:
 				<!-- Button to trigger modal -->
 				<a rel="tooltip" class="icon-flag" href="#myModalVideo{{video.id}}" data-toggle="modal" title="Report"></a>
 
-				{% include "web/home/shared/sticky.html" with type=4 object=video %}
+				{% include "web/home/shared/sticky.html" with type='video' object=video %}
 				{% if user.is_superuser or video.owner == user %}
-				<a rel="tooltip" class="icon-edit" href="{% url "submit" video.id %}?next={{request.path}}" title="Edit"></a>
-				<a rel="tooltip" class="icon-remove" href="#deleteModal4{{ video.id }}" data-toggle="modal" title="Delete"></a>
+				<a rel="tooltip" class="icon-edit" href="{% url "video_submit" video.id %}?next={{request.path}}" title="Edit"></a>
+				<a rel="tooltip" class="icon-remove" href="#deleteModal-video-{{ video.id }}" data-toggle="modal" title="Delete"></a>
 				{# We only need to include this modal if the user is allowed to delete #}
-				{% include "web/home/shared/delete_modal.html" with type=4 object=video %}
+				{% include "web/home/shared/delete_modal.html" with type='video' object=video %}
 				{% endif %}
 			</td>
 			<td style="display:none;">
-				<div class="stickied-4-{{ video.id }}">
-					{% if selected_class in video.classes_stickied_in.all %}
+				<div class="stickied-video-{{ video.id }}">
+					{% if class_object in video.classes_stickied_in.all %}
 						1
 					{% else %}
 						0
@@ -93,4 +91,4 @@ OPTIONAL context:
 		{% endfor %}
 	</tbody>
 </table>
-<script>{% include 'js/tablesorter.settings.js' with table='#videos' sortForce='[[6,1]]' sortAppend='[[4,1]]' sortList='[[6,1],[1,1]]' %}</script>
+<script>{% include 'js/tablesorter.settings.js' with table='table#videos' sortForce='[[6,1]]' sortAppend='[[4,1]]' sortList='[[6,1],[4,1]]' %}</script>

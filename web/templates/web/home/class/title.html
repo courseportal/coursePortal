@@ -4,7 +4,7 @@
 To INCLUDE this file:
 
 	REQUIRED context:
-		selected_class
+		class_object
 
 	OPTIONAL context:
 		None
@@ -14,8 +14,8 @@ To INCLUDE this file:
 {% endcomment %}
 
 <div class="page-header">
-	<span style="font-size: 200%;font-weight:bold;">KnoAtom - {{ selected_class.name }}</span>
-    {% if user == selected_class.author or user.is_superuser %}
-    <span style="float:right"><a href="{% url 'edit_class'  selected_class.id %}">[Edit Class...]</a></span>
+	<span style="font-size: 200%;font-weight:bold;">KnoAtom - {{ class_object.name }}</span>
+    {% if user == class_object.owner or user.is_superuser %}
+    <span style="float:right"><a href="{% url 'edit_class'  class_object.id %}">[Edit Class...]</a></span>
     {% endif %}
 </div>

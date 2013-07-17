@@ -7,15 +7,12 @@ REQUIRED context:
 	atoms
 
 OPTIONAL context:
-	selected_class
-	atom_list_1
-	atom_list_2
-	atom_list_3
+	class_object
 
 -->
 {% endcomment %}
 
-{% if not selected_category.child_categories and selected_category.child_atoms %}
+{% if not category_object.child_categories and category_object.child_atoms %}
 No Atoms or subcategories exist for this category yet!
 {% endif %}
 <div class="row-fluid" id="atom-list"> {# Populated with javascript #}
@@ -35,10 +32,10 @@ $(document).ready(function () {
 	{% cycle 'col1' 'col2' 'col3' as column silent %}//{# Set up the cycling for multiple columns #}
 	{% with length=atoms|length %} //{# Store the number of atoms #}
 	{% for atom in atoms %} //{# Loop through the atoms #}
-		{% if selected_class %} //{# Save the correct link #}
-			var link = "<a href='{% url 'atom' selected_class.id selected_category.id atom.id %}'>{{ atom.name }}</a>";
+		{% if class_object %} //{# Save the correct link #}
+			var link = "<a href='{% url 'atom' class_object.id category_object.id atom.id %}'>{{ atom }}</a>";
 		{% else %}
-			var link = "<a href='{% url 'base_atom' selected_category.id atom.id %}'>{{ atom.name }}</a>";
+			var link = "<a href='{% url 'base_atom' category_object.id atom.id %}'>{{ atom }}</a>";
 		{% endif %}
 		$('#atom-list #{{column}} ul').append( //{# Append link to the list in the correct column #}
 			$('<li>').append(link)
