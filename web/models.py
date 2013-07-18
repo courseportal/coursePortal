@@ -247,16 +247,14 @@ class Class(models.Model):
 		default=datetime.now
 	)
 	date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-	
-<<<<<<< HEAD
+
 	# Stickied Content
-	stickied_videos = models.ManyToManyField(Submission, blank=True, related_name='classes_stickied_in')
+	#stickied_videos = models.ManyToManyField(Submission, blank=True, related_name='classes_stickied_in')
 	stickied_expos = models.ManyToManyField(Exposition, blank=True, related_name='classes_stickied_in')
-	stickied_notes = models.ManyToManyField(LectureNote, blank=True, related_name='classes_stickied_in')
+	#stickied_notes = models.ManyToManyField(LectureNote, blank=True, related_name='classes_stickied_in')
 	stickied_examples = models.ManyToManyField(Example, blank=True, related_name = 'classes_stickied_in')
 	stickied_assignments = models.ManyToManyField(Assignment, blank=True, related_name = 'classes_stickied_in')
-=======
->>>>>>> b11d63b396fabe7896beac9b790c57b6878d3e47
+
 	
 	def __unicode__(self):
 		return self.title
