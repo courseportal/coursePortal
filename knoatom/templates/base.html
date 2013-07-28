@@ -121,7 +121,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 								<li>
                                     <div>
                             			<a href="{% url 'account' %}">{{ user }}</a>
-                                		<span class="cur-user-rate">
+                                		<span id="cur-user-rate">
                                        	{% for i in user.rating_set.all %}
                                             {{ i.rating }}
                                         {% endfor %}
@@ -135,10 +135,10 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	                                    <b class="caret"></b>
 	                                </a>
 	                                <ul class="dropdown-menu">
-	                                    <a href="{% url "video_submit" %}">Video</a>
-	                                    <a href="{% url "expo_submit" %}">Exposition</a>
-	                                    <a href="{% url "note_submit" %}">Note</a>
-	                                    <a href="{% url "example_submit" %}">Example</a>
+	                                    <li><a href="{% url "video_submit" %}">Video</a></li>
+	                                    <li><a href="{% url "expo_submit" %}">Exposition</a></li>
+	                                    <li><a href="{% url "note_submit" %}">Note</a></li>
+	                                    <li><a href="{% url "example_submit" %}">Example</a></li>
 	                                </ul>
 	                            </li>
 									<li><a href="{% url 'logout' %}">Logout</a></li>

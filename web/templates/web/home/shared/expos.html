@@ -15,7 +15,7 @@ OPTIONAL context:
 <table id="expos" class="tablesorter">
 	<thead>
 		<tr>
-			<th data-sorter="false"> </th>
+    		<th data-sorter="false"> </th>
 			<th>Name</th>
 			<th>Created By</th>
 			<th>Votes</th>
@@ -27,7 +27,9 @@ OPTIONAL context:
 		{% for expo in expositions %}
 			<tr id="row-exposition-{{ expo.id }}">
 				<td>
-					{% include "rating/vote_arrows.html" with item='exposition' id=expo.id %}
+          {% if atom_object %}
+					  {% include "rating/vote_arrows.html" with item='exposition' id=expo.id atom_id=atom_object.id %}
+          {% endif %}
 				</td>
 
 				<td>
@@ -45,7 +47,7 @@ OPTIONAL context:
 					{{ expo.owner }}
 				</td>
 				<td>
-					<div class="votes-sum-exposition-{{ expo.id }}">
+					<div id="votes-sum-exposition-{{ expo.id }}">
 						{{ expo.votes }}
 					</div>
 				</td>

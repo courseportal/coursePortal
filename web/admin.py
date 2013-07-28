@@ -15,7 +15,7 @@ for m in get_models():
 	exec "from %s import %s" % (m.__module__, m.__name__)
 
 class ExpositionAdmin(admin.ModelAdmin):
-    exclude = ('owner','votes',)
+    exclude = ('owner',)
     
     def save_model(self, request, obj, form, change):
         if not change:
@@ -26,18 +26,18 @@ class ExpositionAdmin(admin.ModelAdmin):
 
 class ExposInline(admin.StackedInline):
     model = Exposition
-    exclude = ('votes',)
+    exclude = ()
     extra = 1
     raw_id_fields = ("owner",)
 
 class LecNoteInline(admin.StackedInline):
     model = Note
-    exclude = ('votes',)
+    exclude = ()
     extra = 1
 
 class ExampleInline(admin.StackedInline):
     model = Example
-    exclude = ('votes',)
+    exclude = ()
     extra = 1
 
 
@@ -67,7 +67,7 @@ class FileUploadForm(forms.ModelForm):
 		return self.cleaned_data['file']
 
 class NoteAdmin(admin.ModelAdmin):
-	exclude = ('owner','votes',)
+	exclude = ('owner',)
 	form = FileUploadForm
 	def save_model(self, request, obj, form, change):
 		if not change:
@@ -76,7 +76,7 @@ class NoteAdmin(admin.ModelAdmin):
 		super(NoteAdmin, self).save_model(request, obj, form, change)
 		
 class ExampleAdmin(admin.ModelAdmin):
-	exclude = ('owner','votes',)
+	exclude = ('owner',)
 	form = FileUploadForm
 	def save_model(self, request, obj, form, change):
 		if not change:
@@ -123,14 +123,14 @@ class AtomAdmin(admin.ModelAdmin):
 		
         This is a bit of a hack because the save_model method doesn't work properly for using the obj when it doesn't exist yet.  This method only ever does anything when the Atom is first created.
         """
-        cat = Category.objects.get_or_create(title="Atoms")[0]
+        cat = Category.objects.get_or_create(name="Atoms")[0]
         try:
             forum = Forum.objects.get(atom=obj)
         except ObjectDoesNotExist:
             forum = Forum.objects.create(
 					atom=obj,
 					category=cat,
-					name=obj.name,
+					name=obj.title,
 					description=obj.summary # Add when we have field
 				)
             forum.save()
@@ -396,7 +396,7 @@ class VideoAdminForm(forms.ModelForm):
 
 class VideoAdmin(admin.ModelAdmin):
     form = VideoAdminForm
-    exclude = ('votes',)
+    exclude = ()
 
     def save_model(self, request, obj, form, change):
 		#if change:

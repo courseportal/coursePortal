@@ -15,7 +15,7 @@ OPTIONAL context:
 <table id="notes" class="tablesorter">
 	<thead>
 		<tr>
-			<th data-sorter="false"> </th>
+    		<th data-sorter="false"> </th>
 			<th>Name</th>
 			<th>Created By</th>
 			<th>Votes</th>
@@ -27,7 +27,9 @@ OPTIONAL context:
 		{% for note in notes %}
 			<tr id="row-note-{{ note.id }}">
 				<td>
-					{% include "rating/vote_arrows.html" with item='note' id=note.id %}
+          {% if atom_object %}
+					  {% include "rating/vote_arrows.html" with item='note' id=note.id atom_id=atom_object.id %}
+          {% endif %}
 				</td>
 				<td>
 					<a target="_blank" href="{{ note.file.url }}">
@@ -41,7 +43,7 @@ OPTIONAL context:
 					{{ note.owner }}
 				</td>
 				<td>
-					<div class="votes-sum-note-{{ note.id }}">
+					<div id="votes-sum-note-{{ note.id }}">
 						{{ note.votes }}
 					</div>
 				</td>
