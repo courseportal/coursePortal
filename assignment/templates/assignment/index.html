@@ -7,25 +7,25 @@
 
 <div id="assignment-zone">
 	<div class="list-table"> 
-		<table class="table">  
-      	<thead>  
-        		<tr>  
-           		<th>Title</th>
-           		<th>Subject</th>
-           		<th>Author</th>
-        		</tr>  
-      	</thead> 
-      	<tbody>
+	<table class="table">  
+    <thead>  
+      		<tr>  
+       		<th>Title</th>
+       		<th>Subject</th>
+       		<th>Author</th>
+      		</tr>  
+    </thead>
+    <tbody>
    	{% for a in assignment_list %}
    		<tr class="assignment-row">
    			<td class="first-cell" id="{{a.id}}" value="{{a.title}}">{{ a.title }}</td>
-				<td></td>
-				<td></td>
-				<td><i onclick="previewL({{a.id}})" class="icon-eye-open"></i></a></td>
-				<input type="hidden" id="{{a.id}}data" value="{{a.data}}"></div>
-			</tr>
-	   {% endfor %}
-   	   </tbody>  
+			<td></td>
+			<td></td>
+			<td><i onclick="previewL({{a.id}})" class="icon-eye-open"></i></a></td>
+			<input type="hidden" id="{{a.id}}data" value="{{a.data}}"></div>
+		</tr>
+	{% endfor %}
+   	</tbody>  
    	</table>  
 	</div>
 	<div class="row-fluid">

@@ -6,33 +6,90 @@
 
 <form method = "post" action = "{% url 'unmake' %}">
 {% csrf_token %}
-<table class="table">
+<table class="table" id="assigned">
 	<thead>
-		<th style="width:10px"></th>
-		<th style="width:80px">Username</th>
-		<th style="width:100px">Name</th>
-		<th style="width:100px">Assignment</th>
-		<th style="width:100px">Class</th>
+		<th style="width:80px" class="sortable">Username</th>
+		<th style="width:100px" class="sortable">Name</th>
+		<th style="width:100px" class="sortable">Assignment</th>
+		<th style="width:100px" class="sortable">Class</th>
+		<th style="width:10px">Select</th>
 	</thead>
-</table>
-<div class="list-table">  
-<table class="table">
 	<tbody>
+		<tr class = '.filter'>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
 		{% for a in assignments %}
 			{% for i in a.instances.all %}
 				<tr>
-					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
 					<td style="width:80px">{{i.user.username}}</td>
 					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
 					<td style="width:100px">{{i}}</td>
 					<td style="width:100px"></td>
+					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
 				</tr>
 			{% endfor %}
 		{% endfor %}
 	</tbody>
+	<tfoot>
+		<tr class="footer">
+			<th style="width:80px">Username</th>
+			<th style="width:100px">Name</th>
+			<th style="width:100px">Assignment</th>
+			<th style="width:100px">Class</th>
+			<td style="width:10px"></td>
+		</tr>
+	</tfoot>
 </table>
 </div>
 <input type="submit" class="btn"></input>
 </form>
+
+
+
+<script>
+        // tablesorter 2.10.8
+        // Documentation found here:
+        // http://mottie.github.io/tablesorter/docs/index.html
+        
+        // Bootstrap specific example here:
+        // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+        $(function() {
+          
+        	$.extend($.tablesorter.themes.bootstrap, {
+                table      : 'table table-bordered',
+                header     : 'bootstrap-header', // give the header a gradient background
+                footerRow  : '',
+                footerCells: '.footer',
+                icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+                sortNone   : 'bootstrap-icon-unsorted',
+                sortAsc    : 'icon-chevron-up',
+                sortDesc   : 'icon-chevron-down',
+                active     : '', // applied when column is sorted
+                hover      : '', // use custom css here - bootstrap class may not override it
+                filterRow  : '.filter', // filter row class
+                even       : '', // odd row zebra striping
+                odd        : ''  // even row zebra striping
+        	});
+          
+          // call the tablesorter plugin and apply the uitheme widget
+          $("#assigned").tablesorter({
+                theme : "bootstrap",
+                                     
+                widthFixed: true,
+                                     
+                headerTemplate : '{content} {icon}', 
+                selectorHeaders: '> thead .sortable',        
+                initWidgits:true,
+                widgets : ["uitheme", "filter", "zebra" ],
+                widgetOptions: {
+          		
+                }        
+                                     
+            })
+        });
+</script>
 {% endblock %}
 

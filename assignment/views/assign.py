@@ -76,11 +76,7 @@ def instantiate(request):
         for question in assignment.questions.all():
             q=question.data
             q=json.loads(q)
-            q['solution']= q['solution'].replace('<br>', '\n')
-            q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-            for integer_index in range(len(q['choices'])):
-                q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-                q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+            q['choices']=json.loads(q['choices'])
             exec q['code']
             solution=eval(q['solution'])
             #q text formatted here
@@ -133,9 +129,6 @@ def create(request):
         current=request.user.owned_assignments.get(title = a['title'])
     except:
         pass
-    if current!='':
-        for q in current.questions.all():
-            q.delete();
     #create new assignment
     assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
     assignment.save()
@@ -153,9 +146,8 @@ def create(request):
 
     #Add questions
     for q in a['questions']:
-        temp=createQ(q, assignment.owners)
-        assignment.questions.add(temp)
-        questions[str(temp)]=q['points']
+        assignment.questions.add(Question.objects.get(id=q['id']))
+        questions[str(q['id'])]=q['points']
     data['questions']=questions
     #Finish
     assignment.data=json.dumps(data)
@@ -191,13 +183,11 @@ def unmake(request):
     messages=["Assignment(s) succesfully unassigned!"]
     return unassign(request, messages)
 
-def createQ(x, users=[]):
-    question = Question()
-    question.title = x['title']
-    data=dict()
-    question.data = json.dumps(x)
-    question.save()
-    for user in users.all():
-        question.owners.add(user)
-    question.save()
-    return question.id
+def test(request):
+    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
+    breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
+    context = {
+        'breadcrumbs':breadcrumbs,
+        'question_list':Question.objects.all(),
+    }
+    return render(request, 'assignment/test.html', context)

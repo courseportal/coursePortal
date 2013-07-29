@@ -13,13 +13,16 @@
     },
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
-
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
 	function reroute(){
 		document.inputForm.action='{% url "save" %}';
 		return true;
 	}
 </script>
-<script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
 
 <div class="row">
 	<h1><div class="span3 offset3">{{question_selected.title}}</div></h2>

@@ -37,12 +37,6 @@ def replaceX(data):
 		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2+toReplace+replace3)
 	return data
 
-def test(request):
-	context = {
-		'type_list': Variable.objects.all(),
-	}
-	return render(request, 'assignment/test.html', context)
-
 def matchType(request):
 	vartype = request.GET['vartype']
 	variable = Variable.objects.get(name=vartype)
@@ -64,3 +58,10 @@ def validate(request):
 		locals()[vartype.variables.split()[x]]=user_input[x]
 	exec vartype.validation_code
 	return HttpResponse(result)
+
+def validateFull(request):
+	try:
+		exec request.GET['code']
+	except:
+		return HttpResponse("Full Code did not validate, something is wrong with variable dependencies!")
+	return 0

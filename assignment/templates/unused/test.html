@@ -5,13 +5,8 @@
 <!-- TINY MCE -->
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
 
-<!-- CODE MIRROR -->
-<script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
-<script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
-
 <!-- font awesome -->
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
 <!-- JQUERY UI -->
@@ -54,11 +49,11 @@
 			<div id="questionsList">
 				{% for q in assignment.questions.all %}
 				<div class="row-fluid question-whole" id="question{{forloop.counter}}"> 
-					<input type="hidden" value = "{{q.id}}"></input> 
+					<input type="hidden" value = "{{q.data}}"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
-					<div class="span1 question-edit btn" onclick="load_question({{q.id}})">
-						<i class="icon-eye-open"> View</i> 
+					<div class="span1 question-edit btn" onclick="load_question({{forloop.counter}})">
+						<i class="icon-eye-open"> Edit</i> 
 					</div> 
 					{% with id=q.id %}
 					<div class="span1 question-pts"> 
@@ -74,12 +69,11 @@
 		</div>
 	</div>
 
-	<!--<button class="btn btn-inverse" id="opener" disabled>
-		<i class="icon-plus"></i> Add Question </button> -->
-	<button class="btn" id="listingQ">
-		<i class="icon-plus"></i> Load Question</button>
+	<button class="btn btn-inverse" id="opener">
+		<i class="icon-plus"></i> Add Question </button>
 
 	<div id="dialog" class="row-fluid">
+		
 	</div>
 
 	<hr>
@@ -92,72 +86,38 @@
 	<div id="previewform"></div>
 
 <div id="loading-zone">
-	<table class="list-table question-table" style="max-height:300px">
-    <thead>  
-       		<tr> 
-       		<th class='sortable'>Title</th>
-       		<th class='sortable'>Subject</th>
-       		<th class='sortable'>Difficulty</th>
-       		</tr>
-    </thead>  
-    <tbody>
-   		{% for question in question_list %}
+	{% if question_list %}
+		<table class="table">
+      	<thead>  
+        		<tr> 
+           		<th>Title</th>
+           		<th>Subject</th>
+           		<th>Author</th>
+        		</tr>  
+      	</thead>
+      </table>
+   <div class="list-table">  
+		<table class="table">  
+      	<tbody>
+   	{% for question in question_list %}
    		<tr>
    			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
-			<td></td>
-			<td></td>
-			<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
-		</tr>
+				<td></td>
+				<td>{{question.owners.0}}</td>
+				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
+			</tr>
 		{% endfor %}
-	</tbody>  
+		</tbody>  
    	</table>  
+	</div>
+	{% else %}
+		<p>No questions exist!</p>
+	{% endif %}
 	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
 	<div class="preview-area">
 	</div>
 </div>
+
 </body>
-
-
-<script>
-    // tablesorter 2.10.8
-    // Documentation found here:
-    // http://mottie.github.io/tablesorter/docs/index.html
-     
-    // Bootstrap specific example here:
-    // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-    $(function() {
-          
-      	$.extend($.tablesorter.themes.bootstrap, {
-            table      : 'table table-bordered',
-            header     : 'bootstrap-header', // give the header a gradient background
-            footerRow  : '',
-            footerCells: '.footer',
-            icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
-            sortNone   : 'bootstrap-icon-unsorted',
-            sortAsc    : 'icon-chevron-up',
-            sortDesc   : 'icon-chevron-down',
-            active     : '', // applied when column is sorted
-            hover      : '', // use custom css here - bootstrap class may not override it
-            filterRow  : '.filter', // filter row class
-            even       : '', // odd row zebra striping
-            odd        : ''  // even row zebra striping
-      	});
-          
-        // call the tablesorter plugin and apply the uitheme widget
-        $(".question-table").tablesorter({
-            theme : "bootstrap",
-                                     
-            widthFixed: true,                                 
-            headerTemplate : '{content} {icon}', 
-            selectorHeaders: '> thead .sortable',        
-            initWidgits:true,
-            widgets : ["uitheme", "filter", "zebra" ],
-            widgetOptions: {
-          		
-            }        
-                                     
-        })
-    });
-</script>
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 {% endblock %}

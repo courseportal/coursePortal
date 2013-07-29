@@ -250,9 +250,9 @@ class Class(models.Model):
 
 	# Stickied Content
 	#stickied_videos = models.ManyToManyField(Submission, blank=True, related_name='classes_stickied_in')
-	stickied_expos = models.ManyToManyField(Exposition, blank=True, related_name='classes_stickied_in')
+	#stickied_expos = models.ManyToManyField(Exposition, blank=True, related_name='classes_stickied_in')
 	#stickied_notes = models.ManyToManyField(LectureNote, blank=True, related_name='classes_stickied_in')
-	stickied_examples = models.ManyToManyField(Example, blank=True, related_name = 'classes_stickied_in')
+	#stickied_examples = models.ManyToManyField(Example, blank=True, related_name = 'classes_stickied_in')
 	stickied_assignments = models.ManyToManyField(Assignment, blank=True, related_name = 'classes_stickied_in')
 
 	
