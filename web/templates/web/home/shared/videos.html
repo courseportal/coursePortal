@@ -14,7 +14,7 @@ OPTIONAL context:
 
 <table id="videos" class="tablesorter">
 	<thead>
-		<th data-sorter="false"> </th>
+	    <th data-sorter="false"> </th>
 		<th>Video</th>
 		<th data-sorter="false">Description</th>
 		<th>Created By</th>
@@ -28,8 +28,10 @@ OPTIONAL context:
 
 		<tr id="row-video-{{ video.id }}">
 			<td style="vertical-align:middle">
-				{% include "rating/vote_arrows.html" with item='video' id=video.id %}
-			</td>
+        {% if atom_object %}
+				  {% include "rating/vote_arrows.html" with item='video' id=video.id atom_id=atom_object.id %}
+        {% endif %}
+      </td>
 
 			<td style="text-align:center">
 
@@ -58,8 +60,8 @@ OPTIONAL context:
 			</td>
 			<!-- Votes -->
 			<td style="width:75px">
-				<div class="votes-sum-video-{{video.id}}">
-					{{video.votes}}
+				<div id="votes-sum-video-{{video.id}}">
+					{{ video.votes }}
 				</div>
 			</td>
 			<!-- end Votes -->

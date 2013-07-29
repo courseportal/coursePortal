@@ -12,8 +12,23 @@ This is where I will keep a log of what I'm working on, problems I'm having, or 
 Goals
 -----
 
+Goals for 2 weeks when I am gone:
+	*	Finish fixing what I have broken:
+		
+		*	'post'
+		*	voting
+	
+	*	Refactor code
+	*	Document code
+	*	Test code
+	*	Deploy to test server
+	
+		*	How important is the existing data?
+		
+	*	MathJax in formus
+
 Different scores for different atoms
-Multiple tags for everything
+Multiple tags for everything [x]
 questions are related to atoms like tags? weighted list?
 questions/assignments not related to classes, except professors can assign assignments. But everyone can still see them.
 	
@@ -22,8 +37,6 @@ Todo:
 	*	Fix the 'post' view or remove it and reimplement functionality
 	*	Do we want multiple videos?
 	*	Refactor account, put validation in forms
-	*	Remove old video vote system
-	*	Change from child class to parent class
 	*   Implement ajax table updating in the topic list
 	*   Testing
 	*   Documentation
@@ -36,6 +49,9 @@ Week of July 15-19
 
 *	Finished refactoring ``home.py``.  Cut the length from 700+ lines to 150 lines and 100 lines of helper functions in a seperate file
 *	While refactoring ``home.py`` I also started to refactor the templates that it utilizes.
+*	Changed user uploaded content from a ForeignKey to atoms to a ManyToMany.
+*	Removed the video ``post`` view.
+*	Updated ``web/models.py`` to be more consistent.
 
 Week of July 8-12
 =================

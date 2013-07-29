@@ -2,8 +2,37 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.core.exceptions import ValidationError
 from rating.ratings import INITIAL_RATING
 
+class Vote(models.Model):
+	r"""Model for the rating system."""
+	user = models.ForeignKey(User)
+	atom = models.ForeignKey("web.Atom")
+	vote = models.IntegerField(default=0)
+	# Must have only one of these fields
+	video = models.ForeignKey("web.Video", blank=True, null=True,
+		editable=False
+	)
+	note = models.ForeignKey("web.Note", blank=True, null=True, editable=False)
+	exposition = models.ForeignKey("web.Exposition", blank=True, null=True, 
+		editable=False
+	)
+	example = models.ForeignKey("web.Example", blank=True, null=True, 
+		editable=False
+	)
+	topic = models.ForeignKey("pybb.Topic", blank=True, null=True, 
+		editable=False
+	)
+	
+	def clean(self):
+		r"""Make sure that this instance of Vote isn't already assigned to any content."""
+		super(Vote, self).clean()
+		content_is_not_none = [(lambda x: getattr(vote, x.name)
+			is not None)(x) for x in vote._meta.fields[4:]]
+		if content_is_not_none.count(True) != 0:
+			raise ValidationError("The vote can only have one of [video, note, exposition, example, topic] set and it cannot be changed once set.")
+		
 
 class VoteVideo(models.Model):
 	user = models.ForeignKey(User)

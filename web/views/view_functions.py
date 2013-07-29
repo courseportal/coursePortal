@@ -1,6 +1,7 @@
 r"""View helper functions."""
 from itertools import chain
 from django.shortcuts import get_object_or_404
+from django.db.models import Sum
 from web.models import Class, ClassCategory, BaseCategory, Atom, Video, Example, Exposition, Note
 
 # Dict to pass to the breadcrumb function to work with all of web.

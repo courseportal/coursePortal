@@ -80,7 +80,6 @@ class Video(models.Model):
 		validators=[validate_youtube_video_id],
 	)
 	atoms = models.ManyToManyField(Atom, related_name="video_set")
-	votes = models.IntegerField(default=0)
 	classes_stickied_in = models.ManyToManyField(
 		"Class",
 		blank=True,
@@ -111,7 +110,6 @@ class Exposition(models.Model):
 	link = models.CharField(max_length=100, validators=[validate_link], default="http://")
 	atoms = models.ManyToManyField(Atom, related_name="exposition_set")
 	owner = models.ForeignKey(User, related_name="exposition_set")
-	votes = models.IntegerField(default=0)
 	classes_stickied_in = models.ManyToManyField(
 		"Class",
 		blank=True,
@@ -156,7 +154,6 @@ class Note(models.Model):
 	owner = models.ForeignKey(User, related_name="note_set")
 	title = models.CharField(max_length=200)
 	atoms = models.ManyToManyField(Atom, related_name = "note_set")
-	votes = models.IntegerField(default=0)
 	classes_stickied_in = models.ManyToManyField(
 		"Class",
 		blank=True,
@@ -187,7 +184,6 @@ class Example(models.Model):
 	owner = models.ForeignKey(User, related_name="example_set")
 	title = models.CharField(max_length=200)
 	atoms = models.ManyToManyField(Atom, related_name = "example_set")
-	votes = models.IntegerField(default=0)
 	classes_stickied_in = models.ManyToManyField(
 		"Class",
 		blank=True,
@@ -341,12 +337,12 @@ def delete_video_rate(sender, **kwargs):
 	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
 	user_rate.VideoRating -= video_object_delta_rating()
 	user_rate.rating -= video_object_delta_rating()
-	user_vote = VoteVideo.objects.filter(example=kwargs['instance'])
+	user_vote = Vote.objects.filter(video=kwargs['instance'])
 	for v in user_vote:
-		if v.vote == vote_up_delta_rating():
+		if v.vote > 0:
 			user_rate.VoteUp -= vote_up_delta_rating()
 			user_rate.rating -= vote_up_delta_rating()
-		elif v.vote == vote_down_delta_rating():
+		elif v.vote < 0:
 			user_rate.VoteDown -= vote_down_delta_rating()
 			user_rate.rating -= vote_down_delta_rating()
 	user_rate.save()
@@ -360,12 +356,12 @@ def delete_exposition_rate(sender, **kwargs):
 	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
 	user_rate.ExpoRating -= expo_object_delta_rating()
 	user_rate.rating -= expo_object_delta_rating()
-	user_vote = VoteExposition.objects.filter(example=kwargs['instance'])
+	user_vote = Vote.objects.filter(exposition=kwargs['instance'])
 	for v in user_vote:
-		if v.vote == vote_up_delta_rating():
+		if v.vote > 0:
 			user_rate.VoteUp -= vote_up_delta_rating()
 			user_rate.rating -= vote_up_delta_rating()
-		elif v.vote == vote_down_delta_rating():
+		elif v.vote < 0:
 			user_rate.VoteDown -= vote_down_delta_rating()
 			user_rate.rating -= vote_down_delta_rating()
 	user_rate.save()
@@ -381,12 +377,12 @@ def delete_note_rate(sender, **kwargs):
 	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
 	user_rate.LecNoteRating -= note_object_delta_rating()
 	user_rate.rating -= note_object_delta_rating()
-	user_vote = VoteLectureNote.objects.filter(example=kwargs['instance'])
+	user_vote = Vote.objects.filter(note=kwargs['instance'])
 	for v in user_vote:
-		if v.vote == vote_up_delta_rating():
+		if v.vote > 0:
 			user_rate.VoteUp -= vote_up_delta_rating()
 			user_rate.rating -= vote_up_delta_rating()
-		elif v.vote == vote_down_delta_rating():
+		elif v.vote < 0:
 			user_rate.VoteDown -= vote_down_delta_rating()
 			user_rate.rating -= vote_down_delta_rating()
 	user_rate.save()
@@ -401,12 +397,12 @@ def delete_example_rate(sender, **kwargs):
 	user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
 	user_rate.ExampleRating -= example_object_delta_rating()
 	user_rate.rating -= example_object_delta_rating()
-	user_vote = VoteExample.objects.filter(example=kwargs['instance'])
+	user_vote = Vote.objects.filter(example=kwargs['instance'])
 	for v in user_vote:
-		if v.vote == vote_up_delta_rating():
+		if v.vote > 0:
 			user_rate.VoteUp -= vote_up_delta_rating()
 			user_rate.rating -= vote_up_delta_rating()
-		elif v.vote == vote_down_delta_rating():
+		elif v.vote < 0:
 			user_rate.VoteDown -= vote_down_delta_rating()
 			user_rate.rating -= vote_down_delta_rating()
 	user_rate.save()

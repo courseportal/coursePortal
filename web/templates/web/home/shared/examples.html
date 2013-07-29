@@ -26,9 +26,11 @@ OPTIONAL context:
 	<tbody>
 		{% for example in examples %}
 			<tr id="row-example-{{ example.id }}">
-				<td>
-					{% include "rating/vote_arrows.html" with item='example' id=example.id %}
-				</td>
+    				<td>
+              {% if atom_object %}
+    					  {% include "rating/vote_arrows.html" with item='example' id=example.id atom_id=atom_object.id %}
+              {% endif %}
+    				</td>
 				<td>
 
 					<a target="_blank" href="{{ example.file.url }}">
@@ -44,7 +46,7 @@ OPTIONAL context:
 					{{ example.owner }}
 				</td>
 				<td>
-					<div class="votes-sum-example-{{ example.id }}">
+					<div id="votes-sum-example-{{ example.id }}">
 						{{ example.votes }}
 					</div>
 				</td>
