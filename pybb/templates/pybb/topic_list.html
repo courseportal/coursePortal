@@ -25,7 +25,7 @@
     {% for topic in topic_list|pybb_topic_unread:user %}
         <tr class="topic-row {% if topic.sticky %} sticky {% endif %} {% cycle "odd" "even" %} {% if topic.on_moderation %} on-moderation {% endif %}">
             <td style="width:10px">
-                {% include "rating/vote_arrows.html" with item='topic' id=topic.id %}
+                {% include "rating/vote_arrows.html" with item='topic' id=topic.id atom_id=topic.forum.atom.id %}
             </td>
             <td class="topic-name{% if topic.unread %} topic-unread{% endif %}">
                 <div class="state-indicator"></div>
@@ -54,8 +54,8 @@
                 {{ topic.post_count }}
             </td>
             <td style="width:75px">
-                <div class="votes-sum-topic-{{topic.id}}">
-                    {{ topic.votes }}
+                <div id="votes-sum-topic-{{topic.id}}">
+                    {{ topic.votes|default:"0" }}
                 </div>
             </td>
             <td class="topic-view-count">

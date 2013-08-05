@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum
 from django.db.models.aggregates import Count
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
@@ -119,8 +119,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
         self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
         if not perms.may_view_forum(self.request.user, self.forum):
             raise PermissionDenied
-
-        qs = self.forum.topics.order_by('-sticky', '-votes').select_related()
+        qs = self.forum.topics.annotate(votes=Sum('vote_set__vote')).order_by('-sticky', '-votes').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
                 qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
