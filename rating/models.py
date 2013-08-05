@@ -14,15 +14,17 @@ class Vote(models.Model):
 	video = models.ForeignKey("web.Video", blank=True, null=True,
 		editable=False
 	)
-	note = models.ForeignKey("web.Note", blank=True, null=True, editable=False)
+	note = models.ForeignKey("web.Note", blank=True, null=True, 
+        editable=False, related_name='vote_set'
+    )
 	exposition = models.ForeignKey("web.Exposition", blank=True, null=True, 
-		editable=False
+		editable=False, related_name='vote_set'
 	)
 	example = models.ForeignKey("web.Example", blank=True, null=True, 
-		editable=False
+		editable=False, related_name='vote_set'
 	)
 	topic = models.ForeignKey("pybb.Topic", blank=True, null=True, 
-		editable=False
+		editable=False, related_name='vote_set'
 	)
 	
 	def clean(self):
