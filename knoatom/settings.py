@@ -163,6 +163,7 @@ INSTALLED_APPS = (
                   'web',
                   'assignment',
                   'django_wysiwyg',
+                  'discover_runner',
                   # Uncomment the next line to enable the admin:
                   'django.contrib.admin',
                   # Uncomment the next line to enable admin documentation:
