@@ -65,3 +65,13 @@ def validateFull(request):
 	except:
 		return HttpResponse("Full Code did not validate, something is wrong with variable dependencies!")
 	return 0
+
+def practiceEval(request):
+	question = Question.objects.get(id=request.GET['qid']) 
+	if request.GET['status'] == True:
+		question.numCorrect += 1
+		question.save()
+	else:
+		question.numIncorrect += 1
+		question.save()
+	return HttpResponse("stuff")

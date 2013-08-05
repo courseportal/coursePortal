@@ -4,8 +4,11 @@ from django.template import Context, loader
 from django.shortcuts import render
 from assignment.models import *
 from django.contrib.auth.models import User
+from knoatom.view_functions import get_breadcrumbs
+from assignment.views.question import detail
+from web.models import Atom
 from assign import main
-from random import shuffle
+from random import shuffle, randint
 from math import *
 
 
@@ -27,13 +30,24 @@ def eval(request):
     
     for question in assignment.questions.all():
         try:
+            #Store student answer
             answer = request.POST[str(question.id)+'choice']
-            if answer==question.solution:
-                assignment.score += question.value
-                assignment.save()
             question.can_edit=False
             question.student_answer=answer;
             question.save()
+
+            template = question
+            if template.isCopy == True:
+                template = template.original
+            if answer==question.solution:
+                assignment.score += question.value
+                assignment.save()
+                if not template == None:
+                    template.numCorrect+=1
+                    template.save()
+            elif not template == None:
+                template.numIncorrect+=1
+                template.save()
         except:
             continue
         
@@ -69,3 +83,33 @@ def list(request):
         'breadcrumbs':breadcrumbs,
     }
     return render(request, 'assignment/list.html',context)
+
+
+def choose_atom(request, messages=False):
+    context = get_breadcrumbs(request.path)
+    context['atom_list'] = Atom.objects.all()
+    if messages:
+        context['messages'] = messages
+    return render(request, 'atomList.html', context)
+
+def practice(request, id):
+    context = get_breadcrumbs(request.path)
+    question_list = Atom.objects.get(id=id).related_questions.all()
+    count = question_list.count()
+    if count==0:
+        messages = ['No Questions related to that atom!']
+        return choose_atom(request, messages)
+    question = question_list[randint(0,count-1)]
+    #generate question
+    qdat = detail(request, question.id, True)
+    #load page
+    context['qid'] = question.id
+    context['aid'] = id
+    context['title'] = question.title
+    context['text'] = qdat['text']
+    context['answer'] = qdat['answer']
+    context['choices'] = qdat['choices']
+    return render(request, 'question/practice.html', context)
+
+
+

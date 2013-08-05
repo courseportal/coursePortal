@@ -1,0 +1,55 @@
+{% extends "assignment_nav.html" %}
+{% block content%}
+
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/practice.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<div class="row">
+	<h1><div class="span3 offset3">{{title}}</div></h2>
+</div>
+<html>
+<body>
+{{text | safe}}
+<br>
+<br>
+<form id="inputForm">
+<input type="hidden" id="qid" value="{{qid}}"></input>
+<input type="hidden" id="answer" value="{{answer}}"></input>
+{% if choices %}
+	<strong>Choices:</strong>
+	<br>
+	<label class="radio">
+	{% for c in choices %}
+		<input type="radio" name="choice" value={{c}}>{{c}}</input>
+		<br>
+	{% endfor %}
+	</label>
+{% else %}
+	<strong>Answer:</strong>
+	<br>
+	<input type="text" name="choice"></input>
+	<br>
+{% endif %}
+<input type="hidden" name="assignment" value={{assignment_selected.id}}></input>
+</form>
+<button id="submit" onclick="evalPractice();" class="btn" style="margin-bottom:10px">Submit</button><br>
+<div id="result"></div>
+<a class="btn" href="{% url 'choose_practice_atom'%}">Choose New Atom</a>
+<a class="btn" href="{% url 'practice' aid%}">Generate Another Question</a>
+</body>
+</html>
+{% endblock %}

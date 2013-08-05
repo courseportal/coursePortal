@@ -179,8 +179,7 @@ function save(){
 		question.id = $(this).find('input[type=hidden]').val();
 		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
-   });
-
+    });
 	//Check if already own assignment by same name
 	var overwrite;
 	$.ajax('/assignment/utility/checktitle/', {
@@ -286,7 +285,6 @@ function questionstring(num, title, id){
 						<i class="icon-remove-sign"></i>\
 					</div>\
 				</div>\
-				<div class="row-fluid preview-row"></div>\
 			</div>';
 	return questionHTML;
 }

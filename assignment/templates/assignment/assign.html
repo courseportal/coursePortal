@@ -7,7 +7,7 @@
 	function validateAssign(){
 		var good = false;
 		$('.assignment-input').each(function(){
-			if($(this).prop('checked', true))
+			if($(this).prop('checked') == true)
 				good=true;
 		});
 		if(!good){
@@ -31,7 +31,7 @@
     </thead>
    	{% for a in assignments %}
    		<tr>
-   			<td>{{ a.title }}</td>
+   	  <td>{{ a.title }}</td>
 			<td><input type="radio" class="assignment-input" name="assignment" value={{a.pk}}></input></td>
 		</tr>
 	{% endfor %}

@@ -7,6 +7,7 @@ from web.models import *
 from django.contrib.auth.models import User
 import numpy as np
 from string import Template
+from knoatom.view_functions import get_breadcrumbs
 from math import *
 from random import *
 
@@ -97,52 +98,35 @@ def previewAssignment(request):
 def previewTemplate(request, a):
 	assignment = Assignment.objects.get(pk=a)
 	question_list=[]
-	test = ''
 	
-	for q in assignment.questions.all():
-		question={
-			'title':'',
-			'solution':'',
+	for question in assignment.questions.all():
+		qdat = {
+			'title': '',
 			'text':'',
-			'choices':[]
-	   }
-		q=json.loads(q.data)
-		question['title'] = q['title']
-		q['solution']= q['solution'].replace('<br>', '\n')
-		q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-		try:
-			exec q['code']
-		except Exception as ex:
-			test += errorMsg(q['title'], ex, 'code')
-
-		try:
-			question['solution']=eval(q['solution'])
-		except Exception as ex:
-			test += errorMsg(q['title'], ex, 'solution')
-
-		#Format chice texts
-		for integer_index in range(len(q['choices'])):
-			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-			
-
+			'choices': '',
+		}
+		qdat['title'] = question.title
+		q=question.data
+		q=json.loads(q)
+		q['choices']=json.loads(q['choices'])
+		exec q['code']
+		solution=eval(q['solution'])
 		#q text formatted here
+		qdat['text'] = q['text']
 		local_dict = dict(locals())
-		question['text'] = Template(q['text']).substitute(local_dict)
+		qdat['text'] = Template(qdat['text']).substitute(local_dict)
 
-		for integer_index in range(len(q['choices'])):
-			try:
-				answer = eval(q['choices'][integer_index])
-				question['choices'].append(answer)
-			except Exception as ex:
-				y = "Choice"+str(integer_index+1)
-				test += errorMsg(q['title'], ex, y)
+		qdat['choices'] = []
+		for choice in q['choices']:
+			answer = eval(choice)
+			qdat['choices'].append(answer)
 		if len(q['choices']) > 0:
-			question['choices'].append(question['solution'])
-		question_list.append(question)
+			qdat['choices'].append(solution)
+		shuffle(qdat['choices'])
+		question_list.append(qdat)
 
-	if test!='':
-		return HttpResponse(test)
+
+
 	context = {
 		'question_list': question_list,
    		'assignment': assignment
@@ -209,13 +193,26 @@ def deleteA(request):
 			if entry =="csrfmiddlewaretoken":
 				continue
 			assignment = Assignment.objects.get(id=entry)
+			for question in assignment.questions.all():
+				#See if we need to remove ownership from a copy
+				if question.isCopy:
+					removeOwner = False
+					for a in request.user.owned_assignments.all():
+						if a.id != assignment.id and a.questions.filter(id=question.id).exists():
+							removeOwner=True
+							break
+					#remove ownership of copy, see if copy should be deleted
+					if removeOwner:
+						question.owners.remove(request.owner)
+						#Copy has no owners and original has been changed
+						if question.owners.all.count() == 0 and question.original == None:
+							question.delete()
+
 			assignment.delete()
 			#delete assigned instances?
-	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
-	context = {
-		'assignment_list': request.user.owned_assignments.all(),
-		'breadcrumbs':breadcrumbs
-	}
+
+	context = get_breadcrumbs(request.path)
+	context['assignment_list'] = request.user.owned_assignments.all()
 	if request.method == "POST":
 		context['messages']=['Assignment(s) deleted']
 	
@@ -238,15 +235,18 @@ def deleteQ(request):
 				except:
 					pass
 				a.save()
+			copy = question.copy.all()[0]
+			if not copy.owners.all().exists():
+				copy.delete()
+			else:
+				copy.original = None
+				copy.save()
 			question.delete()
-			#delete assigned instances?
-	breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignments'}]
-	context = {
-		'question_list': Question.objects.all(),
-		'breadcrumbs':breadcrumbs
-	}
+			
+	context = get_breadcrumbs(request.path)
+	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
 	if request.method == "POST":
-		context['messages']=['Question(s) deleted']
+		context['messages'] = ['Question(s) deleted']
 	
 	#breadcrumbs.append({'url': reverse('view_student'), 'title': 'Students'})
 	return render(request, 'question/delete.html', context)

@@ -52,5 +52,41 @@ Additionally, the following types should be created:
 	*Equation (?Maybe not, mathjax does provide inline math fonts that are fairly easy to use?)
 	*graph theory graph
 
-		
+7/29/2013:
+Spent mostly planning the week, however small improvements were made:
+	*Choices now randomize order for multiple choice questions
+	{*Assign date now determines when studetns can view an instance
+	{*Due date determines when assignments can no longer be edited
+	{Testing the above two features over the course of this week
+*Bugfixes to assigning
+!BUG: edit an assignment yet do not change start/due date -> dates revert to now.
 
+7/30/2013:
+*Initial test of due date system is succesful, no bugs detected
+*Fixed bugs in previewing assignments written by others
+*Questions can be searched and sorted by related atoms when making an assignment
+*Questions now have a difficulty rating determined by how often students get it correct
+	*questions can be searched by difficulty when adding them to assignments
+*various small bugfixes
+
+7/31/2013:
+*small bugfixes
+*Added the ability for students to do practice questions related to some atom
+
+8/1/2013:
+*Questions create a copy when they are made, consequences of this:
+	*If someone changes original question, question does not change in your assignment
+	*Copy questions cannot be edited or deleted
+	*Copy questions are shared between multiple people
+	*If a copy question has no owners and the original question is changed, copy question is deleted
+*Similarly, loading an assignment now creates a copy which can be deleted whenever. However:
+	*Questions in copies cannot be edited
+	*Dates and point values can be edited
+	*Title cannot be changed
+
+8/2/2013:
+*fixed bugs in the question creation process
+*When loading assignments, assignments can now be sorted and searched by Title and Author
+	*Sorting by subject in the working
+*Atoms can be searched and sorted by name and number of related questions when doing practice
+*fixed bugs in student practicing

@@ -11,7 +11,7 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs	
 import sys
 
-def detail(request, id, newly_added=False):
+def detail(request, id, practice=False):
 	q=Question.objects.get(id=id)
 	data=json.loads(q.data)
 	test = ''
@@ -39,6 +39,12 @@ def detail(request, id, newly_added=False):
 			choices.append(eval(choice))
 		except Exception as ex:
 			choices.append(choice)
+	if len(choices) > 0:
+		try:
+			choices.append(eval(solution))
+		except Exception as ex:
+			choices.append(solution)
+	shuffle(choices)
 
 	if not test=='':
 		return HttpResponse(test)
@@ -48,6 +54,8 @@ def detail(request, id, newly_added=False):
 		'answer': solution,
 		'choices': choices,
 	}
+	if practice:
+		return context
 	return render(request, 'question/detail.html', context)
 
 def addQ(request):
@@ -71,8 +79,20 @@ def create2(request):
 			choices.append('True')
 	data['choices']=json.dumps(choices)
 	q.data=json.dumps(data)
+	q.original = None
 	q.save()
 	q.owners.add(request.user)
+	for atom in json.loads(request.POST['atoms']):
+		q.atoms.add(Atom.objects.get(id=atom))
+	#create copy
+	q2 = Question()
+	q2.title = q.title
+	q2.data = q.data
+	q2.isCopy = True
+	q2.original = q
+	q2.save()
+	for atom in q.atoms.all():
+		q2.atoms.add(atom)
 	context = get_breadcrumbs(request.path)
 	context['messages'] = ['Question sucessfully created']
 	return render(request, "assignment_nav.html", context)
@@ -135,14 +155,3 @@ def instanceDetail(request, pk, id):
     
 	return render(request, 'question/instance.html', context)
 
-def create(request):
-	q = Question()
-	q.title = request.REQUEST['questionname']
-	q.data = request.REQUEST['questiondata']
-	q.save()
-	q.owners.add(request.user)
-	q.save()
-	context={
-		'messages':["Question succesfully made!"],
-	}
-	return render(request, "assignment_nav.html", context)

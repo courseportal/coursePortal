@@ -34,15 +34,17 @@
 		<div id="right" class="span6">
 			Custom code area:<br>
 			<textarea name="code" id="code"></textarea><br>
-			Atoms:<select multiple="multiple" name="atoms">
+			Atoms:<select multiple="multiple" id="atoms">
 				{% for atom in atom_list %}
-					<option id="{{atom.id}}">{{atom}}</option>
+					<option name="{{atom.id}}" value="{{atom.id}}">{{atom}}</option>
 				{% endfor %}
 			</select>
+			<div>Hold ctrl to select multiple.</div>
 		</div>
 	</div>
 	<input type="hidden" id="input_text" name="text"></input>
 	<input type="hidden" id="choices" name="choices"></input>
+	<input type="hidden" id="atom_list" name="atoms"></input>
 	<div class="row-fluid">
 		<div class="span5 btn btn-large" onclick="validateAndPreview()">Preview</div>
 		<div class="span5 btn btn-large" onclick="validateAndSubmit()">Create</div>

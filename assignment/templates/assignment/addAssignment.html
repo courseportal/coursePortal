@@ -27,17 +27,17 @@
 	<div class="row-fluid">
 		<div id="titleDiv" class="span10">
 			<h2>Title:</h2>
-			<input type="text" id="assigntitle" value="{{assignment.title}}"></input>
+			<input {%if isCopy%}disabled{%endif%} type="text" id="assigntitle" value="{{assignment.title}}"></input>
 		</div>
 	</div>
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate" value="{{assignment.start_date}}"></input>
+			<input type="text" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate" value="{{assignment.due_date}}"></input>
+			<input type="text" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
 		</div>
 
 	</div>
@@ -57,17 +57,17 @@
 					<input type="hidden" value = "{{q.id}}"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
-					<div class="span1 question-edit btn" onclick="load_question({{q.id}})">
+					<button class="span1 question-edit btn" onclick="load_question({{q.id}})">
 						<i class="icon-eye-open"> View</i> 
-					</div> 
+					</button> 
 					{% with id=q.id %}
 					<div class="span1 question-pts"> 
 						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input>
 					</div>
 					{% endwith %}
-					<div class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
+					<button {%if isCopy%}disabled{%endif%} class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
 						<i class="icon-remove-sign"></i> 
-					</div> 
+					</button> 
 				</div>
 				{%endfor%}
 			</div>
@@ -76,7 +76,7 @@
 
 	<!--<button class="btn btn-inverse" id="opener" disabled>
 		<i class="icon-plus"></i> Add Question </button> -->
-	<button class="btn" id="listingQ">
+	<button  {%if isCopy%}disabled{%endif%} class="btn" id="listingQ">
 		<i class="icon-plus"></i> Load Question</button>
 
 	<div id="dialog" class="row-fluid">
@@ -85,6 +85,7 @@
 	<hr>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm" style="margin-bottom:10px">
 	{% csrf_token %}
+		<input type="hidden" name="copystatus" value="{{isCopy}}"></input>
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
@@ -96,7 +97,7 @@
     <thead>  
        		<tr> 
        		<th class='sortable'>Title</th>
-       		<th class='sortable'>Subject</th>
+       		<th class='sortable'>Related Subject(s)</th>
        		<th class='sortable'>Difficulty</th>
        		</tr>
     </thead>  
@@ -104,8 +105,8 @@
    		{% for question in question_list %}
    		<tr>
    			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
-			<td></td>
-			<td></td>
+			<td>{%for atom in question.atoms.all %}{{atom}},{%endfor%}</td>
+			<td>{{question.get_rating}}</td>
 			<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
 		</tr>
 		{% endfor %}
@@ -125,8 +126,7 @@
      
     // Bootstrap specific example here:
     // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-    $(function() {
-          
+    $(function() {  
       	$.extend($.tablesorter.themes.bootstrap, {
             table      : 'table table-bordered',
             header     : 'bootstrap-header', // give the header a gradient background

@@ -258,6 +258,13 @@ function validateAndSubmit(){
 			choices.push($(this).val());
 		}
 	});
+	atoms=[]
+	$('#atoms').children().each(function(){
+		if($(this).prop("selected")){
+			atoms.push($(this).attr('value'));
+		}
+	});
+	$('#atom_list').attr('value', JSON.stringify(atoms));
 	$('#choices').attr('value', JSON.stringify(choices));
 	$('#questionForm').submit();
 }

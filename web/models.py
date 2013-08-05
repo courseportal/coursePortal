@@ -61,6 +61,8 @@ class Atom(models.Model):
 
 	def __unicode__(self):
 		return self.title
+	def countQuestions(self):
+		return self.related_questions.filter(isCopy=False).count()
 		
 # Validator for video	
 def validate_youtube_video_id(value):
