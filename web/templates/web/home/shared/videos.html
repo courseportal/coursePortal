@@ -45,9 +45,6 @@ OPTIONAL context:
 						</div>
 					</strong>
 				</div>
-				<!-- <div id="Video">
-          <a class="view-video" id="{{ video.video }}"><img style="margin-bottom: 5px;" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="120" alt="Video Thumbnail" /></a>
-        </div> -->
         <div id="Video">
           <a href="#" data-sid="{{ video.id }}" data-vid="{{ video.video }}"><img style="margin-bottom: 5px;" class="view-video" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="120" alt="Video Thumbnail" /></a>
         </div>
@@ -100,6 +97,14 @@ OPTIONAL context:
 <script>{% include 'js/tablesorter.settings.js' with table='table#videos' sortForce='[[6,1]]' sortAppend='[[4,1]]' sortList='[[6,1],[4,1]]' %}</script>
 
 <script>
+{% comment %}
+/*
+  * When the video image is clicked open up $('div#global_modal') defined in 
+  * ``knoatom/base.html``.  It deletes the contents of the body, then embeds
+  * the youtube player into the body, centers the modal, and shows it.  Then 
+  * when it is hidden it deletes the contents of the body again.
+*/
+{% endcomment %}
 $(document).ready(function() {
   $('.view-video').each(function() {
     $(this).click(function(e) {
@@ -107,11 +112,10 @@ $(document).ready(function() {
       var sid = $(this).parent().attr('data-sid');
       var vid = $(this).parent().attr('data-vid');
       var params = { allowScriptAccess: 'always' };
-      //var atts = { id:'video_player_' + sid, wmode:'opaque' };
       var atts = { id: "modal_player", 'wmode': 'opaque' };
       $('#video_player_' + sid).remove();
       video_preview_div = '<div id="video_preview_div_' + sid + '">Loading...</div><hr />';
-      $('#global_modal .modal-body').append(video_preview_div);
+      $('#global_modal .modal-body').empty().append(video_preview_div);
       swfobject.embedSWF("http://www.youtube.com/v/" + vid + 
         "?version=3&enablejsapi=1&playerapiid=player1", "video_preview_div_" + 
         sid, "560", "315", "9", null, null, params, atts
