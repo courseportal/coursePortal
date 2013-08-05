@@ -36,14 +36,14 @@ OPTIONAL context:
 			<td style="text-align:center">
 
 				<div id="title">
-					<strong><a class="view-video" id="{{ video.video }}">
+					<strong>
 						<div class="name-video-{{ video.id }}">
 							{{ video }}
 							{% if class_object in video.classes_stickied_in.all %}
 								 [stickied]
 							{% endif %}
 						</div>
-					</a></strong>
+					</strong>
 				</div>
 				<!-- <div id="Video">
           <a class="view-video" id="{{ video.video }}"><img style="margin-bottom: 5px;" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="120" alt="Video Thumbnail" /></a>
@@ -101,7 +101,6 @@ OPTIONAL context:
 
 <script>
 $(document).ready(function() {
-  //$('#id_content').addClass('span6').wysihtml5();
   $('.view-video').each(function() {
     $(this).click(function(e) {
       e.preventDefault();
