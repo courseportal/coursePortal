@@ -12,6 +12,7 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     UserTopics, UserPosts, topic_cancel_poll_vote
 
 
+
 urlpatterns = patterns('',
                        # Syndication feeds
                        url('^feeds/posts/$', LastPosts(), name='feed_posts'),
@@ -19,9 +20,10 @@ urlpatterns = patterns('',
                        )
 
 urlpatterns += patterns('pybb.views',
-                        # Index, Category, Forum
+                        # Index, Category
                         url('^$', IndexView.as_view(), name='index'),
                         url('^category/(?P<pk>\d+)/$', CategoryView.as_view(), name='category'),
+                        #Forum
                         url('^forum/(?P<pk>\d+)/$', ForumView.as_view(), name='forum'),
 
                         # User

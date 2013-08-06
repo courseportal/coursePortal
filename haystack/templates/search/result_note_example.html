@@ -2,24 +2,25 @@
 
 
 
-{% if result.model_name == 'lecturenote' %}
+{% if result.model_name == 'note' %}
 <tr id="row-3-{{ result.object.file.id }}">
-    <td>
+    <td style="width:50px">
         <a target="_blank" href="{{ result.object.file.url }}">
             <div class="name-3-{{ result.object.id }}">
-                {{ result.object.filename }}
+                {{ result.object.title }}
             </div>
         </a>
     </td>
     <td>
         {{ result.object.owner }}
     </td>
-    <td style="width:75px">
+   <!-- <td >
         <div class="votes-sum-3-{{result.object.id}}">
-            {{result.object.votes}}
+            {{ result.object.vote_set}}
+            
         </div>
-    </td>
-    <td>
+    </td> -->
+    <td style="width:75px">
         <div class="dateCreated-3-{{ result.object.id }}">
             {{result.object.date_created}}
         </div>
@@ -34,22 +35,24 @@
 {% else %}
     {% if result.model_name == 'example' %}
 <tr id="row-3-{{ result.object.file.id }}">
-    <td>
+    <td style="width:50px">
         <a target="_blank" href="{{ result.object.file.url }}">
             <div class="name-3-{{ result.object.id }}">
-                {{ result.object.filename }}
+                {{ result.object.title }}
             </div>
         </a>
     </td>
     <td>
         {{ result.object.owner }}
     </td>
-    <td style="width:75px">
+    <!-- <td >
         <div class="votes-sum-3-{{result.object.id}}">
-            {{result.object.votes}}
+            {% for i in result.object.vote_set.all %}
+            {{i}}
+            {% endfor %}
         </div>
-    </td>
-    <td>
+    </td> -->
+    <td style="width:75px">
         <div class="dateCreated-3-{{ result.object.id }}">
             {{result.object.date_created}}
         </div>
@@ -60,6 +63,36 @@
         </div>
     </td>
 </tr>
+    {% else %}
+        {% if result.model_name == 'exposition' %}
+        <tr id="row-3-{{ result.object.id }}">
+            <td style="width:50px">
+                <a target="_blank" href="{{ result.object.link }}">
+                    <div class="name-3-{{ result.object.id }}">
+                        {{ result.object.title }}
+                    </div>
+                </a>
+            </td>
+            <td>
+                {{ result.object.owner }}
+            </td>
+            <!-- <td >
+                <div class="votes-sum-3-{{result.object.id}}">
+                    {{result.object.votes}}
+                </div>
+            </td> -->
+            <td style="width:75px">
+                <div class="dateCreated-3-{{ result.object.id }}">
+                    {{result.object.date_created}}
+                </div>
+            </td>
+            <td style="width:75px">
+                <div class="score-sum-3-{{result.object.id}}">
+                    {{result.score}}
+                </div>
+            </td>
+        </tr>
+        {% endif %}
     {% endif %}
 {% endif %}
 {% endwith %}

@@ -45,6 +45,8 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ STATIC_PREFIX }}css/bootstrap-responsive.css" rel="stylesheet">
 <link href="{{ STATIC_PREFIX }}css/bootstrap-wysihtml5.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/jquery.dataTables_themeroller.css" rel="stylesheet">
+<link href="{{ STATIC_PREFIX }}css/jquery.dataTables.css" rel="stylesheet">
 
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
@@ -56,7 +58,8 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <script src="{{ STATIC_PREFIX }}js/jquery.formset.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.widgets.min.js"></script>
-
+<script src="{{ STATIC_PREFIX}}js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_PREFIX}}js/dataTables.htmlColumnFilter.js"></script>
 
 {% block head %}
 {% endblock %}
