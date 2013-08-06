@@ -69,7 +69,7 @@ class Atom(WebBaseModel):
     class Meta:
         ordering = ['title']
         
-	def countQuestions(self):
+    def countQuestions(self):
 		return self.related_questions.filter(isCopy=False).count()
         
 def validate_youtube_video_id(value):
@@ -213,7 +213,7 @@ class Class(WebBaseModel):
         verbose_name=_('Class Description'),
         default=_("There is currently no summary.")
     )
-	stickied_assignments = models.ManyToManyField(
+    stickied_assignments = models.ManyToManyField(
         Assignment,
         blank=True,
         related_name='classes_stickied_in'
@@ -225,7 +225,7 @@ class Class(WebBaseModel):
     class Meta:
         ordering = ['title']
         verbose_name_plural = _("Classes")
-        
+
     def get_absolute_url(self):
         if self.pk is not None:
             return reverse('classes', args=[self.pk])

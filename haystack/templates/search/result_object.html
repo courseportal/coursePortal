@@ -43,7 +43,7 @@
                     <p><strong>Related:</strong></p>
                     <ul>
                         {% for related in related_content %}
-                        title: {{related.object.name }} {{related.object.title}}
+                        
                             {% if related.object.base_category %}
                             <li><a href="?q={{related.object.title}}">Atom: {{ related.object.title }}</a></li>
                             {% else %}
@@ -83,7 +83,7 @@
                     <li><a href="?q={{related.object.title}}">Atom: {{ related.object.title }}</a></li>
                     {% else %}
                         {% if related.object.child_categories %}
-                    <li><a href="?q={{related.object.title}}">Category: {{ related.object.tile }}</a></li>
+                    <li><a href="?q={{related.object.title}}">Category: {{ related.object.title }}</a></li>
                         {% endif %}
                     {% endif %}
                     {% endfor %}
