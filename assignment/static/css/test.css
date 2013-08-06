@@ -33,9 +33,22 @@ body.dialog-open { overflow: hidden; }
 .answer .CodeMirror {
   /* Set height, width, borders, and global font properties here */
   height: 25px;
+  border-style:'solid';
+}
+
+.CodeMirror {
+	height: 200px;
+	width: 300px;
+	border: 2px;
+	border-style: solid;
 }
 
 .list-table {
+	height: 300px;
 	max-height:300px;
 	overflow-y:scroll;
+}
+
+#code {
+	border-style: 'solid';
 }

@@ -3,6 +3,7 @@ from django.template import Context, loader
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from assignment.models import *
+from web.models import Atom
 from django.utils import simplejson as json
 from random import *
 from math import *
@@ -10,46 +11,109 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs	
 import sys
 
-def detail(request, id, newly_added=False):
-	return HttpResponse("This needs to be written if you want to use it!")
+def detail(request, id, practice=False):
+	q=Question.objects.get(id=id)
+	data=json.loads(q.data)
+	test = ''
+	try:
+		exec data['code']
+
+	except Exception as ex:
+		test += "Error in code section:<br>"+str(ex)+"<br>"
+
+	try:
+		solution = eval(data['solution'])
+	except:
+		solution = data['solution']
+
+	text = data['text']
+	local_dict = dict(locals())
+	text = Template(text).safe_substitute(local_dict)
+	
+
+	# #choices formatted here
+	choices = []
+	for choice in json.loads(data['choices']):
+		choice = Template(choice).safe_substitute(local_dict)
+		try:
+			choices.append(eval(choice))
+		except Exception as ex:
+			choices.append(choice)
+	if len(choices) > 0:
+		try:
+			choices.append(eval(solution))
+		except Exception as ex:
+			choices.append(solution)
+	shuffle(choices)
+
+	if not test=='':
+		return HttpResponse(test)
+
+	context = {
+		'text': text,
+		'answer': solution,
+		'choices': choices,
+	}
+	if practice:
+		return context
+	return render(request, 'question/detail.html', context)
 
 def addQ(request):
 	context = get_breadcrumbs(request.path)
+	context['type_list']= Variable.objects.all()
+	context['atom_list']= Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-def create(request):
+def create2(request):
 	q = Question()
-	q.title = request.REQUEST['questionname']
-	q.data = request.REQUEST['questiondata']
+	q.title = request.POST['question_title']
+	data=dict()
+	data['code'] = request.POST['code']
+	data['solution'] = request.POST['answer']
+	data['text'] = request.POST['text']
+	choices = json.loads(request.POST['choices'])
+	if request.POST['question_type'] == 'True/False':
+		if data['solution'] == 'True':
+			choices.append('False')
+		else:
+			choices.append('True')
+	data['choices']=json.dumps(choices)
+	q.data=json.dumps(data)
+	q.original = None
 	q.save()
 	q.owners.add(request.user)
-	q.save()
-	context={
-		'messages':["Question succesfully made!"],
-	}
+	for atom in json.loads(request.POST['atoms']):
+		q.atoms.add(Atom.objects.get(id=atom))
+	#create copy
+	q2 = Question()
+	q2.title = q.title
+	q2.data = q.data
+	q2.isCopy = True
+	q2.original = q
+	q2.save()
+	for atom in q.atoms.all():
+		q2.atoms.add(atom)
+	context = get_breadcrumbs(request.path)
+	context['messages'] = ['Question sucessfully created']
 	return render(request, "assignment_nav.html", context)
 
 def preview(request):
-	q = request.POST['previewdata']
-	q = json.loads(q)
+	q=dict()
+	q['code'] = request.POST['code']
+	q['text'] = request.POST['text']
+	q['solution'] = request.POST['answer']
+	q['choices'] = json.loads(request.POST['choices'])
 	test = ''
 	try:
 		exec q['code']
+
 	except Exception as ex:
-		test += "Error in code section:<br>"+str(ex)
-		return HttpResponse(test)
+		test += "Error in code section:<br>"+str(ex)+"<br>"
 
 	try:
-		q['solution']= q['solution'].replace('<br>', '\n')
-		q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-		for integer_index in range(len(q['choices'])):
-			q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-			q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-		exec q['code']
 		solution = eval(q['solution'])
 	except Exception as ex:
-		test += "Error in solutions:<br>"+str(ex)
-		return HttpResponse(test)
+		solution = q['solution']
 
 	text = q['text']
 	local_dict = dict(locals())
@@ -58,7 +122,13 @@ def preview(request):
 	# #choices formatted here
 	choices = []
 	for choice in q['choices']:
-		choices.append(eval(choice))
+		try:
+			choices.append(eval(choice))
+		except Exception as ex:
+			choices.append(choice)
+
+	if not test=='':
+		return HttpResponse(test)
 
 	context = {
 		'text': text,
@@ -84,3 +154,4 @@ def instanceDetail(request, pk, id):
 	}
     
 	return render(request, 'question/instance.html', context)
+

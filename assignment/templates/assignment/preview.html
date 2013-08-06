@@ -11,7 +11,9 @@
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
-<script type="text/javascript" src="{{STATIC_PREFIX}}mathjax/MathJax.js"></script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 <body>
 <div class="row">
@@ -25,7 +27,7 @@
 	</div>
 	{{q.text | safe}}
 		<br>
-		{% if q.choices.0 %}
+		{% if q.choices %}
 			<strong>Choices:</strong>
 			<br>
 			{% for c in q.choices %}

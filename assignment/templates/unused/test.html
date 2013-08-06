@@ -1,0 +1,123 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+{% load my_filters %}
+
+<!-- TINY MCE -->
+<script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
+
+<!-- font awesome -->
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+
+<!-- JQUERY UI -->
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+
+<!-- javascript -->
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment2.js"></script>
+
+<html>
+
+<body>
+	<a href="{% url 'assignment_index' %}" style="margin-right:5px" class="btn btn-success" id="loadA">Load Assignment</a>
+	<div class="row-fluid">
+		<div id="titleDiv" class="span10">
+			<h2>Title:</h2>
+			<input type="text" id="assigntitle" value="{{assignment.title}}"></input>
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span5">
+			<h3>Assign date:</h3>
+			<input type="text" id="assigndate" value="{{assignment.start_date}}"></input>
+		</div>
+		<div class="span5">
+			<h3>Due date:</h3>
+			<input type="text" id="duedate" value="{{assignment.due_date}}"></input>
+		</div>
+
+	</div>
+	<div class="row-fluid">
+		<div id="questionsDiv" class="span10">
+			<h2>Questions:</h2>
+			<div class="row-fluid">
+				<div class="span5" style="padding-left:15px"><h3>Description</div>
+				<div class="span1">&nbsp;</div>
+				<div class="span1" style="padding-left:25px"><h3>Points</div>
+				<div class="span1">&nbsp;</div>
+				<input type="hidden" id="questionNum"></input>
+			</div>
+			<div id="questionsList">
+				{% for q in assignment.questions.all %}
+				<div class="row-fluid question-whole" id="question{{forloop.counter}}"> 
+					<input type="hidden" value = "{{q.data}}"></input> 
+					<div class="span5 question-description">{{q.title}}
+					</div> 
+					<div class="span1 question-edit btn" onclick="load_question({{forloop.counter}})">
+						<i class="icon-eye-open"> Edit</i> 
+					</div> 
+					{% with id=q.id %}
+					<div class="span1 question-pts"> 
+						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input>
+					</div>
+					{% endwith %}
+					<div class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
+						<i class="icon-remove-sign"></i> 
+					</div> 
+				</div>
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+
+	<button class="btn btn-inverse" id="opener">
+		<i class="icon-plus"></i> Add Question </button>
+
+	<div id="dialog" class="row-fluid">
+		
+	</div>
+
+	<hr>
+	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm" style="margin-bottom:10px">
+	{% csrf_token %}
+		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
+		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
+	</form>
+	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
+	<div id="previewform"></div>
+
+<div id="loading-zone">
+	{% if question_list %}
+		<table class="table">
+      	<thead>  
+        		<tr> 
+           		<th>Title</th>
+           		<th>Subject</th>
+           		<th>Author</th>
+        		</tr>  
+      	</thead>
+      </table>
+   <div class="list-table">  
+		<table class="table">  
+      	<tbody>
+   	{% for question in question_list %}
+   		<tr>
+   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
+				<td></td>
+				<td>{{question.owners.0}}</td>
+				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+				<input type="hidden" id="{{question.id}}data" value="{{question.data}}"></div>
+			</tr>
+		{% endfor %}
+		</tbody>  
+   	</table>  
+	</div>
+	{% else %}
+		<p>No questions exist!</p>
+	{% endif %}
+	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
+	<div class="preview-area">
+	</div>
+</div>
+
+</body>
+{% endblock %}

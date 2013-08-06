@@ -1,0 +1,47 @@
+<head>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</head>
+<html>
+<body>
+{{text | safe}}
+<br>
+<br>
+<form name="inputForm" action="{% url "eval"%}"  method = "post">
+{% csrf_token %}
+{% if choices %}
+  <strong>Choices:</strong>
+  <br>
+  <label class="radio">
+  {% for c in choices %}
+    <input type="radio" name="{{q.id}}choice" value={{c}} {% ifequal q.student_answer c.solution %}checked{%endifequal%} {%ifequal q.can_edit 0%}disabled{%endifequal%}>{{c}}
+    </input>
+    <br>
+  {% endfor %}
+  </label>
+{% else %}
+  <strong>Answer:</strong>
+  <br>
+  <input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
+  {% ifequal q.can_edit 0 %}
+    <div text="green">{{q.solution}}</div>
+  {% endifequal %}
+  <br>
+{% endif %}
+</form>
+</body>
+</html>

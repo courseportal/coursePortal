@@ -14,6 +14,7 @@ from knoatom.settings import MEDIA_ROOT, ALLOWED_FILE_EXTENTIONS, \
     MAX_UPLOAD_SIZE
 from rating.models import *
 from rating.ratings import *
+from assignment.models import Assignment
 
 
 
@@ -68,7 +69,9 @@ class Atom(WebBaseModel):
     class Meta:
         ordering = ['title']
         
-# Validator for video    
+	def countQuestions(self):
+		return self.related_questions.filter(isCopy=False).count()
+        
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
     if not regex_vid_id.match(value):
@@ -209,6 +212,11 @@ class Class(WebBaseModel):
     summary = models.TextField(
         verbose_name=_('Class Description'),
         default=_("There is currently no summary.")
+    )
+	stickied_assignments = models.ManyToManyField(
+        Assignment,
+        blank=True,
+        related_name='classes_stickied_in'
     )
     
     def __unicode__(self):

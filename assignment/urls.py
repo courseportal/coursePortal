@@ -1,12 +1,18 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('',
+    url(r'utility/matchType/?$', 'assignment.views.utility.matchType', name='matchType'),
     url(r'utility/checktitle/?$', 'assignment.views.utility.checkAssignmentTitle', name='check_title'),
+    url(r'utility/validate/?$', 'assignment.views.utility.validate', name='validateVariable'),
+    url(r'utility/validateFull/?$', 'assignment.views.utility.validateFull', name='validateFull'),
+    url(r'utility/getTypeCode/?$', 'assignment.views.utility.getTypeCode', name='getTypeCode'),
+    url(r'utility/practiceEval/?$', 'assignment.views.utility.practiceEval', name='practiceEval'),
 
     url(r'add_question/?$', 'assignment.views.question.addQ', name='add_question'),
     url(r'(?P<pk>\d+)/question/(?P<id>\d+)/?$', 'assignment.views.question.instanceDetail', name='question_instance'),
+    url(r'question/(?P<id>\d+)/?$', 'assignment.views.question.detail', name='question_detail'),
     url(r'question/preview/?$', 'assignment.views.question.preview', name='preview'),
-    url(r'question/create/?$', 'assignment.views.question.create', name='create_question'),
+    url(r'question/create2/?$', 'assignment.views.question.create2', name='create_question'),
     url(r'question/delete/?$', 'assignment.views.staff.deleteQ', name='delete_question'),
     
     url(r'delete/?$', 'assignment.views.staff.deleteA', name='delete_assignment'),
@@ -20,6 +26,8 @@ urlpatterns = patterns('',
     url(r'save/?$', 'assignment.views.student.save', name='save'),
     url(r'grades/?$', 'assignment.views.student.grades', name='grades'),
     url(r'list/?$', 'assignment.views.student.list', name='list'),
+    url(r'atom choice/?$', 'assignment.views.student.choose_atom', name='choose_practice_atom'),
+    url(r'practice/(?P<id>\d+)?$', 'assignment.views.student.practice', name='practice'),
     
     url(r'unmade/?$', 'assignment.views.assign.unmake', name='unmake'),
     url(r'unassign/?$', 'assignment.views.assign.unassign', name='unassign'),
