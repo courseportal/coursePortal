@@ -40,7 +40,7 @@ PYBB_TEMPLATE = 'forum_base.html'
 PYBB_POLL_MAX_ANSWERS = 10
 
 # List of allowed file upload types
-ALLOWED_FILE_EXTENTIONS = ['.pdf']
+ALLOWED_FILE_EXTENSIONS = ['.pdf']
 # 2.5MB - 2621440
 # 5MB - 5242880
 # 10MB - 10485760
@@ -49,7 +49,7 @@ ALLOWED_FILE_EXTENTIONS = ['.pdf']
 # 100MB - 104857600
 # 250MB - 214958080
 # 500MB - 429916160
-MAX_UPLOAD_SIZE = "5242880"
+MAX_UPLOAD_SIZE = 5242880
 
 
 FILE_UPLOAD_HANDLERS= ("django.core.files.uploadhandler.MemoryFileUploadHandler",
@@ -89,7 +89,7 @@ rel_to_abs = lambda rel: os.path.join(PROJECT_ROOT, rel)
 TEST_RUNNER = 'discover_runner.DiscoverRunner'
 TEST_DISCOVER_TOP_LEVEL = PROJECT_ROOT
 
-MEDIA_ROOT = rel_to_abs('media/')
+MEDIA_ROOT = rel_to_abs('test_media/')
 #MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media/').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a

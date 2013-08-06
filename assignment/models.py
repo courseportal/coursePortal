@@ -4,6 +4,7 @@ from django.db import models
 from django.forms import ModelForm, Textarea
 from django.utils import simplejson as json
 from django.utils import timezone
+import web.models
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
@@ -27,6 +28,8 @@ class Question(models.Model):
             return "hard"
         else:
             return "very hard"
+    def get_atoms(self):
+        return self.atoms.all().order_by('title')
     def __unicode__(self):
         return self.title
 
@@ -35,11 +38,21 @@ class Assignment(models.Model):
     due_date = models.DateTimeField()
     start_date = models.DateTimeField()
     isCopy = models.BooleanField(default=False)
+     #Stringified tuple of dictionaries, contains question id, point value, title
     data = models.TextField(default='', null=True, blank=True)
     questions = models.ManyToManyField(Question, related_name='assigned_to')
     owners = models.ManyToManyField(User, related_name='owned_assignments', blank=True, null=True)
     def __unicode__(self):
         return self.title
+    def get_atoms(self):
+        atoms = []
+        for question in self.questions.all():
+            for atom in question.atoms.all():
+                if atoms.count(atom.title) == 0:
+                    atoms.append(atom.title)
+        atoms.sort()
+        return atoms
+
 
 class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)

@@ -55,15 +55,11 @@ I have changed this file a bit, you should use this as the template you extend. 
   <li><a href="{% url "delete_assignment" %}">Delete Assignment</a></li>
   <li><a href="{% url "add_question" %}">Add Question</a></li>
   <li><a href="{% url 'delete_question' %}">Delete Question</a></li>
-  <li class="divider"></li>
-{% endif %}
-
-{% if user.is_staff or user.is_superuser %}
-  <li class="nav-header">Administrative</li>
   <li><a href="{% url "assign" %}">Assign</a></li>
   <li><a href="{% url "unassign" %}">Unassign</a></li>
+  <li><a href="{% url "select" %}">Extend Due Date</a></li>
   <li><a href="{% url "view_student" %}">View Students</a></li>
-  <li><a href="{% url "metrics" %}">Class Performance</a></li>
+  <li><a href="{% url "metrics" %}">Performance</a></li>
   <li class="divider"></li>
 {% endif %}
 

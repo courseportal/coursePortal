@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 
 <!-- javascript -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment2.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
 
 <html>
 
@@ -52,7 +52,7 @@
 				<input type="hidden" id="questionNum"></input>
 			</div>
 			<div id="questionsList">
-				{% for q in assignment.questions.all %}
+				{% for q in assign_data %}
 				<div class="row-fluid question-whole" id="question{{forloop.counter}}"> 
 					<input type="hidden" value = "{{q.id}}"></input> 
 					<div class="span5 question-description">{{q.title}}
@@ -62,7 +62,7 @@
 					</button> 
 					{% with id=q.id %}
 					<div class="span1 question-pts"> 
-						<input type="text" class="input-fit point-value" value="{{assign_data.questions|lookup:id}}"></input>
+						<input type="text" class="input-fit point-value" value="{{q.points}}"></input>
 					</div>
 					{% endwith %}
 					<button {%if isCopy%}disabled{%endif%} class="span1 question-remove btn" onclick="remove_question({{forloop.counter}})"> 
@@ -105,7 +105,7 @@
    		{% for question in question_list %}
    		<tr>
    			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
-			<td>{%for atom in question.atoms.all %}{{atom}},{%endfor%}</td>
+			<td>{%for atom in question.get_atoms %}{{atom}},{%endfor%}</td>
 			<td>{{question.get_rating}}</td>
 			<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
 		</tr>

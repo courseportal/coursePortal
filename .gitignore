@@ -1,6 +1,5 @@
 *.pyc
 *.sw
-*/migrations/*
 */media/*
 update.bat
 .DS_Store
@@ -8,3 +7,5 @@ update.bat
 docs/html/*
 docs/doctrees/*
 *box*.png
+.coverage
+htmlcov/

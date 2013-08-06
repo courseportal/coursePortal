@@ -53,9 +53,8 @@ var CodeMirrorSettings = {
 	theme: 'eclipse',
 };
 
-var fullTestFlag = false;
 var validFlag = true;
-var patt1=/\$[a-zA-Z][a-zA-Z0-9_]*/g;
+var patt1=/\$[A-z]+[A-z0-9_]*/g;
 
 code = CodeMirror.fromTextArea($('#code').get(0), CodeMirrorSettings);
 $('#variable_list').sortable();
@@ -69,15 +68,11 @@ $('#variable-zone').dialog({
 	open: function(event, ui){
 		var text = tinymce.activeEditor.getContent();
 		var index = 0
-		while(text.indexOf('$', index)>=0){
-			index=text.indexOf('$', index)+1;
-			var varName=findVar(text, index);
-			if(varName==-1){
-				continue;
+		var varNames=text.match(patt1);
+		if(varNames!=null){
+			for(var x=0; x<varNames.length; x++){
+				addVar(varNames[x].substr(1));
 			}
-			//See if var is aready listed
-			addVar(varName);
-			index+=1;
 		}
 	},
 	close: function(event, ui){
@@ -92,6 +87,9 @@ $('#preview-zone').dialog({
 	height: document.body.clientHeight*0.6,
 	modal:true,
 	autoOpen:false,
+	close: function(event, ui){
+		$('#preview-zone').html('');
+	},
 });
 
 function addVar(varName){
@@ -141,23 +139,6 @@ function viewVariables(){
 	$('#variable-zone').dialog('open');
 }
 
-function findVar(str, index){
-	//Make these global strings later
-	characters='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	full=characters+'1234567890_';
-	varName='';
-	//Check first value is fine
-	if(characters.indexOf(str[index]) == -1){
-		return -1;
-	}
-	//Run while characters are fine
-	while(full.indexOf(str[index]) >= 0){
-		varName+=str[index];
-		index+=1;
-	}
-	return varName;
-}
-
 function validateAndPreview(){
 	pdata = {
 		code:code.getValue(),
@@ -188,27 +169,27 @@ function validateAndPreview(){
 		}
 	});
 	pdata.choices = JSON.stringify(pdata.choices);
-	//test full code if necessary
+	//test full code: looks for infinite loops and other run-time errors
 	var reply
-	if(fullTestFlag){
-		fullTestFlag=false;
-		///Eliminate $
-		pdata.code = pdata.code.replace(/\$/g,'');
-		//Ajax call to test full code
-		$.ajax('/assignment/utility/validateFull/', {
-			type: 'GET',
-			async: false,
-			data: pdata,
-		}).done(function(response){
-			fullTestFlag = false;
-			reply=response;
-		});
-		if(reply!=0){
-			alert(reply);
-			return false;
-		}
+	//Eliminate $ in code
+	pdata.code = pdata.code.replace(/\$/g,'');
+	//Ajax call to test full code
+	$.ajax('/assignment/utility/validateFull/', {
+		type: 'GET',
+		async: false,
+		data: pdata,
+	}).done(function(response){
+		reply=response;
+	});
+	if(reply!=0){
+		alert(reply);
+		return false;
 	}
+	//Finally preview
 	$('#preview-zone').load('question/preview',pdata, function(response, status, xhr){
+		MathJax.Hub.Queue(
+      		["Typeset",MathJax.Hub,'preview-zone']
+    	);
 		$('#preview-zone').dialog('open');
 	});
 }
@@ -226,26 +207,22 @@ function validateAndSubmit(){
 		tempCode = generate($(this), tempCode);
 	});
 	tempCode += "\n"+code.getValue();
-	//test full code if necessary
-	if(fullTestFlag){
-		data={
-			code:tempCode.replace(/\$/g,'')
-		}
-		var reply
-		fullTestFlag=false;
-		//Ajax call to test full code
-		$.ajax('/assignment/utility/validateFull/', {
-			type: 'GET',
-			async: false,
-			data: data,
-		}).done(function(response){
-			fullTestFlag = false;
-			reply=response;
-		});
-		if(reply!=0){
-			alert(reply);
-			return false;
-		}
+	//test full code: look for infinite-loops and other run-time errors
+	data={
+		code:tempCode.replace(/\$/g,'')
+	}
+	var reply
+	//Ajax call to test full code
+	$.ajax('/assignment/utility/validateFull/', {
+		type: 'GET',
+		async: false,
+		data: data,
+	}).done(function(response){
+		reply=response;
+	});
+	if(reply!=0){
+		alert(reply);
+		return false;
 	}
 	code.setValue(tempCode);
 	$('#input_text').attr('value', tinymce.activeEditor.getContent());
@@ -286,7 +263,6 @@ function validate(row, dependent){
 		var varValue = $(this).val();
 		//Check if this is defined by another variable
 		if(varValue.match(patt1) != null){
-			if(!fullTestFlag) fullTestFlag=true;
 			//Find dependencies
 			currDependencies = varValue.match(patt1);
 			//Check for any 'loops'
@@ -294,7 +270,6 @@ function validate(row, dependent){
 				for(var x=0; x<currDependencies.length; x++){
 					for(var y=0; y<dependent.length; y++){
 						if(currDependencies[x] == dependent[y]){
-							fullTestFlag = false;
 							validFlag = false;
 							alert("Dependency loop detected in variables!");
 							return false;
@@ -323,7 +298,6 @@ function validate(row, dependent){
 	}).done(function(response){
 		if(response != 0){
 			alert("\""+data.name+"\" data is invalid:\n"+response);
-			fullTestFlag = false;
 			x=response;
 		}
 	});

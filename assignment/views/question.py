@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.shortcuts import render
 from assignment.models import *
 from web.models import Atom
@@ -154,4 +155,5 @@ def instanceDetail(request, pk, id):
 	}
     
 	return render(request, 'question/instance.html', context)
+
 

@@ -49,7 +49,7 @@
 	<br>
 	<input type="text" name="{{q.id}}choice" value={{q.student_answer}} {%ifequal q.can_edit 0%}disabled{%endifequal%}>
 	{% ifequal q.can_edit 0 %}
-		<div text="green">{{q.solution}}</div>
+		<div>{{q.solution}}</div>
 	{% endifequal %}
 	<br>
 {% endif %}

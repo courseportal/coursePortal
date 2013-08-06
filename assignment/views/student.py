@@ -104,7 +104,7 @@ def practice(request, id):
     qdat = detail(request, question.id, True)
     #load page
     context['qid'] = question.id
-    context['aid'] = id
+    context['atomid'] = id
     context['title'] = question.title
     context['text'] = qdat['text']
     context['answer'] = qdat['answer']
