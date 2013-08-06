@@ -26,10 +26,10 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'knoatom',                      # Or path to database file if using sqlite3.
-        'USER': 'knoatom',                      # Not used with sqlite3.
-        'PASSWORD': 'password',                  # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': ':memory:',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
 }
@@ -85,6 +85,9 @@ USE_L10N = True
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__name__))
 # Function to turn relative paths from the project root into absolute paths
 rel_to_abs = lambda rel: os.path.join(PROJECT_ROOT, rel)
+# Test Runner
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
+TEST_DISCOVER_TOP_LEVEL = PROJECT_ROOT
 
 MEDIA_ROOT = rel_to_abs('media/')
 #MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media/').replace('\\','/')
@@ -169,6 +172,7 @@ INSTALLED_APPS = (
                   'web',
                   'assignment',
                   'django_wysiwyg',
+                  'discover_runner',
                   # Uncomment the next line to enable the admin:
                   'django.contrib.admin',
                   # Uncomment the next line to enable admin documentation:
