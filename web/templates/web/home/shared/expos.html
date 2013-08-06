@@ -9,6 +9,7 @@ OPTIONAL context:
 	expositions
 
 -->
+{% load vote_filters %}
 
 <!-- Should make this prettier -->
 <div id="report"> </div>
@@ -48,7 +49,12 @@ OPTIONAL context:
 				</td>
 				<td>
 					<div id="votes-sum-exposition-{{ expo.id }}">
-						{{ expo.votes }}
+  					{% if atom_object %}
+              {{ expo.vote_set|total:atom_object }}
+            {% else %}
+              {{ expo.vote_set|total }}
+            {% endif %}
+						
 					</div>
 				</td>
 				<td>

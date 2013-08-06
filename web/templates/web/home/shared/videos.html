@@ -11,6 +11,7 @@ OPTIONAL context:
 
 -->
 {% load my_filters %}
+{% load vote_filters %}
 
 <table id="videos" class="tablesorter">
 	<thead>
@@ -61,7 +62,11 @@ OPTIONAL context:
 			<!-- Votes -->
 			<td style="width:75px">
 				<div id="votes-sum-video-{{video.id}}">
-					{{ video.votes }}
+					{% if atom_object %}
+            {{ video.vote_set|total:atom_object }}
+          {% else %}
+            {{ video.vote_set|total }}
+          {% endif %}
 				</div>
 			</td>
 			<!-- end Votes -->
