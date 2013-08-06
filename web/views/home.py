@@ -82,9 +82,6 @@ def category(request, cat_id, class_id=None):
     context.update( # Add the category specific content to the context
         get_context_for_category(category_object)
     )
-    for content_list in [context['videos'], context['notes'], context['examples'], context['expositions']]:
-        for content in content_list:
-            content.votes = sum([v.vote for v in content.vote_set.all()])
     context.update({
         'class_object':class_object,
         'category_object':category_object,
@@ -117,9 +114,6 @@ def atom(request, cat_id, atom_id, class_id=None):
     context.update( # Add the atom specific content to the context
         get_context_for_atom(atom_object)
     )
-    for content_list in [context['videos'], context['notes'], context['examples'], context['expositions']]:
-        for content in content_list:
-            content.votes = sum([v.vote for v in content.vote_set.filter(atom=atom_object)])
     context.update({
         'atom_object': atom_object,
         'class_object':class_object,

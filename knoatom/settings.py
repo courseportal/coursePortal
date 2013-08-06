@@ -40,7 +40,7 @@ PYBB_TEMPLATE = 'forum_base.html'
 PYBB_POLL_MAX_ANSWERS = 10
 
 # List of allowed file upload types
-ALLOWED_FILE_EXTENTIONS = ['.pdf']
+ALLOWED_FILE_EXTENSIONS = ['.pdf']
 # 2.5MB - 2621440
 # 5MB - 5242880
 # 10MB - 10485760
@@ -82,9 +82,12 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__name__))
+# Function to turn relative paths from the project root into absolute paths
+rel_to_abs = lambda rel: os.path.join(PROJECT_ROOT, rel)
 
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media/').replace('\\','/')
+MEDIA_ROOT = rel_to_abs('media/')
+#MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media/').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -95,7 +98,8 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/var/www/knoatom-static/static/'
+STATIC_ROOT = rel_to_abs('static/')
+#STATIC_ROOT = '/var/www/knoatom-static/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -103,7 +107,9 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
 )
 
 # List of finder classes that know how to find static files in

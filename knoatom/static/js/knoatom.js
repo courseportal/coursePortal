@@ -85,26 +85,26 @@ init_delete_content = function() {
 /*
  * Video viewer on submissions
  */
-init_video_viewer = function() {
-    $('.view_video').each(function() {
-        $(this).click(function(e) {
-            e.preventDefault();
-            var sid = $(this).parent().attr('data-sid');
-            var vid = $(this).parent().attr('data-vid');
-            var params = { allowScriptAccess: 'always' };
-            var atts = { id: 'video_player_' + sid, 'wmode': 'opaque' };
-            $('#video_player_' + sid).remove();
-            $(this).parent().parent().parent().prepend('<div id="video_view_' + sid + '"></div>');
-            $('#hide_video_' + sid).show();
-            swfobject.embedSWF("http://www.youtube.com/v/" + vid + "?version=3&enablejsapi=1&playerapiid=player1", "video_view_" + sid, "560", "315", "9", null, null, params, atts);
-        });
-    });
-    $('.hide_video').click(function() {
-        var sid = $(this).attr('data-hide_sid');
-        $('#hide_video_' + sid).hide();
-        $('#video_player_' + sid).remove();
-    });
-};
+// init_video_viewer = function() {
+//     $('.view_video').each(function() {
+//         $(this).click(function(e) {
+//             e.preventDefault();
+//             var sid = $(this).parent().attr('data-sid');
+//             var vid = $(this).parent().attr('data-vid');
+//             var params = { allowScriptAccess: 'always' };
+//             var atts = { id: 'video_player_' + sid, 'wmode': 'opaque' };
+//             $('#video_player_' + sid).remove();
+//             $(this).parent().parent().parent().prepend('<div id="video_view_' + sid + '"></div>');
+//             $('#hide_video_' + sid).show();
+//             swfobject.embedSWF("http://www.youtube.com/v/" + vid + "?version=3&enablejsapi=1&playerapiid=player1", "video_view_" + sid, "560", "315", "9", null, null, params, atts);
+//         });
+//     });
+//     $('.hide_video').click(function() {
+//         var sid = $(this).attr('data-hide_sid');
+//         $('#hide_video_' + sid).hide();
+//         $('#video_player_' + sid).remove();
+//     });
+// };
 
 /*
  * Call all the initialization functions
@@ -112,5 +112,5 @@ init_video_viewer = function() {
 $(document).ready(function() {
     init_sidebar();
 	init_sticking();
-    init_video_viewer();
+    //init_video_viewer();
 });

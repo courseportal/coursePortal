@@ -1,55 +1,61 @@
 {% load i18n pybb_tags %}
 
-<table class="table topic-list">
+<table id="topic_list" class="table topic-list">
     <thead>
         <tr class="topic-row head-row">
-            <th data-sorter="false" class="voting"> </th>
-            <th class="topic-name">
+            <th data-sorter="false" class="voting">Arrow </th>
+            <th id="topic" class="topic-name">
                 {% trans "Topic" %}
             </th>
-            <th class="topic-post-count">
+            
+            <th id="posts" class="topic-post-count">
                 {% trans "Posts" %}
             </th>
-            <th class="votes">
+            <th id="votes" class="votes">
                 {% trans "Votes" %}
             </th>
-            <th class="topic-view-count">
+            <th id="views" class="topic-view-count">
                 {% trans "Views" %}
             </th>
-            <th class="topic-last-post">
+            <th id="last_post" class="topic-last-post">
                 {% trans "Last post" %}
             </th>
+            <th  style="display:none;" >Is Stickied</th>
         </tr>
     </thead>
     <tbody>
-    {% for topic in topic_list|pybb_topic_unread:user %}
+        {% for topic in topic_list|pybb_topic_unread:user %}
         <tr class="topic-row {% if topic.sticky %} sticky {% endif %} {% cycle "odd" "even" %} {% if topic.on_moderation %} on-moderation {% endif %}">
             <td style="width:10px">
-                {% include "rating/vote_arrows.html" with item='topic' id=topic.id atom_id=topic.forum.atom.id %}
+
+                 {% include "rating/vote_arrows.html" with item='topic' id=topic.id atom_id=topic.forum.atom.id %} 
+
             </td>
             <td class="topic-name{% if topic.unread %} topic-unread{% endif %}">
                 <div class="state-indicator"></div>
                 <a href="{{ topic.get_absolute_url }}">{{ topic.name|truncatewords:10 }}</a>
-                <a href="{{ topic.get_absolute_url }}?first-unread=1" class="first-unread-post-link" title="{% trans 'Go to first unread post' %}">⇨</a>
+                 <a href="{{ topic.get_absolute_url }}?first-unread=1" class="first-unread-post-link" title="{% trans 'Go to first unread post' %}">⇨</a> 
                 {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
                 {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
                 {% with topic|pybb_topic_inline_pagination as pages %}
-                    {% if pages|length > 1 %}
-                        <span class="mini-pagination">
-                            {% trans "pages" %}:
-                            {% for page in pages %}
-                                <span class="page">
-                                {% if page == "..." %}
-                                    ...
-                                {% else %}
-                                    <a href="{{ topic.get_absolute_url }}?page={{ page }}">{{ page }}</a>
-                                {% endif %}
-                                </span>
-                            {% endfor %}
-                        </span>
-                    {% endif %}
+                {% if pages|length > 1 %}
+                <span class="mini-pagination">
+                    {% trans "pages" %}:
+                    {% for page in pages %}
+                    <span class="page">
+                        {% if page == "..." %}
+                        ...
+                        {% else %}
+                        <a href="{{ topic.get_absolute_url }}?page={{ page }}">{{ page }}</a>
+                        {% endif %}
+                    </span>
+                    {% endfor %}
+                </span>
+                {% endif %}
                 {% endwith %}
+                 
             </td>
+            
             <td class="topic-post-count">
                 {{ topic.post_count }}
             </td>
@@ -64,66 +70,119 @@
             <td class="topic-last-post">
                 {% include "pybb/topic_last_message_info.html" %}
             </td>
+            <td class="stickied-post-{{ post.id }}" style="display:none;">
+                    {% if topic.sticky %}
+                    1
+                    {% else %}
+                    0
+                    {% endif %}
+            </td>
         </tr>
-    {% endfor %}
+        {% endfor %}
     </tbody>
 </table>
 
 <script>
-// tablesorter 2.10.8
-// Documentation found here:
-// http://mottie.github.io/tablesorter/docs/index.html
-
-// Bootstrap specific example here:
-// http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-$(function() {
-
-  $.extend($.tablesorter.themes.bootstrap, {
-    // these classes are added to the table. To see other table classes available,
-    // look here: http://twitter.github.com/bootstrap/base-css.html#tables
-    table      : 'table topic-list',
-    header     : 'bootstrap-header', // give the header a gradient background
-    footerRow  : '',
-    footerCells: '',
-    icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
-    sortNone   : 'bootstrap-icon-unsorted',
-    sortAsc    : 'icon-chevron-up',
-    sortDesc   : 'icon-chevron-down',
-    active     : '', // applied when column is sorted
-    hover      : '', // use custom css here - bootstrap class may not override it
-    filterRow  : '', // filter row class
-    even       : '', // odd row zebra striping
-    odd        : ''  // even row zebra striping
-  });
-
-  // call the tablesorter plugin and apply the uitheme widget
-  $("#notes").tablesorter({
-    // this will apply the bootstrap theme if "uitheme" widget is included
-    // the widgetOptions.uitheme is no longer required to be set
-    theme : "bootstrap",
-
-    widthFixed: true,
-
-    headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+    
+    $(document).ready(function() {
+                      var oTable = $('#topic_list').dataTable( {
+                                              "asColumns": [
+                                                              null,
+                                                            { "sSortDataType": "dom-text" },
+                                                            { "sSortDataType": "dom-text" },
+                                                            { "sSortDataType": "dom-text", "sType": "numeric" },
+                                                            { "sSortDataType": "dom-text", "sType": "numeric" },
+                                                            { "sSortDataType": "dom-text", "sType": "numeric" },
+                                                            { "sSortDataType": "dom-text", "sType": "numeric" },
+                                                            null
+                                                              
+                                                              ],
+                                              "sDom": '<"top"f>rt<"bottom"p><"clear">'
+                                              } );
+                      oTable.fnSortListener( document.getElementById("topic"), 1);
+                      $("#topic").click( function () {
+                                        oTable.fnSort( [[6,"desc"],[1,"desc"]] );
+                                        });
+                      
+                     
+                      
+                      oTable.fnSortListener( document.getElementById("posts"), 2);
+                      $("#posts").click( function () {
+                                       oTable.fnSort( [[6,"desc"],[2,"desc"]] );
+                                       });
+                      
+                      oTable.fnSortListener( document.getElementById("votes"), 3);
+                      $("#votes").click( function () {
+                                        oTable.fnSort( [[6,"desc"],[3,"desc"]] );
+                                        });
+                      
+                      oTable.fnSortListener( document.getElementById("views"), 4);
+                      $("#views").click( function () {
+                                        oTable.fnSort( [[6,"desc"],[4,"desc"]] );
+                                        });
+                      
+                      oTable.fnSortListener( document.getElementById("last_post"), 5);
+                      $("#last_post").click( function () {
+                                        oTable.fnSort( [[6,"desc"],[5,"desc"]] );
+                                        });
+                      
+                      } );
    
-    // Set to always prepend a sort by stickied/not stickied in descending order on all user sorting
-    //sortForce : [[5,1]],
+    /*
+    // tablesorter 2.10.8
+    // Documentation found here:
+    // http://mottie.github.io/tablesorter/docs/index.html
     
-    // Set to sort initially by stickied then votes in descending order and name in ascending order
-    sortList : [[3,1]],
-    
-    // Set to always append a sort by votes in descending order on all user sorting
-    sortAppend : [[3,1]],
-    
-    
-
-    // widget code contained in the jquery.tablesorter.widgets.js file
-    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
-    widgets : ["uitheme"] //,, "filter", "zebra" ],
-
-   
-  })
-
-});
-</script>
-
+    // Bootstrap specific example here:
+    // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+    $(function() {
+      
+      $.extend($.tablesorter.themes.bootstrap, {
+               // these classes are added to the table. To see other table classes available,
+               // look here: http://twitter.github.com/bootstrap/base-css.html#tables
+               table      : 'table topic-list',
+               header     : 'bootstrap-header', // give the header a gradient background
+               footerRow  : '',
+               footerCells: '',
+               icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+               sortNone   : 'bootstrap-icon-unsorted',
+               sortAsc    : 'icon-chevron-up',
+               sortDesc   : 'icon-chevron-down',
+               active     : '', // applied when column is sorted
+               hover      : '', // use custom css here - bootstrap class may not override it
+               filterRow  : '', // filter row class
+               even       : '', // odd row zebra striping
+               odd        : ''  // even row zebra striping
+               });
+      
+      // call the tablesorter plugin and apply the uitheme widget
+      $("#topic_list").tablesorter({
+                              // this will apply the bootstrap theme if "uitheme" widget is included
+                              // the widgetOptions.uitheme is no longer required to be set
+                              theme : "bootstrap",
+                              
+                              widthFixed: true,
+                              
+                              headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+                              
+                              // Set to always prepend a sort by stickied/not stickied in descending order on all user sorting
+                              //sortForce : [[5,1]],
+                              
+                              // Set to sort initially by stickied then votes in descending order and name in ascending order
+                              sortList : [[3,1]],
+                              
+                              // Set to always append a sort by votes in descending order on all user sorting
+                              sortAppend : [[3,1]],
+                              
+                              
+                              
+                              // widget code contained in the jquery.tablesorter.widgets.js file
+                              // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+                              widgets : ["uitheme"] //,, "filter", "zebra" ],
+                              
+                              
+                              })
+      
+      });
+     */
+    </script>

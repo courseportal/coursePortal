@@ -11,7 +11,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 	url(r'vote/', include(rating_urls)),
-    url(r'', include(web_urls)),
+    
     url(r'^ajax/bugReport/?$', 'knoatom.views.bug_report_view', name='bugReport'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^assignment/', include(assignment_urls)),
@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^forum/', include('pybb.urls', namespace = 'pybb')),
+    url(r'', include(web_urls)),
     # Uncomment the next line to enable the admin:
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
