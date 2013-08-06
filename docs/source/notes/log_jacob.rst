@@ -102,4 +102,4 @@ Spent mostly planning the week, however small improvements were made:
 *Fixed bugs in previewing assignments
 *Due Dates can be extended
 *improved variable system in adding questions
-*
+*Practice html improved

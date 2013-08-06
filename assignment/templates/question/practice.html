@@ -17,8 +17,6 @@
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
-<!-- JQUERY UI -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 
 
 <div class="row">
@@ -53,15 +51,22 @@
 <div id="result"></div>
 <a class="btn" href="{% url 'choose_practice_atom'%}">Choose New Atom</a>
 <a class="btn" href="{% url 'practice' atomid%}">Generate Another Question</a>
-
-<div class = 'btn btn-danger' id="broken">Report Broken Question</div>
+<a href="#reportform" role="button" class="btn btn-danger" data-toggle="modal">Report Broken Question</a>
 <div id="qid" class = "display:none" value="{{qid}}"></div>
-<div id = "reportform" title="Report Question">
-	Description of problem:<br>
-	<div class="row-fluid">
-		<textarea id="problemText"></textarea><br>
+
+<!--Modal-->
+<div role="dialog" id = "reportform" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">×</button>
+    	<h3>Report Broken Problem</h3>
+    </div>
+    <div class="modal-body">
+		<p>Description of problem:<p>
+		<textarea id="problemText" rows='6' style="width:500px"></textarea>
+	</div>
+	<div class="modal-footer">
+		<div class="btn" data-dismiss="modal">Close</div>
 		<div class="btn" id="submitreport">Submit</div>
-		<div class="btn" id="closereport">Close</div>
 	</div>
 </div>
 </body>
