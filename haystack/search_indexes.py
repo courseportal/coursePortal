@@ -1,7 +1,7 @@
 from haystack import indexes
 from haystack.backends.solr_backend import SolrSearchBackend
 from django.template import RequestContext, loader, Context
-from web.models import Atom, BaseCategory, Class, Note, Example
+from web.models import Atom, BaseCategory, Class, Note, Example, Exposition
 from pybb.models import Category, Forum, Topic, Post
 
 class AtomIndex(indexes.SearchIndex, indexes.Indexable):
@@ -41,6 +41,7 @@ class BaseCategoryIndex(indexes.SearchIndex, indexes.Indexable):
 class ClassIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     ClassTitle = indexes.CharField(model_attr='title')
+    ClassInstructors = indexes.CharField(model_attr='instructors', faceted=True)
     ClassAuthor = indexes.CharField(model_attr='owner', faceted=True)
     ClassStatus = indexes.CharField(model_attr='status', faceted=True)
     #Auto_Suggestions = indexes.EdgeNgramField(model_attr='name') #for haystack-autocomplete
@@ -48,7 +49,7 @@ class ClassIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return Class
 
-
+#This is the category for forum. (NO USE!!!!)
 class CategoryIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
     CatTitle = indexes.CharField(model_attr='name')
@@ -110,7 +111,7 @@ class LectureNoteIndex(indexes.SearchIndex, indexes.Indexable):
     
     # Now we'll finally perform the template processing to render the
     # text field with *all* of our metadata visible for templating:
-                t = loader.select_template(('search/indexes/web/lecturenote_text.txt', ))
+                t = loader.select_template(('search/indexes/web/note_text.txt', ))
                 data['text'] = t.render(Context({'object': obj,
                                     'extracted': extracted_data}))
             return data
@@ -146,7 +147,12 @@ class ExampleIndex(indexes.SearchIndex, indexes.Indexable):
             return data
     
     
-
-
+class ExpositionIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    ExpoName = indexes.CharField(model_attr='title')
+    ExpoOwner = indexes.CharField(model_attr='owner')
+    
+    def get_model(self):
+        return Exposition
 
 
