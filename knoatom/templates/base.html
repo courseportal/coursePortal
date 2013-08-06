@@ -58,8 +58,13 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <script src="{{ STATIC_PREFIX }}js/jquery.formset.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.min.js"></script>
 <script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.widgets.min.js"></script>
+
 <script src="{{ STATIC_PREFIX}}js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_PREFIX}}js/dataTables.htmlColumnFilter.js"></script>
+
+<script src="{{ STATIC_PREFIX }}js/jquery.tablesorter.pager.js"></script>
+
+
 
 {% block head %}
 {% endblock %}
@@ -187,11 +192,9 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 {% include "bugReport_modal.html" %}
     
     
-    
-<!-- What are these doing here? -->
 <div class="modal fade" id="global_modal" >
 	<div class="modal-header">
-		<a class="close" data-dismiss="modal">x</a><h3>Video Preview</h3>
+		<a class="close" data-dismiss="modal">x</a><h3>Video Viewer</h3>
 	</div>
 	<div class="modal-body">
 		<!-- empty, for now -->

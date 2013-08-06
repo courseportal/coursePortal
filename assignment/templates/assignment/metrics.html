@@ -3,35 +3,36 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 <script type="text/javascript" src="{{STATIC_PREFIX}}js/boxplot.js"></script>
 
-
+<body>
 <div class="row">
 	<h1><div class="span3 offset3">Class Metrics</div></h1>
 </div>
 {% for stats in stat_set %}
 	<div class="row-fluid">
-		<div class="row-fluid"><h3>Class:{{stats.className}}
+		<div><h3>Assignment: {{stats.assignmentName}}
 			<button 
 				id="plot"
 				class="btn" 
-				onclick="display({{stats.data}},{{stats.classid}});" >Plot</h3>
+				onclick="display({{stats.data}},{{stats.assignmentid}});" >Plot</button></h3>
 		</div>
 	</div>
+	<div>Number of existing instances: {{stats.numinstances}}</div>
 	<div>Average: {{stats.average|floatformat:2}}%</div>
 	<div>Standard Deviation: {{stats.deviation|floatformat:2}}%</div>
 	<div>Minimum: {{stats.minimum|floatformat:2}}%</div>
 	<div>Maximum: {{stats.maximum|floatformat:2}}%</div>
 	<div>Median: {{stats.median|floatformat:2}}%</div>
 	<div style="display:none">
-		<img  id="dialog{{stats.classid}}" title="Class boxplot"></div>
+		<img  id="dialog{{stats.assignmentid}}" title="Assignment boxplot"></img>
 	</div>
-
-
-
+	<br>
+	<br>
 {%endfor%}
+</body>
 <script>
-function display(data, classid){
+function display(data, assignmentid){
 	var name1="dialog", name2="#";
-	name1=name1.concat(classid);
+	name1=name1.concat(assignmentid);
 	name2=name2.concat(name1)
 	//Creates min, max, lowerWhisker, upperWhisker, median, q1, q3, mildOutliers, extremeOutliers
 	calculateValues(data);

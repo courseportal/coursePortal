@@ -42,7 +42,7 @@ CodeMirrorSettings = {
 	tabSize: 2,
 	lineNumbers: true,
 	indentWithTabs: true,
-	theme: 'monokai'
+	theme: 'solarized-light'
 };
 
 code = {};
@@ -57,8 +57,7 @@ function init(){
 	      $('#questionsList>.row-fluid').each(function(index){
 	      	num = index+1;
 	      	$(this).attr('id', 'question'+num)
-	         $(this).find('.question-edit').attr('onclick', 'load_question('+num+')');
-	         $(this).find('.question-remove').attr('onclick', 'remove_question('+num+')');
+	        $(this).find('.question-remove').attr('onclick', 'remove_question('+num+')');
 	      });
 	   },
 	});
@@ -73,19 +72,6 @@ function init(){
 		autoOpen: false,
 		draggable: false,
 		resizable: false,
-		open: function(event, ui){
-			$('#dialogPreview').height($('#dialog').height()*0.75);
-			$('#dialogPreview').width($('#dialog').width()*0.39);
-			previewOffsetLeft = $('#editDiv').offset().left+$('#editDiv').width()*1.05
-			$( '.previewDiv').offset({
-				left: previewOffsetLeft,
-			})
-
-			//codemirrors are always reconstructed so they animate correctly
-			code = CodeMirror($('#codediv').get(0), CodeMirrorSettings);
-			solution = CodeMirror($('#solndiv').get(0), CodeMirrorSettings);
-			load_question_helper();
-		},
 		focus: function(event, ui){
 			//disable parent scrolling
 			$('body').addClass('dialog-open');
@@ -94,11 +80,6 @@ function init(){
 			//re-enable parent scrolling
 			$('body').removeClass('dialog-open');
 		},
-		beforeClose: function( event, ui ) {
-			$('#codediv').html('');
-			$('#solndiv').html('');
-			return true;
-		}
 	});
 
 	$('#loading-zone').dialog({
@@ -136,144 +117,14 @@ function init(){
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
-	$('#Qtemplate').attr('onclick', "openTemplates()");
-}
-
-function add_choice_div(){
-	$('#choicediv').append('<div class="answer"></div>');
-	choices.push(CodeMirror($('.answer:last').get(0), CodeMirrorSettings));
 }
 
 function load_question(num){ 
 	$('#questionNum').val(num);
 	//change save destination
-	$('#question-save-button').attr('onclick', 'save_question('+num+')');
+	$( '#dialog' ).load('question/'+num);
 	$( '#dialog' ).dialog('open');
 	//open the dialog
-}
-
-function load_question_helper(){
-	num = $('#questionNum').val();
-	numQuestions = $('#questionsList').children().length;
-	if(num > numQuestions){ //this is a new question
-
-		//wipe out all form fields
-		$('#questiontitle').val('');
-		code.setValue('');
-		solution.setValue('');
-		$('#choicediv').html(''); //wipe out choices
-		choices = [];
-		tinymce.activeEditor.setContent('');
-		$('#dialogPreview').html(''); //wipe out preview
-	}
-
-	else{
-		//load the data from the text
-		questiondata = $('#questionsList :nth-child('+num+')').find('input[type=hidden]').val();
-		question = jQuery.parseJSON(questiondata);
-		//replace the fields
-		$('#questiontitle').val(question.title);
-		code.setValue(question.code);
-		solution.setValue(question.solution);
-		$('#choicediv').html(''); //wipe out choices
-		choices = [];
-		for (var i = 0; i < question.choices.length; i++){//replace them
-			$('#choicediv').append('<div class="answer"></div>');
-			choices.push(CodeMirror($('.answer:last').get(0), CodeMirrorSettings));
-			choices[i].setValue(question.choices[i]);
-		}
-		tinymce.activeEditor.setContent(question.text);
-		//clear up preview
-		$('#dialogPreview').html('');
-	}
-}
-
-function genQ(){
-	//Validate input fields, Replace @fields in original data
-	var formdata = $("#templateForm").serializeArray();
-	var templatedata = $("#template_data").attr("value");
-	for(var x=0; x<formdata.length; x++){
-		if(formdata[x].name == 'csrfmiddlewaretoken' || formdata[x].name == 'tid'){
-			continue;
-		}
-		if(formdata[x].value == null || formdata[x].value == ''){
-			alert("Input field \""+formdata[x].name+"\" is empty!");
-			return false;
-		}
-		else{
-			toReplace = "@"+formdata[x].name;
-			while(templatedata.search(toReplace)>=0)
-				templatedata=templatedata.replace(toReplace, formdata[x].value);
-		}
-	}
-	//append question data to list
-	num = $('#questionsList').children().length+1;
-	questionHTML=questionstring(num, $("#template_title").attr("value"));
-	$('#questionsList').append(questionHTML);
-	$('#question'+num).find('input[type=hidden]').attr("value",templatedata);
-	//Close dialog
-}
-
-function preview_question(num){
-	//create question object
-	question = {
-		choices: []
-	};
-	question.title = $('#questiontitle').val();
-	question.code = code.getValue();
-	question.solution = solution.getValue();
-	for(var i = 0; i < choices.length; i++){
-		question.choices.push(choices[i].getValue());
-	}
-	question.text = tinymce.activeEditor.getContent();
-	questiondata = JSON.stringify(question);
-	
-	//Check if code contains template-like text
-	$('#preview-button').html('Previewing... <i class="icon-spinner icon-large icon-spin"></i>');
-	//make post object
-	questionPOST = {
-		questiondata: questiondata
-	};
-	$.ajax('/assignment/qpreview/', {
-		type: 'POST',
-		async: true,
-		data: questionPOST,
-	}).done(function(response){
-		//fill out the preview
-		var preview = jQuery.parseJSON(response)
-		$('#question'+num).find('.preview-row').html(preview.text);
-		$('#dialogPreview').html(preview.text);
-		//make the button normal again
-		$('#preview-button').html('Preview');
-	});
-
-	return questiondata;
-}
-
-function save_question(num){
-	//if a new question, add to the question list
-	numQuestions = $('#questionsList').children().length;
-	if(num > numQuestions){
-		questionHTML = questionstring(num, $('#questiontitle').val());
-		$('#questionsList').append(questionHTML);
-	}
-
-	//preview the question
-	questiondata = preview_question(num);
-
-	//save the data to a hidden field
-	datafield = $('#question'+num).find('input[type=hidden]');
-	datafield.val(questiondata);
-
-	//close the dialog
-	$( '#dialog' ).dialog('close');
-
-	//kill codemirrors so that they can be replaced
-	$('#codediv').html('');
-	$('#solndiv').html('');
-
-	//update the description
-	$('#question'+num).find('.question-description').html(question.title);
 }
 
 function remove_question(num){
@@ -321,12 +172,14 @@ function save(){
 
 	
 	$('#questionsList>.question-whole').each(function(index){
-		questiondata = $(this).find('input[type=hidden]').val();
-		question = jQuery.parseJSON(questiondata);
+		question = {
+			id: 0,
+			points: 0,
+		}
+		question.id = $(this).find('input[type=hidden]').val();
 		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
-   });
-
+    });
 	//Check if already own assignment by same name
 	var overwrite;
 	$.ajax('/assignment/utility/checktitle/', {
@@ -345,23 +198,6 @@ function save(){
    $('#assignmentForm').submit();
 }
 
-function previewQ(questiondata){
-	//given questiondata, it will give you a preview
-	// questiondata = $('#question'+num).find('input[type=hidden]').val();
-	question = jQuery.parseJSON(questiondata);
-	questionPOST = {
-		questiondata: questiondata
-	},
-
-	$.ajax('/assignment/qpreview', {
-		type: 'POST',
-		async: false,
-		data: questionPOST,
-	}).done(function(response){
-		return jQuery.parseJSON(response)
-	});
-}
-
 function previewA(){
 	//empty object
 	assignment = {
@@ -378,7 +214,6 @@ function previewA(){
 	$('#questionsList > .question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
-		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
    });
 
@@ -427,23 +262,21 @@ function loadExisting(){
   		$("#iframepreview"+$(this).attr("id")).remove();
 		//append question data to list
 		num = $('#questionsList').children().length+1;
-		var data = $(ID+"data").attr("value");
-		questionHTML=questionstring(num, $(ID+"title").attr("value"));
+		questionHTML=questionstring(num, $(ID+"title").attr("value"), $(this).attr('id'));
 		$('#questionsList').append(questionHTML);
-		$('#question'+num).find('input[type=hidden]').attr("value",data);
 	});
 }
 
-function questionstring(num, title){
+function questionstring(num, title, id){
 	questionHTML = 
 		'<div class="question-whole" id="question'+num+'">\
 				<div class="row-fluid questionMenu">\
-					<input type="hidden"></input>\
+					<input type="hidden" value="'+id+'"></input>\
 				<div class="span5 question-description">'+
 						title+
 					'</div>\
-					<div class="span1 btn question-edit" onclick="load_question('+num+')">\
-						<i class="icon-edit-sign"> Edit</i>\
+					<div class="span1 btn question-edit" onclick="load_question('+id+')">\
+						<i class="icon-eye-open"> View</i>\
 					</div>\
 					<div class="span1 question-pts">\
 						<input type="text" class="input-fit" value="0"></input>\
@@ -452,7 +285,6 @@ function questionstring(num, title){
 						<i class="icon-remove-sign"></i>\
 					</div>\
 				</div>\
-				<div class="row-fluid preview-row"></div>\
 			</div>';
 	return questionHTML;
 }

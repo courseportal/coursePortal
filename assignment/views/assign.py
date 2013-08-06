@@ -1,7 +1,8 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
-from django.shortcuts import render
+from knoatom.view_functions import get_breadcrumbs  
+from django.shortcuts import render, get_object_or_404
 from assignment.models import *
 from django.contrib.auth.models import User
 from django.utils import simplejson as json
@@ -25,7 +26,14 @@ def index(request):
     return render(request, 'assignment/index.html', context)
 
 def detail(request, id):
-    assignment = request.user.assignmentInstances.get(pk=id)
+    assignment = get_object_or_404(AssignmentInstance, pk=id)
+    #check if assignment was published
+    if not assignment.was_published():
+        return Http404
+    #check if assignment was due
+    if assignment.was_due():
+        assignment.can_edit=False
+        assignment.save()
     question_list = assignment.questions.all()
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url': reverse('assignment_detail', args=[assignment.id]), 'title': assignment})
@@ -76,11 +84,7 @@ def instantiate(request):
         for question in assignment.questions.all():
             q=question.data
             q=json.loads(q)
-            q['solution']= q['solution'].replace('<br>', '\n')
-            q['solution']= q['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
-            for integer_index in range(len(q['choices'])):
-                q['choices'][integer_index] = q['choices'][integer_index].replace('<br>', '\n')
-                q['choices'][integer_index] = q['choices'][integer_index].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
+            q['choices']=json.loads(q['choices'])
             exec q['code']
             solution=eval(q['solution'])
             #q text formatted here
@@ -88,15 +92,18 @@ def instantiate(request):
 
             local_dict = dict(locals())
             text = string.Template(text).substitute(local_dict)
-            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][str(question.id)]), assignmentInstance=instance)
+            question_instance = QuestionInstance(title=question.title, solution=solution, text=text, value=float(data['questions'][str(question.id)]), assignmentInstance=instance, template=question)
             question_instance.save()
 
+            choices = []
             for choice in q['choices']:
                 answer = eval(choice)
-                choice_instance = ChoiceInstance(solution=answer, question=question_instance)
-                choice_instance.save()
+                choices.append(answer)
             if len(q['choices']) > 0:
-                choice_instance = ChoiceInstance(solution=solution, question=question_instance)
+                choices.append(solution)
+            shuffle(choices)
+            for choice in choices:
+                choice_instance = ChoiceInstance(solution = choice, question=question_instance)
                 choice_instance.save()
             instance.max_score+=question_instance.value
             instance.save()
@@ -107,37 +114,39 @@ def addA(request):
     breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     breadcrumbs.append({'url':reverse('add_assignment'), 'title':'Add Assignment'})
     context = {
+        'isCopy':False,
         'breadcrumbs':breadcrumbs,
-        'question_list':Question.objects.all(),
+        'question_list':Question.objects.filter(isCopy=False),
     }
     return render(request, 'assignment/addAssignment.html', context)
 
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
     assign_data = json.loads(assignment.data)
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-    breadcrumbs.append({'url':reverse('edit_assignment', args=[assignment.id]), 'title':'Edit Assignment'})
-    context = {
-        'assignment': assignment,
-        'question_list':Question.objects.all(),
-        'assign_data': assign_data,
-        'breadcrumbs': breadcrumbs,
-    }
+    context = get_breadcrumbs(request.path)
+    if assignment.owners.filter(id=request.user.id).exists():
+        context['isCopy'] = False
+    else:
+        context['isCopy'] = True
+    context['assignment']= assignment
+    context['question_list']=Question.objects.filter(isCopy=False)
+    context['assign_data']= assign_data
     return render(request, 'assignment/addAssignment.html', context)
 
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
     #Search for assignment by same name, delete it if found
+    isCopy = request.POST['copystatus']
     current=''
-    try:
-        current=request.user.owned_assignments.get(title = a['title'])
-    except:
-        pass
-    if current!='':
-        for q in current.questions.all():
-            q.delete();
+    if isCopy == False:
+        try:
+            current=request.user.owned_assignments.get(title = a['title'])
+        except:
+            pass
     #create new assignment
     assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
+    if isCopy:
+        assignment.isCopy = True;
     assignment.save()
 
     data=dict()
@@ -153,9 +162,20 @@ def create(request):
 
     #Add questions
     for q in a['questions']:
-        temp=createQ(q, assignment.owners)
-        assignment.questions.add(temp)
-        questions[str(temp)]=q['points']
+        question = Question.objects.get(id=q['id'])
+        #If user owns question, simply add it
+        if question.owners.filter(id = request.user.id).exists():
+            assignment.questions.add(question)
+            questions[str(q['id'])]=q['points']
+        #otherwise add copy, give user ownersip of copy
+        else:
+            if question.isCopy == False:
+                question = question.copy #Retrieves copy
+            questions[str(question.id)]=q['points']
+            #Give ownership of copy if necessary
+            if question.owners.filter(id = request.user.id).exists():
+                question.owners.add(request.user)
+                question.save()
     data['questions']=questions
     #Finish
     assignment.data=json.dumps(data)
@@ -163,15 +183,11 @@ def create(request):
     return main(request)
 
 def unassign(request, messages=[]):
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
-    breadcrumbs.append({'url':reverse('unassign'), 'title':'Assign'})
-    context = {
-        'user': request.user,
-        'breadcrumbs': breadcrumbs,
-        'assignments': request.user.owned_assignments.all(),
-        'class_list': request.user.allowed_classes.all() | request.user.classes_authored.all(),
-        'messages':messages
-    }
+    context = get_breadcrumbs(request.path)
+    context['user']= request.user,
+    context['assignments']= request.user.owned_assignments.all(),
+    context['class_list']= request.user.allowed_classes.all() | request.user.classes_authored.all(),
+    context['messages']=messages
     return render(request, 'assignment/unassign.html', context)
 
 def unmake(request):
@@ -190,14 +206,3 @@ def unmake(request):
         pass
     messages=["Assignment(s) succesfully unassigned!"]
     return unassign(request, messages)
-
-def createQ(x, users=[]):
-    question = Question()
-    question.title = x['title']
-    data=dict()
-    question.data = json.dumps(x)
-    question.save()
-    for user in users.all():
-        question.owners.add(user)
-    question.save()
-    return question.id

@@ -1,3 +1,5 @@
+
+<head>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
@@ -11,16 +13,19 @@
   });
 </script>
 
-<script type="text/javascript" src="static/mathjax/MathJax.js"></script>
-{{text|safe}}
-<br>
-<br>
-solution:
-<br>
-{{answer}}
-<br><br>
-choices:
-<br>
-{% for c in choices %}
-	{{c}}   
-{% endfor %}
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</head>
+<div id="preview">
+  {{text|safe}}
+  solution:
+  <br>
+  {{answer}}
+  <br><br>
+  choices:
+  <br>
+  {% for c in choices %}
+  	{{c}}   
+  {% endfor %}
+</div>

@@ -71,12 +71,12 @@ I have changed this file a bit, you should use this as the template you extend. 
   <li class="nav-header">Student Affairs</li>
   <li class="{% if grade_check == 1 %}active{%endif%}">
   <a href="{% url "grades" %}">View grades</a></li>
-
+  <li><a href="{% url 'choose_practice_atom' %}">Practice</a></li>
   <li class="{% if assignment_selected %}open{%endif%}">
     <a href="{% url "list"%}"><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a>
   <ul class="nav nav-list">
   {% for a in user.assignmentInstances.all %}
-    {% if a.questions.all %}
+    {% if a.was_published %}
       <li class="{% if a.id == assignment_selected.id %}open{% endif %}">
       <a href="{% url "assignment_detail" a.id%}"><i class="sidebar-dropdown-toggle icon-minus"></i>{{a}}</a>
       <ul class="nav nav-list">

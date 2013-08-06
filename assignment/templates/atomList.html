@@ -1,41 +1,22 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
-{% load my_filters %}
-
-<!-- javascript -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment_index.js"></script>
-
-<div id="assignment-zone">
-	<div class="list-table"> 
-	<table class="table assignment-table">  
-    <thead>  
-      		<tr>  
-       		<th class="sortable">Title</th>
-       		<th class="sortable">Subject</th>
-       		<th class="sortable">Author</th>
-      		</tr>  
-    </thead>
-    <tbody>
-   	{% for a in assignment_list %}
-   		<tr class="assignment-row">
-   			<td class="first-cell" id="{{a.id}}" value="{{a.title}}">{{ a.title }}</td>
-			<td></td>
-			<td>{{a.owners.all.0}}</td>
-			<td><i onclick="previewL({{a.id}})" class="icon-eye-open"></i></a></td>
-			<input type="hidden" id="{{a.id}}data" value="{{a.data}}"></div>
-		</tr>
-	{% endfor %}
-   	</tbody>  
-   	</table>  
-	</div>
-	<div class="row-fluid">
-		<button class="btn btn-success load-assignment">Load</button>
-		<button class="btn btn-warning" onclick="history.go(-1);return true;">Cancel</button>
-	</div>
-	<div class="assignment-area">
-	</div>
-</div>
-
+<table class="table atom-table">
+<thead>
+<tr>
+	<th class="sortable">Atom Name</th>
+	<th class="sortable">Questions Contained</th>
+</tr>
+</thead>
+<tbody>
+{% for a in atom_list %}
+	<tr>
+		<td>{{a}}</td>
+		<td>{{a.countQuestions}}</td>	
+		<td><a class="btn" href="{%url 'practice' a.id%}">Select</a></td>
+	</tr>
+{%endfor%}
+</tbody>
+</table>
 
 <script>
     // tablesorter 2.10.8
@@ -62,7 +43,7 @@
       	});
           
         // call the tablesorter plugin and apply the uitheme widget
-        $(".assignment-table").tablesorter({
+        $(".atom-table").tablesorter({
             theme : "bootstrap",
                                      
             widthFixed: true,                                 

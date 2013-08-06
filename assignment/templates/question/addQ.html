@@ -14,48 +14,83 @@
 <!-- JQUERY UI -->
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 
+
 <body>
+<form action='{% url "create_question" %}' id="questionForm" method="POST">
 {% csrf_token %}
+	Title:<input type='text' name='question_title'></input> 
+	<textarea id="problemText" title="Problem text"></textarea><br>
 	<div class="row-fluid">
-			Title<br/>
-			<input type="text" id="title"></input>
-	</div>
-	<div class="row-fluid">
-		<div id="solutiondiv" class="span8">
-			CODE:<br/>
-			<textarea name="solution" id="solution"></textarea>
+		<div id='left' class="span6">
+			<div class="btn" onclick="viewVariables()">Variables</div><br>
+			Question Type:<select onchange="inputChange($(this).val());" name="question_type">
+				<option value="Short Answer" selected>Short Answer</option>
+				<option value="True/False">True/False</option>
+				<option value="Multiple Choice">Multiple Choice</option>
+			</select><br>
+			Answer:<br><div id='answer_input'><input type='text' name='answer' placeholder='answer'></input></div>
+			Choices:<br><div id='choice_input'></div>
 		</div>
-		<div class="span4">
-			SOLUTIONS:<br/>
-			<div id="solnDiv" class="solnDiv">
+		<div id="right" class="span6">
+			Custom code area:<br>
+			<textarea name="code" id="code"></textarea><br>
+			Atoms:<select multiple="multiple" id="atoms">
+				{% for atom in atom_list %}
+					<option name="{{atom.id}}" value="{{atom.id}}">{{atom}}</option>
+				{% endfor %}
+			</select>
+			<div>Hold ctrl to select multiple.</div>
+		</div>
+	</div>
+	<input type="hidden" id="input_text" name="text"></input>
+	<input type="hidden" id="choices" name="choices"></input>
+	<input type="hidden" id="atom_list" name="atoms"></input>
+	<div class="row-fluid">
+		<div class="span5 btn btn-large" onclick="validateAndPreview()">Preview</div>
+		<div class="span5 btn btn-large" onclick="validateAndSubmit()">Create</div>
+	</div>
+
+	<div id="variable-zone">
+		<br>
+		<br>
+		<div class="row-fluid">
+			<div class='span8'>
+				<table class="table list-table">
+					<thead>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Data</th>
+					</thead>
+					<tbody id="variable_list">
+					</tbody>
+				</table>
 			</div>
-			<a class="btn btn-large btn-inverse" href="#" onclick="add_choice()">
-			<i class="icon-plus"></i>  Add Answer</a>
+			<div class='span3'>
+				<br>
+				<br>
+				<div class="btn" onclick='addVar($("#add_name").val());'>Add<br>
+					<input type='text' id='add_name' style='width:100px'></input>
+				</div><br>
+				<div class="btn" onclick='delVar($("#delete_name").val());'>Delete<br>
+					<input type='text' id='delete_name' style='width:100px'></input>
+				</div>
+			</div>
 		</div>
+		<div class="btn" onclick="$('#variable-zone').dialog('close')">Close</div>
 	</div>
-	<hr>
-	<div class="row-fluid" style = "width:775px">
-		<div id="textdiv" class="span9">
-			TEXT:<br/>
-			<textarea name="text" id="text"></textarea>
-		</div>
-	</div>
-	<hr>
-
-	<form action="{% url 'create_question' %}" style="margin-bottom:5px" method="post" id="questionForm">
-	{% csrf_token %}
-		<input type="text" style="display:none" id="questionname" name="questionname"></input>
-		<input type="text" style="display:none" id="data" name="questiondata"></input>
-		<button style="width:70px" class="btn btn-primary" onclick="save()">submit</button>
-	</form>
-	<div id="previewform"></div>
-	<button style="width:70px" onclick="preview()" class="btn">Preview</button>
+</form>
+<div id="preview-zone"></div>
 </body>
-</html>
+
+<div style="display:none">
+	<select class = "variables" name="variable_type">
+		{% for v in type_list %}
+			<option value="{{v.name}}" {% ifequal v.name 'Custom'%}selected{%endifequal%}>{{v.name}}</option>
+		{% endfor %}
+	</select>
+</div>
 
 
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/test.js"></script>
-
-
+<script src="{{ STATIC_PREFIX }}js/question.js"></script>
 
 {% endblock %}

@@ -1,41 +1,167 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
 
-<script type="text/x-mathjax-config">
 
+
+<script>
 	function validateAssign(){
-		for(element in $('.assignment-input')){
-			if element.prop("checked", true){
-				return true;
-			}
+		var good = false;
+		$('.assignment-input').each(function(){
+			if($(this).prop('checked') == true)
+				good=true;
+		});
+		if(!good){
+			alert("Please select an assignment.");
+			return false;
 		}
-		alert("Select an assignment");
-		return false;
 	}
 </script>
+<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css"> 
 
 {% if assignments %}
 <form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">
 	{% csrf_token %}
 	<strong>Assignment:</strong><br> 
-	{% for a in assignments %}
-		<input type="radio" class="assignment-input" name="assignment" value={{a.pk}}>{{a.title}}<br>
-	{%endfor%}
-	<br><strong>Assigned to:</strong><br>
-	<hr>
-	Users:<br>
-	{% for u in users %}
-		<input type="checkbox" name="users" value={{u.id}}>{{u}} <br>
+	<table class="table assignments" style="width:500px">  
+    <thead>  
+      		<tr>  
+       		<th class="sortable">Title</th>
+       		<th>Select</th>
+      		</tr>
+    </thead>
+   	{% for a in assignments %}
+   		<tr>
+   	  <td>{{ a.title }}</td>
+			<td><input type="radio" class="assignment-input" name="assignment" value={{a.pk}}></input></td>
+		</tr>
 	{% endfor %}
-	<hr>
-	Classes:<br>
-	{% for c in class_list %}
-		<input type="checkbox" name="class" value={{c.id}}>{{c}}<br>
-	{%endfor%}
+   	</tbody>  
+   	</table>
+   	<hr>
+	<br><strong>Assigned to:</strong><br>
+
+	<div class="row-fluid">
+		<div>
+		Users:
+		<table class="table students" style="width:500px">  
+    		<thead>  
+      			<tr>  
+       			<th class="sortable">Username</th>
+       			<th class="sortable">Student Name</th>
+       			<th></th>
+      			</tr>  
+    	</thead>
+    	<tbody>
+    		<tr class = '.filter'>
+    			<td></td>
+    			<td></td>
+    		</tr>
+   			{% for u in users %}
+   			<tr>
+   				<td>{{u}}</td>
+   				<td>{{u.first_name}} {{u.last_name}}</td>
+				<td><input type="checkbox" name="users" value={{u.id}}></input></td>
+			</tr>
+			{% endfor %}
+   		</tbody>  
+   		</table>
+		</div>
+		
+		<div>
+		Classes:
+		<table style="width:500px" class="table classes">  
+    		<thead>  
+      			<tr>  
+       			<th class="sortable">Class name</th>
+       			<th></th>
+      			</tr>  
+    	</thead>
+    	<tbody>
+   			{% for c in class_list %}
+   			<tr>
+   				<td>{{c}}</td>
+				<td><input type="checkbox" name="class" value={{c.id}}></input></td>
+			</tr>
+			{% endfor %}
+   		</tbody>  
+   		</table>
+   		</div>
+	</div>
 	<button type="submit" class="btn">Submit</button>
 <form>
+
+<script>
+        // tablesorter 2.10.8
+        // Documentation found here:
+        // http://mottie.github.io/tablesorter/docs/index.html
+        
+        // Bootstrap specific example here:
+        // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+        $(function() {
+          
+        	$.extend($.tablesorter.themes.bootstrap, {
+                table      : 'table table-bordered',
+                header     : 'bootstrap-header', // give the header a gradient background
+                footerRow  : '',
+                footerCells: '.footer',
+                icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+                sortNone   : 'bootstrap-icon-unsorted',
+                sortAsc    : 'icon-chevron-up',
+                sortDesc   : 'icon-chevron-down',
+                active     : '', // applied when column is sorted
+                hover      : '', // use custom css here - bootstrap class may not override it
+                filterRow  : '.filter', // filter row class
+                even       : '', // odd row zebra striping
+                odd        : ''  // even row zebra striping
+        	});
+          
+          // call the tablesorter plugin and apply the uitheme widget
+          $(".assignments").tablesorter({
+                theme : "bootstrap",
+                                     
+                widthFixed: true,
+                                     
+                headerTemplate : '{content} {icon}', 
+                selectorHeaders: '> thead .sortable',        
+                initWidgits:true,
+                widgets : ["uitheme", "filter", "zebra" ],
+                widgetOptions: {
+
+                }                              
+            });
+          	$(".students").tablesorter({
+                theme : "bootstrap",
+                                     
+                widthFixed: true,
+                                     
+                headerTemplate : '{content} {icon}', 
+                selectorHeaders: '> thead .sortable',        
+                initWidgits:true,
+                widgets : ["uitheme", "filter", "zebra" ],
+                widgetOptions: {
+
+                }                              
+            });
+            $(".classes").tablesorter({
+                theme : "bootstrap",
+                                     
+                widthFixed: true,
+                                     
+                headerTemplate : '{content} {icon}', 
+                selectorHeaders: '> thead .sortable',        
+                initWidgits:true,
+                widgets : ["uitheme", "filter", "zebra" ],
+                widgetOptions: {
+
+                }                              
+            });
+        });
+</script>
+
+
+
 {% else %}
-	<p>No assignment templates exist! Go out and make some!</p>
+	<p>No assignments exist! Go out and make some!</p>
 {% endif %}
 {% endblock %}
 

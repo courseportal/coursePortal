@@ -1,3 +1,9 @@
+TODO list:
++ Change how questions are made
++ Loaded assignments/questions can't be edited
++ Metrics look at assignments, not classes
+
+
 7/9/2013:
 *Removed Nyromodal from the project, expanded use of jqueryUI
 *Implemented use of google chart API to view boxplots of class performance
@@ -24,10 +30,63 @@
 *More in-depth testing and bugfixing performed
 
 7/15/2013:
-After discussion with professor, following features have been removed:
+After discussion with professor, following features have been REMOVED:
 	1.Ability to make things 'private'; everything will be public in some fashion
 	*question and assignment model field 'private' removed
 	2.Current template system. Functionality will be folded into the question system somehow. In the future, templates will be a way of styling a question.
 	*Models 'template' and 'Atemplate' removed, andd corresponding views/templates
-		
+*Classes relate to assignments, questions relate to atoms
 
+week of 7/26:
+Past two weeks have been spent creating a new model called a 'variable type'. This essentially allows users to use pre-written code chunks to create a question. Variable types have the following fields:
+	VARIABLES: a list of the data that user must provide for the code chunk to work
+	VALIDATION CODE: Optional, code that can be run to validate data provided by the user. Sets a variable called "result" to some helpful error message if the data is not good.
+	GENERATED CODE: This is thee code that will be generated in the question's code section, with '__this' being replaced by the specified variable name. Assignments for necessary data will be pasted in beforehand.
+This has been tested with question/assignment creation, deletion, and instantiation and currently works. Additionally, variable data can be defined by other variables. Currently, I am working on expanding the type moel with the following features:
+	*Allow the variables list to declare variable types, which can then be automatically tested instead of requiring validation code to include said tests.
+	*Allow variable list to declare default values.
+	*Include a 'viewing html' field, which determines the way that the variable displays on a page.
+Additionally, the following types should be created:
+	*Set
+	*graph
+	*Equation (?Maybe not, mathjax does provide inline math fonts that are fairly easy to use?)
+	*graph theory graph
+
+7/29/2013:
+Spent mostly planning the week, however small improvements were made:
+	*Choices now randomize order for multiple choice questions
+	{*Assign date now determines when studetns can view an instance
+	{*Due date determines when assignments can no longer be edited
+	{Testing the above two features over the course of this week
+*Bugfixes to assigning
+!BUG: edit an assignment yet do not change start/due date -> dates revert to now.
+
+7/30/2013:
+*Initial test of due date system is succesful, no bugs detected
+*Fixed bugs in previewing assignments written by others
+*Questions can be searched and sorted by related atoms when making an assignment
+*Questions now have a difficulty rating determined by how often students get it correct
+	*questions can be searched by difficulty when adding them to assignments
+*various small bugfixes
+
+7/31/2013:
+*small bugfixes
+*Added the ability for students to do practice questions related to some atom
+
+8/1/2013:
+*Questions create a copy when they are made, consequences of this:
+	*If someone changes original question, question does not change in your assignment
+	*Copy questions cannot be edited or deleted
+	*Copy questions are shared between multiple people
+	*If a copy question has no owners and the original question is changed, copy question is deleted
+*Similarly, loading an assignment now creates a copy which can be deleted whenever. However:
+	*Questions in copies cannot be edited
+	*Dates and point values can be edited
+	*Title cannot be changed
+
+8/2/2013:
+*fixed bugs in the question creation process
+*When loading assignments, assignments can now be sorted and searched by Title and Author
+	*Sorting by subject in the working
+*Atoms can be searched and sorted by name and number of related questions when doing practice
+*fixed bugs in student practicing

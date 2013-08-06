@@ -12,7 +12,7 @@ OPTIONAL context:
 -->
 
 <!-- Should make this prettier -->
-
+{% load vote_filters %}
 
 <table id="examples" class="tablesorter">
 	<thead>
@@ -47,7 +47,12 @@ OPTIONAL context:
 				</td>
 				<td>
 					<div id="votes-sum-example-{{ example.id }}">
-						{{ example.votes }}
+  					{% if atom_object %}
+              {{ example.vote_set|total:atom_object }}
+            {% else %}
+              {{ example.vote_set|total }}
+            {% endif %}
+						
 					</div>
 				</td>
 				<td>
