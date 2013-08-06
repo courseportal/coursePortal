@@ -40,7 +40,7 @@ PYBB_TEMPLATE = 'forum_base.html'
 PYBB_POLL_MAX_ANSWERS = 10
 
 # List of allowed file upload types
-ALLOWED_FILE_EXTENTIONS = ['.pdf']
+ALLOWED_FILE_EXTENSIONS = ['.pdf']
 # 2.5MB - 2621440
 # 5MB - 5242880
 # 10MB - 10485760
