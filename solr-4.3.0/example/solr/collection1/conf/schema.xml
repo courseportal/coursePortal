@@ -156,6 +156,10 @@
     <field indexed="true" multiValued="false" name="ClassTitle" stored="true" type="text_en"/>
 
     <field indexed="true" multiValued="false" name="ClassAuthor_exact" stored="true" type="string"/>
+      
+    <field name="ClassInstructors" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+    <field name="ClassInstructors_exact" type="string" indexed="true" stored="true" multiValued="false" />
 
     <field indexed="true" multiValued="false" name="ClassStatus_exact" stored="true" type="string"/>
 
@@ -167,6 +171,10 @@
 
     <field indexed="true" multiValued="false" name="ExampleOwner" stored="true" type="text_en"/>
 
+    <field indexed="true" multiValued="false" name="ExpoOwner" stored="true" type="text_en"/>
+      
+    <field indexed="true" multiValued="false" name="ExpoName" stored="true" type="text_en"/>
+      
     <field indexed="true" multiValued="false" name="ForumTitle" stored="true" type="text_en"/>
 
     <field indexed="true" multiValued="false" name="ForumDescription" stored="true" type="text_en"/>
@@ -190,5 +198,5 @@
   <defaultSearchField>text</defaultSearchField>
 
   <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
-  <solrQueryParser defaultOperator="AND"/>
+  <solrQueryParser defaultOperator="OR"/>
 </schema>

@@ -10,8 +10,6 @@ import simplejson as json
 
 RESULTS_PER_PAGE = getattr(settings, 'HAYSTACK_SEARCH_RESULTS_PER_PAGE', 20)
 
-
-
 class SearchView(object):
     template = 'search/search.html'
     extra_context = {}
@@ -75,9 +73,9 @@ class SearchView(object):
 
         Returns an empty string if the query is invalid.
         """
+        print ("self.form.is_valid()")
         if self.form.is_valid():
             return self.form.cleaned_data['q']
-
         return ''
 
     def get_results(self):
@@ -129,7 +127,6 @@ class SearchView(object):
         """
         Generates the actual HttpResponse to send back to the user.
         """
-        #print("I am giving result!!!!!")
         (paginator, page) = self.build_page()
         class_tab = False,
         atom_tab = False,
@@ -139,6 +136,7 @@ class SearchView(object):
         post_tab = False,
         note_tab = False,
         example_tab = False,
+        expo_tab = False,
         for result in page.object_list:
             if result.model_name == 'class':
                 class_tab = True
@@ -148,17 +146,21 @@ class SearchView(object):
                 base_category_tab = True
             if result.model_name == 'forum':
                 forum_tab = True
+            if result.model_name == 'topic':
+                topic_tab = True
             if result.model_name == 'post':
                 post_tab = True
-            if result.model_name == 'lecturenote':
+            if result.model_name == 'note':
                 note_tab = True
             if result.model_name == 'example':
                 example_tab = True
+            if result.model_name == 'exposition':
+                expo_tab = True
+
         if page.object_list:
             active_tab = page.object_list[0].model_name
         else:
             active_tab = None
-
         context = {
             'query': self.query,
             'form': self.form,
@@ -173,6 +175,7 @@ class SearchView(object):
             'post_tab': post_tab,
             'note_tab': note_tab,
             'example_tab': example_tab,
+            'expo_tab': expo_tab,
             'active_tab': active_tab,
         }
 

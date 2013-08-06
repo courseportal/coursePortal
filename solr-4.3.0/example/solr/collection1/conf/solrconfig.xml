@@ -986,14 +986,14 @@
 
        <!-- Spell checking defaults -->
        <str name="spellcheck">on</str>
-       <str name="spellcheck.extendedResults">false</str>       
-       <str name="spellcheck.count">5</str>
-       <str name="spellcheck.alternativeTermCount">2</str>
-       <str name="spellcheck.maxResultsForSuggest">5</str>
+       <str name="spellcheck.extendedResults">true</str>
+       <str name="spellcheck.count">2</str>                             <!-- this is useful-->
+       <str name="spellcheck.alternativeTermCount">20</str>
+       <str name="spellcheck.maxResultsForSuggest">15</str>
        <str name="spellcheck.collate">true</str>
        <str name="spellcheck.collateExtendedResults">true</str>  
-       <str name="spellcheck.maxCollationTries">5</str>
-       <str name="spellcheck.maxCollations">3</str>           
+       <str name="spellcheck.maxCollationTries">15</str>
+       <str name="spellcheck.maxCollations">15</str>
      </lst>
 
   </requestHandler>
@@ -1390,12 +1390,12 @@
       <str name="spellcheck">on</str>
       <str name="spellcheck.extendedResults">true</str>       
       <str name="spellcheck.count">10</str>
-      <str name="spellcheck.alternativeTermCount">5</str>
-      <str name="spellcheck.maxResultsForSuggest">5</str>       
+      <str name="spellcheck.alternativeTermCount">15</str>
+      <str name="spellcheck.maxResultsForSuggest">15</str>
       <str name="spellcheck.collate">true</str>
       <str name="spellcheck.collateExtendedResults">true</str>  
-      <str name="spellcheck.maxCollationTries">10</str>
-      <str name="spellcheck.maxCollations">5</str>         
+      <str name="spellcheck.maxCollationTries">15</str>
+      <str name="spellcheck.maxCollations">15</str>
     </lst>
   </requestHandler>
 
