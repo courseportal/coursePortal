@@ -2,14 +2,15 @@
 {% block content %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
-<form method = "post" action = "{% url 'unmake' %}">
+<form method = "post" action = "{% url 'extend' %}">
 {% csrf_token %}
+<div class="span4"><h3>Select Instances to Extend Deadline On</h3></div> 
 <table class="table" id="assigned">
 	<thead>
 		<th style="width:80px" class="sortable">Username</th>
 		<th style="width:100px" class="sortable">Name</th>
 		<th style="width:100px" class="sortable">Assignment</th>
-		<th style="width:100px" class="sortable">Class</th>
+		<th style="width:100px" class="sortable">Due Date</th>
 		<th style="width:10px">Select</th>
 	</thead>
 	<tbody>
@@ -25,7 +26,7 @@
 					<td style="width:80px">{{i.user.username}}</td>
 					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
 					<td style="width:100px">{{i}}</td>
-					<td style="width:100px"></td>
+					<td style="width:100px">{{i.due_date}}</td>
 					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
 				</tr>
 			{% endfor %}
@@ -36,13 +37,14 @@
 			<th style="width:80px">Username</th>
 			<th style="width:100px">Name</th>
 			<th style="width:100px">Assignment</th>
-			<th style="width:100px">Class</th>
+			<th style="width:100px">Due Date</th>
 			<td style="width:10px"></td>
 		</tr>
 	</tfoot>
 </table>
 </div>
-<input type="submit" class="btn"></input>
+<div class="span5">New Due Date:<input class="span2" type="date" id="duedate"></input></div>
+<input type="submit" class="btn span1 offset2"></input>
 </form>
 
 
@@ -51,7 +53,6 @@
         // tablesorter 2.10.8
         // Documentation found here:
         // http://mottie.github.io/tablesorter/docs/index.html
-        
         // Bootstrap specific example here:
         // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
         $(function() {
@@ -75,17 +76,13 @@
           // call the tablesorter plugin and apply the uitheme widget
           $("#assigned").tablesorter({
                 theme : "bootstrap",
-                                     
-                widthFixed: true,
-                                     
+                widthFixed: true,                    
                 headerTemplate : '{content} {icon}', 
                 selectorHeaders: '> thead .sortable',        
                 initWidgits:true,
                 widgets : ["uitheme", "filter", "zebra" ],
                 widgetOptions: {
-          		
-                }        
-                                     
+                }
             })
         });
 </script>

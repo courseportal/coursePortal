@@ -1,13 +1,14 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
+from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render
 from assignment.models import *
 from web.models import *
 from django.contrib.auth.models import User
 from math import *
 from random import *
-import string
+import string, signal#, resource
 
 
 def checkAssignmentTitle(request):
@@ -23,20 +24,6 @@ def checkAssignmentTitle(request):
 	overwrite['overwrite'] = value
 	return HttpResponse(json.dumps(overwrite))
 
-def replaceX(data):
-	replace1="<input type=\"text\" name=\""
-	replace2="\" class=\"t_input\" style='max-width:200px;' placeholder='"
-	replace3="'></input>"
-	toReplace=""
-	while string.find(data, "@")>=0:
-		toReplace=""
-		index=string.find(data, "@")+1
-		while index<len(data) and data[index] in string.ascii_letters+string.digits+"_":
-			toReplace+=data[index]
-			index=index+1
-		data=string.replace(data, "@"+toReplace, replace1+toReplace+replace2+toReplace+replace3)
-	return data
-
 def matchType(request):
 	vartype = request.GET['vartype']
 	variable = Variable.objects.get(name=vartype)
@@ -50,6 +37,12 @@ def getTypeCode(request):
 	variable = Variable.objects.get(name=vartype)
 	return HttpResponse(json.dumps(variable.generated_code))
 
+def seghandler(signum, frame):
+	raise IOError("Segfault! You probably are using too much memory, check for infinite loops!")
+
+def timehandler(signum, frame):
+	raise IOError("Program runs too long, possibly indicating an infinite loop!")
+
 def validate(request):
 	user_input = json.loads(request.GET['input'])
 	vartype=Variable.objects.get(name=request.GET['vartype'])
@@ -60,11 +53,15 @@ def validate(request):
 	return HttpResponse(result)
 
 def validateFull(request):
+	#Limit runtime and memory allocated
+	#signal.alarm(5) #will signal SIGALRM in 5 seconds
 	try:
 		exec request.GET['code']
 	except:
-		return HttpResponse("Full Code did not validate, something is wrong with variable dependencies!")
-	return 0
+		return HttpResponse("Full Code did not validate!")
+	return HttpResponse(0)
+
+
 
 def practiceEval(request):
 	question = Question.objects.get(id=request.GET['qid']) 
@@ -75,3 +72,12 @@ def practiceEval(request):
 		question.numIncorrect += 1
 		question.save()
 	return HttpResponse("stuff")
+
+def reportQ(request):
+	question = Question.objects.get(id=request.GET['id'])
+	subject = "Question Reported"
+	message = "Your question '"+question.title+"' has been reported as broken. Here is the message submitted by a student:\n"
+	message+= request.GET['text']
+	send_mail(subject, message, 'test-no-use@umich.edu', [question.owners.all()[0].email])
+	return HttpResponse('Success')
+	

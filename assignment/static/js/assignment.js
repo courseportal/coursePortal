@@ -193,9 +193,8 @@ function save(){
 	if(overwrite.overwrite == true)
 		if(!confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?"))
 			return;
-
-   $('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-   $('#assignmentForm').submit();
+	$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
+	$('#assignmentForm').submit();
 }
 
 function previewA(){
@@ -215,19 +214,22 @@ function previewA(){
 		questiondata = $(this).find('input[type=hidden]').val();
 		question = jQuery.parseJSON(questiondata);
 		assignment.questions.push(question);
-   });
+    });
 
-   data = {
-   	previewdata:JSON.stringify(assignment, undefined, 2),
-   };
+    data = {
+   	    previewdata:JSON.stringify(assignment, undefined, 2),
+    };
 
-   $('#previewform').load('preview/', data, function(response, status, xhr){
+    $('#previewform').load('preview/', data, function(response, status, xhr){
    	if (status == "error") {
     		var msg = "Sorry but there was an error: ";
     		$("#previewform").html(msg + xhr.status + " " + xhr.statusText);
   		}
-   });
-   $('#previewform').dialog('open');
+    });
+    MathJax.Hub.Queue(
+      	["Typeset",MathJax.Hub,'previewform']
+    );
+    $('#previewform').dialog('open');
 }
 
 function iframe_preview(qid){

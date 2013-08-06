@@ -90,3 +90,16 @@ Spent mostly planning the week, however small improvements were made:
 	*Sorting by subject in the working
 *Atoms can be searched and sorted by name and number of related questions when doing practice
 *fixed bugs in student practicing
+
+8/5/2013:
+*Mathjax now processes text every time you preview a question rather than just the first time
+*Questions can be reported as broken from the practice area
+	*Emails creator user-submitted text. 
+*Subjects for each question sorted alphabetically
+
+8/6/2013:
+*Assignments can now contain multiple copies of the same question with different point values.
+*Fixed bugs in previewing assignments
+*Due Dates can be extended
+*improved variable system in adding questions
+*

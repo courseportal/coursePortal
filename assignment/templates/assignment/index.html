@@ -19,7 +19,7 @@
    	{% for a in assignment_list %}
    		<tr class="assignment-row">
    			<td class="first-cell" id="{{a.id}}" value="{{a.title}}">{{ a.title }}</td>
-			<td></td>
+			<td>{% for atom in a.get_atoms %}{{atom}}, {%endfor%}</td>
 			<td>{{a.owners.all.0}}</td>
 			<td><i onclick="previewL({{a.id}})" class="icon-eye-open"></i></a></td>
 			<input type="hidden" id="{{a.id}}data" value="{{a.data}}"></div>
