@@ -70,11 +70,8 @@ class Atom(WebBaseModel):
         ordering = ['title']
         
     def countQuestions(self):
-<<<<<<< HEAD
 		return self.related_questions.filter(isCopy=False).count()
-=======
-        return self.related_questions.filter(isCopy=False).count()
->>>>>>> 93182497526a3f7a919a4c9765e49ad010dfe106
+
         
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
