@@ -6,7 +6,7 @@ from django.forms.models import BaseModelFormSet, modelformset_factory, BaseInli
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 #from sets import Set
-from knoatom.settings import ALLOWED_FILE_EXTENTIONS
+from knoatom.settings import ALLOWED_FILE_EXTENSIONS
 
 # Import ForumInlineAdmin
 from pybb.models import Forum, Category

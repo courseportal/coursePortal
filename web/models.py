@@ -10,8 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from knoatom.settings import MEDIA_ROOT, ALLOWED_FILE_EXTENTIONS, \
-    MAX_UPLOAD_SIZE
+from knoatom.settings import (MEDIA_ROOT, ALLOWED_FILE_EXTENSIONS, 
+    MAX_UPLOAD_SIZE)
 from rating.models import *
 from rating.ratings import *
 from assignment.models import Assignment
@@ -69,8 +69,8 @@ class Atom(WebBaseModel):
     class Meta:
         ordering = ['title']
         
-	def countQuestions(self):
-		return self.related_questions.filter(isCopy=False).count()
+    def countQuestions(self):
+        return self.related_questions.filter(isCopy=False).count()
         
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
@@ -126,15 +126,14 @@ def validate_uploaded_file(value):
     r"""
     Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
     """
+    if value.size > int(MAX_UPLOAD_SIZE):
+        raise ValidationError((u'Please keep filesize under {}. Current filesize {}').format(filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
     valid = False
-    for ext in ALLOWED_FILE_EXTENTIONS:
+    for ext in ALLOWED_FILE_EXTENSIONS:
         if value.name.endswith(ext):
-            if value.size < int(MAX_UPLOAD_SIZE):
-                valid = True
-            else:
-                raise ValidationError((u'Please keep filesize under %s. Current filesize %s') % (filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
+            valid = True
     if not valid:
-        raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENTIONS))
+        raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENSIONS))
 
 #Lecture Note
 class Note(WebBaseModel):
@@ -154,9 +153,6 @@ class Note(WebBaseModel):
     
     class Meta:
         ordering = ['title']
-    
-    def __unicode__(self):
-        return self.title
         
 
 
@@ -177,9 +173,6 @@ class Example(WebBaseModel):
     
     class Meta:
         ordering = ['title']
-
-    def __unicode__(self):
-        return self.title
 
 class Class(WebBaseModel):
     r"""
@@ -213,14 +206,11 @@ class Class(WebBaseModel):
         verbose_name=_('Class Description'),
         default=_("There is currently no summary.")
     )
-	stickied_assignments = models.ManyToManyField(
+    stickied_assignments = models.ManyToManyField(
         Assignment,
         blank=True,
         related_name='classes_stickied_in'
     )
-    
-    def __unicode__(self):
-        return self.title
         
     class Meta:
         ordering = ['title']
@@ -233,6 +223,9 @@ class Class(WebBaseModel):
             raise Http404
 
 class ClassCategory(WebBaseModel):
+    summary = models.TextField(
+        default=_("There is currently no summary.")
+    )
     parent_class = models.ForeignKey(
         Class,
         default=None,
@@ -255,9 +248,6 @@ class ClassCategory(WebBaseModel):
     class Meta:
         ordering = ['title']
         verbose_name_plural = _("Categories")
-
-    def __unicode__(self):
-        return self.title
         
 @receiver(post_save, sender=Video)
 def add_submission_rate(sender, **kwargs):
@@ -311,7 +301,7 @@ def delete_video_rate(sender, **kwargs):
 @receiver(pre_delete, sender=Exposition)
 def delete_exposition_rate(sender, **kwargs):
     """
-    This adds the functionality to remove the file upon deletion.
+    
     """
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
     user_rate.ExpoRating -= expo_object_delta_rating()
