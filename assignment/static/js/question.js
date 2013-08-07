@@ -115,7 +115,7 @@ function addVar(varName){
 		name = $(this).parent().parent().attr('id');
 		for(x=0; x<names.length; x++){
 			inputString =
-				names[x]+"= <input type='text' name="+name+"_"+names[x]+"></input><br>";
+				names[x].name+"= <input type='text' name="+name+"_"+names[x].name+" value="+names[x].defValue+"></input><br>";
 			dataZone.append(inputString);
 		}
 	});

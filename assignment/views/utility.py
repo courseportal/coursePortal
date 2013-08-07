@@ -28,8 +28,12 @@ def matchType(request):
 	vartype = request.GET['vartype']
 	variable = Variable.objects.get(name=vartype)
 	names = []
-	for word in variable.variables.split():
-		names.append(word)
+	for word in variable.variables.split('\n'):
+		curVar={
+			'name':word.split(',')[0],
+			'defValue':word.split(',')[2]
+		}
+		names.append(curVar)
 	return HttpResponse(json.dumps(names))
 
 def getTypeCode(request):
@@ -46,9 +50,16 @@ def timehandler(signum, frame):
 def validate(request):
 	user_input = json.loads(request.GET['input'])
 	vartype=Variable.objects.get(name=request.GET['vartype'])
-	
-	for x in range(0,len(vartype.variables.split())):
-		locals()[vartype.variables.split()[x]]=user_input[x]
+	for x in range(0,len(vartype.variables.split('\n'))):
+		variable_args = vartype.variables.split('\n')[x].split(',')
+		locals()[variable_args[0]]=user_input[x]
+		#Test that value can be of the correct type
+		tryString = variable_args[1]+"("+locals()[variable_args[0]]+")"
+		try:
+			locals()[variable_args[0]] = eval(tryString)
+		except:
+			result = "Variable '"+str(variable_args[0])+"' needs to be of type "+variable_args[1]
+			return HttpResponse(result)
 	exec vartype.validation_code
 	return HttpResponse(result)
 

@@ -103,3 +103,10 @@ Spent mostly planning the week, however small improvements were made:
 *Due Dates can be extended
 *improved variable system in adding questions
 *Practice html improved
+
+8/7/2013:
+I have decided not to implement a viewing field in the variable type model, because generated code section declares how the variable will display in text, it is simpler to just allow the user to declare said representation as an html string when creating the variable type.
+*Variable data fields can have default values specified
+*Variable type can be specified in variable list area and will be tested automatically
+	*It is no longer necessary to test for the correct data type in validation code or cast it to be such.
+	*TODO: create testing for a default type
