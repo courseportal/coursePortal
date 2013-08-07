@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; knoatom 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="knoatom 0.5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">knoatom 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p>TODO list:
++ Change how questions are made
++ Loaded assignments/questions can&#8217;t be edited
++ Metrics look at assignments, not classes</p>
+<p>7/9/2013:
+<a href="#id1"><span class="problematic" id="id2">*</span></a>Removed Nyromodal from the project, expanded use of jqueryUI
+<a href="#id3"><span class="problematic" id="id4">*</span></a>Implemented use of google chart API to view boxplots of class performance</p>
+<blockquote>
+<div><a href="#id5"><span class="problematic" id="id6">**</span></a>NOTE: boxplot is made by combining candlestick, line, and dot markers on a chart, google does not have a boxplot chart type</div></blockquote>
+<p><a href="#id7"><span class="problematic" id="id8">*</span></a>Bugfixs</p>
+<p>7/10/2013:
+<a href="#id9"><span class="problematic" id="id10">*</span></a>Assignments can now be unassigned from students after being assigned.
+<a href="#id11"><span class="problematic" id="id12">*</span></a>Assignments and questions can now be deleted without the use of an admin page.</p>
+<p>7/11/2013:
+<a href="#id13"><span class="problematic" id="id14">*</span></a>Separated due_date and start_date from assignment data field</p>
+<blockquote>
+<div><a href="#id15"><span class="problematic" id="id16">**</span></a>NOTE: Data field now holds only a list of point values linked to question ids</div></blockquote>
+<p><a href="#id17"><span class="problematic" id="id18">*</span></a>Fixed bugs in loading question templates, added back button
+<a href="#id19"><span class="problematic" id="id20">*</span></a>Added owners field to questions
+<a href="#id21"><span class="problematic" id="id22">*</span></a>Added ability to make questions/assignments private</p>
+<blockquote>
+<div>!NOT FULLY TESTED YET, EXPECT BUGFIXES IN THE FUTURE
+EDIT:DELETED</div></blockquote>
+<p><a href="#id23"><span class="problematic" id="id24">*</span></a>Slightly improved addQ HTML
+<a href="#id25"><span class="problematic" id="id26">*</span></a>improved url system</p>
+<p>7/12/2013:
+<a href="#id27"><span class="problematic" id="id28">*</span></a>Templates can now be deleted
+<a href="#id29"><span class="problematic" id="id30">*</span></a>More in-depth testing and bugfixing performed</p>
+<p>7/15/2013:
+After discussion with professor, following features have been REMOVED:</p>
+<blockquote>
+<div>1.Ability to make things &#8216;private&#8217;; everything will be public in some fashion
+<a href="#id31"><span class="problematic" id="id32">*</span></a>question and assignment model field &#8216;private&#8217; removed
+2.Current template system. Functionality will be folded into the question system somehow. In the future, templates will be a way of styling a question.
+<a href="#id33"><span class="problematic" id="id34">*</span></a>Models &#8216;template&#8217; and &#8216;Atemplate&#8217; removed, andd corresponding views/templates</div></blockquote>
+<p><a href="#id35"><span class="problematic" id="id36">*</span></a>Classes relate to assignments, questions relate to atoms</p>
+<p>week of 7/26:
+Past two weeks have been spent creating a new model called a &#8216;variable type&#8217;. This essentially allows users to use pre-written code chunks to create a question. Variable types have the following fields:</p>
+<blockquote>
+<div>VARIABLES: a list of the data that user must provide for the code chunk to work
+VALIDATION CODE: Optional, code that can be run to validate data provided by the user. Sets a variable called &#8220;result&#8221; to some helpful error message if the data is not good.
+GENERATED CODE: This is thee code that will be generated in the question&#8217;s code section, with &#8216;__this&#8217; being replaced by the specified variable name. Assignments for necessary data will be pasted in beforehand.</div></blockquote>
+<dl class="docutils">
+<dt>This has been tested with question/assignment creation, deletion, and instantiation and currently works. Additionally, variable data can be defined by other variables. Currently, I am working on expanding the type moel with the following features:</dt>
+<dd><a href="#id37"><span class="problematic" id="id38">*</span></a>Allow the variables list to declare variable types, which can then be automatically tested instead of requiring validation code to include said tests.
+<a href="#id39"><span class="problematic" id="id40">*</span></a>Allow variable list to declare default values.
+<a href="#id41"><span class="problematic" id="id42">*</span></a>Include a &#8216;viewing html&#8217; field, which determines the way that the variable displays on a page.</dd>
+<dt>Additionally, the following types should be created:</dt>
+<dd><a href="#id43"><span class="problematic" id="id44">*</span></a>Set
+<a href="#id45"><span class="problematic" id="id46">*</span></a>graph
+<a href="#id47"><span class="problematic" id="id48">*</span></a>Equation (?Maybe not, mathjax does provide inline math fonts that are fairly easy to use?)
+<a href="#id49"><span class="problematic" id="id50">*</span></a>graph theory graph</dd>
+</dl>
+<p>7/29/2013:
+Spent mostly planning the week, however small improvements were made:</p>
+<blockquote>
+<div><a href="#id51"><span class="problematic" id="id52">*</span></a>Choices now randomize order for multiple choice questions
+{<a href="#id53"><span class="problematic" id="id54">*</span></a>Assign date now determines when studetns can view an instance
+{<a href="#id55"><span class="problematic" id="id56">*</span></a>Due date determines when assignments can no longer be edited
+{Testing the above two features over the course of this week</div></blockquote>
+<p><a href="#id57"><span class="problematic" id="id58">*</span></a>Bugfixes to assigning
+!BUG: edit an assignment yet do not change start/due date -&gt; dates revert to now.</p>
+<p>7/30/2013:
+<a href="#id59"><span class="problematic" id="id60">*</span></a>Initial test of due date system is succesful, no bugs detected
+<a href="#id61"><span class="problematic" id="id62">*</span></a>Fixed bugs in previewing assignments written by others
+<a href="#id63"><span class="problematic" id="id64">*</span></a>Questions can be searched and sorted by related atoms when making an assignment
+<a href="#id65"><span class="problematic" id="id66">*</span></a>Questions now have a difficulty rating determined by how often students get it correct</p>
+<blockquote>
+<div><a href="#id67"><span class="problematic" id="id68">*</span></a>questions can be searched by difficulty when adding them to assignments</div></blockquote>
+<p><a href="#id69"><span class="problematic" id="id70">*</span></a>various small bugfixes</p>
+<p>7/31/2013:
+<a href="#id71"><span class="problematic" id="id72">*</span></a>small bugfixes
+<a href="#id73"><span class="problematic" id="id74">*</span></a>Added the ability for students to do practice questions related to some atom</p>
+<p>8/1/2013:
+<a href="#id75"><span class="problematic" id="id76">*</span></a>Questions create a copy when they are made, consequences of this:</p>
+<blockquote>
+<div><a href="#id77"><span class="problematic" id="id78">*</span></a>If someone changes original question, question does not change in your assignment
+<a href="#id79"><span class="problematic" id="id80">*</span></a>Copy questions cannot be edited or deleted
+<a href="#id81"><span class="problematic" id="id82">*</span></a>Copy questions are shared between multiple people
+<a href="#id83"><span class="problematic" id="id84">*</span></a>If a copy question has no owners and the original question is changed, copy question is deleted</div></blockquote>
+<dl class="docutils">
+<dt><a href="#id85"><span class="problematic" id="id86">*</span></a>Similarly, loading an assignment now creates a copy which can be deleted whenever. However:</dt>
+<dd><a href="#id87"><span class="problematic" id="id88">*</span></a>Questions in copies cannot be edited
+<a href="#id89"><span class="problematic" id="id90">*</span></a>Dates and point values can be edited
+<a href="#id91"><span class="problematic" id="id92">*</span></a>Title cannot be changed</dd>
+</dl>
+<p>8/2/2013:
+<a href="#id93"><span class="problematic" id="id94">*</span></a>fixed bugs in the question creation process
+<a href="#id95"><span class="problematic" id="id96">*</span></a>When loading assignments, assignments can now be sorted and searched by Title and Author</p>
+<blockquote>
+<div><a href="#id97"><span class="problematic" id="id98">*</span></a>Sorting by subject in the working</div></blockquote>
+<p><a href="#id99"><span class="problematic" id="id100">*</span></a>Atoms can be searched and sorted by name and number of related questions when doing practice
+<a href="#id101"><span class="problematic" id="id102">*</span></a>fixed bugs in student practicing</p>
+<p>8/5/2013:
+<a href="#id103"><span class="problematic" id="id104">*</span></a>Mathjax now processes text every time you preview a question rather than just the first time
+<a href="#id105"><span class="problematic" id="id106">*</span></a>Questions can be reported as broken from the practice area</p>
+<blockquote>
+<div><a href="#id107"><span class="problematic" id="id108">*</span></a>Emails creator user-submitted text.</div></blockquote>
+<p><a href="#id109"><span class="problematic" id="id110">*</span></a>Subjects for each question sorted alphabetically</p>
+<p>8/6/2013:
+<a href="#id111"><span class="problematic" id="id112">*</span></a>Assignments can now contain multiple copies of the same question with different point values.
+<a href="#id113"><span class="problematic" id="id114">*</span></a>Fixed bugs in previewing assignments
+<a href="#id115"><span class="problematic" id="id116">*</span></a>Due Dates can be extended
+<a href="#id117"><span class="problematic" id="id118">*</span></a>improved variable system in adding questions
+*</p>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/notes/log_jacob.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">knoatom 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nick Terrell, Taoran Yan, Jacob Texel, Ian Lai.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

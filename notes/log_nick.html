@@ -59,85 +59,232 @@
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title first">Table of Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#week-of-june-17-21" id="id1">Week of June 17-21</a><ul>
-<li><a class="reference internal" href="#goals" id="id2">Goals</a></li>
+<li><a class="reference internal" href="#goals" id="id1">Goals</a><ul>
+<li><a class="reference internal" href="#week-of-july-15-19" id="id2">Week of July 15-19</a></li>
+<li><a class="reference internal" href="#week-of-july-8-12" id="id3">Week of July 8-12</a></li>
+<li><a class="reference internal" href="#week-of-july-1-5" id="id4">Week of July 1-5</a></li>
+<li><a class="reference internal" href="#week-of-june-24-28" id="id5">Week of June 24-28</a></li>
+<li><a class="reference internal" href="#week-of-june-17-21" id="id6">Week of June 17-21</a></li>
+<li><a class="reference internal" href="#week-of-june-9-14" id="id7">Week of June 9-14</a></li>
+<li><a class="reference internal" href="#week-of-june-3-7" id="id8">Week of June 3-7</a></li>
+<li><a class="reference internal" href="#week-of-may-27-31" id="id9">Week of May 27-31</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#week-of-june-9-14" id="id3">Week of June 9-14</a></li>
-<li><a class="reference internal" href="#week-of-june-3-7" id="id4">Week of June 3-7</a></li>
-<li><a class="reference internal" href="#week-of-may-27-31" id="id5">Week of May 27-31</a></li>
 </ul>
 </div>
 <p>This is where I will keep a log of what I&#8217;m working on, problems I&#8217;m having, or just notes in general.</p>
-<div class="section" id="week-of-june-17-21">
-<h2><a class="toc-backref" href="#id1">Week of June 17-21</a><a class="headerlink" href="#week-of-june-17-21" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="goals">
-<h3><a class="toc-backref" href="#id2">Goals</a><a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h3>
+<h2><a class="toc-backref" href="#id1">Goals</a><a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Goals for 2 weeks when I am gone:</dt>
+<dd><ul class="first last simple">
+<li>Finish fixing what I have broken:<ul>
+<li>&#8216;post&#8217;</li>
+<li>voting</li>
+</ul>
+</li>
+<li>Refactor code</li>
+<li>Document code</li>
+<li>Test code</li>
+<li>Deploy to test server<ul>
+<li>How important is the existing data?</li>
+</ul>
+</li>
+<li>MathJax in formus</li>
+</ul>
+</dd>
+</dl>
+<p>Different scores for different atoms
+Multiple tags for everything [x]
+questions are related to atoms like tags? weighted list?
+questions/assignments not related to classes, except professors can assign assignments. But everyone can still see them.</p>
 <dl class="docutils">
 <dt>Todo:</dt>
 <dd><ul class="first last simple">
-<li>Integrate forum into the Atom better</li>
-<li>Put a delete option in the submit form if they are editing</li>
-<li>Add a report feature for all content/posts so that malicious/disrespectful content can be removed</li>
-<li>Allow professors to &#8220;sticky&#8221; content to stay at the top of the content list no matter the ranking in some way, maybe create a new tab for stickied content.</li>
-<li>Implement a vote based ranking system for the forums</li>
-<li>Give users a rating based on submissions and quality of their submissions and use that rating to give &#8220;initial&#8221; rating to new content/posts (Taoran is working on it)</li>
+<li>Work with the url system</li>
+<li>Fix the &#8216;post&#8217; view or remove it and reimplement functionality</li>
+<li>Do we want multiple videos?</li>
+<li>Refactor account, put validation in forms</li>
+<li>Implement ajax table updating in the topic list</li>
+<li>Testing</li>
+<li>Documentation</li>
+<li>Refactor</li>
+<li>More validation for uploaded file types</li>
+<li>Integrate forum into Atom better</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="week-of-july-15-19">
+<h3><a class="toc-backref" href="#id2">Week of July 15-19</a><a class="headerlink" href="#week-of-july-15-19" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Finished refactoring <tt class="docutils literal"><span class="pre">home.py</span></tt>.  Cut the length from 700+ lines to 150 lines and 100 lines of helper functions in a seperate file</li>
+<li>While refactoring <tt class="docutils literal"><span class="pre">home.py</span></tt> I also started to refactor the templates that it utilizes.</li>
+<li>Changed user uploaded content from a ForeignKey to atoms to a ManyToMany.</li>
+<li>Removed the video <tt class="docutils literal"><span class="pre">post</span></tt> view.</li>
+<li>Updated <tt class="docutils literal"><span class="pre">web/models.py</span></tt> to be more consistent.</li>
+</ul>
+</div>
+<div class="section" id="week-of-july-8-12">
+<h3><a class="toc-backref" href="#id3">Week of July 8-12</a><a class="headerlink" href="#week-of-july-8-12" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Finished class edit form<ul>
+<li>It uses AJAX to submit all data, but still works without AJAX.  However you cannot edit categories without javascript, but you can make new ones.</li>
+<li>On this page you can edit the class as well as create and edit categories</li>
+<li>There is a &#8216;finder-like&#8217; view of the categories in the class that you can double click on a category to edit it.</li>
+<li>The buttons and titles change based on wether you are editing or creating a new category.</li>
+<li>The &#8216;finder-like&#8217; columnview of the categories refreshes when you create/update a category.</li>
+<li>The columnview uses AJAX to get one level of the hierarchy at a time for faster loading.</li>
+<li>Added delete category button when we are editing a category</li>
+</ul>
+</li>
+<li>Added a delete button to all of the user uploaded submission pages when you are updating.</li>
+<li>Put the class summary in the class &#8220;home&#8221; page.  HTML markup is allowed.</li>
+<li>Created a universal breadcrumb generating function to replace old version</li>
+<li>Moved the report form to its own view and removed the need for a context variable for an empty ReportForm by using a template tag.</li>
+</ul>
+</div>
+<div class="section" id="week-of-july-1-5">
+<h3><a class="toc-backref" href="#id4">Week of July 1-5</a><a class="headerlink" href="#week-of-july-1-5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Finished class creation form</li>
+<li>Started work on class edit form<ul>
+<li>Added support for creating/editing multiple categories at a time in the class edit form using formsets</li>
+<li>Removed support for creating/editng multiple categories at a time because it is simpler to program and use a form that only allows creating one category at a time.</li>
+<li>Added support for creating categories one at a time in the class edit form</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="week-of-june-24-28">
+<h3><a class="toc-backref" href="#id5">Week of June 24-28</a><a class="headerlink" href="#week-of-june-24-28" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Moved all functionality related to bug reports from <tt class="docutils literal"><span class="pre">web/</span></tt> to <tt class="docutils literal"><span class="pre">knoatom/</span></tt>.</li>
+<li>Added a custom templatetag in <tt class="docutils literal"><span class="pre">knoatom/templatetags/</span></tt> to import the bug report form and abstract that functionality out of the views</li>
+<li>Now the bug report should work for every view that extends <tt class="docutils literal"><span class="pre">base.html</span></tt> automatically</li>
+<li>Moved the rating system into a seperate app</li>
+<li>Added rating for topics in forum</li>
+<li>Forum now orders topics by votes</li>
+<li>Creating new view for creating classes</li>
+</ul>
+</div>
+<div class="section" id="week-of-june-17-21">
+<h3><a class="toc-backref" href="#id6">Week of June 17-21</a><a class="headerlink" href="#week-of-june-17-21" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>So far this week I have:</dt>
+<dd><ul class="first last">
+<li><p class="first">Added custom validation to the exposition form to ensure that the link begins with <tt class="docutils literal"><span class="pre">http://</span></tt> or <tt class="docutils literal"><span class="pre">https://</span></tt></p>
+</li>
+<li><p class="first">Changed the video display list to a sortable table to be consistent with the rest of the content display lists</p>
+</li>
+<li><p class="first">Added a sticky feature for content lists in classes</p>
+<blockquote>
+<div><ul>
+<li><p class="first">First I added a sticky field for each content type in the Class model</p>
+</li>
+<li><p class="first">Then I added functionality to force the table sort to be prepended by a sort on sticky/not stickied by adding a hidden column for sticky status</p>
+</li>
+<li><p class="first">Then I added a button for <tt class="docutils literal"><span class="pre">authors</span></tt> and <tt class="docutils literal"><span class="pre">allowed_users</span></tt> of a class to be able to sticky content in the content list for videos, expositions, notes and examples.</p>
+<blockquote>
+<div><ul class="simple">
+<li>I used AJAX to have the (not) stickied change be reflected in the table without reloading the page</li>
+<li>Then I added automatic table updating and resorting when the votes or sticky status is changed</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">When users are creating new content there is a new field <tt class="docutils literal"><span class="pre">classes_to_sticky_in</span></tt></p>
+<blockquote>
+<div><ul class="simple">
+<li>If the user isn&#8217;t the <tt class="docutils literal"><span class="pre">author</span></tt> or an <tt class="docutils literal"><span class="pre">allowed_user</span></tt> of any class then the field is hidden</li>
+<li>Otherwise it shows all the classes that they are the <tt class="docutils literal"><span class="pre">author</span></tt> of or an <tt class="docutils literal"><span class="pre">allowed_user</span></tt> in and allows them to select the classes they wish the submission to be stickied in</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Abstracted the modal for reporting content to another template because it was repeated 8 times.</p>
+</li>
+<li><p class="first">Changed the deletion of content from linking users to a new page and instead use AJAX and a modal</p>
+<blockquote>
+<div><ul class="simple">
+<li>When a user tries to delete an object a confirmation modal pops up</li>
+<li>If they click yes an AJAX script fires that calls the view and deletes the object and it returns the required variables</li>
+<li>Then the function deletes the row from the table that the content was in and updates the table data</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Changed some minor aesthetic stuff in the content list templates so that weird underlines don&#8217;t show up when hovering over the icons</p>
+</li>
+<li><p class="first">Added tooltips to the option icons</p>
+</li>
+<li><p class="first">Changed the vote system so that the values are abstracted into one place so that it is easy to change in the future</p>
+</li>
+<li><p class="first">Added some code to my delete content AJAX function to update the user rating when you delete the object so it is reflected on the screen without refreshing.</p>
+</li>
 </ul>
 </dd>
 </dl>
 </div>
-</div>
 <div class="section" id="week-of-june-9-14">
-<h2><a class="toc-backref" href="#id3">Week of June 9-14</a><a class="headerlink" href="#week-of-june-9-14" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id7">Week of June 9-14</a><a class="headerlink" href="#week-of-june-9-14" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt>So far this week so far I have:</dt>
 <dd><ul class="first last">
 <li><p class="first">Fixed the forum poll system</p>
 </li>
 <li><p class="first">Added the ability for all users to submit new content for:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>Expositions</li>
 <li>Lecture Notes</li>
 <li>Examples</li>
 </ul>
-<p>Lecture Notes and Examples are limited to <tt class="docutils literal"><span class="pre">.pdf</span></tt> files right now.</p>
+<p>Lecture Notes and Examples are limited to <tt class="docutils literal"><span class="pre">.pdf</span></tt> files right now.  The <tt class="docutils literal"><span class="pre">ALLOWED_FILE_EXTENSIONS</span></tt> setting in <tt class="docutils literal"><span class="pre">settings.py</span></tt> sets the allowed file extensions.  We should probably do more type checking than just this because people can lie.</p>
+</div></blockquote>
 </li>
 <li><p class="first">I have been adding documentation as I go to various functions and classes.</p>
 </li>
 <li><p class="first">Added the ability for the owner of a user submitted object and all staff/superusers to edit/delete that object where they are listed.  This works for:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>Expositions</li>
 <li>Lecture Notes</li>
 <li>Examples</li>
 <li>Videos</li>
 </ul>
+</div></blockquote>
 </li>
 <li><p class="first">Improved aesthetics of exposition/note/example display list</p>
 </li>
 <li><p class="first">Added sorting features to exposition/notes/example display list</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>Default sort is by the votes and users can sort by whatever they want to</li>
 </ul>
+</div></blockquote>
 </li>
 <li><p class="first">Changed the class list to use the same sortable table that user uploaded content is displayed in</p>
 </li>
 <li><p class="first">Changed the class list so only active classes show up to everyone.  Inactive classes show up to:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>The superuser</li>
 <li>The class author</li>
 <li>The allowed users of the class</li>
 </ul>
-<p>If a user tries to access the class by typing in the URL and they don&#8217;t have access then they will be redirected to the <tt class="docutils literal"><span class="pre">'class_index'</span></tt> page.</p>
+</div></blockquote>
+</li>
+<li><p class="first">If a user tries to access the class by typing in the URL and they don&#8217;t have access then they will be redirected to the <tt class="docutils literal"><span class="pre">'class_index'</span></tt> page.</p>
 </li>
 </ul>
 </dd>
 </dl>
 </div>
 <div class="section" id="week-of-june-3-7">
-<h2><a class="toc-backref" href="#id4">Week of June 3-7</a><a class="headerlink" href="#week-of-june-3-7" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id8">Week of June 3-7</a><a class="headerlink" href="#week-of-june-3-7" title="Permalink to this headline">¶</a></h3>
 <p>This week I implemented the forums and completly changed the template structure.</p>
 <dl class="docutils">
-<dt>I used the <a href="#id6"><span class="problematic" id="id7">`Pybbm forums&lt;https://pybbm.readthedocs.org/en/latest/index.html&gt;`_</span></a> to implement the forums.  Most of it was fairly easy to integrate as it was built to be able to easily plug into an existing project.  I had a few problems though including:</dt>
+<dt>I used the <a href="#id10"><span class="problematic" id="id11">`Pybbm forums&lt;https://pybbm.readthedocs.org/en/latest/index.html&gt;`_</span></a> to implement the forums.  Most of it was fairly easy to integrate as it was built to be able to easily plug into an existing project.  I had a few problems though including:</dt>
 <dd><ul class="first last simple">
 <li>The template took some time to set up so that it works</li>
 <li>I had some problems with urls.py because of the ordering and the regexs used</li>
@@ -157,7 +304,7 @@
 <p>Lastly I worked on implementing the forum into the atom view as well as creating a link to the base forum.</p>
 </div>
 <div class="section" id="week-of-may-27-31">
-<h2><a class="toc-backref" href="#id5">Week of May 27-31</a><a class="headerlink" href="#week-of-may-27-31" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id9">Week of May 27-31</a><a class="headerlink" href="#week-of-may-27-31" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt>This week I mainly worked on overhauling the atom orginazational system:</dt>
 <dd><ul class="first last">
@@ -201,6 +348,7 @@
 </dl>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -211,13 +359,17 @@
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Nick&#8217;s Development Log</a><ul>
-<li><a class="reference internal" href="#week-of-june-17-21">Week of June 17-21</a><ul>
-<li><a class="reference internal" href="#goals">Goals</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#goals">Goals</a><ul>
+<li><a class="reference internal" href="#week-of-july-15-19">Week of July 15-19</a></li>
+<li><a class="reference internal" href="#week-of-july-8-12">Week of July 8-12</a></li>
+<li><a class="reference internal" href="#week-of-july-1-5">Week of July 1-5</a></li>
+<li><a class="reference internal" href="#week-of-june-24-28">Week of June 24-28</a></li>
+<li><a class="reference internal" href="#week-of-june-17-21">Week of June 17-21</a></li>
 <li><a class="reference internal" href="#week-of-june-9-14">Week of June 9-14</a></li>
 <li><a class="reference internal" href="#week-of-june-3-7">Week of June 3-7</a></li>
 <li><a class="reference internal" href="#week-of-may-27-31">Week of May 27-31</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

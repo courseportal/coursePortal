@@ -213,6 +213,24 @@ $ workon &lt;venv_name&gt;</pre>
 </li>
 </ol>
 </div>
+<div class="section" id="about-search-with-solr">
+<h3>About Search with Solr<a class="headerlink" href="#about-search-with-solr" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Start the Solr Search Engine</p>
+<p>under the folder with your picked &lt;venv_name&gt;
+$ cd solr-4.3.0/example
+$ java -jar start.jar</p>
+</li>
+<li><p class="first">Manually rebuild the index if necessary (If items have been created or documents have been uploaded before the Solr Search Engine starts, this step is necessary)</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py rebuild_index</pre>
+</div>
+</li>
+<li><p class="first">If no error throws up in step 2, everything should be working now, check by running the server again:</p>
+<div class="highlight-python"><pre>(&lt;venv_name&gt;)$ ./manage.py runserver</pre>
+</div>
+</li>
+</ol>
+</div>
 </div>
 </div>
 
@@ -233,6 +251,7 @@ $ workon &lt;venv_name&gt;</pre>
 <li><a class="reference internal" href="#install-django-and-required-apps">Install Django and Required Apps</a></li>
 <li><a class="reference internal" href="#get-source-code">Get Source Code</a></li>
 <li><a class="reference internal" href="#setup-database">Setup Database</a></li>
+<li><a class="reference internal" href="#about-search-with-solr">About Search with Solr</a></li>
 </ul>
 </li>
 </ul>
