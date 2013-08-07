@@ -183,9 +183,9 @@ Setup Database
 About Search with Solr
 ----------------------
 
-1. Start the Solr Search Engine ::
+1. Start the Solr Search Engine (under the folder with your picked <venv_name> )::
     
-   under the folder with your picked <venv_name> 
+   
    $ cd solr-4.3.0/example
    $ java -jar start.jar
 
