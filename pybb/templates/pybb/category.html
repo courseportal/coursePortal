@@ -3,7 +3,7 @@
 
 <div class='category'>
     <h1>{{ category.name }} {% if category.hidden %}[{% trans "Hidden" %}]{% endif %}</h1>
-    <table class="table category-table">
+    <table id="forum_category" class="table category-table">
         <thead>
             <tr class="forum-row head-row">
                 <th class="forum-name">
@@ -47,3 +47,12 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    
+    $(document).ready(function() {
+                      var oTable = $('#forum_category').dataTable( {
+                                    "sDom": '<"top"lf>rt<"bottom"p><"clear">'
+                                                                  });
+                      });
+</script>

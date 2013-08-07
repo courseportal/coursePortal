@@ -14,18 +14,18 @@
     <td>
         {{ result.object.owner }}
     </td>
-   <!-- <td >
+    <td style="width:25px">
         <div class="votes-sum-3-{{result.object.id}}">
-            {{ result.object.vote_set}}
+            {{ result.object.vote_set|total}}
             
         </div>
-    </td> -->
-    <td style="width:75px">
+    </td> 
+    <td style="width:70px">
         <div class="dateCreated-3-{{ result.object.id }}">
             {{result.object.date_created}}
         </div>
     </td>
-    <td style="width:75px">
+    <td style="width:50px">
         <div class="score-sum-3-{{result.object.id}}">
             {{result.score}}
         </div>
@@ -45,19 +45,17 @@
     <td>
         {{ result.object.owner }}
     </td>
-    <!-- <td >
+    <td style="width:25px">
         <div class="votes-sum-3-{{result.object.id}}">
-            {% for i in result.object.vote_set.all %}
-            {{i}}
-            {% endfor %}
+            {{ result.object.vote_set|total}}
         </div>
-    </td> -->
-    <td style="width:75px">
+    </td> 
+    <td style="width:70px">
         <div class="dateCreated-3-{{ result.object.id }}">
             {{result.object.date_created}}
         </div>
     </td>
-    <td style="width:75px">
+    <td style="width:50px">
         <div class="score-sum-3-{{result.object.id}}">
             {{result.score}}
         </div>
@@ -76,17 +74,17 @@
             <td>
                 {{ result.object.owner }}
             </td>
-            <!-- <td >
+            <td style="width:25px">
                 <div class="votes-sum-3-{{result.object.id}}">
-                    {{result.object.votes}}
+                    {{ result.object.vote_set|total}}
                 </div>
-            </td> -->
-            <td style="width:75px">
+            </td> 
+            <td style="width:70px">
                 <div class="dateCreated-3-{{ result.object.id }}">
                     {{result.object.date_created}}
                 </div>
             </td>
-            <td style="width:75px">
+            <td style="width:50px">
                 <div class="score-sum-3-{{result.object.id}}">
                     {{result.score}}
                 </div>
