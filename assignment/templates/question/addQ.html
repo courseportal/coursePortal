@@ -11,13 +11,10 @@
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
-<!-- JQUERY UI -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
-
 <!-- MATHJAX -->
 <head>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
+MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
     jax: ["input/TeX", "output/HTML-CSS"],
     tex2jax: {
@@ -26,7 +23,7 @@
       processEscapes: true
     },
     "HTML-CSS": { availableFonts: ["TeX"] }
-  });
+});
 </script>
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -40,7 +37,7 @@
 	<textarea id="problemText" title="Problem text"></textarea><br>
 	<div class="row-fluid">
 		<div id='left' class="span6">
-			<div class="btn" onclick="viewVariables()">Variables</div><br>
+			<a href="#variable-zone" role="button" data-toggle="modal" class="btn">Variables</a><br>
 			Question Type:<select onchange="inputChange($(this).val());" name="question_type">
 				<option value="Short Answer" selected>Short Answer</option>
 				<option value="True/False">True/False</option>
@@ -64,40 +61,59 @@
 	<input type="hidden" id="choices" name="choices"></input>
 	<input type="hidden" id="atom_list" name="atoms"></input>
 	<div class="row-fluid">
-		<div class="span5 btn btn-large" onclick="validateAndPreview()">Preview</div>
+		<a href="#preview-zone" role="button" data-toggle="modal" class="span5 btn btn-large">Preview</a>
 		<div class="span5 btn btn-large" onclick="validateAndSubmit()">Create</div>
 	</div>
 
-	<div id="variable-zone">
-		<br>
-		<br>
-		<div class="row-fluid">
-			<div class='span8'>
-				<table class="table list-table">
-					<thead>
-						<th>Name</th>
-						<th>Type</th>
-						<th>Data</th>
-					</thead>
-					<tbody id="variable_list">
-					</tbody>
-				</table>
-			</div>
-			<div class='span3'>
-				<br>
-				<br>
-				<div class="btn" onclick='addVar($("#add_name").val());'>Add<br>
-					<input type='text' id='add_name' style='width:100px'></input>
-				</div><br>
-				<div class="btn" onclick='delVar($("#delete_name").val());'>Delete<br>
-					<input type='text' id='delete_name' style='width:100px'></input>
+
+	<!-- variable modal -->
+	<div style="width:900px" class="modal hide fade" role="dialog" id="variable-zone">
+		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    		<h3>Question Variables</h3>
+  		</div>
+  		<div class="modal-body" style="max-height:1000px">
+			<div class="row-fluid">
+				<div class='span8'>
+					<table class="table list-table">
+						<thead>
+							<th>Name</th>
+							<th>Type</th>
+							<th>Data</th>
+						</thead>
+						<tbody id="variable_list">
+						</tbody>
+					</table>
+				</div>
+				<div class='span3'>
+					<div class="btn" onclick='addVar($("#add_name").val());'>Add<br>
+						<input type='text' id='add_name' style='width:100px'></input>
+					</div><br>
+					<div class="btn" onclick='delVar($("#delete_name").val());'>Delete<br>
+						<input type='text' id='delete_name' style='width:100px'></input>
+					</div>
 				</div>
 			</div>
+
 		</div>
-		<div class="btn" onclick="$('#variable-zone').dialog('close')">Close</div>
+		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  		</div>
 	</div>
 </form>
-<div id="preview-zone"></div>
+
+<!-- preview modal -->
+<div class='modal hids fade' role='dialog' id="preview-zone">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3>Question Preview</h3>
+	</div>
+	<div class="modal-body" id="preview-body">
+	</div>
+	<div class="modal-footer">
+    	<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  	</div>
+</div>
 </body>
 
 <div style="display:none">
@@ -108,7 +124,5 @@
 	</select>
 </div>
 
-
 <script src="{{ STATIC_PREFIX }}js/question.js"></script>
-
 {% endblock %}

@@ -110,3 +110,10 @@ I have decided not to implement a viewing field in the variable type model, beca
 *Variable type can be specified in variable list area and will be tested automatically
 	*It is no longer necessary to test for the correct data type in validation code or cast it to be such.
 	*TODO: create testing for a default type
+Variables should now be specified in the following format:
+name,type,default
+	name: The name of the variable
+	type: What type data provided should be. This will be automatically tested.
+	default: A default value for the variable.
+*Removed jqueryUI from addQ.html
+*Removed jqueryUI from addassignment.html

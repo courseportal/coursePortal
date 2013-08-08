@@ -23,12 +23,14 @@
 	<div>Maximum: {{stats.maximum|floatformat:2}}%</div>
 	<div>Median: {{stats.median|floatformat:2}}%</div>
 	<div style="display:none">
-		<img  id="dialog{{stats.assignmentid}}" title="Assignment boxplot"></img>
+		<img  id="dialog{{stats.assignmentid}}" title="{{stats.assignmentName}} boxplot"></img>
 	</div>
 	<br>
 	<br>
 {%endfor%}
 </body>
+
+
 <script>
 function display(data, assignmentid){
 	var name1="dialog", name2="#";

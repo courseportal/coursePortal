@@ -241,16 +241,13 @@ def selectInstance(request, messages=[]):
 	return render(request, 'assignment/select.html', context)
 
 def extend(request):
-	try:
-		date=request.POST['duedate']
-		inputs = request.POST
-		for i in inputs:
-			if i=="csrfmiddlewaretoken" or i=="dudate":
-				continue
-			instance = AssignmentInstance.objects.get(id=request.POST[i])
-			instance.due_date=date
-			instance.save()
-	except:
-		pass
+	date=request.POST['duedate']
+	inputs = request.POST
+	for i in inputs:
+		if i=="csrfmiddlewaretoken" or i=="duedate":
+			continue
+		instance = AssignmentInstance.objects.get(id=request.POST[i])
+		instance.due_date=date
+		instance.save()
 	messages=["Due dates extended"]
 	return selectInstance(request, messages)

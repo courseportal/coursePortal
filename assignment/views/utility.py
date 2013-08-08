@@ -50,6 +50,8 @@ def timehandler(signum, frame):
 def validate(request):
 	user_input = json.loads(request.GET['input'])
 	vartype=Variable.objects.get(name=request.GET['vartype'])
+	if vartype == 'Custom':
+		return HttpResponse('0')
 	for x in range(0,len(vartype.variables.split('\n'))):
 		variable_args = vartype.variables.split('\n')[x].split(',')
 		locals()[variable_args[0]]=user_input[x]
@@ -71,8 +73,6 @@ def validateFull(request):
 	except:
 		return HttpResponse("Full Code did not validate!")
 	return HttpResponse(0)
-
-
 
 def practiceEval(request):
 	question = Question.objects.get(id=request.GET['qid']) 

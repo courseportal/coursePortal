@@ -59,37 +59,23 @@ var patt1=/\$[A-z]+[A-z0-9_]*/g;
 code = CodeMirror.fromTextArea($('#code').get(0), CodeMirrorSettings);
 $('#variable_list').sortable();
 
-$('#variable-zone').dialog({
-	title: "VARIABLES",
-	width: document.body.clientWidth*0.7,
-	height: document.body.clientHeight*0.6,
-	modal: true,
-	autoOpen: false,
-	open: function(event, ui){
-		var text = tinymce.activeEditor.getContent();
-		var index = 0
-		var varNames=text.match(patt1);
-		if(varNames!=null){
-			for(var x=0; x<varNames.length; x++){
-				addVar(varNames[x].substr(1));
-			}
+$('#variable-zone').on('show', function() {
+	var text = tinymce.activeEditor.getContent();
+	var varNames=text.match(patt1);
+	if(varNames!=null){
+		for(var x=0; x<varNames.length; x++){
+			addVar(varNames[x].substr(1));
 		}
-	},
-	close: function(event, ui){
-		$('#add_name').val('');
-		$('#delete_name').val('');
-	},
+	
+	}
+});
+$('#variable-zone').on('hidden',function(){
+	$('#add_name').val('');
+	$('#delete_name').val('');
 });
 
-$('#preview-zone').dialog({
-	title: "PREVIEW",
-	width: document.body.clientWidth*0.7,
-	height: document.body.clientHeight*0.6,
-	modal:true,
-	autoOpen:false,
-	close: function(event, ui){
-		$('#preview-zone').html('');
-	},
+$('#preview-zone').on('show', function(){
+	validateAndPreview();
 });
 
 function addVar(varName){
@@ -101,22 +87,27 @@ function addVar(varName){
 	variables.attr('name', varName+"_"+variables.attr('name'));
 	variables.change(function(){
 		var name = $(this).val();
-		data = {
-			vartype : name,
-		};
-		$.ajax('/assignment/utility/matchType/', {
-			type: 'GET',
-			async: false,
-			data: data,
-		}).done(function(response){
-			names=jQuery.parseJSON(response);
-		});
-		dataZone = $(this).parent().parent().children('.row-data').html('');
-		name = $(this).parent().parent().attr('id');
-		for(x=0; x<names.length; x++){
-			inputString =
-				names[x].name+"= <input type='text' name="+name+"_"+names[x].name+" value="+names[x].defValue+"></input><br>";
-			dataZone.append(inputString);
+		if(name != "Custom"){
+			data = {
+				vartype : name,
+			};
+			$.ajax('/assignment/utility/matchType/', {
+				type: 'GET',
+				async: false,
+				data: data,
+			}).done(function(response){
+				names=jQuery.parseJSON(response);
+			});
+			dataZone = $(this).parent().parent().children('.row-data').html('');
+			name = $(this).parent().parent().attr('id');
+			for(x=0; x<names.length; x++){
+				inputString =
+					names[x].name+"= <input type='text' style='width:100px' name="+name+"_"+names[x].name+" value="+names[x].defValue+"></input><br>";
+				dataZone.append(inputString);
+			}
+		}
+		else{
+			$(this).parent().parent().children('.row-data').html('');
 		}
 	});
 }
@@ -133,10 +124,6 @@ function rowString(varName){
 			<td class='row-data'></td>\
 		</tr>";
 	return rowHTML
-}
-
-function viewVariables(){
-	$('#variable-zone').dialog('open');
 }
 
 function validateAndPreview(){
@@ -186,11 +173,10 @@ function validateAndPreview(){
 		return false;
 	}
 	//Finally preview
-	$('#preview-zone').load('question/preview',pdata, function(response, status, xhr){
+	$('#preview-body').load('question/preview',pdata, function(response, status, xhr){
 		MathJax.Hub.Queue(
       		["Typeset",MathJax.Hub,'preview-zone']
     	);
-		$('#preview-zone').dialog('open');
 	});
 }
 
