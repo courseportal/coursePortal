@@ -16,11 +16,12 @@ This file contains things that are in both "base/home.html "and class/home.html"
 
 <!-- Default app specific content for the content page, will get overridden by other templates -->
 
-<!-- Should spruce this up a bit -->
+
+{% load staticfiles %}
 {% if top_ranked_videos %}
 	{% include "web/home/shared/top_ratings.html" %}
 {% else %}
-<p>This is the home page of the site~!</p>
+<p>This is the home page of the site!</p>
 <!--
 <div id="myCarousel" class="carousel slide">
     <ol class="carousel-indicators" style="list-style-type: none;" >

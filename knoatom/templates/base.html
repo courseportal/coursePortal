@@ -39,46 +39,23 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 
 {% block extra_head %}{% endblock %}
 
-{% load static %}
-{% get_static_prefix as STATIC_PREFIX %}
-
-<link href="{{ STATIC_PREFIX }}css/bootstrap.min.css" rel="stylesheet">
-<link href="{{ STATIC_PREFIX }}css/bootstrap-responsive.css" rel="stylesheet">
-<link href="{{ STATIC_PREFIX }}css/bootstrap-wysihtml5.css" rel="stylesheet">
-<link href="{{ STATIC_PREFIX }}css/jquery.dataTables_themeroller.css" rel="stylesheet">
-<link href="{{ STATIC_PREFIX }}css/jquery.dataTables.css" rel="stylesheet">
-
+{% load staticfiles %}
+{% block stylesheets %}
+<link href="{% static css/bootstrap.min.css %}" rel="stylesheet">
+<link href="{% static css/bootstrap-responsive.css %}" rel="stylesheet">
+<link href="{% static css/bootstrap-wysihtml5.css %}" rel="stylesheet">
+<link href="{% static css/jquery.dataTables_themeroller.css %}" rel="stylesheet">
+<link href="{% static css/jquery.dataTables.css %}" rel="stylesheet">
+<link href="{% static css/theme.bootstrap.css %}" rel="stylesheet">
+{% endblock stylesheets %}
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
-<link href="{{ STATIC_PREFIX }}css/theme.bootstrap.css" rel="stylesheet">
-
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script src="{{ STATIC_PREFIX }}js/jquery.formset.min.js"></script>
-<script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.min.js"></script>
-<script src="{{ STATIC_PREFIX}}js/jquery.tablesorter.widgets.min.js"></script>
-
-<script src="{{ STATIC_PREFIX}}js/jquery.dataTables.js"></script>
-<script src="{{ STATIC_PREFIX}}js/dataTables.htmlColumnFilter.js"></script>
-
-<script src="{{ STATIC_PREFIX }}js/jquery.tablesorter.pager.js"></script>
-
-
 
 {% block head %}
 {% endblock %}
 
 </head>
 <body>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/analytics.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/swfobject.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/wysihtml5-0.3.0_rc2.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap-wysihtml5.js"></script>
-    <script type="text/javascript" src="{{ STATIC_PREFIX }}js/knoatom.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/voting.js"></script>
-    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}pybb/js/pybbjs.js"></script>
     {% block extra_script %}
     {% endblock %}
 
@@ -210,6 +187,26 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 	</div>
 </div> <!-- end #expo_modal -->
 
+{% block javascript %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="{% static js/jquery.formset.min.js %}"></script>
+<script src="{% static js/jquery.tablesorter.min.js %}"></script>
+<script src="{% static js/jquery.tablesorter.widgets.min.js %}"></script>
 
+<script src="{% static js/jquery.dataTables.js %}"></script>
+<script src="{% static js/dataTables.htmlColumnFilter.js %}"></script>
+
+<script src="{% static js/jquery.tablesorter.pager.js %}"></script>
+
+<script type="text/javascript" src="{% static js/analytics.js %}"></script>
+<script type="text/javascript" src="{% static js/swfobject.js %}"></script>
+<script type="text/javascript" src="{% static js/wysihtml5-0.3.0_rc2.min.js %}"></script>
+<script type="text/javascript" src="{% static js/bootstrap-wysihtml5.js %}"></script>
+<script type="text/javascript" src="{% static js/knoatom.js %}"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/voting.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}pybb/js/pybbjs.js"></script>
+{% endblock javascript %}
 </body>
 </html>

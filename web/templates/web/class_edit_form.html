@@ -34,6 +34,7 @@ BLOCKS(Including inherited blocks):
 {% endcomment %}
 
 {% block content %}
+{% load staticfiles %}
 <script src="{{ STATIC_URL }}js/jquery.columnview.js" type="text/javascript"></script>
 <script type="text/javascript">
 var cat_id; // Used to store the category id for later use if we are updating a category
