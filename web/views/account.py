@@ -15,7 +15,6 @@ import logging
 import random, string
 from web.forms.account import *
 from rating.models import UserRating
-from knoatom.settings import EMAIL_HOST_USER
 from knoatom.view_functions import get_breadcrumbs
 from web.views.view_functions import web_breadcrumb_dict
 

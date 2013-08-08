@@ -6,7 +6,7 @@ from django.forms.models import BaseModelFormSet, modelformset_factory, BaseInli
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 #from sets import Set
-from knoatom.settings import ALLOWED_FILE_EXTENSIONS
+from django.conf import settings
 
 # Import ForumInlineAdmin
 from pybb.models import Forum, Category
@@ -50,7 +50,7 @@ class ExampleInline(admin.StackedInline):
 	
 class FileUploadForm(forms.ModelForm):
 	r"""
-	Custom form for only allowing file types defined in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENSIONS``.
+	Custom form for only allowing file types defined in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENSIONS``.
 	"""
 	
 	def clean_file(self):
