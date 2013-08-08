@@ -147,6 +147,8 @@ Install Django and Required Apps
 		(<venv_name>)$ pip install pysolr
 		(<venv_name>)$ pip install simplejson
         (<venv_name>)$ pip install numpy
+        
+        
 		
 Get Source Code
 ---------------
@@ -177,3 +179,20 @@ Setup Database
 		(<venv_name>)$ ./manage.py runserver
 		
 	and make sure everything is working
+    
+About Search with Solr
+----------------------
+
+1. Start the Solr Search Engine (under the folder with your picked <venv_name> )::
+    
+   
+   $ cd solr-4.3.0/example
+   $ java -jar start.jar
+
+2. Manually rebuild the index if necessary (If items have been created or documents have been uploaded before the Solr Search Engine starts, this step is necessary) ::
+
+   (<venv_name>)$ ./manage.py rebuild_index
+   
+3. If no error throws up in step 2, everything should be working now, check by running the server again::
+
+    (<venv_name>)$ ./manage.py runserver

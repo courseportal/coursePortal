@@ -70,7 +70,8 @@ class Atom(WebBaseModel):
         ordering = ['title']
         
     def countQuestions(self):
-        return self.related_questions.filter(isCopy=False).count()
+		return self.related_questions.filter(isCopy=False).count()
+
         
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
@@ -215,7 +216,7 @@ class Class(WebBaseModel):
     class Meta:
         ordering = ['title']
         verbose_name_plural = _("Classes")
-        
+
     def get_absolute_url(self):
         if self.pk is not None:
             return reverse('classes', args=[self.pk])

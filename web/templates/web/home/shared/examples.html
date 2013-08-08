@@ -57,13 +57,13 @@ OPTIONAL context:
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
-					<a rel="tooltip" class="icon-flag" href="#myModalExample{{ example.id} }" data-toggle="modal" title="Report"></a>
+					<a rel="tooltip" class="icon-flag" href="#myModalExample{{ example.id}}" data-toggle="modal" title="Report"></a>
 					{% include "web/home/shared/sticky.html" with object=example type='example' %}
 					{% if user.is_superuser or example.owner == user %}
 						<a rel="tooltip" class="icon-edit" href="{% url "example_submit" example.id %}?next={{request.path}}" title="Edit"></a>
 						<a rel="tooltip" class="icon-remove" href="#deleteModal-example-{{ example.id }}" data-toggle="modal" title="Delete"></a>
 						{# We only need to include this modal if the user is allowed to delete #}
-						{% include "web/home/shared/delete_modal.html" with object=example type='example' %}
+						{% include "web/home/shared/delete_modal.html" with object=example type='Example' %}
 					{% endif %}
 				</td>
 				<td style="display:none;">

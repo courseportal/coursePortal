@@ -11,7 +11,9 @@
             <th id="posts" class="topic-post-count">
                 {% trans "Posts" %}
             </th>
-            <th id="votes" class="votes">
+
+            <th id="vote" class="votes">
+
                 {% trans "Votes" %}
             </th>
             <th id="views" class="topic-view-count">
@@ -111,8 +113,9 @@
                                        oTable.fnSort( [[6,"desc"],[2,"desc"]] );
                                        });
                       
-                      oTable.fnSortListener( document.getElementById("votes"), 3);
-                      $("#votes").click( function () {
+
+                      oTable.fnSortListener( document.getElementById("vote"), 3);
+                      $("#vote").click( function () {
                                         oTable.fnSort( [[6,"desc"],[3,"desc"]] );
                                         });
                       

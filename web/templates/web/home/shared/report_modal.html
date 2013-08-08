@@ -1,5 +1,5 @@
 {% load my_tags %}
-<div id="myModal{{ type }}{{ e.id }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="myModal{{ type }}{{ object.id }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div id="report-messages"></div>
   <form id="report-form" class="testForm" method="post" action="{{form_action|default:'/ajax/report/'}}">
       {% csrf_token %}
