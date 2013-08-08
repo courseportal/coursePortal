@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.template import loader, RequestContext
 from django.shortcuts import render
+from django.conf import settings
 import hashlib
 import logging
 import random, string
@@ -252,7 +253,7 @@ def register(request):
 						'Management')
 					),
 					from_email='knoatom-noreply@gmail.com', 
-					recipient_list=[user.email, EMAIL_HOST_USER], 
+					recipient_list=[user.email, settings.EMAIL_HOST_USER], 
 					fail_silently=False
 				)
 				messages.success(request, _('You have been registered. Please '

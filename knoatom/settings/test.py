@@ -21,6 +21,8 @@ EMAIL_HOST_USER = 'knoatom.webmaster@gmail.com'
 EMAIL_HOST_PASSWORD = 'djangogrubsalad'
 EMAIL_PORT = 587
 
+ALLOWED_HOSTS = ['localhost']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
