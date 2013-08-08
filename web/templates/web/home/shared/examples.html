@@ -63,7 +63,7 @@ OPTIONAL context:
 						<a rel="tooltip" class="icon-edit" href="{% url "example_submit" example.id %}?next={{request.path}}" title="Edit"></a>
 						<a rel="tooltip" class="icon-remove" href="#deleteModal-example-{{ example.id }}" data-toggle="modal" title="Delete"></a>
 						{# We only need to include this modal if the user is allowed to delete #}
-						{% include "web/home/shared/delete_modal.html" with object=example type='Example' %}
+						{% include "web/home/shared/delete_modal.html" with object=example type='example' %}
 					{% endif %}
 				</td>
 				<td style="display:none;">
