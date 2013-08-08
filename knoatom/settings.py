@@ -8,8 +8,9 @@ TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = True
 
 ADMINS = (
-          ('Bryan Kendall', 'bkend@umich.edu'),
-          )
+    ('Nick Terrell', 'terrelln@umich.edu'),
+    ('Jacob Texel', 'texel@umich.edu'),
+)
 
 # Email
 EMAIL_SUBJECT_PREFIX = '[KnoAtom] '
