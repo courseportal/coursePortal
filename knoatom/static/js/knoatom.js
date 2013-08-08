@@ -112,5 +112,6 @@ init_delete_content = function() {
 $(document).ready(function() {
     init_sidebar();
 	init_sticking();
+  init_delete_content();
     //init_video_viewer();
 });

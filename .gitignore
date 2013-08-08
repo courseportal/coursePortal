@@ -1,5 +1,7 @@
 *.pyc
 *.sw
+*media/*
+/static/
 */media/*
 update.bat
 .DS_Store

@@ -83,7 +83,7 @@ OPTIONAL context:
 <script>{% include 'js/tablesorter.settings.js' with table='#expos' sortForce='[[5,1]]' sortAppend='[[3,1]]' sortList='[[5,1],[3,1]]' %}</script>
 
 
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />
+<link rel="stylesheet" type="text/css" href="{% static "css/knoatom.css" %}" />
 <script type="text/javascript">
     $('textarea').addClass('span6').wysihtml5();
     $('.expo_link').each(function() {

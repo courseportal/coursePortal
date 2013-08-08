@@ -34,7 +34,7 @@ BLOCKS(Including inherited blocks):
 {% endcomment %}
 {% block content %}
 {% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/knoatom.css" />
+<link rel="stylesheet" type="text/css" href="{% static "/css/knoatom.css" %}" />
 <script type="text/javascript">
 $(document).ready(function() {
 

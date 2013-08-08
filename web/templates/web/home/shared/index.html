@@ -32,9 +32,9 @@ This file contains things that are in both "base/home.html "and class/home.html"
     <!-- Carousel items -->
 <!--
     <div class="carousel-inner">
-        <div class="active item"><img src="{{ STATIC_URL }}/pic/pic_1.jpg" class="img-rounded" style="height:400px;width:1000px;"></div>
-        <div class="item"><img src="{{ STATIC_URL }}/pic/pic_2.jpg" class="img-rounded" style="height:400px;width:1000px;"></div>
-        <div class="item"><img src="{{ STATIC_URL }}/pic/pic_3.jpg" class="img-rounded" style="height:400px;width:1000px;"></div>
+        <div class="active item"><img src="{% static "/pic/pic_1.jpg" %}" class="img-rounded" style="height:400px;width:1000px;"></div>
+        <div class="item"><img src="{% static "/pic/pic_2.jpg" %}" class="img-rounded" style="height:400px;width:1000px;"></div>
+        <div class="item"><img src="{% static "/pic/pic_3.jpg" %}" class="img-rounded" style="height:400px;width:1000px;"></div>
     </div>
     <!-- Carousel nav -->
 <!--
