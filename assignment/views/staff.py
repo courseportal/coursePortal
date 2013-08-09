@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from assignment.models import *
 from web.models import *
 from django.contrib.auth.models import User
@@ -10,6 +10,7 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs
 from math import *
 from random import *
+import web.models
 
 def viewStudent(request):
 	user = request.user
@@ -233,6 +234,36 @@ def deleteQ(request):
 	if request.method == "POST":
 		context['messages'] = ['Question(s) deleted']
 	return render(request, 'question/delete.html', context)
+
+def editQ(request, id):
+	question = get_object_or_404(Question, id=id)
+	#Generate list of variables
+	variable_list = []
+	varCode = json.loads(question.data)['code'].split('#CUSTOM')[0].replace('\r\n', '\n')
+	if varCode.find('#var:') >= 0:
+		for content in varCode.split('#var')[1:]:
+			variable={
+				'vartype':'',
+				'varname':'',
+				'vardata':dict(),
+			}
+			variable['vartype'] = content.split('\n')[0].split('_')[0]
+			variable['varname'] = content.split('\n')[0].split('_')[1]
+			for line in content.split('#Template Code\n')[0].split('\n')[1:-1]:
+				variable['vardata'][line.split('=')[0]] = line.split('=')[1]
+			variable_list.append(variable)
+	#Get code
+	code = json.loads(question.data)['code'].split('#CUSTOM')[1]
+
+	context=get_breadcrumbs(request.path)
+	context['qdata'] = json.loads(question.data)
+	context['code'] = code
+	context['variable_list'] = variable_list
+	context['question'] = question
+	context['type_list'] = Variable.objects.all()
+	context['atom_list'] = web.models.Atom.objects.all()
+	return render(request, 'question/addQ.html', context)
+
 
 def selectInstance(request, messages=[]):
 	context = get_breadcrumbs(request.path)

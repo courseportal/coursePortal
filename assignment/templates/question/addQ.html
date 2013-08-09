@@ -1,6 +1,7 @@
 
 {% extends "assignment_nav.html" %}
 {% block content %}
+{% load my_filters %}
 <script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
 
 <script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
@@ -9,7 +10,6 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
 
 <link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
 
 <!-- MATHJAX -->
 <head>
@@ -31,10 +31,18 @@ MathJax.Hub.Config({
 </head>
 
 <body>
+{% if question %}
+<div style='display:none'>
+	<input type="hidden" id='qid' value="{{question.id}}"></input>
+	<input type='text' id='initialType' value='{{qdata.question_type}}'></input>
+	<input type='text' id='initialAnswer' value='{{qdata.solution}}'></input>
+	<input type='text' id='initialChoice' value='{{qdata.choices}}'></input>
+</div>
+{% endif %}
 <form action='{% url "create_question" %}' id="questionForm" method="POST">
 {% csrf_token %}
-	Title:<input type='text' name='question_title'></input> 
-	<textarea id="problemText" title="Problem text"></textarea><br>
+	Title:<input type='text' name='question_title' value="{{question.title}}"></input>
+	<textarea id="problemText" title="Problem text">{{qdata.text}}</textarea><br>
 	<div class="row-fluid">
 		<div id='left' class="span6">
 			<a href="#variable-zone" role="button" data-toggle="modal" class="btn">Variables</a><br>
@@ -48,10 +56,10 @@ MathJax.Hub.Config({
 		</div>
 		<div id="right" class="span6">
 			Custom code area:<br>
-			<textarea name="code" id="code"></textarea><br>
+			<textarea name="code" id="code">{{code}}</textarea><br>
 			Atoms:<select multiple="multiple" id="atoms">
-				{% for atom in atom_list %}
-					<option name="{{atom.id}}" value="{{atom.id}}">{{atom}}</option>
+				{% for a in atom_list %}
+				<option name="{{a.id}}" value="{{a.id}}" {%if question.atoms|has_atom:a.id%}selected{%endif%}>{{a}}</option>
 				{% endfor %}
 			</select>
 			<div>Hold ctrl to select multiple.</div>
@@ -76,13 +84,32 @@ MathJax.Hub.Config({
 			<div class="row-fluid">
 				<div class='span8'>
 					<table class="table list-table">
-						<thead>
-							<th>Name</th>
-							<th>Type</th>
-							<th>Data</th>
-						</thead>
-						<tbody id="variable_list">
-						</tbody>
+					<thead>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Data</th>
+					</thead>
+					<tbody id="variable_list">
+					{%for var in variable_list%}
+						<tr id='{{var.varname}}'>
+							<td>{{var.varname}}</td>
+							<td class='typecell'>
+							<select class = "variables" name="variable_type">
+							{% for v in type_list %}
+							<option value="{{v.name}}" {%ifequal v.name var.vartype%}selected{%endifequal%}>{{v.name}}</option>
+							{% endfor %}
+							</select>
+							</td>
+							<td class='row-data'>
+							{%for key in var.vardata%}
+							{{key}}= 
+							<input type='text' style='width:100px' name="{{var.varname}}_{{key}}" value="{{var.vardata|lookup:key}}">
+							</input><br>
+							{%endfor%}
+							</td>
+						</tr>
+					{%endfor%}
+					</tbody>
 					</table>
 				</div>
 				<div class='span3'>

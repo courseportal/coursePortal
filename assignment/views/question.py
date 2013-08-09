@@ -18,7 +18,6 @@ def detail(request, id, practice=False):
 	test = ''
 	try:
 		exec data['code']
-
 	except Exception as ex:
 		test += "Error in code section:<br>"+str(ex)+"<br>"
 
@@ -65,15 +64,30 @@ def addQ(request):
 	context['atom_list']= Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-def create2(request):
-	q = Question()
+def create(request):
+	qid=''
+	if 'qid' in request.POST:
+		qid=request.POST['qid']
+		q = Question.objects.get(id=qid)
+		q.owners.clear()
+		q.atoms.clear()
+		if q.copy.all()[0].owners.count() == 0:
+			q.copy.all()[0].delete()
+		else:
+			q.copy.all()[0].original = None
+			q.copy.all()[0].save()
+	else:
+		q = Question()
 	q.title = request.POST['question_title']
 	data=dict()
 	data['code'] = request.POST['code']
+	if data['code'][0] == '\r':
+		data['code']=data['code'][2:]
 	data['solution'] = request.POST['answer']
 	data['text'] = request.POST['text']
+	data['question_type'] = request.POST['question_type']
 	choices = json.loads(request.POST['choices'])
-	if request.POST['question_type'] == 'True/False':
+	if data['question_type'] == 'True/False':
 		if data['solution'] == 'True':
 			choices.append('False')
 		else:

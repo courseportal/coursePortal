@@ -33,8 +33,6 @@ MathJax.Hub.Config({
 </script>
 </head>
 
-
-
 <html>
 <body>
 	<a href="{% url 'assignment_index' %}" style="margin-right:5px" class="btn btn-success" id="loadA">Load Assignment</a>
@@ -47,11 +45,11 @@ MathJax.Hub.Config({
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
+			<input type="date" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
+			<input type="date" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
 		</div>
 
 	</div>
@@ -107,6 +105,9 @@ MathJax.Hub.Config({
 	<hr>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm" style="margin-bottom:10px">
 	{% csrf_token %}
+		{% if assignment %}
+			<input type='hidden' name='aid' value="{{assignment.id}}"></input>
+		{% endif %}
 		<input type="hidden" name="copystatus" value="{{isCopy}}"></input>
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>

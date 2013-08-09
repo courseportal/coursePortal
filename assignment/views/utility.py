@@ -8,21 +8,7 @@ from web.models import *
 from django.contrib.auth.models import User
 from math import *
 from random import *
-import string, signal#, resource
-
-
-def checkAssignmentTitle(request):
-	user = request.user
-	title = request.POST['title']
-	value = False
-	overwrite=dict()
-	try:
-		if user.owned_assignments.filter(title=title):
-			value = True
-	except:
-		pass
-	overwrite['overwrite'] = value
-	return HttpResponse(json.dumps(overwrite))
+import string, signal, sys
 
 def matchType(request):
 	vartype = request.GET['vartype']
@@ -41,17 +27,12 @@ def getTypeCode(request):
 	variable = Variable.objects.get(name=vartype)
 	return HttpResponse(json.dumps(variable.generated_code))
 
-def seghandler(signum, frame):
-	raise IOError("Segfault! You probably are using too much memory, check for infinite loops!")
-
 def timehandler(signum, frame):
 	raise IOError("Program runs too long, possibly indicating an infinite loop!")
 
 def validate(request):
 	user_input = json.loads(request.GET['input'])
 	vartype=Variable.objects.get(name=request.GET['vartype'])
-	if vartype == 'Custom':
-		return HttpResponse('0')
 	for x in range(0,len(vartype.variables.split('\n'))):
 		variable_args = vartype.variables.split('\n')[x].split(',')
 		locals()[variable_args[0]]=user_input[x]
@@ -66,12 +47,16 @@ def validate(request):
 	return HttpResponse(result)
 
 def validateFull(request):
-	#Limit runtime and memory allocated
-	#signal.alarm(5) #will signal SIGALRM in 5 seconds
+	#Limit runtime, feature only useable in unix environment
+	if not sys.platform.startswith('win'):
+		signal.signal(signal.SIGALRM, timehandler)
+		signal.alarm(3) #will signal SIGALRM in 5 seconds
 	try:
 		exec request.GET['code']
-	except:
-		return HttpResponse("Full Code did not validate!")
+	except MemoryError:
+		return HttpResponse("Your code consumed too much memory, look for any non-terminating loops.")
+	except Exception as e:
+		return HttpResponse("Full Code did not validate! Here is the eror messages produced:\n" + str(e))
 	return HttpResponse(0)
 
 def practiceEval(request):

@@ -27,3 +27,10 @@ def performance(student):
 	value = float((achieved/possible)*100)
 	performance=str(value)+'%'
 	return performance
+
+@register.filter(name="has_atom")
+def has_atom(qset, aid):
+	try:
+		return qset.filter(id=aid).exists()
+	except:
+		return False

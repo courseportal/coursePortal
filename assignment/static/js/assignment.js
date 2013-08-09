@@ -131,19 +131,7 @@ function save(){
 		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
     });
-	//Check if already own assignment by same name
-	var overwrite;
-	$.ajax('/assignment/utility/checktitle/', {
-		type: 'POST',
-		async: false,
-		data: assignment,
-	}).done(function(response){
-		overwrite=jQuery.parseJSON(response);
-	});
 
-	if(overwrite.overwrite == true)
-		if(!confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?"))
-			return;
 	$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
 	$('#assignmentForm').submit();
 }
@@ -152,14 +140,10 @@ function previewA(){
 	//empty object
 	assignment = {
 		title: '',
-		start: '',
-		due: '',
 		questions: [],		
 	};
 
 	assignment.title = $('#assigntitle').val();
-	assignment.start = $('#assigndate').datepicker('getDate');
-	assignment.due = $('#duedate').datepicker('getDate');
 
 	$('#questionsList > .question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
@@ -236,9 +220,9 @@ function questionstring(num, title, id){
 					<div class="span1 question-pts">\
 						<input type="text" class="input-fit" value="0"></input>\
 					</div>\
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+					<button class="span1 question-remove btn" onclick="remove_question('+num+')">\
 						<i class="icon-remove-sign"></i>\
-					</div>\
+					</button>\
 				</div>\
 			</div>';
 	return questionHTML;

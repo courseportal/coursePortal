@@ -117,3 +117,11 @@ name,type,default
 	default: A default value for the variable.
 *Removed jqueryUI from addQ.html
 *Removed jqueryUI from addassignment.html
+
+8/8/2013:
+*System will test memory usage and runtime of submitted code, this feature will only work if the website is run in a unix environment
+*Questions can be edited after being created
+	TODO: test that edited question behaviour is as desired
+
+8/9/2013:
+*Editing questions now fully implemented
