@@ -125,3 +125,6 @@ name,type,default
 
 8/9/2013:
 *Editing questions now fully implemented
+*Bugfixes
+*User can now create two assignments of same name.
+*Edit assignment will overwrite old assignment with same id rather than create new assignment

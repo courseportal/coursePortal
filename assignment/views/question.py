@@ -30,7 +30,6 @@ def detail(request, id, practice=False):
 	local_dict = dict(locals())
 	text = Template(text).safe_substitute(local_dict)
 	
-
 	# #choices formatted here
 	choices = []
 	for choice in json.loads(data['choices']):
@@ -65,10 +64,9 @@ def addQ(request):
 	return render(request, 'question/addQ.html', context)
 
 def create(request):
-	qid=''
+	q=''
 	if 'qid' in request.POST:
-		qid=request.POST['qid']
-		q = Question.objects.get(id=qid)
+		q = Question.objects.get(id=request.POST['qid'])
 		q.owners.clear()
 		q.atoms.clear()
 		if q.copy.all()[0].owners.count() == 0:

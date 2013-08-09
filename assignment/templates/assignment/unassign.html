@@ -1,6 +1,7 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <form method = "post" action = "{% url 'unmake' %}">
 {% csrf_token %}

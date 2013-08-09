@@ -1,7 +1,7 @@
 {% extends "assignment_nav.html" %}
 {% block content%}
-
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/practice.js"></script>
+{% load staticfiles %}
+<script type="text/javascript" src="{% static "js/practice.js" %}"></script>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],

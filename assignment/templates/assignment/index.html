@@ -1,9 +1,10 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
 {% load my_filters %}
+{% load staticfiles %}
 
 <!-- javascript -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment_index.js"></script>
+<script type="text/javascript" src="{% static "js/assignment_index.js" %}"></script>
 
 <div id="assignment-zone">
 	<div class="list-table"> 

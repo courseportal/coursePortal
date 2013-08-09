@@ -1,18 +1,18 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
 {% load my_filters %}
-
+{% load staticfiles %}
 <!-- CODE MIRROR -->
-<script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
-<script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
+<script src="{% static "codemirror/lib/codemirror.js" %}"></script>
+<script src="{% static "codemirror/mode/python/python.js" %}"></script>
+<link rel="stylesheet" href="{% static "codemirror//lib/codemirror.css" %}">
+<link rel="stylesheet" href="{% static "codemirror//lib/themes.css" %}">
 
 <!-- font awesome -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <!-- javascript -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
+<script type="text/javascript" src="{% static "js/assignment.js" %}"></script>
 
 <!-- MathJax -->
 <head>
@@ -204,5 +204,5 @@ MathJax.Hub.Config({
         })
     });
 </script>
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" type="test/css" href="{% static "css/test.css" %}">
 {% endblock %}

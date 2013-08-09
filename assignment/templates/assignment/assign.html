@@ -1,7 +1,6 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
-
-
+{% load staticfiles %}
 
 <script>
 	function validateAssign(){
@@ -16,7 +15,7 @@
 		}
 	}
 </script>
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css"> 
+<link rel="stylesheet" type="test/css" href="{% static "css/test.css" %}">
 
 {% if assignments %}
 <form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">

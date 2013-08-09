@@ -1,9 +1,9 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
+{% load staticfiles %}
 
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
+<link rel="stylesheet" type="test/css" href="{% static "css/test.css" %}">
 <script>
 	function confirmDelete(){
 		var msg = "This will delete the following assignments:\n";
