@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.mail import send_mail, BadHeaderError
 from django.utils.translation import ugettext_lazy as _
 import json
-from web.models import Example, Exposition, Note, Video
+from web.models import Example, Exposition, Note, Video, Class
 from knoatom.view_functions import render_to_json_response
 from rating.models import UserRating
 	
@@ -81,8 +81,8 @@ def sticky_content(request, class_id, item, item_id):
 		
 	class_object = get_object_or_404(Class, id=class_id)
 	if not (request.user.is_superuser or 
-			request.user == selected_class.author or
-			selected_class.allowed_users.filter(id=request.user.id).exists()):
+			request.user == class_object.author or
+			class_object.allowed_users.filter(id=request.user.id).exists()):
 		return HttpResponseForbidden(json.dumps({
 				'result': False,
 				'error': _('You are not authorized to perform this action')
@@ -112,10 +112,10 @@ def sticky_content(request, class_id, item, item_id):
 		'id':obj.id,
 		'name':obj.__unicode__()
 	}
-	if obj.classes_stickied_in.filter(id=selected_class.id).exists():
-		obj.classes_stickied_in.remove(selected_class)
+	if obj.classes_stickied_in.filter(id=class_object.id).exists():
+		obj.classes_stickied_in.remove(class_object)
 		context.update({'stickied':False})
 	else:
-		obj.classes_stickied_in.add(selected_class)
+		obj.classes_stickied_in.add(class_object)
 		context.update({'stickied':True})
 	return render_to_json_response(context)

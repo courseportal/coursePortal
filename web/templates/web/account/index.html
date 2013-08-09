@@ -37,28 +37,28 @@ BLOCKS(Including inherited blocks):
 {% block content %}
 
 	<div class="page-header">
-		<span style="font-size: 200%;font-weight:bold;">{% blocktrans %}Welcome, {{ user }}{% endblocktrans %}</span>
+		<span style="font-size: 200%;font-weight:bold;">Welcome, {{ user }}</span>
         {% if user.is_staff or user.is_superuser %}
-        <span style="float:right"><a href="{% url 'admin:app_list' app_label='auth' %}">{% trans "[User Auth Admin Site..]" %}</a></span>
+        <span style="float:right"><a href="{% url 'admin:app_list' app_label='auth' %}">[User Auth Admin Site..]</a></span>
         {% endif %}
         
 	</div>
     
 
-	<p>{% trans "Use the forms below to change your account information as needed." %}</p>
+	<p>Use the forms below to change your account information as needed.</p>
 
 	<div class="tabbable">
 		<ul class="nav nav-tabs">
-			<li class=""><a href="#1" data-toggle="tab">{% trans Password %}</a></li>
-			<li class=""><a href="#2" data-toggle="tab">{% trans Display Name %}</a></li>
-			<li class=""><a href="#3" data-toggle="tab">{% trans Advanced %}</a></li>
-            <li class="active"><a href="#4" data-toggle="tab">{% trans "Rating Detail" %}</a></li>
+			<li class=""><a href="#1" data-toggle="tab">Password</a></li>
+			<li class=""><a href="#2" data-toggle="tab">Display Name</a></li>
+			<li class=""><a href="#3" data-toggle="tab">Advanced</a></li>
+            <li class="active"><a href="#4" data-toggle="tab">Rating Detail</a></li>
 		</ul> <!-- .nav nav-tabs -->
 	
 		<div class="tab-content">
 
 			<div class="tab-pane" id="1">
-				<h3>{% trans "Change Password" %}</h3>
+				<h3>Change Password</h3>
 				<form class="form-horizontal" action="{% url "account" %}" method="post">
 				{% csrf_token %}
 				{% include "web/form_template.html" with form=password_form %}
@@ -70,7 +70,7 @@ BLOCKS(Including inherited blocks):
 			</div> <!-- #1 -->
 
 			<div class="tab-pane" id="2">
-				<h3>{% trans "Change Display Name" %}</h3>
+				<h3>Change Display Name</h3>
 				<form class="form-horizontal" action="{% url "account" %}" method="post">
 				{% csrf_token %}
 				{% include "web/form_template.html" with form=username_form %}
@@ -82,27 +82,27 @@ BLOCKS(Including inherited blocks):
 			</div> <!-- #2 -->
 
 			<div class="tab-pane" id="3">
-				<h3>{% trans Advanced %}</h3>
-				<p>{% trans "Here, you shall find advanced things to do for your account. Proceed with caution." %}</p>
-				<h4>{% trans "Delete Account" %}</h4>
+				<h3>Advanced</h3>
+				<p>Here, you shall find advanced things to do for your account. Proceed with caution.</p>
+				<h4>Delete Account</h4>
 				<div class="well">
-					<p>{% trans "Take actions to delete your account: " %}<a class="btn btn-danger" data-toggle="modal" href="#delete_account_modal">{% trans "Delete Account" %}</a></p>
+					<p>Take actions to delete your account: <a class="btn btn-danger" data-toggle="modal" href="#delete_account_modal">Delete Account</a></p>
 				</div>
 
 				<!-- modal for the form -->
 				<div class="modal fade hide" id="delete_account_modal" style="height:initial;">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">×</button>
-						<h3>{% trans "Confirm Account Deletion" %}</h3>
+						<h3>Confirm Account Deletion</h3>
 					</div>
 					<div class="modal-body">
-						<p>{% trans "We don't want to see you go! But, if you insist, type in "KnoAtom" into the box below, and we'll delete your account." %}</p>
+						<p>We don't want to see you go! But, if you insist, type in "KnoAtom" into the box below, and we'll delete your account.</p>
 						<form class="form-horizontal" action="{% url "account" %}" method="post">
 						{% csrf_token %}
 						{% include "web/form_template.html" with form=delete_account_form %}
 					</div> <!-- .modal-body -->
 					<div class="modal-footer">
-						<a href="#" class="btn" data-dismiss="modal">{% trans Cancel %}</a>
+						<a href="#" class="btn" data-dismiss="modal">Cancel</a>
 						<input class="btn btn-danger" type="submit" value="Delete Account" />
 					</div> <!-- .modal-footer -->
 					</form>
@@ -111,17 +111,17 @@ BLOCKS(Including inherited blocks):
 			</div> <!-- #3 -->
 
             <div class="tab-pane active" id="4">
-				<h3>{% trans "Rating Details" %}</h3>
+				<h3>Rating Details</h3>
                 <table class="table table-bordered table-hover" >
                     <thead>
-                        <th style="text-align: center">{% trans Register %}</th>
-                        <th style="text-align: center">{% trans Video %}</th>
-                        <th style="text-align: center">{% trans Exposition %}</th>
-                        <th style="text-align: center">{% trans Note %}</th>
-                        <th style="text-align: center">{% trans Example %}</th>
-                        <th style="text-align: center">{% trans Votes Up %}</th>
-                        <th style="text-align: center">{% trans Votes Down %}</th>
-                        <th style="text-align: center">{% trans Total %}</th>
+                        <th style="text-align: center">Register</th>
+                        <th style="text-align: center">Video</th>
+                        <th style="text-align: center">Exposition</th>
+                        <th style="text-align: center">Note</th>
+                        <th style="text-align: center">Example</th>
+                        <th style="text-align: center">Votes Up</th>
+                        <th style="text-align: center">Votes Down</th>
+                        <th style="text-align: center">Total</th>
                     </thead>
                     <tbody>
 

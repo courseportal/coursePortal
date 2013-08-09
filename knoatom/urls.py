@@ -21,6 +21,6 @@ urlpatterns = patterns('',
     url(r'^forum/', include('pybb.urls', namespace = 'pybb')),
     url(r'', include(web_urls)),
     # Uncomment the next line to enable the admin:
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+) + (static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 
 

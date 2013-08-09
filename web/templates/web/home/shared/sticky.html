@@ -1,5 +1,5 @@
 {% if class_object %}
   {% if user.is_staff or user.is_superuser or class_object.owner == user or user in class_object.instructors.all %}
-    <a rel='tooltip' href='javascript:void(0);' class='sticky icon-file' class-id='{{ selected_class.id }}' item-type='{{ type }}' item-id='{{ object.id }}' title='Sticky'></a>
+    <a rel='tooltip' href='javascript:void(0);' class='sticky icon-file' class-id='{{ class_object.id }}' item-type='{{ type }}' item-id='{{ object.id }}' title='Sticky'></a>
   {% endif %}
 {% endif %}

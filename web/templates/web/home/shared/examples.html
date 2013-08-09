@@ -57,7 +57,7 @@ OPTIONAL context:
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
-					<a rel="tooltip" class="icon-flag" href="#myModalExample{{ example.id} }" data-toggle="modal" title="Report"></a>
+					<a rel="tooltip" class="icon-flag" href="#myModalExample{{ example.id}}" data-toggle="modal" title="Report"></a>
 					{% include "web/home/shared/sticky.html" with object=example type='example' %}
 					{% if user.is_superuser or example.owner == user %}
 						<a rel="tooltip" class="icon-edit" href="{% url "example_submit" example.id %}?next={{request.path}}" title="Edit"></a>

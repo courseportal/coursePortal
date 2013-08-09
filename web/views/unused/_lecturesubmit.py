@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 import json
 from web.forms.submission import LectureNoteForm
 from web.models import AtomCategory, LectureNote, Class
-from knoatom.settings import MEDIA_ROOT
+from django.conf import settings
 
 
 
@@ -21,7 +21,7 @@ class PlainErrorList(ErrorList):
         return u'<br/>'.join([ e for e in self ])
 
 def media_root():
-    return MEDIA_ROOT
+    return settings.MEDIA_ROOT
 
 @login_required()
 def handle_uploaded_file(f):
