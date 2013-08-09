@@ -29,12 +29,10 @@ class WebBaseModel(models.Model):
         auto_now_add=True,
         default=datetime.now
     )
-    date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
-    
-    def clean(self):
-        super(WebBaseModel, self).clean()
-        if self.title == '':
-            raise ValidationError("'title' field cannot be empty.")
+    date_modified = models.DateTimeField(
+        auto_now=True,
+        default=datetime.now
+    )
     
     class Meta:
         abstract = True

@@ -140,7 +140,10 @@ $(document).ready(function() {
 	};
 	var class_success_function = function(data)
 	{
-		$("#messages").empty().append('<div class="alert alert-success">'+data.message+'</div>');
+		if (data.pk)
+    {
+      $("#messages").empty().append('<div class="alert alert-success">'+data.message+'</div>');
+    }
 	};
 	var category_success_function = function(data)
 	{
