@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect,\
     HttpResponseBadRequest
 from django.views.generic.edit import CreateView
 from django.core.urlresolvers import reverse
-from web.forms.edit_class import CreateClassForm, CategoryForm, ClassForm
+from web.forms.edit_class import CategoryForm, ClassForm
 from django.template import RequestContext, loader
 from web.models import Class, ClassCategory, BaseCategory
 from django.utils.translation import ugettext as _
@@ -48,7 +48,7 @@ class AjaxableResponseMixin(object):
         
 class CreateClassView(AjaxableResponseMixin, CreateView):
     r"""View for creating class.  Handles both normal and AJAX requests."""
-    form_class = CreateClassForm
+    form_class = ClassForm
     model = Class
     #template='web/class_form.html'
     
