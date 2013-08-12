@@ -87,7 +87,6 @@ $(document).ready(function() {
 		// id starting in "string".
 		form.find('*[id^=field]').removeClass('error')
 		form.find('*[id^=help-inline]').empty()
-    console.log(form.serialize())
 		var promise = $.ajax({
 			async: false, // Set it to be synchronous
 			data: form.serialize(), // Get the form data
