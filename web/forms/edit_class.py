@@ -44,7 +44,7 @@ class CategoryForm(forms.ModelForm):
                     .exists()):
                 print "Validation Error indirect"
                 raise forms.ValidationError(_("There is an indirect infinite loop in the categories"))
-        return data
+        return data.get('parent_categories')
         
     def save(self, commit=True):
         r"""Overrides the save method."""
@@ -62,37 +62,40 @@ class ClassForm(forms.ModelForm):
         """Sets the queryset of ``instructors`` to exclude the author and save the user to ``self`` and make the ``instructors`` field not required."""
         self.user = kwargs.pop('user')
         super(ClassForm, self).__init__(*args, **kwargs)
-        self.fields['instructors'].queryset = User.objects.exclude(
-            id=self.user.id)
+        if self.instance.pk is None:
+            self.fields['instructors'].queryset = User.objects.exclude(
+                id=self.user.id)
+        else:
+            self.fields['instructors'].queryset = User.objects.exclude(
+                pk=self.instance.owner.pk)
         self.fields['instructors'].required = False
-        
-    #title = forms.CharField(required=True, label="Class Name")
-    
-    # def save(self, commit=True):
-#         instance = super(ClassForm, self).save(commit=False)
-#         instance.title = self.cleaned_data.get('title')
-#         if commit:
-#             instance.save()
-#             self.save_m2m()
-#         return instance
 
     class Meta:
         r"""Set the model the form is attached to and select the fields."""
         model = Class
         fields = ('title', 'status', 'summary', 'instructors', 'students')
         
-    #Clean categories so they can't have the same name?
-        
-class CreateClassForm(ClassForm):
-    r"""Form for **creating** classes."""
     def save(self):
-        r"""Overrides the save to add ``self.user`` to ``instructors`` and as an ``owner``."""
-        instance = super(CreateClassForm, self).save(commit=False)
-        instance.owner = self.user
-        
+        r"""Overrides the save to add ``self.user`` to ``instructors`` and as an ``owner`` if the ``owner`` isn't already set."""
+        instance = super(ClassForm, self).save(commit=False)
+        if instance.pk is None:
+            instance.owner = self.user
         instance.save()
         self.save_m2m()
         instance.instructors.add(self.user)
-            
         return instance
         
+# class CreateClassForm(ClassForm):
+#     r"""Form for **creating** classes."""
+#     def save(self):
+#         r"""Overrides the save to add ``self.user`` to ``instructors`` and as an ``owner``."""
+#         instance = super(CreateClassForm, self).save(commit=False)
+#         instance.owner = self.user
+#         
+#         
+#         instance.save()
+#         self.save_m2m()
+#         instance.instructors.add(self.user)
+#             
+#         return instance
+#         
