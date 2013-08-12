@@ -30,6 +30,8 @@ class Question(models.Model):
             return "very hard"
     def get_atoms(self):
         return self.atoms.all().order_by('title')
+    def has_atom(self, aid):
+        return self.atoms.filter(id=aid).exists()
     def __unicode__(self):
         return self.title
 

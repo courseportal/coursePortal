@@ -2,22 +2,6 @@
 $(init);
 
 function init(){
-	$('#reportform').dialog({
-		width: document.body.clientWidth*0.35,
-		height: document.body.clientHeight*0.2,
-		modal: true,
-		autoOpen: false,
-		focus: function(event, ui){
-			//disable parent scrolling
-			$('body').addClass('dialog-open');
-		},
-		close: function(event, ui){
-			//re-enable parent scrolling
-			$('body').removeClass('dialog-open');
-		}
-	});
-	$('#broken').attr('onclick', "openreport()");
-	$('#closereport').attr('onclick', '$("#reportform").dialog("close")');
 	$('#submitreport').attr('onclick', "submitQbug()");
 }
 
@@ -49,10 +33,6 @@ function evalPractice(){
 	else{
 		$('#result').append('<div>Incorrect</div>');
 	}
-}
-
-function openreport(){
-	$('#reportform').dialog('open');
 }
 
 function submitQbug(){

@@ -1,8 +1,8 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
 {% load my_filters %}
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/bootstrap.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <div class="row">
 	<h1><div class="span3 offset3">Students Enrolled</div></h1>

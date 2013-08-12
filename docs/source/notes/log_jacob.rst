@@ -102,4 +102,29 @@ Spent mostly planning the week, however small improvements were made:
 *Fixed bugs in previewing assignments
 *Due Dates can be extended
 *improved variable system in adding questions
-*
+*Practice html improved
+
+8/7/2013:
+I have decided not to implement a viewing field in the variable type model, because generated code section declares how the variable will display in text, it is simpler to just allow the user to declare said representation as an html string when creating the variable type.
+*Variable data fields can have default values specified
+*Variable type can be specified in variable list area and will be tested automatically
+	*It is no longer necessary to test for the correct data type in validation code or cast it to be such.
+	*TODO: create testing for a default type
+Variables should now be specified in the following format:
+name,type,default
+	name: The name of the variable
+	type: What type data provided should be. This will be automatically tested.
+	default: A default value for the variable.
+*Removed jqueryUI from addQ.html
+*Removed jqueryUI from addassignment.html
+
+8/8/2013:
+*System will test memory usage and runtime of submitted code, this feature will only work if the website is run in a unix environment
+*Questions can be edited after being created
+	TODO: test that edited question behaviour is as desired
+
+8/9/2013:
+*Editing questions now fully implemented
+*Bugfixes
+*User can now create two assignments of same name.
+*Edit assignment will overwrite old assignment with same id rather than create new assignment

@@ -54,6 +54,14 @@ I have changed this file a bit, you should use this as the template you extend. 
   </ul>
   <li><a href="{% url "delete_assignment" %}">Delete Assignment</a></li>
   <li><a href="{% url "add_question" %}">Add Question</a></li>
+  <li><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Question</li>
+  <ul class="nav nav-list">
+  {%for q in user.owned_questions.all%}
+    {% ifequal q.isCopy False %}
+      <li><a href="{% url 'edit_question' q.id %}">{{q}}</a></li>
+    {% endifequal %}
+  {%endfor%}
+  </ul>
   <li><a href="{% url 'delete_question' %}">Delete Question</a></li>
   <li><a href="{% url "assign" %}">Assign</a></li>
   <li><a href="{% url "unassign" %}">Unassign</a></li>

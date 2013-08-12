@@ -1,5 +1,3 @@
-//'/[^/]$/g'
-
 //this is ajax CSRF certificate stuff.  ignore
 $(document).ajaxSend(function(event, xhr, settings) {
     function getCookie(name) {
@@ -38,7 +36,6 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 });
 
-
 tinymce.init({
    selector: "textarea#problemText",
    force_p_newlines : false,
@@ -54,43 +51,36 @@ var CodeMirrorSettings = {
 };
 
 var validFlag = true;
-var patt1=/\$[A-z]+[A-z0-9_]*/g;
-
+var patt1=/\$[A-z]+[A-z0-9_]*/g;	
 code = CodeMirror.fromTextArea($('#code').get(0), CodeMirrorSettings);
-$('#variable_list').sortable();
 
-$('#variable-zone').dialog({
-	title: "VARIABLES",
-	width: document.body.clientWidth*0.7,
-	height: document.body.clientHeight*0.6,
-	modal: true,
-	autoOpen: false,
-	open: function(event, ui){
+$(init);
+
+function init(){
+	$('#variable_list').sortable();
+
+	$('#variable-zone').on('show', function() {
 		var text = tinymce.activeEditor.getContent();
-		var index = 0
 		var varNames=text.match(patt1);
 		if(varNames!=null){
 			for(var x=0; x<varNames.length; x++){
 				addVar(varNames[x].substr(1));
 			}
+		
 		}
-	},
-	close: function(event, ui){
+	});
+
+	$('#variable-zone').on('hidden',function(){
 		$('#add_name').val('');
 		$('#delete_name').val('');
-	},
-});
+	});
 
-$('#preview-zone').dialog({
-	title: "PREVIEW",
-	width: document.body.clientWidth*0.7,
-	height: document.body.clientHeight*0.6,
-	modal:true,
-	autoOpen:false,
-	close: function(event, ui){
-		$('#preview-zone').html('');
-	},
-});
+	$('#preview-zone').on('show', function(){
+		validateAndPreview();
+	});	
+	initialInput($('#initialType').attr('value'), $('#initialAnswer').attr('value'), $('#initialChoice').attr('value'));
+}
+
 
 function addVar(varName){
 	if(varName == '' || $('#'+varName).length != 0) return false;
@@ -101,22 +91,27 @@ function addVar(varName){
 	variables.attr('name', varName+"_"+variables.attr('name'));
 	variables.change(function(){
 		var name = $(this).val();
-		data = {
-			vartype : name,
-		};
-		$.ajax('/assignment/utility/matchType/', {
-			type: 'GET',
-			async: false,
-			data: data,
-		}).done(function(response){
-			names=jQuery.parseJSON(response);
-		});
-		dataZone = $(this).parent().parent().children('.row-data').html('');
-		name = $(this).parent().parent().attr('id');
-		for(x=0; x<names.length; x++){
-			inputString =
-				names[x]+"= <input type='text' name="+name+"_"+names[x]+"></input><br>";
-			dataZone.append(inputString);
+		if(name != "Custom"){
+			data = {
+				vartype : name,
+			};
+			$.ajax('/assignment/utility/matchType/', {
+				type: 'GET',
+				async: false,
+				data: data,
+			}).done(function(response){
+				names=jQuery.parseJSON(response);
+			});
+			dataZone = $(this).parent().parent().children('.row-data').html('');
+			name = $(this).parent().parent().attr('id');
+			for(x=0; x<names.length; x++){
+				inputString =
+					names[x].name+"= <input type='text' style='width:100px' name="+name+"_"+names[x].name+" value="+names[x].defValue+"></input><br>";
+				dataZone.append(inputString);
+			}
+		}
+		else{
+			$(this).parent().parent().children('.row-data').html('');
 		}
 	});
 }
@@ -135,10 +130,6 @@ function rowString(varName){
 	return rowHTML
 }
 
-function viewVariables(){
-	$('#variable-zone').dialog('open');
-}
-
 function validateAndPreview(){
 	pdata = {
 		code:code.getValue(),
@@ -146,9 +137,14 @@ function validateAndPreview(){
 		choices:[],
 		answer:$('#answer_input').children().first().val(),
 	};
+	if($('#tfTrue').prop('checked')){
+		pdata.answer = true;
+	}
+	else if($('#tfFalse').prop('checked')){
+		pdata.answer = false;
+	}
 	$('#variable_list').children().each(function(){
 		validate($(this));
-		
 	});
 	if(validFlag == false){
 		validFlag = true;
@@ -169,11 +165,11 @@ function validateAndPreview(){
 		}
 	});
 	pdata.choices = JSON.stringify(pdata.choices);
-	//test full code: looks for infinite loops and other run-time errors
-	var reply
+	
 	//Eliminate $ in code
 	pdata.code = pdata.code.replace(/\$/g,'');
-	//Ajax call to test full code
+	//test full code: looks for infinite loops and other run-time errors
+	var reply
 	$.ajax('/assignment/utility/validateFull/', {
 		type: 'GET',
 		async: false,
@@ -186,11 +182,10 @@ function validateAndPreview(){
 		return false;
 	}
 	//Finally preview
-	$('#preview-zone').load('question/preview',pdata, function(response, status, xhr){
+	$('#preview-body').load('question/preview',pdata, function(response, status, xhr){
 		MathJax.Hub.Queue(
       		["Typeset",MathJax.Hub,'preview-zone']
     	);
-		$('#preview-zone').dialog('open');
 	});
 }
 
@@ -202,11 +197,11 @@ function validateAndSubmit(){
 		validFlag = true;
 		return false;
 	} 
-	tempCode = '';
+	var tempCode = '';
 	$('#variable_list').children().each(function(){
 		tempCode = generate($(this), tempCode);
 	});
-	tempCode += "\n"+code.getValue();
+	tempCode = tempCode.concat("\n#CUSTOM\n",code.getValue());
 	//test full code: look for infinite-loops and other run-time errors
 	data={
 		code:tempCode.replace(/\$/g,'')
@@ -253,6 +248,9 @@ function validate(row, dependent){
 		vartype: row.find('.variables').val(),
 		input: '',
 	};
+	if(data.vartype == 'Custom'){
+		return true
+	}
 	if(dependent == undefined)
 		dependent = [];
 	arr=[];
@@ -312,6 +310,9 @@ function generate(row, tempCode){
 	data={
 		vartype: row.find('.variables').val(),
 	};
+	if(data.vartype == 'Custom'){
+		return tempCode;
+	}
 	$.ajax('assignment/utility/getTypeCode', {
 		type: 'GET',
 		async: false,
@@ -322,12 +323,13 @@ function generate(row, tempCode){
 	//Format code to generate
 	genCode=genCode.replace('__this', row.attr('id'));
 	genCode=jQuery.parseJSON(genCode);
+	genCode="#Template Code\n"+genCode;
 	row.children('.row-data').children("input").each(function(){
 		varName = $(this).attr('name').split('_')[1]; //Name of variable
 		value = $(this).val(); //Value input
 		genCode = varName+"="+value+"\n"+genCode;
 	});
-	tempCode = tempCode+'\n'+genCode;
+	tempCode = tempCode.concat('\n#var:',data.vartype,'_',row.attr('id'),'\n',genCode);
 	return tempCode;
 }
 
@@ -336,8 +338,8 @@ function inputChange(questionType){
 	$('#choice_input').html('');
 	if(questionType == "True/False"){
 		html=
-			"<input type='radio' name='answer' value=1>True</input>\
-			<input type='radio' name='answer' value=0>False</input>";
+			"<input type='radio' name='answer' id='tfTrue' value='true' checked>True</input>\
+			<input type='radio' name='answer' id='tfFalse' value='false'>False</input>";
 		$('#answer_input').html(html);
 	}else if(questionType == "Short Answer"){
 		html=
@@ -353,6 +355,28 @@ function inputChange(questionType){
 				<div class='btn' onclick='addChoice()'>Add Choice</div>\
 			</div>";
 		$('#choice_input').html(html);
+	}
+}
+
+function initialInput(type, solution, choices){
+	inputChange(type);
+	if(type != 'True/False'){
+		$('#answer_input').children('[name="answer"]').attr('value', solution);
+	}
+	else if(solution == 'true'){
+		$('#tfTrue').prop('checked', true);
+	}
+	else{
+		$('#tfFalse').prop('checked', true);
+	}
+	if(type == 'Multiple Choice'){
+		choices=jQuery.parseJSON(choices);
+		for(var x=0; x<choices.length; x++){
+			$('#choice_input').find('input').last().attr('value', choices[x]);
+			if(x != choices.length-1){
+				addChoice();
+			}
+		}
 	}
 }
 

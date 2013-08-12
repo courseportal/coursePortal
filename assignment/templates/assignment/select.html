@@ -1,6 +1,7 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <form method = "post" action = "{% url 'extend' %}">
 {% csrf_token %}
@@ -43,7 +44,7 @@
 	</tfoot>
 </table>
 </div>
-<div class="span5">New Due Date:<input class="span2" type="date" id="duedate"></input></div>
+<div class="span5">New Due Date:<input class="span2" type="datetime-local" name="duedate"></input></div>
 <input type="submit" class="btn span1 offset2"></input>
 </form>
 

@@ -1,23 +1,21 @@
 
 {% extends "assignment_nav.html" %}
 {% block content %}
-<script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
+{% load my_filters %}
+{% load staticfiles %}
+<script type="text/javascript" src="{% static "tinymce/js/tinymce/tinymce.min.js" %}"></script>
 
-<script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
-<script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
+<script src="{% static "codemirror/lib/codemirror.js" %}"></script>
+<script src="{% static "codemirror/mode/python/python.js" %}"></script>
+<link rel="stylesheet" href="{% static "codemirror//lib/codemirror.css" %}">
+<link rel="stylesheet" href="{% static "codemirror//lib/themes.css" %}">
 
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
-
-<!-- JQUERY UI -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+<link rel="stylesheet" type="test/css" href="{% static "css/test.css" %}">
 
 <!-- MATHJAX -->
 <head>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
+MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
     jax: ["input/TeX", "output/HTML-CSS"],
     tex2jax: {
@@ -26,7 +24,7 @@
       processEscapes: true
     },
     "HTML-CSS": { availableFonts: ["TeX"] }
-  });
+});
 </script>
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -34,13 +32,21 @@
 </head>
 
 <body>
+{% if question %}
+<div style='display:none'>
+	<input type='text' id='initialType' value='{{qdata.question_type}}'></input>
+	<input type='text' id='initialAnswer' value='{{qdata.solution}}'></input>
+	<input type='text' id='initialChoice' value='{{qdata.choices}}'></input>
+</div>
+{% endif %}
 <form action='{% url "create_question" %}' id="questionForm" method="POST">
 {% csrf_token %}
-	Title:<input type='text' name='question_title'></input> 
-	<textarea id="problemText" title="Problem text"></textarea><br>
+	<input type="hidden" id='qid' name='qid' value="{{question.id}}"></input>
+	Title:<input type='text' name='question_title' value="{{question.title}}"></input>
+	<textarea id="problemText" title="Problem text">{{qdata.text}}</textarea><br>
 	<div class="row-fluid">
 		<div id='left' class="span6">
-			<div class="btn" onclick="viewVariables()">Variables</div><br>
+			<a href="#variable-zone" role="button" data-toggle="modal" class="btn">Variables</a><br>
 			Question Type:<select onchange="inputChange($(this).val());" name="question_type">
 				<option value="Short Answer" selected>Short Answer</option>
 				<option value="True/False">True/False</option>
@@ -51,10 +57,10 @@
 		</div>
 		<div id="right" class="span6">
 			Custom code area:<br>
-			<textarea name="code" id="code"></textarea><br>
+			<textarea name="code" id="code">{{code}}</textarea><br>
 			Atoms:<select multiple="multiple" id="atoms">
-				{% for atom in atom_list %}
-					<option name="{{atom.id}}" value="{{atom.id}}">{{atom}}</option>
+				{% for a in atom_list %}
+				<option name="{{a.id}}" value="{{a.id}}" {%if question.atoms|has_atom:a.id%}selected{%endif%}>{{a}}</option>
 				{% endfor %}
 			</select>
 			<div>Hold ctrl to select multiple.</div>
@@ -64,40 +70,78 @@
 	<input type="hidden" id="choices" name="choices"></input>
 	<input type="hidden" id="atom_list" name="atoms"></input>
 	<div class="row-fluid">
-		<div class="span5 btn btn-large" onclick="validateAndPreview()">Preview</div>
+		<a href="#preview-zone" role="button" data-toggle="modal" class="span5 btn btn-large">Preview</a>
 		<div class="span5 btn btn-large" onclick="validateAndSubmit()">Create</div>
 	</div>
 
-	<div id="variable-zone">
-		<br>
-		<br>
-		<div class="row-fluid">
-			<div class='span8'>
-				<table class="table list-table">
+
+	<!-- variable modal -->
+	<div style="width:900px" class="modal hide fade" role="dialog" id="variable-zone">
+		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    		<h3>Question Variables</h3>
+  		</div>
+  		<div class="modal-body" style="max-height:1000px">
+			<div class="row-fluid">
+				<div class='span8'>
+					<table class="table list-table">
 					<thead>
 						<th>Name</th>
 						<th>Type</th>
 						<th>Data</th>
 					</thead>
 					<tbody id="variable_list">
+					{%for var in variable_list%}
+						<tr id='{{var.varname}}'>
+							<td>{{var.varname}}</td>
+							<td class='typecell'>
+							<select class = "variables" name="variable_type">
+							{% for v in type_list %}
+							<option value="{{v.name}}" {%ifequal v.name var.vartype%}selected{%endifequal%}>{{v.name}}</option>
+							{% endfor %}
+							</select>
+							</td>
+							<td class='row-data'>
+							{%for key in var.vardata%}
+							{{key}}= 
+							<input type='text' style='width:100px' name="{{var.varname}}_{{key}}" value="{{var.vardata|lookup:key}}">
+							</input><br>
+							{%endfor%}
+							</td>
+						</tr>
+					{%endfor%}
 					</tbody>
-				</table>
-			</div>
-			<div class='span3'>
-				<br>
-				<br>
-				<div class="btn" onclick='addVar($("#add_name").val());'>Add<br>
-					<input type='text' id='add_name' style='width:100px'></input>
-				</div><br>
-				<div class="btn" onclick='delVar($("#delete_name").val());'>Delete<br>
-					<input type='text' id='delete_name' style='width:100px'></input>
+					</table>
+				</div>
+				<div class='span3'>
+					<div class="btn" onclick='addVar($("#add_name").val());'>Add<br>
+						<input type='text' id='add_name' style='width:100px'></input>
+					</div><br>
+					<div class="btn" onclick='delVar($("#delete_name").val());'>Delete<br>
+						<input type='text' id='delete_name' style='width:100px'></input>
+					</div>
 				</div>
 			</div>
+
 		</div>
-		<div class="btn" onclick="$('#variable-zone').dialog('close')">Close</div>
+		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  		</div>
 	</div>
 </form>
-<div id="preview-zone"></div>
+
+<!-- preview modal -->
+<div class='modal hids fade' role='dialog' id="preview-zone">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3>Question Preview</h3>
+	</div>
+	<div class="modal-body" id="preview-body">
+	</div>
+	<div class="modal-footer">
+    	<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  	</div>
+</div>
 </body>
 
 <div style="display:none">
@@ -108,7 +152,5 @@
 	</select>
 </div>
 
-
-<script src="{{ STATIC_PREFIX }}js/question.js"></script>
-
+<script src="{% static "js/question.js" %}"></script>
 {% endblock %}
