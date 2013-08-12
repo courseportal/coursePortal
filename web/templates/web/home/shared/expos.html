@@ -34,7 +34,7 @@ OPTIONAL context:
 				</td>
 
 				<td>
-					<a class="expo_link" data-toggle="modal" href="expo_modal" data-href="{{ expo.link }}">
+					<a target="_blank" href="{{ expo.link }}">
 						<div class="name-exposition-{{ expo.id }}">
 							{{ expo }} 
 							{% if class_object in expo.classes_stickied_in.all %}
@@ -81,23 +81,5 @@ OPTIONAL context:
 </table>
 
 <script>{% include 'js/tablesorter.settings.js' with table='#expos' sortForce='[[5,1]]' sortAppend='[[3,1]]' sortList='[[5,1],[3,1]]' %}</script>
-
-
-<link rel="stylesheet" type="text/css" href="{% static "css/knoatom.css" %}" />
-<script type="text/javascript">
-    $('textarea').addClass('span6').wysihtml5();
-    $('.expo_link').each(function() {
-        $(this).click(function() {
-            $($('#expo_modal').children()[1]).html('<iframe style="width:1024px;height:400px" src="'+$(this).attr('data-href')+'">Loading...</iframe>');
-            $('#expo_modal').modal('toggle').css({
-                width:'auto',
-                'margin-left':function(){
-                    return -($(this).width()/2);
-                                                 }
-            });
-        })
-    });
-    
-</script>
 
 
