@@ -27,12 +27,24 @@ class CategoryForm(forms.ModelForm):
             self.fields['parent_categories'].queryset = (
                 ClassCategory.objects.filter(parent_class=self.parent_class)
             )
-        
     
     class Meta:
         r"""Set the model it is attached to and select the fields."""
         model = ClassCategory
         fields=('title', 'parent_categories', 'child_atoms')
+        
+    def clean_parent_categories(self):
+        data = self.cleaned_data
+        if self.instance.pk is not None:
+            if (self.instance.child_categories.filter(pk=self.instance.pk)):
+                print "Validation Error"
+                raise forms.ValidationError(_("There is an infinite loop in the categories."))
+            parent_categories = data.get('parent_categories').all()
+            if (self.instance.child_categories.filter(id__in=parent_categories)
+                    .exists()):
+                print "Validation Error indirect"
+                raise forms.ValidationError(_("There is an indirect infinite loop in the categories"))
+        return data
         
     def save(self, commit=True):
         r"""Overrides the save method."""

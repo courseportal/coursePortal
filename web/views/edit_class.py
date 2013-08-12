@@ -84,9 +84,7 @@ def EditClassView(request, class_id, cat_id):
         category_form_kwargs.update({'instance':category_object})
         
     if request.method == 'POST':
-        print request.POST
         if u'class-form' in request.POST: # class submit
-            print "in submit class"
             class_form = ClassForm(request.POST, **class_form_kwargs)
             context.update(
                 process_forms(
@@ -96,7 +94,6 @@ def EditClassView(request, class_id, cat_id):
                 )
             )
         elif u'category-form' in request.POST: # category submit
-            print "in submit category"
             category_form = CategoryForm(request.POST, **category_form_kwargs)
             context.update(
                 process_forms(
@@ -106,7 +103,6 @@ def EditClassView(request, class_id, cat_id):
                 )
             )
         else: # submit all
-            print "in submit all"
             class_form = ClassForm(request.POST, **class_form_kwargs)
             category_form = CategoryForm(request.POST, **category_form_kwargs)
             context.update(

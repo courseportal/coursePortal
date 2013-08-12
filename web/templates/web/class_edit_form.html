@@ -97,6 +97,7 @@ $(document).ready(function() {
 			function(response) {
 				if (!response.pk) // If we created an object
 				{
+        
 					// Loop through keys in response variable
 					if (response.message)
 					{
@@ -153,7 +154,10 @@ $(document).ready(function() {
 		$('form#category-form input#submit-form').attr('value', 'Add Category');
 		$('form#category-form').attr('action', '');
 		$('button#delete-category').addClass('hidden');
-		$("div#category-form").empty().append(data.category_form);
+		if (data.pk)
+    {
+      $("div#category-form").empty().append(data.category_form);
+    }
 		$('ul#cat-list').columnview('update');
 	};
 	
@@ -239,30 +243,5 @@ $(document).ready(function() {
 Double click on a category to edit it.
 </div>
 {% comment %}
-	<!-- <div id="messages"></div>
-  <h2>Edit Class</h2>
-    <form id="edit-form" class="form-horizontal" action="{{ form_action }}" method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="form-type" id="form-type" value="">
-      <div id="class-form">
-        {% include "web/class_form_template.html" with form=class_form %}
-      </div>
-      <input class="btn btn-primary hidden" type="submit" name="submit-class" value="Update Class" id="submit-class-form" />
-      <h2><div id="cat-header">Add Category</div></h2>
-      <div id="category-form">
-        {% include "web/category_form_template.html" with form=category_form %}
-      </div>
-      <input class="btn btn-primary hidden" type="submit" name="submit-category" value="Add Category" id="submit-category-form" />
-      <input class="btn" type="reset" value="New Category" id="new-category-form" />
-      <input class="btn btn-danger hidden" name="delete-category" value="Delete Category" id="delete-category">
-      <div class="form-actions">
-        <input class="btn btn-primary" type="submit" name="submit-all" value="Submit All" id="submit-form" />
-      </div>
-    </form> 
-		<div id="category-list">
-			<ul id="cat-list">
-			</ul>
-		</div>
-		Double click on a category to edit it. -->
 		{% endcomment %}
 {% endblock %}
