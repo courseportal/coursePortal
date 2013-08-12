@@ -34,6 +34,11 @@ class WebBaseModel(models.Model):
         default=datetime.now
     )
     
+    def clean(self):
+        super(WebBaseModel, self).clean()
+        if self.title == '':
+            raise ValidationError("'title' field cannot be empty.")
+    
     class Meta:
         abstract = True
         

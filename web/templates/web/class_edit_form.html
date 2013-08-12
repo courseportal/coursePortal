@@ -40,11 +40,6 @@ BLOCKS(Including inherited blocks):
 var cat_id; // Used to store the category id for later use if we are updating a category
 
 $(document).ready(function() {
-	
-	// Add the buttons that only work when javascript is enabled
-	$('#submit-category-form').removeClass('hidden');
-	$('#submit-class-form').removeClass('hidden');
-	
 	// Generate category list
 	$("ul#cat-list").columnview({
 		preview: false,
@@ -67,30 +62,32 @@ $(document).ready(function() {
 	
 	// Get new category form when the button is pressed
 	$('#new-category-form').click(function() {
-		$('div#cat-header').empty().append('Add Category')
-		$('input#submit-category-form').attr('value', 'Add Category')
-		$('#edit-form').attr('action', '');
-		$('input#delete-category').addClass('hidden');
+		$('div#cat-header').empty().append('Add Category');
+		$('input#submit-category-form').attr('value', 'Add Category');
+		$('form#category-form').attr('action', '');
+		$('button#delete-category').addClass('hidden');
 		$.ajax({
 			type: 'GET',
 			url: '/edit-class/{{ pk }}/'
 		}).done(
 			function(data) {
-				$("#category-form").empty().append(data.category_form)
+				$("div#category-form").empty().append(data.category_form)
 			}
 		);
 		return false;
 	});
 	
-	var ajax_submit = function(form, id_insert) {
+	var ajax_submit = function(form) {
 		// Returns the ajax promise
 		// Disable buttons
-		$('#submit-'+id_insert+'-form').attr('disabled', true);
-		$('#clear-'+id_insert+'-form').attr('disabled', true);
+		form.find('#submit-form').attr('disabled', true);
+		form.find('#new-category-form').attr('disabled', true);
+    form.find('#delete-category').attr('disabled', true);
 		// Reset the error fields '*[id^="string"]' finds all elements with
 		// id starting in "string".
-		$('*[id^='+id_insert+'field]').removeClass('error')
-		$('*[id^='+id_insert+'help-inline]').empty()
+		form.find('*[id^=field]').removeClass('error')
+		form.find('*[id^=help-inline]').empty()
+    console.log(form.serialize())
 		var promise = $.ajax({
 			async: false, // Set it to be synchronous
 			data: form.serialize(), // Get the form data
@@ -108,14 +105,14 @@ $(document).ready(function() {
 					}
 					for (var key in response)
 					{
-						$('#'+id_insert+'field-' + key).addClass('error')
-						$('#'+id_insert+'help-inline-' + key).empty().append(
+						form.find('#field-' + key).addClass('error')
+						form.find('#help-inline-' + key).empty().append(
 							$('<ul>') // Reset the div and add an empty list
 						);
 						// Loop through the error array for key
 						for (i in response[key])
 						{
-							$('#'+id_insert+'help-inline-' + key + ' ul').append(
+							form.find('#help-inline-' + key + ' ul').append(
 								$('<li>').append( // Add each item to the list
 									response[key][i]
 								)
@@ -127,8 +124,9 @@ $(document).ready(function() {
 		).always(
 			function() {
 			// Enable the buttons again.
-			$('input#submit-'+id_insert+'-form').attr('disabled', false);
-			$('input#new-'+id_insert+'-form').attr('disabled', false);
+			form.find('input#submit-form').attr('disabled', false);
+			form.find('input#new-category-form').attr('disabled', false);
+      form.find('#delete-category').attr('disabled', false);
 			}
 		);
 		return promise;
@@ -152,10 +150,10 @@ $(document).ready(function() {
 			$("#messages").empty().append('<div class="alert alert-success">'+data.message+'</div>');
 		}
 		$('div#cat-header').empty().append('Add Category');
-		$('input#submit-category-form').attr('value', 'Add Category');
-		$('#edit-form').attr('action', '');
-		$('input#delete-category').addClass('hidden');
-		$("#category-form").empty().append(data.category_form);
+		$('form#category-form input#submit-form').attr('value', 'Add Category');
+		$('form#category-form').attr('action', '');
+		$('button#delete-category').addClass('hidden');
+		$("div#category-form").empty().append(data.category_form);
 		$('ul#cat-list').columnview('update');
 	};
 	
@@ -170,7 +168,7 @@ $(document).ready(function() {
 		{
 			cat_id = $(this).attr('id');	// Set global cat_id
 	
-			$('#edit-form').attr('action', '/edit-class/{{ pk }}/' + cat_id + '/')
+			$('form#category-form').attr('action', '/edit-class/{{ pk }}/' + cat_id + '/')
 			// Change action of form
 			$.ajax({
 				type: 'GET',
@@ -178,71 +176,93 @@ $(document).ready(function() {
 			}).done(
 				function (data) {
 					$('div#cat-header').empty().append('Edit Category');
-					$('input#submit-category-form').attr('value', 'Update Category');
-					$("#category-form").empty().append(data.category_form);
-					$('input#delete-category').removeClass('hidden');
+					$('form#category-form input#submit-form').attr('value', 'Update Category');
+					$("div#category-form").empty().append(data.category_form);
+					$('button#delete-category').removeClass('hidden');
 				}
 			);
 			return false;
 		}
 	})
 	
-	$('#submit-class-form').click(function() {
-		$('input[id=form-type]').val('submit-class');
-		var form = $('#edit-form');
-		var promise = ajax_submit(form, 'class');
+	$('form#class-form #submit-form').click(function() {
+		var form = $('form#class-form');
+		var promise = ajax_submit(form);
 		promise.done(class_success_function);
 		return false;
 	});
-	$('#submit-category-form').click(function() {
-		$('input[id=form-type]').val('submit-category');
-		var form = $('#edit-form');
-		var promise = ajax_submit(form, 'category');
+	$('form#category-form #submit-form').click(function() {
+		var form = $('form#category-form');
+		var promise = ajax_submit(form);
 		promise.done(category_success_function);
 		return false;
 	});
-	$('input#submit-form').click(function() {
-		$('input[id=form-type]').val('');
-		return true;
-	});
 	
-	$('input#delete-category').click(function() {
-		$('input#delete-category').attr('disabled', true);
+	$('button#delete-category').click(function() {
+		$('button#delete-category').attr('disabled', true);
 		$.ajax({
 			url: '/ajax/delete-category/' + cat_id + '/'
 		}).always(function() {
-			$('input#delete-category').attr('disabled', false);
+			$('button#delete-category').attr('disabled', false);
 		}).done(category_success_function);
 		return false;
 	});
 });
 </script>
-
-	<div id="messages"></div>
-	<h2>Edit Class</h2>
-		<form id="edit-form" class="form-horizontal" action="{{ form_action }}" method="POST">
-			{% csrf_token %}
-			<input type="hidden" name="form-type" id="form-type" value="">
-			<div id="class-form">
-				{% include "web/class_form_template.html" with form=class_form %}
-			</div>
-			<input class="btn btn-primary hidden" type="submit" name="submit-class" value="Update Class" id="submit-class-form" />
-			<h2><div id="cat-header">Add Category</div></h2>
-			<div id="category-form">
-				{% include "web/category_form_template.html" with form=category_form %}
-			</div>
-			<input class="btn btn-primary hidden" type="submit" name="submit-category" value="Add Category" id="submit-category-form" />
-			<input class="btn" type="reset" value="New Category" id="new-category-form" />
-			<input class="btn btn-danger hidden" name="delete-category" value="Delete Category" id="delete-category">
-			<div class="form-actions">
-				<input class="btn btn-primary" type="submit" name="submit-all" value="Submit All" id="submit-form" />
-			</div>
-		</form>
+<div class="container">
+  <div id="messages"></div>
+  <h2>Edit Class</h2>
+  <form id="class-form" class="form-horizontal" 
+      action="{{ form_action }}" method="POST">
+    {% csrf_token %}
+    <div id="class-form">
+      {% include "web/class_form_template.html" with form=class_form %}
+    </div>
+    <input type="hidden" name="class-form" /> <!-- form identifier -->
+    <input class="btn btn-primary" type="submit" name="submit-class" value="Update Class" id="submit-form" /> <!-- submit button -->
+  </form>
+  <form id="category-form" class="form-horizontal" 
+      action="{{ form_action }}" method="POST">
+    {% csrf_token %}
+  	<div id="category-form">
+  		{% include "web/category_form_template.html" with form=category_form %}
+  	</div>
+    <input type="hidden" name="category-form" /><!-- form identifier -->
+    <input class="btn btn-primary" type="submit" name="submit-category" value="Add Category" id="submit-form" /> <!-- submit button -->
+    <input class="btn" type="reset" value="New Category" 
+      id="new-category-form" /> <!-- Clear button -->
+    <button class="btn btn-danger hidden" name="delete-category" id="delete-category">Delete Category</button> <!-- delete button -->
+  </form>
+  <div id="category-list">
+  	<ul id="cat-list"></ul>
+  </div>
+Double click on a category to edit it.
+</div>
+{% comment %}
+	<!-- <div id="messages"></div>
+  <h2>Edit Class</h2>
+    <form id="edit-form" class="form-horizontal" action="{{ form_action }}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="form-type" id="form-type" value="">
+      <div id="class-form">
+        {% include "web/class_form_template.html" with form=class_form %}
+      </div>
+      <input class="btn btn-primary hidden" type="submit" name="submit-class" value="Update Class" id="submit-class-form" />
+      <h2><div id="cat-header">Add Category</div></h2>
+      <div id="category-form">
+        {% include "web/category_form_template.html" with form=category_form %}
+      </div>
+      <input class="btn btn-primary hidden" type="submit" name="submit-category" value="Add Category" id="submit-category-form" />
+      <input class="btn" type="reset" value="New Category" id="new-category-form" />
+      <input class="btn btn-danger hidden" name="delete-category" value="Delete Category" id="delete-category">
+      <div class="form-actions">
+        <input class="btn btn-primary" type="submit" name="submit-all" value="Submit All" id="submit-form" />
+      </div>
+    </form> 
 		<div id="category-list">
 			<ul id="cat-list">
 			</ul>
 		</div>
-		Double click on a category to edit it.
-		
-	</h2>
+		Double click on a category to edit it. -->
+		{% endcomment %}
 {% endblock %}

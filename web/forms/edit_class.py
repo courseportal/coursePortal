@@ -50,7 +50,6 @@ class ClassForm(forms.ModelForm):
         """Sets the queryset of ``instructors`` to exclude the author and save the user to ``self`` and make the ``instructors`` field not required."""
         self.user = kwargs.pop('user')
         super(ClassForm, self).__init__(*args, **kwargs)
-        self.fields['class_name'].initial = self.instance.title
         self.fields['instructors'].queryset = User.objects.exclude(
             id=self.user.id)
         self.fields['instructors'].required = False
@@ -65,22 +64,10 @@ class ClassForm(forms.ModelForm):
 #             self.save_m2m()
 #         return instance
 
-    class_name = forms.CharField(max_length=200, label="Class Name", required=True)
-    
-    def save(self, commit=True):
-        instance = super(ClassForm, self).save(commit=False)
-        instance.title = self.cleaned_data.get('class_name')
-        
-        if commit:
-            instance.save()
-            self.save_m2m()
-        
-        return instance
-    
     class Meta:
         r"""Set the model the form is attached to and select the fields."""
         model = Class
-        fields = ('class_name', 'status', 'summary', 'instructors', 'students')
+        fields = ('title', 'status', 'summary', 'instructors', 'students')
         
     #Clean categories so they can't have the same name?
         
