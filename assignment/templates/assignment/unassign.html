@@ -10,7 +10,7 @@
 		<th style="width:80px" class="sortable">Username</th>
 		<th style="width:100px" class="sortable">Name</th>
 		<th style="width:100px" class="sortable">Assignment</th>
-		<th style="width:100px" class="sortable">Class</th>
+		<th style="width:100px" class="sortable">Subjects</th>
 		<th style="width:10px">Select</th>
 	</thead>
 	<tbody>
@@ -26,7 +26,7 @@
 					<td style="width:80px">{{i.user.username}}</td>
 					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
 					<td style="width:100px">{{i}}</td>
-					<td style="width:100px"></td>
+					<td style="width:100px">{%for atom in a.get_atoms %}{{atom}},{%endfor%}</td>
 					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
 				</tr>
 			{% endfor %}
