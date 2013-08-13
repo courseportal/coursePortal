@@ -29,6 +29,7 @@ class Migration(SchemaMigration):
             ('topic_count', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
             ('hidden', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('headline', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('atom', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='forum', unique=True, null=True, to=orm['web.Atom'])),
         ))
         db.send_create_signal(u'pybb', ['Forum'])
 
@@ -244,14 +245,15 @@ class Migration(SchemaMigration):
             'size': ('django.db.models.fields.IntegerField', [], {})
         },
         u'pybb.category': {
-            'Meta': {'ordering': "['position']", 'object_name': 'Category'},
+            'Meta': {'ordering': "['position', 'name']", 'object_name': 'Category'},
             'hidden': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         },
         u'pybb.forum': {
-            'Meta': {'ordering': "['position']", 'object_name': 'Forum'},
+            'Meta': {'ordering': "['position', 'name']", 'object_name': 'Forum'},
+            'atom': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'forum'", 'unique': 'True', 'null': 'True', 'to': u"orm['web.Atom']"}),
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'forums'", 'to': u"orm['pybb.Category']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'headline': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
@@ -335,6 +337,24 @@ class Migration(SchemaMigration):
             'time_stamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pybb.Topic']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        u'web.atom': {
+            'Meta': {'ordering': "['title']", 'object_name': 'Atom'},
+            'base_category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'child_atoms'", 'to': u"orm['web.BaseCategory']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
+        u'web.basecategory': {
+            'Meta': {'ordering': "['title']", 'object_name': 'BaseCategory'},
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'parent_categories': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'child_categories'", 'blank': 'True', 'to': u"orm['web.BaseCategory']"}),
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         }
     }
 

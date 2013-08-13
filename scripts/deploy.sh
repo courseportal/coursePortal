@@ -1,23 +1,38 @@
 #!/bin/bash
 
-cd ../
-
-# move stuff to web directory
-cp -R * /var/www/knoatom-web/
-
-# remove .git directory from deployment
-rm -rf /var/www/knoatom-web/.git
-
-cd /var/www/knoatom-web
-
-# restore settings file
-cp /var/www/knoatom-backup/settings.py knoatom/
-
+PROJECT_ROOT="/var/www/knoatom-web/"
+APACHE2_DIR="/etc/apache2/"
+BACKUP_ROOT="/var/www/knoatom-web-backup/"
+SETTINGS="knoatom.settings.production"
+APPS=( "knoatom" "web" "assignment" "rating" "pybb" "haystack" )
+echo "Variables set"
+cd ../ # cd into git project root
+# Copy contents of project root
+cp -rf $PROJECT_ROOT* $BACKUP_ROOT
+echo "Backed up the code that is currently in $PROJECT_ROOT"
+# Delete contents of project root
+rm -rf $PROJECT_ROOT*
+echo "Deleted code in $PROJECT_ROOT"
+# copy to project root
+cp -r * $PROJECT_ROOT
+echo "Copied code from current directory into $PROJECT_ROOT"
+# cd into project root
+cd $PROJECT_ROOT
+# Delete .git* files and secret_key.py
+rm -rf .git .gitignore knoatom/settings/secret_key.py
+echo "Deleted unwanted files."
 # collect static stuff
-python manage.py collectstatic --noinput
-
-# sync db
-python manage.py syncdb --noinput
+python manage.py collectstatic --settings=$SETTINGS --noinput
+echo "Collected static files"
+# sync db, we NEED to work on creating south migrations correctly
+for i in ${APPS[@]}
+do
+        python manage.py migrate $i --settings=$SETTINGS
+done
+echo "Migrated all APPS"
+#python manage.py syncdb --noinput
 
 # restart apache
-service apache2 restart
+sudo service apache2 restart
+echo "Restarted server"
+echo "Done"
