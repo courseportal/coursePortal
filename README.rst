@@ -1,3 +1,8 @@
+=====================================================================
+**DO NOT PUSH A DATABASE CHANGE TO THIS BRANCH WITHOUT A MIGRATION!**
+=====================================================================
+**Do not push buggy code to the PRODUCTION branch**
+
 Knoatom
 =======
 
