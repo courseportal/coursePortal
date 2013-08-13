@@ -2,6 +2,7 @@
 *.sw
 *media/*
 /static/
+*secret_key.py
 */media/*
 update.bat
 .DS_Store
