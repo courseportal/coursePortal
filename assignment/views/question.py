@@ -9,7 +9,7 @@ from django.utils import simplejson as json
 from random import *
 from math import *
 from string import Template
-from knoatom.view_functions import get_breadcrumbs	
+from knoatom.view_functions import get_breadcrumbs
 import sys
 
 def detail(request, id, practice=False):

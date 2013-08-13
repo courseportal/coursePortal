@@ -75,9 +75,6 @@ function init(){
 		$('#delete_name').val('');
 	});
 
-	$('#preview-zone').on('show', function(){
-		validateAndPreview();
-	});	
 	initialInput($('#initialType').attr('value'), $('#initialAnswer').attr('value'), $('#initialChoice').attr('value'));
 }
 
@@ -143,6 +140,7 @@ function validateAndPreview(){
 	else if($('#tfFalse').prop('checked')){
 		pdata.answer = false;
 	}
+	//Validate user input
 	$('#variable_list').children().each(function(){
 		validate($(this));
 	});
@@ -168,7 +166,7 @@ function validateAndPreview(){
 	
 	//Eliminate $ in code
 	pdata.code = pdata.code.replace(/\$/g,'');
-	//test full code: looks for infinite loops and other run-time errors
+	//test full code: looks for infinite loops and security errors
 	var reply
 	$.ajax('/assignment/utility/validateFull/', {
 		type: 'GET',
@@ -187,6 +185,7 @@ function validateAndPreview(){
       		["Typeset",MathJax.Hub,'preview-zone']
     	);
 	});
+	$('#preview-zone').modal('show');
 }
 
 function validateAndSubmit(){
@@ -221,6 +220,7 @@ function validateAndSubmit(){
 	}
 	code.setValue(tempCode);
 	$('#input_text').attr('value', tinymce.activeEditor.getContent());
+	//Set choices
 	choices=[];
 	$('#choice_input').children().each(function(){
 		if($(this).attr('class') == 'row-fluid'){

@@ -9,6 +9,9 @@ from django.contrib.auth.models import User
 from math import *
 from random import *
 import string, signal, sys
+from sandbox import Sandbox, SandboxConfig
+if not sys.platform.startswith('win'):
+	import resource
 
 def matchType(request):
 	vartype = request.GET['vartype']
@@ -50,13 +53,18 @@ def validateFull(request):
 	#Limit runtime, feature only useable in unix environment
 	if not sys.platform.startswith('win'):
 		signal.signal(signal.SIGALRM, timehandler)
-		signal.alarm(3) #will signal SIGALRM in 5 seconds
+		signal.alarm(5) #will signal SIGALRM in 5 seconds
+		resource.setrlimit(resource.RLIMIT_STACK, (3145728, 3145728)) #limit stack to 3mb
+		resource.setrlimit(resource.RLIMIT_DATA, (3145728, 3145728)) #limit heap to 3mb
+	#Set sandbox environment
+	sandbox = Sandbox(SandboxConfig('math', 'random', 'datetime', 'time'))
+	sbHeader = "from random import *\nfrom math import *"
 	try:
-		exec request.GET['code']
+		sandbox.execute(sbHeader+request.GET['code'])
 	except MemoryError:
-		return HttpResponse("Your code consumed too much memory, look for any non-terminating loops.")
+		return HttpResponse("Your code consumed too much memory, look for non-terminating loops.")
 	except Exception as e:
-		return HttpResponse("Full Code did not validate! Here is the eror messages produced:\n" + str(e))
+		return HttpResponse("Full Code did not validate! Here is the error message produced:\n" + str(e))
 	return HttpResponse(0)
 
 def practiceEval(request):
