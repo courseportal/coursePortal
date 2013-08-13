@@ -24,7 +24,9 @@ EMAIL_PORT = 587
 ALLOWED_HOSTS = [
     'localhost',
     'knoatom.eecs.umich.edu',
-    'cportal-nt.eecs.umich.edu'
+    'cportal-nt.eecs.umich.edu',
+    '127.0.0.1',
+    '141.213.4.210'
 ]
 
 DATABASES = {
