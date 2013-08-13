@@ -177,10 +177,11 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 			<!-- Default Title -->
 			{% block page_title %}
 			{% endblock %}
-			
-			{% block content %}
-				<!-- This block is the main content of the page -->
-			{% endblock %}
+			<div id="block-content">
+  			{% block content %}
+  				<!-- This block is the main content of the page -->
+  			{% endblock %}
+      </div>
 		</div> <!-- end .span9 -->
 	</div> <!-- end .row -->
 
