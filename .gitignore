@@ -12,4 +12,3 @@ docs/doctrees/*
 *box*.png
 .coverage
 htmlcov/
-*/migrations/*
