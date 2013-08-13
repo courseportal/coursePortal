@@ -1,4 +1,10 @@
 from .base import *
+try:
+    from .secret_key import *
+except ImportError:
+    SETTINGS_DIR=os.path.abspath(os.path.dirname(__file__))
+    generate_secret_key(os.path.join(SETTINGS_DIR, 'secret_key.py'))
+    from .secret_key import *
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -64,4 +70,3 @@ STATICFILES_DIRS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ.get('secret_KEY')

@@ -1,5 +1,14 @@
 # Django settings for knoatom-web project.
 import os
+from django.utils.crypto import get_random_string
+# Function that generates secret keys
+def generate_secret_key(filename):
+    r"""Creates a file that defines a random SECRET_KEY in a file located at filename."""
+    secret_key_file = open(filename, 'w')
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    secret_key = get_random_string(50, chars)
+    secret_key_file.write('SECRET_KEY = "{}"'.format(secret_key))
+    secret_key_file.close()
 
 ADMINS = (
     ('Nick Terrell', 'terrelln@umich.edu'),
