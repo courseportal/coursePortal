@@ -131,3 +131,5 @@ name,type,default
 
 8/12/2013:
 *Fixed bugs in the deletion of questions
+*Fixed bugs in creation of assignments
+*Assignments and questions can now be picked from a searchable/sortable table to edit

@@ -168,4 +168,9 @@ def instanceDetail(request, pk, id):
     
 	return render(request, 'question/instance.html', context)
 
+def editQlist(request):
+	context = get_breadcrumbs(request.path)
+	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
+	return render(request, 'question/list.html', context)
+
 
