@@ -122,9 +122,16 @@ def editA(request, id):
     context['assign_data']=json.loads(assignment.data)
     return render(request, 'assignment/addAssignment.html', context)
 
+def editAlist(request):
+    context = get_breadcrumbs(request.path)
+    context['assignment_list'] = request.user.owned_assignments.filter(isCopy = False)
+    return render(request, 'assignment/list.html', context)
+
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
-    isCopy = request.POST['copystatus']
+    isCopy = False
+    if 'copystatus' in request.POST:
+        isCopy = request.POST['copystatus']
     
     #create new assignment/grab assignment to edit
     assignment = ''

@@ -46,7 +46,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 {% if user.is_staff %}
   <li class="nav-header">My Class</li>
   <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
-  <li><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</li>
+  <li><a href='{%url "edit_assignment_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</a> 
   <ul class="nav nav-list">
   {%for t in user.owned_assignments.all%}
     <li><a href="{% url 'edit_assignment' t.id %}">{{t}}</a></li>
@@ -54,7 +54,7 @@ I have changed this file a bit, you should use this as the template you extend. 
   </ul>
   <li><a href="{% url "delete_assignment" %}">Delete Assignment</a></li>
   <li><a href="{% url "add_question" %}">Add Question</a></li>
-  <li><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Question</li>
+  <li><a href='{%url "edit_question_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Question</a>
   <ul class="nav nav-list">
   {%for q in user.owned_questions.all%}
     {% ifequal q.isCopy False %}

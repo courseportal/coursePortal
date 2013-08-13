@@ -82,7 +82,7 @@ def list(request):
         'assignment_list':assignment_list,
         'breadcrumbs':breadcrumbs,
     }
-    return render(request, 'assignment/list.html',context)
+    return render(request, 'assignment/instancelist.html',context)
 
 
 def choose_atom(request, messages=False):

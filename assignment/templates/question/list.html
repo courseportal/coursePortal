@@ -6,7 +6,7 @@
 
 <div id="assignment-zone">
 	<div> 
-	<table class="table assignment-table">  
+	<table class="table question-table">  
     <thead>  
       		<tr>  
        		<th class="sortable">Title</th>
@@ -15,11 +15,11 @@
       		</tr>  
     </thead>
     <tbody>
-   	{% for a in assignment_list %}
+   	{% for q in question_list %}
    		<tr class="assignment-row">
-   			<td><a href='{% url "edit_assignment" a.id%}'>{{ a.title }}</a></td>
-			<td>{% for atom in a.get_atoms %}{{atom}}, {%endfor%}</td>
-			<td>{{a.instances.all.count}}</td>
+   			<td><a href='{% url "edit_question" a.id%}'>{{ q.title }}</a></td>
+			<td>{% for atom in q.get_atoms %}{{atom}}, {%endfor%}</td>
+			<td>{{q.instances.all.count}}</td>
 		</tr>
 	{% endfor %}
    	</tbody>  
@@ -52,7 +52,7 @@
       	});
           
         // call the tablesorter plugin and apply the uitheme widget
-        $(".assignment-table").tablesorter({
+        $(".question-table").tablesorter({
             theme : "bootstrap",
                                      
             widthFixed: true,                                 

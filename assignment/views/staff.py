@@ -216,9 +216,10 @@ def deleteQ(request):
 			#Delete data entries in assignments
 			for a in question.assigned_to.all():
 				data = json.loads(a.data)
-				for q in data:
-					if int(q['id']) == int(question.id):
-						data.remove(q)
+				while str(question.id) in json.dumps(data):
+					for q in data:
+						if int(q['id']) == int(question.id):
+							data.remove(q)
 				a.data = json.dumps(data)
 				a.save()
 			copy = question.copy.all()[0]

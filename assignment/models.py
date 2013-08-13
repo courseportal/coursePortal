@@ -42,7 +42,7 @@ class Assignment(models.Model):
     isCopy = models.BooleanField(default=False)
      #Stringified tuple of dictionaries, contains question id, point value, title
     data = models.TextField(default='', null=True, blank=True)
-    questions = models.ManyToManyField(Question, related_name='assigned_to')
+    questions = models.ManyToManyField(Question, related_name='assigned_to', blank=True, null=True)
     owners = models.ManyToManyField(User, related_name='owned_assignments', blank=True, null=True)
     def __unicode__(self):
         return self.title
