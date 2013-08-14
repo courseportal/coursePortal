@@ -210,6 +210,22 @@ $(document).ready(function() {
 		}).done(category_success_function);
 		return false;
 	});
+  $('button#delete-class').click(function() {
+    var confirmed = confirm("Are you sure you want to delete this class?")
+    if (!confirmed) {return false;}
+    $('button#delete-class').attr('disabled', true);
+    $.ajax({
+      url:'/ajax/delete-class/{{ pk }}/'
+    }).always(function() {
+      $('button#delete-class').attr('disabled', false);
+    }).done(function(response) {
+      alert(response.message);
+      window.location = '/';
+    }).fail(function() {
+      $("#messages").empty().append('<div class="alert alert-error">Failed to delete class.</div>');
+    });
+    return false;
+  });
 });
 </script>
 <div class="container">
@@ -222,7 +238,10 @@ $(document).ready(function() {
       {% include "web/class_form_template.html" with form=class_form %}
     </div>
     <input type="hidden" name="class-form" /> <!-- form identifier -->
-    <input class="btn btn-primary" type="submit" name="submit-class" value="Update Class" id="submit-form" /> <!-- submit button -->
+    <input class="btn btn-primary" type="submit" name="submit-class" 
+      value="Update Class" id="submit-form" /> <!-- submit button -->
+    <button class="btn btn-danger" name="delete-class" 
+      id="delete-class">Delete Class</button> <!-- delete button -->
   </form>
   <form id="category-form" class="form-horizontal" 
       action="{{ form_action }}" method="POST">

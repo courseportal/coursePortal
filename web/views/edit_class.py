@@ -209,6 +209,22 @@ def process_forms(request, class_object, class_form=None, category_form=None):
                 messages.error(request, _('Error saving category.'))
     return context
     
+def delete_class(request, pk):
+    r"""
+    Deletes the class with pk=pk.  Returns a success message if successful.
+    
+    .. warning::
+        
+        This view is designed to only be used with AJAX
+    
+    """
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
+    class_object = get_object_or_404(Class, pk=pk)
+    class_object.delete()
+    context = {'message': _('Successfully deleted class.')}
+    return render_to_json_response(context)
+    
 # View to delete categories
 def delete_category(request, pk):
     r"""

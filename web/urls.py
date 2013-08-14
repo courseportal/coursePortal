@@ -30,6 +30,7 @@ urlpatterns = patterns('',
 	url(r'^edit-class/(?P<class_id>\d+)/(?P<cat_id>\d+)?/?$', 'web.views.edit_class.EditClassView', name='edit_class'),
 	# URLs for class editing form that are ONLY used with AJAX
 	url(r'^ajax/get-children/(?P<is_class>\d+)/(?P<pk>\d+)?/?$', 'web.views.edit_class.get_children', name='get_children'),
+    url(r'^ajax/delete-class/(?P<pk>\d+)/?$', 'web.views.edit_class.delete_class', name="delete_class"),
 	url(r'^ajax/delete-category/(?P<pk>\d+)/?$', 'web.views.edit_class.delete_category', name="delete_category"),
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='atom'),
     url(r'^class/(?P<class_id>\d+)/category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name = 'category'),
