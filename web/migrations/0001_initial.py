@@ -12,9 +12,9 @@ class Migration(SchemaMigration):
         db.create_table(u'web_basecategory', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('summary', self.gf('django.db.models.fields.TextField')(default='There is currently no summary.')),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('summary', self.gf('django.db.models.fields.TextField')(default=u'There is currently no summary.')),
         ))
         db.send_create_signal(u'web', ['BaseCategory'])
 
@@ -31,7 +31,9 @@ class Migration(SchemaMigration):
         db.create_table(u'web_atom', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('summary', self.gf('django.db.models.fields.TextField')(default=u'There is no summary added at this time.')),
+            ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
+            ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('summary', self.gf('django.db.models.fields.TextField')(default=u'There is currently no summary.')),
             ('base_category', self.gf('django.db.models.fields.related.ForeignKey')(related_name='child_atoms', to=orm['web.BaseCategory'])),
         ))
         db.send_create_signal(u'web', ['Atom'])
@@ -39,13 +41,12 @@ class Migration(SchemaMigration):
         # Adding model 'Video'
         db.create_table(u'web_video', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='video_owner', to=orm['auth.User'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('content', self.gf('django.db.models.fields.TextField')()),
-            ('video', self.gf('django.db.models.fields.CharField')(max_length=400, blank=True)),
-            ('votes', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='video_owner', to=orm['auth.User'])),
+            ('content', self.gf('django.db.models.fields.TextField')(default='-')),
+            ('video', self.gf('django.db.models.fields.CharField')(max_length=400, blank=True)),
         ))
         db.send_create_signal(u'web', ['Video'])
 
@@ -70,12 +71,11 @@ class Migration(SchemaMigration):
         # Adding model 'Exposition'
         db.create_table(u'web_exposition', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('link', self.gf('django.db.models.fields.CharField')(default='http://', max_length=100)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='exposition_set', to=orm['auth.User'])),
-            ('votes', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('link', self.gf('django.db.models.fields.CharField')(default='http://', max_length=100)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='exposition_set', to=orm['auth.User'])),
         ))
         db.send_create_signal(u'web', ['Exposition'])
 
@@ -100,12 +100,11 @@ class Migration(SchemaMigration):
         # Adding model 'Note'
         db.create_table(u'web_note', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='note_set', to=orm['auth.User'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('votes', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='note_set', to=orm['auth.User'])),
         ))
         db.send_create_signal(u'web', ['Note'])
 
@@ -130,12 +129,11 @@ class Migration(SchemaMigration):
         # Adding model 'Example'
         db.create_table(u'web_example', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='example_set', to=orm['auth.User'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('votes', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='example_set', to=orm['auth.User'])),
         ))
         db.send_create_signal(u'web', ['Example'])
 
@@ -160,12 +158,12 @@ class Migration(SchemaMigration):
         # Adding model 'Class'
         db.create_table(u'web_class', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='classes_authored', to=orm['auth.User'])),
-            ('status', self.gf('django.db.models.fields.CharField')(default='N', max_length=1)),
-            ('summary', self.gf('django.db.models.fields.TextField')(default='There is no summary added at this time.')),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='classes_authored', to=orm['auth.User'])),
+            ('status', self.gf('django.db.models.fields.CharField')(default='N', max_length=1)),
+            ('summary', self.gf('django.db.models.fields.TextField')(default=u'There is currently no summary.')),
         ))
         db.send_create_signal(u'web', ['Class'])
 
@@ -187,13 +185,23 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['class_id', 'user_id'])
 
+        # Adding M2M table for field stickied_assignments on 'Class'
+        m2m_table_name = db.shorten_name(u'web_class_stickied_assignments')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('class', models.ForeignKey(orm[u'web.class'], null=False)),
+            ('assignment', models.ForeignKey(orm[u'assignment.assignment'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['class_id', 'assignment_id'])
+
         # Adding model 'ClassCategory'
         db.create_table(u'web_classcategory', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('parent_class', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='category_set', null=True, blank=True, to=orm['web.Class'])),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True)),
             ('date_modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True)),
+            ('summary', self.gf('django.db.models.fields.TextField')(default=u'There is currently no summary.')),
+            ('parent_class', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='category_set', null=True, blank=True, to=orm['web.Class'])),
         ))
         db.send_create_signal(u'web', ['ClassCategory'])
 
@@ -271,6 +279,9 @@ class Migration(SchemaMigration):
         # Removing M2M table for field students on 'Class'
         db.delete_table(db.shorten_name(u'web_class_students'))
 
+        # Removing M2M table for field stickied_assignments on 'Class'
+        db.delete_table(db.shorten_name(u'web_class_stickied_assignments'))
+
         # Deleting model 'ClassCategory'
         db.delete_table(u'web_classcategory')
 
@@ -282,6 +293,29 @@ class Migration(SchemaMigration):
 
 
     models = {
+        u'assignment.assignment': {
+            'Meta': {'object_name': 'Assignment'},
+            'data': ('django.db.models.fields.TextField', [], {'default': "''", 'null': 'True', 'blank': 'True'}),
+            'due_date': ('django.db.models.fields.DateTimeField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'isCopy': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'owners': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'owned_assignments'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
+            'questions': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'assigned_to'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['assignment.Question']"}),
+            'start_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'title': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100'})
+        },
+        u'assignment.question': {
+            'Meta': {'object_name': 'Question'},
+            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'related_questions'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
+            'data': ('django.db.models.fields.TextField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'isCopy': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'numCorrect': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'numIncorrect': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'original': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'copy'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['assignment.Question']"}),
+            'owners': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'owned_questions'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
         u'auth.group': {
             'Meta': {'object_name': 'Group'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -321,8 +355,10 @@ class Migration(SchemaMigration):
         u'web.atom': {
             'Meta': {'ordering': "['title']", 'object_name': 'Atom'},
             'base_category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'child_atoms'", 'to': u"orm['web.BaseCategory']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is no summary added at this time.'"}),
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.basecategory': {
@@ -331,7 +367,7 @@ class Migration(SchemaMigration):
             'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'parent_categories': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'child_categories'", 'blank': 'True', 'to': u"orm['web.BaseCategory']"}),
-            'summary': ('django.db.models.fields.TextField', [], {'default': "'There is currently no summary.'"}),
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.class': {
@@ -342,9 +378,10 @@ class Migration(SchemaMigration):
             'instructors': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'allowed_classes'", 'blank': 'True', 'to': u"orm['auth.User']"}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'classes_authored'", 'to': u"orm['auth.User']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '1'}),
+            'stickied_assignments': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'classes_stickied_in'", 'blank': 'True', 'to': u"orm['assignment.Assignment']"}),
             'students': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'enrolled_classes'", 'blank': 'True', 'to': u"orm['auth.User']"}),
-            'summary': ('django.db.models.fields.TextField', [], {'default': "'There is no summary added at this time.'"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.classcategory': {
             'Meta': {'ordering': "['title']", 'object_name': 'ClassCategory'},
@@ -354,6 +391,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'parent_categories': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'child_categories'", 'blank': 'True', 'to': u"orm['web.ClassCategory']"}),
             'parent_class': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'category_set'", 'null': 'True', 'blank': 'True', 'to': u"orm['web.Class']"}),
+            'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.example': {
@@ -365,8 +403,7 @@ class Migration(SchemaMigration):
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'example_set'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'votes': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.exposition': {
             'Meta': {'ordering': "['title']", 'object_name': 'Exposition'},
@@ -377,8 +414,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'link': ('django.db.models.fields.CharField', [], {'default': "'http://'", 'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'exposition_set'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'votes': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.note': {
             'Meta': {'ordering': "['title']", 'object_name': 'Note'},
@@ -389,21 +425,19 @@ class Migration(SchemaMigration):
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'note_set'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'votes': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'web.video': {
             'Meta': {'ordering': "['title']", 'object_name': 'Video'},
             'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'video_set'", 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
             'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_videos'", 'blank': 'True', 'to': u"orm['web.Class']"}),
-            'content': ('django.db.models.fields.TextField', [], {}),
+            'content': ('django.db.models.fields.TextField', [], {'default': "'-'"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
             'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'video_owner'", 'to': u"orm['auth.User']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'video': ('django.db.models.fields.CharField', [], {'max_length': '400', 'blank': 'True'}),
-            'votes': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'video': ('django.db.models.fields.CharField', [], {'max_length': '400', 'blank': 'True'})
         }
     }
 

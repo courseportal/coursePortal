@@ -1,25 +1,70 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
-<table class="table">
-<tr>
-	<th>Assignment Name</th>
-	<th>Value</th>
-	<th>Completed?</th>
-	<th>Due Date</th>
-</tr>
-{% for a in assignment_list %}
-{% if a.was_published %}
-	<tr>
-		<td>{{a.title}}</td>
-		<td>{{a.max_score}}</td>	
-		{% ifequal a.can_edit 0 %}
-			<td>Yes</td>
-		{% else %}
-			<td>No</td>
-		{% endifequal %}
-		<td>{{a.due_date}}</td>
-	</tr>
-{% endif %}
-{%endfor%}
-</table>
+{% load my_filters %}
+{% load staticfiles %}
+
+
+<div id="assignment-zone">
+	<div> 
+	<table class="table assignment-table">  
+    <thead>  
+      		<tr>  
+       		<th class="sortable">Title</th>
+       		<th class="sortable">Subject</th>
+       		<th class="sortable">Number of Instances</th>
+      		</tr>  
+    </thead>
+    <tbody>
+   	{% for a in assignment_list %}
+   		<tr class="assignment-row">
+   			<td><a href='{% url "edit_assignment" a.id%}'>{{ a.title }}</a></td>
+			<td>{% for atom in a.get_atoms %}{{atom}}, {%endfor%}</td>
+			<td>{{a.instances.all.count}}</td>
+		</tr>
+	{% endfor %}
+   	</tbody>  
+   	</table>  
+	</div>
+</div>
+
+<script>
+    // tablesorter 2.10.8
+    // Documentation found here:
+    // http://mottie.github.io/tablesorter/docs/index.html
+     
+    // Bootstrap specific example here:
+    // http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+    $(function() {  
+      	$.extend($.tablesorter.themes.bootstrap, {
+            table      : 'table table-bordered',
+            header     : 'bootstrap-header', // give the header a gradient background
+            footerRow  : '',
+            footerCells: '.footer',
+            icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+            sortNone   : 'bootstrap-icon-unsorted',
+            sortAsc    : 'icon-chevron-up',
+            sortDesc   : 'icon-chevron-down',
+            active     : '', // applied when column is sorted
+            hover      : '', // use custom css here - bootstrap class may not override it
+            filterRow  : '.filter', // filter row class
+            even       : '', // odd row zebra striping
+            odd        : ''  // even row zebra striping
+      	});
+          
+        // call the tablesorter plugin and apply the uitheme widget
+        $(".assignment-table").tablesorter({
+            theme : "bootstrap",
+                                     
+            widthFixed: true,                                 
+            headerTemplate : '{content} {icon}', 
+            selectorHeaders: '> thead .sortable',        
+            initWidgits:true,
+            widgets : ["uitheme", "filter", "zebra" ],
+            widgetOptions: {
+          		
+            }        
+                                     
+        })
+    });
+</script>
 {% endblock %}

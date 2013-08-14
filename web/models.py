@@ -10,8 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from knoatom.settings import (MEDIA_ROOT, ALLOWED_FILE_EXTENSIONS, 
-    MAX_UPLOAD_SIZE)
+from django.conf import settings
 from rating.models import *
 from rating.ratings import *
 from assignment.models import Assignment
@@ -30,7 +29,10 @@ class WebBaseModel(models.Model):
         auto_now_add=True,
         default=datetime.now
     )
-    date_modified = models.DateTimeField(auto_now=True, default=datetime.now)
+    date_modified = models.DateTimeField(
+        auto_now=True,
+        default=datetime.now
+    )
     
     def clean(self):
         super(WebBaseModel, self).clean()
@@ -79,6 +81,7 @@ def validate_youtube_video_id(value):
         raise ValidationError('%s is not a valid YouTube video id.' % value)
     if len(value) > 11:
         raise ValidationError('%s is not a valid YouTube video id.' % value)
+        
 class Video(WebBaseModel):
     owner = models.ForeignKey(User, related_name="video_owner")
     content = models.TextField(default="-")
@@ -100,6 +103,16 @@ class Video(WebBaseModel):
     
     class Meta:
         ordering = ['title']
+        
+    def get_absolute_url(self):
+        r"""Returns the absolute url of an atom containing Video"""
+        if self.pk is None:
+            raise Http404
+        atoms = self.atoms.all()
+        if len(atoms) > 0:
+            return reverse('base_atom', args=[atoms[0].base_category.pk, 
+                atoms[0].pk])
+        raise Http404
 
 # Validator for expositions
 def validate_link(value):
@@ -122,19 +135,29 @@ class Exposition(WebBaseModel):
     class Meta:
         ordering = ['title']
         
+    def get_absolute_url(self):
+        r"""Returns the absolute url of an atom containing Exposition"""
+        if self.pk is None:
+            raise Http404
+        atoms = self.atoms.all()
+        if len(atoms) > 0:
+            return reverse('base_atom', args=[atoms[0].base_category.pk, 
+                atoms[0].pk])
+        raise Http404
+        
 # Validator for Note and Example
 def validate_uploaded_file(value):
     r"""
-    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
+    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.settings.MAX_UPLOAD_SIZE".
     """
-    if value.size > int(MAX_UPLOAD_SIZE):
-        raise ValidationError((u'Please keep filesize under {}. Current filesize {}').format(filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(value.size)))
+    if value.size > int(settings.MAX_UPLOAD_SIZE):
+        raise ValidationError((u'Please keep filesize under {}. Current filesize {}').format(filesizeformat(settings.MAX_UPLOAD_SIZE), filesizeformat(value.size)))
     valid = False
-    for ext in ALLOWED_FILE_EXTENSIONS:
+    for ext in settings.ALLOWED_FILE_EXTENSIONS:
         if value.name.endswith(ext):
             valid = True
     if not valid:
-        raise ValidationError(u'Not valid file type, we only accept {} files'.format(ALLOWED_FILE_EXTENSIONS))
+        raise ValidationError(u'Not valid file type, we only accept {} files'.format(settings.ALLOWED_FILE_EXTENSIONS))
 
 #Lecture Note
 class Note(WebBaseModel):
@@ -155,7 +178,15 @@ class Note(WebBaseModel):
     class Meta:
         ordering = ['title']
         
-
+    def get_absolute_url(self):
+        r"""Returns the absolute url of an atom containing Note"""
+        if self.pk is None:
+            raise Http404
+        atoms = self.atoms.all()
+        if len(atoms) > 0:
+            return reverse('base_atom', args=[atoms[0].base_category.pk, 
+                atoms[0].pk])
+        raise Http404
 
 class Example(WebBaseModel):
     file = models.FileField(
@@ -174,6 +205,16 @@ class Example(WebBaseModel):
     
     class Meta:
         ordering = ['title']
+        
+    def get_absolute_url(self):
+        r"""Returns the absolute url of an atom containing Example"""
+        if self.pk is None:
+            raise Http404
+        atoms = self.atoms.all()
+        if len(atoms) > 0:
+            return reverse('base_atom', args=[atoms[0].base_category.pk, 
+                atoms[0].pk])
+        raise Http404
 
 class Class(WebBaseModel):
     r"""
@@ -220,8 +261,7 @@ class Class(WebBaseModel):
     def get_absolute_url(self):
         if self.pk is not None:
             return reverse('classes', args=[self.pk])
-        else:
-            raise Http404
+        raise Http404
 
 class ClassCategory(WebBaseModel):
     summary = models.TextField(

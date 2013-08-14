@@ -1,27 +1,39 @@
 {% extends "assignment_nav.html" %}
 {% block content %}
 {% load my_filters %}
-
-<!-- TINY MCE -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}tinymce/js/tinymce/tinymce.min.js"></script>
-
+{% load staticfiles %}
 <!-- CODE MIRROR -->
-<script src="{{ STATIC_PREFIX }}codemirror/lib/codemirror.js"></script>
-<script src="{{ STATIC_PREFIX }}codemirror/mode/python/python.js"></script>
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/codemirror.css">
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}codemirror//lib/themes.css">
+<script src="{% static "codemirror/lib/codemirror.js" %}"></script>
+<script src="{% static "codemirror/mode/python/python.js" %}"></script>
+<link rel="stylesheet" href="{% static "codemirror//lib/codemirror.css" %}">
+<link rel="stylesheet" href="{% static "codemirror//lib/themes.css" %}">
 
 <!-- font awesome -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}font-awesome/css/font-awesome.min.css">
-
-<!-- JQUERY UI -->
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <!-- javascript -->
-<script type="text/javascript" src="{{ STATIC_PREFIX }}js/assignment.js"></script>
+<script type="text/javascript" src="{% static "js/assignment.js" %}"></script>
+
+<!-- MathJax -->
+<head>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [["\\(","\\)"] ],
+      displayMath: [ ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+});
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</head>
 
 <html>
-
 <body>
 	<a href="{% url 'assignment_index' %}" style="margin-right:5px" class="btn btn-success" id="loadA">Load Assignment</a>
 	<div class="row-fluid">
@@ -33,11 +45,11 @@
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="text" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
+			<input type="date" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="text" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
+			<input type="date" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
 		</div>
 
 	</div>
@@ -57,9 +69,9 @@
 					<input type="hidden" value = "{{q.id}}"></input> 
 					<div class="span5 question-description">{{q.title}}
 					</div> 
-					<button class="span1 question-edit btn" onclick="load_question({{q.id}})">
+					<div class="span1 question-edit btn" onclick="load_question({{q.id}})">
 						<i class="icon-eye-open"> View</i> 
-					</button> 
+					</div> 
 					{% with id=q.id %}
 					<div class="span1 question-pts"> 
 						<input type="text" class="input-fit point-value" value="{{q.points}}"></input>
@@ -74,46 +86,79 @@
 		</div>
 	</div>
 
-	<!--<button class="btn btn-inverse" id="opener" disabled>
-		<i class="icon-plus"></i> Add Question </button> -->
-	<button  {%if isCopy%}disabled{%endif%} class="btn" id="listingQ">
-		<i class="icon-plus"></i> Load Question</button>
+	<a href="#loading-modal" role="button" data-toggle="modal"  {%if isCopy%}disabled{%endif%} class="btn">
+		<i class="icon-plus"></i> Load Question</a>
 
-	<div id="dialog" class="row-fluid">
+	<!-- Question modal -->
+	<div id="dialog" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">x</button>
+			<h3 id="myModalLabel">Question Preview</h3>
+		</div>
+		<div class="modal-body" id="dialog-body">
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		</div>
 	</div>
 
 	<hr>
 	<form action="{% url "create_assignment" %}" method="post" id="assignmentForm" style="margin-bottom:10px">
 	{% csrf_token %}
-		<input type="hidden" name="copystatus" value="{{isCopy}}"></input>
+		{% if assignment %}
+			<input type='hidden' name='aid' value="{{assignment.id}}"></input>
+			<input type="hidden" name="copystatus" value="{{isCopy}}"></input>
+		{% endif %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
 		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
 	</form>
 	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
-	<div id="previewform"></div>
 
-<div id="loading-zone">
-	<table class="list-table question-table" style="max-height:300px">
-    <thead>  
-       		<tr> 
-       		<th class='sortable'>Title</th>
-       		<th class='sortable'>Related Subject(s)</th>
-       		<th class='sortable'>Difficulty</th>
-       		</tr>
-    </thead>  
-    <tbody>
-   		{% for question in question_list %}
-   		<tr>
-   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
-			<td>{%for atom in question.get_atoms %}{{atom}},{%endfor%}</td>
-			<td>{{question.get_rating}}</td>
-			<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
-		</tr>
-		{% endfor %}
-	</tbody>  
-   	</table>  
-	<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
-	<div class="preview-area">
+	<!-- Preview modal -->
+	<div id="previewModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">x</button>
+			<h3 id="myModalLabel">Assignment Preview</h3>
+		</div>
+		<div class="modal-body" id="preview-body">
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		</div>
+	</div>
+
+<!-- question load modal -->
+<div id="loading-modal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3 id="myModalLabel">Questions</h3>
+	</div>
+	<div class="modal-body" id="loading-zone">
+		<table class="list-table question-table" style="max-height:300px">
+	    <thead>  
+	       		<tr> 
+	       		<th class='sortable'>Title</th>
+	       		<th class='sortable'>Related Subject(s)</th>
+	       		<th class='sortable'>Difficulty</th>
+	       		</tr>
+	    </thead>  
+	    <tbody>
+	   		{% for question in question_list %}
+	   		<tr>
+	   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
+				<td>{%for atom in question.get_atoms %}{{atom}},{%endfor%}</td>
+				<td>{{question.get_rating}}</td>
+				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+			</tr>
+			{% endfor %}
+		</tbody>  
+	   	</table>  
+		<div class="preview-area">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button type="button" class="btn btn-success" onclick="loadExisting()">Load Questions</button>
 	</div>
 </div>
 </body>
@@ -159,5 +204,5 @@
         })
     });
 </script>
-<link rel="stylesheet" type="test/css" href="{{ STATIC_PREFIX }}css/test.css">
+<link rel="stylesheet" type="test/css" href="{% static "css/test.css" %}">
 {% endblock %}

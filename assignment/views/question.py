@@ -9,7 +9,7 @@ from django.utils import simplejson as json
 from random import *
 from math import *
 from string import Template
-from knoatom.view_functions import get_breadcrumbs	
+from knoatom.view_functions import get_breadcrumbs
 import sys
 
 def detail(request, id, practice=False):
@@ -18,7 +18,6 @@ def detail(request, id, practice=False):
 	test = ''
 	try:
 		exec data['code']
-
 	except Exception as ex:
 		test += "Error in code section:<br>"+str(ex)+"<br>"
 
@@ -31,7 +30,6 @@ def detail(request, id, practice=False):
 	local_dict = dict(locals())
 	text = Template(text).safe_substitute(local_dict)
 	
-
 	# #choices formatted here
 	choices = []
 	for choice in json.loads(data['choices']):
@@ -65,15 +63,29 @@ def addQ(request):
 	context['atom_list']= Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-def create2(request):
-	q = Question()
+def create(request):
+	q=''
+	if 'qid' in request.POST:
+		q = Question.objects.get(id=request.POST['qid'])
+		q.owners.clear()
+		q.atoms.clear()
+		if q.copy.all()[0].owners.count() == 0:
+			q.copy.all()[0].delete()
+		else:
+			q.copy.all()[0].original = None
+			q.copy.all()[0].save()
+	else:
+		q = Question()
 	q.title = request.POST['question_title']
 	data=dict()
 	data['code'] = request.POST['code']
+	if data['code'][0] == '\r':
+		data['code']=data['code'][2:]
 	data['solution'] = request.POST['answer']
 	data['text'] = request.POST['text']
+	data['question_type'] = request.POST['question_type']
 	choices = json.loads(request.POST['choices'])
-	if request.POST['question_type'] == 'True/False':
+	if data['question_type'] == 'True/False':
 		if data['solution'] == 'True':
 			choices.append('False')
 		else:
@@ -155,5 +167,10 @@ def instanceDetail(request, pk, id):
 	}
     
 	return render(request, 'question/instance.html', context)
+
+def editQlist(request):
+	context = get_breadcrumbs(request.path)
+	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
+	return render(request, 'question/list.html', context)
 
 

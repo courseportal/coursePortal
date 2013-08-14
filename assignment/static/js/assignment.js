@@ -62,69 +62,20 @@ function init(){
 	   },
 	});
 
-	//init the dialog
-	$( '#dialog' ).dialog({ 
-		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.5,
-		modal: true,
-		distance: 10,
-		overflow: scroll,
-		autoOpen: false,
-		draggable: false,
-		resizable: false,
-		focus: function(event, ui){
-			//disable parent scrolling
-			$('body').addClass('dialog-open');
-		},
-		close: function(event, ui){
-			//re-enable parent scrolling
-			$('body').removeClass('dialog-open');
-		},
-	});
-
-	$('#loading-zone').dialog({
-		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.7,
-		modal: true,
-		autoOpen: false,
-	});
-
-	$('#previewform').dialog({
-		width: document.body.clientWidth*0.8,
-		height: document.body.clientHeight*0.7,
-		modal: true,
-		autoOpen: false,
-		focus: function(event, ui){
-			//disable parent scrolling
-			$('body').addClass('dialog-open');
-		},
-		close: function(event, ui){
-			//re-enable parent scrolling
-			$('body').removeClass('dialog-open');
-		}
-	});
-	//init wysiwyg
-	tinymce.init({
-	   selector: 'textarea#text',
-	   force_p_newlines : false 
-	});
-	//init dialogPreview height
-	 	
-
 	//initalize datepickers
 	$('#assigndate').datepicker({ dateFormat: "yy-mm-dd" });
 	$('#duedate').datepicker({ dateFormat: "yy-mm-dd" });
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
-	$('#listingQ').attr('onclick', "$('#loading-zone').dialog('open')");
 }
 
 function load_question(num){ 
 	$('#questionNum').val(num);
-	//change save destination
-	$( '#dialog' ).load('question/'+num);
-	$( '#dialog' ).dialog('open');
-	//open the dialog
+	$( '#dialog-body' ).load('question/'+num);
+	MathJax.Hub.Queue(
+      	["Typeset",MathJax.Hub,'dialog-body']
+    );
+	$( '#dialog' ).modal('show');
 }
 
 function remove_question(num){
@@ -180,19 +131,7 @@ function save(){
 		question.points = $(this).find('input[type=text]').val();
 		assignment.questions.push(question);
     });
-	//Check if already own assignment by same name
-	var overwrite;
-	$.ajax('/assignment/utility/checktitle/', {
-		type: 'POST',
-		async: false,
-		data: assignment,
-	}).done(function(response){
-		overwrite=jQuery.parseJSON(response);
-	});
 
-	if(overwrite.overwrite == true)
-		if(!confirm("Saving this will overwrite owned assignment of same name.\n Is this ok?"))
-			return;
 	$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
 	$('#assignmentForm').submit();
 }
@@ -201,14 +140,10 @@ function previewA(){
 	//empty object
 	assignment = {
 		title: '',
-		start: '',
-		due: '',
 		questions: [],		
 	};
 
 	assignment.title = $('#assigntitle').val();
-	assignment.start = $('#assigndate').datepicker('getDate');
-	assignment.due = $('#duedate').datepicker('getDate');
 
 	$('#questionsList > .question-whole').each(function(index){
 		questiondata = $(this).find('input[type=hidden]').val();
@@ -220,16 +155,18 @@ function previewA(){
    	    previewdata:JSON.stringify(assignment, undefined, 2),
     };
 
-    $('#previewform').load('preview/', data, function(response, status, xhr){
-   	if (status == "error") {
+    $('#preview-body').load('preview/', data, function(response, status, xhr){
+   		if (status == "error") {
     		var msg = "Sorry but there was an error: ";
-    		$("#previewform").html(msg + xhr.status + " " + xhr.statusText);
+    		$("#preview-body").html(msg + xhr.status + " " + xhr.statusText);
+  		}
+  		else{
+  			MathJax.Hub.Queue(
+      			["Typeset",MathJax.Hub,'previewModal']
+    		);
   		}
     });
-    MathJax.Hub.Queue(
-      	["Typeset",MathJax.Hub,'previewform']
-    );
-    $('#previewform').dialog('open');
+    $('#previewModal').modal('show');
 }
 
 function iframe_preview(qid){
@@ -252,8 +189,8 @@ function iframe_close(qid){
 function loadExisting(){
 	var ID='';
 	var questionHTML='';
-	//Close dialog box
-	$( '#loading-zone' ).dialog('close');
+	//Close modal box
+	$('#loading-modal').modal('hide')
 	//Loop through selected elements
 	$('.icon-eye-close').each(function(){
 		ID='#';
@@ -283,9 +220,9 @@ function questionstring(num, title, id){
 					<div class="span1 question-pts">\
 						<input type="text" class="input-fit" value="0"></input>\
 					</div>\
-					<div class="span1 question-remove btn" onclick="remove_question('+num+')">\
+					<button class="span1 question-remove btn" onclick="remove_question('+num+')">\
 						<i class="icon-remove-sign"></i>\
-					</div>\
+					</button>\
 				</div>\
 			</div>';
 	return questionHTML;

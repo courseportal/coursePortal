@@ -122,33 +122,38 @@ def editA(request, id):
     context['assign_data']=json.loads(assignment.data)
     return render(request, 'assignment/addAssignment.html', context)
 
+def editAlist(request):
+    context = get_breadcrumbs(request.path)
+    context['assignment_list'] = request.user.owned_assignments.filter(isCopy = False)
+    return render(request, 'assignment/list.html', context)
+
 def create(request):
     a=json.loads(request.POST['assignmentdata'])
-    #Search for assignment by same name, delete it if found
-    isCopy = request.POST['copystatus']
-    current=''
-    if isCopy == False:
-        try:
-            current=request.user.owned_assignments.get(title = a['title'])
-        except:
-            pass
-    #create new assignment
-    assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
-    if isCopy:
-        assignment.isCopy = True;
+    isCopy = False
+    if 'copystatus' in request.POST:
+        isCopy = request.POST['copystatus']
+    
+    #create new assignment/grab assignment to edit
+    assignment = ''
+    #Assignment came from editing and is owned by user
+    if 'aid' in request.POST:
+        assignment = Assignment.objects.get(id=request.POST['aid'])
+        if assignment.owners.filter(id=request.user.id).exists():
+            assignment.owners.clear()
+        else:
+            assignment=''
+    #Assignment is either new or a copy of something unowned by user
+    if assignment == '':
+        assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
+
+    assignment.isCopy = isCopy
     assignment.save()
 
-    questions=[]
-
-    #save owners
-    if current!='': 
-        for x in current.owners.all():
-            assignment.owners.add(x)
-        current.delete();
-    else:
-        assignment.owners.add(request.user)
+    #save owner
+    assignment.owners.add(request.user)
 
     #Add questions
+    questions=[]
     for q in a['questions']:
         qdat={
             'id':0,
