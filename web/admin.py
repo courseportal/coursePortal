@@ -149,7 +149,7 @@ class BaseCategoryAdminForm(forms.ModelForm):
                     .exists()):
                 print "Validation Error indirect"
                 raise forms.ValidationError(_("There is an indirect infinite loop in the categories"))
-        return data
+        return data['parent_categories']
         
     class Meta:
         model = BaseCategory

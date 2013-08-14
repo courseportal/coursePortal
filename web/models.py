@@ -73,16 +73,48 @@ class Atom(WebBaseModel):
         
     def countQuestions(self):
 		return self.related_questions.filter(isCopy=False).count()
-
-        
+    
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
     if not regex_vid_id.match(value):
         raise ValidationError('%s is not a valid YouTube video id.' % value)
     if len(value) > 11:
         raise ValidationError('%s is not a valid YouTube video id.' % value)
-        
+
+    
+# Validator for links
+def validate_link(value):
+    r"""Checks that exposition links begin with ``http://`` or ``https://``."""
+    if not (re.match('^http://', value) or re.match('^https://', value)):
+        raise ValidationError(u'The link must begin with http:// or https://.')
+
+# Validator for uploaded files
+def validate_uploaded_file(value):
+    r"""
+    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
+    """
+    if value.size > int(settings.MAX_UPLOAD_SIZE):
+        raise ValidationError((u'Please keep filesize under {}. Current filesize {}').format(filesizeformat(settings.MAX_UPLOAD_SIZE), filesizeformat(value.size)))
+    valid = False
+    for ext in settings.ALLOWED_FILE_EXTENSIONS:
+        if value.name.endswith(ext):
+            valid = True
+    if not valid:
+        raise ValidationError(u'Not valid file type, we only accept {} files'.format(settings.ALLOWED_FILE_EXTENSIONS))
+
+LECTURE = "L"
+EXAMPLE = "E"
+READING = "R"
+HOMEWORK = "H"
+CONTENT_TYPES = (
+    (LECTURE, "Lecture"),
+    (EXAMPLE, "Example"),
+    (READING, "Reading"),
+    (HOMEWORK, "Homework"),
+)
+
 class Video(WebBaseModel):
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES, default=LECTURE)
     owner = models.ForeignKey(User, related_name="video_owner")
     content = models.TextField(default="-")
     video = models.CharField(
@@ -113,14 +145,9 @@ class Video(WebBaseModel):
             return reverse('base_atom', args=[atoms[0].base_category.pk, 
                 atoms[0].pk])
         raise Http404
-
-# Validator for expositions
-def validate_link(value):
-    r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""
-    if not (re.match('^http://', value) or re.match('^https://', value)):
-        raise ValidationError(u'The link must begin with http:// or https://.')
-
+        
 class Exposition(WebBaseModel):
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES, default=READING)
     link = models.CharField(max_length=100, validators=[validate_link], default="http://")
     atoms = models.ManyToManyField(Atom, related_name="exposition_set")
     owner = models.ForeignKey(User, related_name="exposition_set")
@@ -161,6 +188,7 @@ def validate_uploaded_file(value):
 
 #Lecture Note
 class Note(WebBaseModel):
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES, default=LECTURE)
     file = models.FileField(
         upload_to='notes/',
         validators=[validate_uploaded_file]
@@ -189,6 +217,7 @@ class Note(WebBaseModel):
         raise Http404
 
 class Example(WebBaseModel):
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES, default=EXAMPLE)
     file = models.FileField(
         upload_to='examples/',
         validators=[validate_uploaded_file]
