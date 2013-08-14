@@ -38,11 +38,21 @@ def vote(request, atom_id, item, item_id, vote_type):
         if vote_type == 'up':
             if vote.vote != 0:
                 delta = -1*vote_down_delta_rating()
+                vote.voteUp += vote_up_delta_rating()
+                vote.voteDown += vote_down_delta_rating()
+            else:
+                vote.voteUp += vote_up_delta_rating()
             delta += vote_up_delta_rating()
+            
         elif vote_type == 'down':
             if vote.vote != 0:
                 delta = -1*vote_up_delta_rating()
+                vote.voteDown -= vote_down_delta_rating()
+                vote.voteUp -= vote_up_delta_rating()
+            else:
+                vote.voteDown -= vote_down_delta_rating()
             delta += vote_down_delta_rating()
+            
         else:
             raise Http404
         vote.vote += delta
@@ -58,9 +68,13 @@ def vote(request, atom_id, item, item_id, vote_type):
         user_rating.rating += delta
         user_rating.save()
         votes = [v.vote for v in content_object.vote_set.filter(atom=atom_object)]
+        votesUp = [v.voteUp for v in content_object.vote_set.filter(atom=atom_object)]
+        votesDown = [v.voteDown for v in content_object.vote_set.filter(atom=atom_object)]
         context = {
             'result':True, 
             'votes':sum(votes),
+            'votesUp': sum(votesUp),
+            'votesDown': sum(votesDown),
             'id':content_object.id,
             'item':item
         }

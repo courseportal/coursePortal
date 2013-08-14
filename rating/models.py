@@ -11,6 +11,8 @@ class Vote(models.Model):
     user = models.ForeignKey(User)
     atom = models.ForeignKey("web.Atom")
     vote = models.IntegerField(default=0)
+    voteUp = models.IntegerField(default=0)
+    voteDown = models.IntegerField(default=0)
     # Must have only one of these fields
     video = models.ForeignKey("web.Video", blank=True, null=True,
         editable=False

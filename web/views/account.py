@@ -212,35 +212,36 @@ def logout(request):
 	return HttpResponseRedirect(reverse('login'))
 
 def register(request):
-	if request.user.is_authenticated():
-		return HttpResponseRedirect(reverse('home'))
-	if request.method == 'POST':
-		form = RegisterForm(request.POST)
-		if form.is_valid():
-			email_exists = User.objects.filter(
-				email=form.cleaned_data['email']
-			).exists()
-			if email_exists:
-				messages.warning(request, _('Could not register you. Email is '
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('home'))
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            email_exists = User.objects.filter(
+                email=form.cleaned_data['email']
+            ).exists()
+            if email_exists:
+                messages.warning(request, _('Could not register you. Email is '
 					'already registered.')
 				)
-			if (form.cleaned_data['password'] != 
+            if (form.cleaned_data['password'] !=
 					form.cleaned_data['password_confirmation']):
 				messages.warning(request, _('Passwords did not match. Please '
 					'try again.')
 				)
-			elif not email_exists:
-				user = User.objects.create_user(
-					form.cleaned_data['email'], form.cleaned_data['email'],
-					form.cleaned_data['password']
+            elif not email_exists:
+                user = User.objects.create_user(
+                    form.cleaned_data['email'], form.cleaned_data['email'],
+                    form.cleaned_data['password']
 				)
-				user.first_name = form.cleaned_data['firstname']
-				user.last_name = form.cleaned_data['lastname']
-				user.is_active = False
-				user.save()
-				m = hashlib.md5()
-				m.update(user.email + str(user.date_joined).split('.')[0])
-				send_mail(
+                user.first_name = form.cleaned_data['firstname']
+                user.last_name = form.cleaned_data['lastname']
+                user.username = form.cleaned_data['username']
+                user.is_active = False
+                user.save()
+                m = hashlib.md5()
+                m.update(user.email + str(user.date_joined).split('.')[0])
+                send_mail(
 					subject=_('KnoAtom Registration'), 
 					message=(_('You have successfully registered at '
 						'knoatom.eecs.umich.edu with the username ') + 
@@ -256,18 +257,18 @@ def register(request):
 					recipient_list=[user.email, EMAIL_HOST_USER], 
 					fail_silently=False
 				)
-				messages.success(request, _('You have been registered. Please '
+                messages.success(request, _('You have been registered. Please '
 					'login to continue.')
 				)
-				return HttpResponseRedirect(reverse('login'))
+                return HttpResponseRedirect(reverse('login'))
 		
-		messages.warning(request, _('Could not register you. Try again.'))
-	else: # Request is GET
-		form = RegisterForm()
+        messages.warning(request, _('Could not register you. Try again.'))
+    else: # Request is GET
+        form = RegisterForm()
 	
-	context = get_breadcrumbs(request.path, web_breadcrumb_dict)
-	context.update({'register_form':form})
-	return render(request, 'web/account/register.html', context)
+    context = get_breadcrumbs(request.path, web_breadcrumb_dict)
+    context.update({'register_form':form})
+    return render(request, 'web/account/register.html', context)
 
 def validate(request):
 	if request.user.is_authenticated():

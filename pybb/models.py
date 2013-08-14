@@ -109,7 +109,6 @@ class Forum(models.Model):
 	hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
 	readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
 	headline = models.TextField(_('Headline'), blank=True, null=True)
-	
 	atom = models.ForeignKey(Atom, related_name="forum", blank=True, null=True,unique=True)
 
 	class Meta(object):
@@ -535,14 +534,14 @@ def add_note_rate(sender, **kwargs):
 		user_rate.save()
 
 @receiver(pre_delete, sender=Topic)
-def delete_exposition_rate(sender, **kwargs):
+def delete_topic_rate(sender, **kwargs):
     """
         This adds the functionality to remove the file upon deletion.
     """
     user_rate = UserRating.objects.get(user=kwargs['instance'].user)
     user_rate.TopicRating -= topic_object_delta_rating()
     user_rate.rating -= topic_object_delta_rating()
-    user_vote = VoteTopic.objects.filter(example=kwargs['instance'])
+    user_vote = Vote.objects.filter(example=kwargs['instance'])
     for v in user_vote:
         if v.vote == vote_up_delta_rating():
             user_rate.VoteUp -= vote_up_delta_rating()

@@ -2,11 +2,24 @@ var vote_done = function(data) {
     if (data.result == true)
     {
         var vote_div = '#votes-sum-'+data.item+'-'+data.id;
+        var vote_up_div = '#votes-sum-up-'+data.item+'-'+data.id;
+        var vote_down_div = '#votes-sum-down-'+data.item+'-'+data.id;
+        var vote_up_bar_div = '#sparkbar-likes-'+data.item+'-'+data.id;
+        var vote_down_bar_div = '#sparkbar-dislikes-'+data.item+'-'+data.id;
         if (data.user_rating)
         {
             $('#cur-user-rate').text(data.user_rating);
         }
         $(vote_div).text(data.votes);
+        $(vote_up_div).text(data.votesUp);
+        $(vote_down_div).text(data.votesDown);
+        var up=data.votesUp/(data.votesUp + data.votesDown)*100+"%";
+        
+        var down=data.votesDown/(data.votesUp + data.votesDown)*100+"%";
+        
+        $(vote_up_bar_div).css('width', up);
+        $(vote_down_bar_div).css('width', down);
+        
         $('table').trigger('update');
     }
     else

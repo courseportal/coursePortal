@@ -13,6 +13,10 @@ OPTIONAL context:
 {% load staticfiles %}
 <!-- Should make this prettier -->
 <div id="report"> </div>
+<div class="sparkbar">
+<div class="sparkbar-likes" style="2px;width: 50%; background-color: #590;float: left;">Up</div>
+<div class="sparkbar-dislikes" style="width:50%; background-color: #ccc;float:right;">Down</div>
+</div>
 <table id="expos" class="tablesorter">
 	<thead>
 		<tr>
@@ -50,12 +54,18 @@ OPTIONAL context:
 				<td>
 					<div id="votes-sum-exposition-{{ expo.id }}">
   					{% if atom_object %}
-              {{ expo.vote_set|total:atom_object }}
-            {% else %}
-              {{ expo.vote_set|total }}
-            {% endif %}
-						
-					</div>
+                        {{ expo.vote_set|total:atom_object }}
+                    {% else %}
+                        {{ expo.vote_set|total }}
+                    {% endif %}
+                    </div>
+                    <div id="sparkbar-likes-exposition-{{ expo.id }}" style="width:50%; background-color: #590;float: left;">
+                        U
+                    </div>
+                    <div id="sparkbar-dislikes-exposition-{{ expo.id }}" style="width:50%; background-color: #ccc;float:right;">
+                        D
+                    </div>
+					
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
@@ -97,6 +107,7 @@ OPTIONAL context:
             });
         })
     });
+    
     
 </script>
 
