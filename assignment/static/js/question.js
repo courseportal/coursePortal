@@ -147,7 +147,9 @@ function validateAndPreview(){
 	if(validFlag == false){
 		validFlag = true;
 		return false;
-	} 
+	}
+
+	//Generate code
 	tempCode = '';
 	$('#variable_list').children().each(function(){
 		tempCode = generate($(this), tempCode);
@@ -189,13 +191,24 @@ function validateAndPreview(){
 }
 
 function validateAndSubmit(){
+	//Validate title and answer
+	if($('#answer_input').children().first().val() == ''){
+		alert("Please give your question an answer");
+		return false;
+	}
+	if($('#question_title').val() == ''){
+		alert("Please give your question a title");
+		return false;
+	}
+	//Validate variable data input
 	$('#variable_list').children().each(function(){
 		validate($(this))
 	});
 	if(validFlag == false){
 		validFlag = true;
 		return false;
-	} 
+	}
+	//Generate code
 	var tempCode = '';
 	$('#variable_list').children().each(function(){
 		tempCode = generate($(this), tempCode);
@@ -219,6 +232,7 @@ function validateAndSubmit(){
 		return false;
 	}
 	code.setValue(tempCode);
+	code.toTextArea();
 	$('#input_text').attr('value', tinymce.activeEditor.getContent());
 	//Set choices
 	choices=[];
@@ -230,6 +244,7 @@ function validateAndSubmit(){
 			choices.push($(this).val());
 		}
 	});
+	//Set atoms
 	atoms=[]
 	$('#atoms').children().each(function(){
 		if($(this).prop("selected")){
@@ -238,7 +253,13 @@ function validateAndSubmit(){
 	});
 	$('#atom_list').attr('value', JSON.stringify(atoms));
 	$('#choices').attr('value', JSON.stringify(choices));
-	$('#questionForm').submit();
+	$.ajax('/assignment/question/create/',{
+		type: 'POST',
+		async: false,
+		data: $('#questionForm').serializeArray()
+	});
+	console.log($('#questionForm').serialize());
+	window.location = '/assignment/';
 }
 
 function validate(row, dependent){

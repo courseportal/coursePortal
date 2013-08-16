@@ -29,9 +29,9 @@ def eval(request):
     assignment = AssignmentInstance.objects.get(pk=request.POST['assignment'])
     
     for question in assignment.questions.all():
-        try:
-            #Store student answer
-            answer = request.POST[str(question.id)+'choice']
+        #Store student answer
+        answer = request.POST[str(question.id)+'choice']
+        if question.can_edit:
             question.can_edit=False
             question.student_answer=answer;
             question.save()
@@ -48,8 +48,6 @@ def eval(request):
             elif not template == None:
                 template.numIncorrect+=1
                 template.save()
-        except:
-            continue
         
     if assdone(assignment):
         assignment.can_edit=False
@@ -83,7 +81,6 @@ def list(request):
         'breadcrumbs':breadcrumbs,
     }
     return render(request, 'assignment/instancelist.html',context)
-
 
 def choose_atom(request, messages=False):
     context = get_breadcrumbs(request.path)

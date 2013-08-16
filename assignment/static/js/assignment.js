@@ -62,9 +62,6 @@ function init(){
 	   },
 	});
 
-	//initalize datepickers
-	$('#assigndate').datepicker({ dateFormat: "yy-mm-dd" });
-	$('#duedate').datepicker({ dateFormat: "yy-mm-dd" });
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 }
@@ -79,8 +76,8 @@ function load_question(num){
 }
 
 function remove_question(num){
-	if(confirm('Are you sure you want to delete this question?'))
-		$('#question'+num).remove()
+	if(confirm('Are you sure you want to remove this question?'))
+		$('#question'+num).remove();
 }
 
 function save(){
@@ -100,14 +97,14 @@ function save(){
 		else
 			$('#assigntitle').style="";
 
-		assignment.start = $('#assigndate').datepicker('getDate');
+		assignment.start = $('#assigndate').val();
 		if(assignment.start == null){
 			redo+="Assign date\n";
 		}
 		else
 			$('#assigndate').style="";
 
-		assignment.due = $('#duedate').datepicker('getDate');
+		assignment.due = $('#duedate').val();
 		if(assignment.due == null){
 			redo+="Due date\n";
 		}
@@ -133,7 +130,13 @@ function save(){
     });
 
 	$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-	$('#assignmentForm').submit();
+	$.ajax('/assignment/create/',{
+		type:'POST',
+		async:false,
+		data:$('#assignmentForm').serialize()
+	});
+	//$('#assignmentForm').submit();
+	window.location = '/assignment/'
 }
 
 function previewA(){
@@ -227,3 +230,7 @@ function questionstring(num, title, id){
 			</div>';
 	return questionHTML;
 }
+
+$(document).ajaxError(function(event, request, settings) {
+  alert( "Error requesting page " + request.responseText);
+});
