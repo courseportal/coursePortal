@@ -8,7 +8,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 import random, string, re
 from web.forms.admin import *
-from web.models import User, Video
 from knoatom.view_functions import get_breadcrumbs
 from web.views.view_functions import web_breadcrumb_dict
 
@@ -60,16 +59,16 @@ def batch_add(request):
 	context.update({'form':form})
 	return request(render, 'web/admin/batch_add.html', context)
 
-@login_required()
-def list_videos(request):
-	if not request.user.is_staff:
-		return HttpResponseRedirect(reverse('home'))
-
-	top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
-	if top_ranked_videos is None: # If there is no cached version
-		top_ranked_videos = Video.objects.all().order_by('-votes')[:5]
-		cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
-	
-	context = get_breadcrumbs(request.path, web_breadcrumb_dict)
-	context.update({'top_ranked_videos':top_ranked_videos})
-	return render(request, 'web/admin/videos.html', context)
+# @login_required()
+# def list_videos(request):
+#     if not request.user.is_staff:
+#         return HttpResponseRedirect(reverse('home'))
+# 
+#     top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
+#     if top_ranked_videos is None: # If there is no cached version
+#         top_ranked_videos = Video.objects.all().order_by('-votes')[:5]
+#         cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
+#     
+#     context = get_breadcrumbs(request.path, web_breadcrumb_dict)
+#     context.update({'top_ranked_videos':top_ranked_videos})
+#     return render(request, 'web/admin/videos.html', context)

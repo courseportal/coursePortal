@@ -11,19 +11,21 @@ class Vote(models.Model):
     user = models.ForeignKey(User)
     atom = models.ForeignKey("web.Atom")
     vote = models.IntegerField(default=0)
+    content = models.ForeignKey("web.Content", blank=True, null=True, 
+        editable=False)
     # Must have only one of these fields
-    video = models.ForeignKey("web.Video", blank=True, null=True,
-        editable=False
-    )
-    note = models.ForeignKey("web.Note", blank=True, null=True, 
-        editable=False, related_name='vote_set'
-    )
-    exposition = models.ForeignKey("web.Exposition", blank=True, null=True, 
-        editable=False, related_name='vote_set'
-    )
-    example = models.ForeignKey("web.Example", blank=True, null=True, 
-        editable=False, related_name='vote_set'
-    )
+    # video = models.ForeignKey("web.Video", blank=True, null=True,
+#         editable=False
+#     )
+#     note = models.ForeignKey("web.Note", blank=True, null=True, 
+#         editable=False, related_name='vote_set'
+#     )
+#     exposition = models.ForeignKey("web.Exposition", blank=True, null=True, 
+#         editable=False, related_name='vote_set'
+#     )
+#     example = models.ForeignKey("web.Example", blank=True, null=True, 
+#         editable=False, related_name='vote_set'
+#     )
     topic = models.ForeignKey("pybb.Topic", blank=True, null=True, 
         editable=False, related_name='vote_set'
     )
@@ -32,17 +34,13 @@ class Vote(models.Model):
     def clean(self):
         r"""Make sure that this instance of Vote isn't already assigned to any content."""
         super(Vote, self).clean()
-        content_is_not_none = [(lambda x: getattr(vote, x.name)
-            is not None)(x) for x in vote._meta.fields[4:]]
-        if content_is_not_none.count(True) != 0:
-            raise ValidationError("The vote can only have one of [video, note, exposition, example, topic] set and it cannot be changed once set.")
+        if (getattr(self, content) is not None and
+                getattr(self, topic) is not None):
+            raise ValidationError("The vote can only have one of [content, topic] set and it cannot be changed once set.")
 
 class UserRating(models.Model):
     user = models.ForeignKey(User, related_name="rating_set")
-    ExpoRating = models.IntegerField(default=0)
-    LecNoteRating = models.IntegerField(default=0)
-    ExampleRating = models.IntegerField(default=0)
-    VideoRating = models.IntegerField(default=0)
+    ContentRating = models.IntegerField(default=0)
     TopicRating = models.IntegerField(default=0)
     VoteUp = models.IntegerField(default=0)
     VoteDown = models.IntegerField(default=0)

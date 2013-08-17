@@ -1,3 +1,5 @@
+{% if form.non_field_errors %}<div id="{{ id_insert }}non-field-errors" class="alert alert-warning">{{ form.non_field_errors }}</div>{% endif %}{% for field in form.hidden_fields %}{{ field }}{% endfor %}{% for field in form.visible_fields %}{% include "web/field_template.html" %}{% endfor %}{% comment %}
+<!-- This is the code with newlines.  I deleted the newlines for javascript parsing -->
 {% if form.non_field_errors %}
 	<div id="{{ id_insert }}non-field-errors" class="alert alert-warning">{{ form.non_field_errors }}</div>
 {% endif %}
@@ -5,5 +7,7 @@
 	{{ field }}
 {% endfor %}
 {% for field in form.visible_fields %}
-	{% include 'web/field_template.html' %}
+	{% include "web/field_template.html" %}
 {% endfor %}
+
+{% endcomment %}

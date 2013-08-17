@@ -7,8 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.db.models import Count
 
 from pybb.models import Forum
-from web.models import BaseCategory, Atom, Video, Exposition, \
-Note, Example, Class, ClassCategory
+from web.models import BaseCategory, Atom, Content, Class, ClassCategory
 from web.forms.submission import ReportForm
 from knoatom.view_functions import get_breadcrumbs, render_to_json_response
 from web.views.view_functions import get_navbar_context, \
@@ -51,13 +50,13 @@ def index(request):
         For now this displays the top ranked videos for all of the categories, we need to change it eventually.
     """
     context = get_navbar_context() # Add the initial navbar content.
-    top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
-    if top_ranked_videos is None: # If there is no cached version
-        top_ranked_videos = Video.objects.all().annotate(votes=Count('vote')).order_by('-votes')[:5]
-        cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
-    context.update({ # Add 'top_ranked_videos' to context
-        'top_ranked_videos': top_ranked_videos,
-    })
+    # top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
+#     if top_ranked_videos is None: # If there is no cached version
+#         top_ranked_videos = Video.objects.all().annotate(votes=Count('vote')).order_by('-votes')[:5]
+#         cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
+#     context.update({ # Add 'top_ranked_videos' to context
+#         'top_ranked_videos': top_ranked_videos,
+#     })
     return render(request, 'web/home/base/index.html', context)    
 
 def category(request, cat_id, class_id=None):
@@ -65,14 +64,14 @@ def category(request, cat_id, class_id=None):
     This is the view for category and base_category (``/class/<class_id>/category/<cat_id>`` and ``/category/<cat_id>``).  It generates the category page which has a table of all the content in all of its ``child_atoms`` and all of the ``child_atoms`` in all categories under it.
     """
     if class_id is not None:
-        template = 'web/home/class/category.html'
+        template = 'web/content_list.html'
         category_object = get_object_or_404(ClassCategory, id=cat_id)
         class_object = get_object_or_404(Class, id=class_id)
         # Check if user is allowed to see this page
         if has_class_access(class_object, request.user):
             return HttpResponseRedirect(reverse('class_index')) # Redirect
     else:
-        template = 'web/home/base/category.html'
+        template = 'web/content_list.html'
         category_object = get_object_or_404(BaseCategory, id=cat_id)
         class_object = None # We aren't in a class
     context = get_navbar_context(category_object, class_object)
@@ -83,6 +82,7 @@ def category(request, cat_id, class_id=None):
         get_context_for_category(category_object)
     )
     context.update({
+        'title':category_object.title,
         'class_object':class_object,
         'category_object':category_object,
     })
@@ -96,14 +96,14 @@ def atom(request, cat_id, atom_id, class_id=None):
     This is the view for both the ``atom`` view and the ``base_atom`` view (``/class/<class_id>/category/<cat_id>/atom/<atom_id>`` and ``/category/<cat_id>/atom/<atom_id>``).  It generates the content that is contained in the atom.
     """
     if class_id is not None:
-        template = 'web/home/class/category.html'
+        template = 'web/content_list.html'
         class_object = get_object_or_404(Class, id=class_id)
         category_object = get_object_or_404(ClassCategory, id=cat_id)
         # Check if user is allowed to see this page
         if has_class_access(class_object, request.user):
             return HttpResponseRedirect(reverse('class_index')) # Redirect
     else:
-        template = 'web/home/base/category.html'
+        template = 'web/content_list.html'
         class_object = None
         category_object = get_object_or_404(BaseCategory, id=cat_id)
     atom_object = get_object_or_404(Atom, id=atom_id) 
@@ -115,11 +115,26 @@ def atom(request, cat_id, atom_id, class_id=None):
         get_context_for_atom(atom_object)
     )
     context.update({
+        'title': atom_object.title,
         'atom_object': atom_object,
         'class_object':class_object,
         'forum': Forum.objects.get(atom=atom_object),
     })
     return render(request, template, context)
+    
+def content_detail(request, pk):
+    r"""
+    This is the view for the content detail view page.
+    """
+    obj = get_object_or_404(Content, pk=pk)
+    context = get_navbar_context()
+    context.update(
+        get_breadcrumbs(request.path, web_breadcrumb_dict)
+    )
+    context.update({
+        'content_object':obj
+    })
+    return render(request, 'web/content_details.html', context)
 
 def classes(request, class_id):
     r"""

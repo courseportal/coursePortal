@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="form-messages"></div> {#<!-- Div to put AJAX messages in. -->#}
+<form id="content-form" class="form-horizontal" action="{{ form_action }}" 
+    method="POST" data-type="content"> {#<!-- Form for the content object -->#}
+  {% csrf_token %}
+  <div id="form-div">
+    {% include "web/form_template.html" with form=form %}
+  </div>
+  <input class="btn btn-primary" type="submit" name="submit-content" 
+    value="Submit Content" id="submit-form" /> <!-- submit button -->
+  <button class="btn delete btn-danger hidden" id="delete-content" 
+    data-type="content">
+    Delete Content<!-- delete button -->
+  </button>
+</form>
+<div class="hidden" id="sub-forms">
+  <div class="row-fluid">
+    <div class="span7">
+      <form id="video-form" class="form-horizontal" action="{{ form_action }}" 
+          method="POST" data-type="video">
+        {% csrf_token %}
+        <div id="form-div">
+          {% include "web/form_template.html" with form=empty_video_form %}
+        </div>
+        <input class="btn btn-primary" type="submit" name="submit-video" 
+          value="Submit Video" id="submit-form" /> <!-- submit button -->
+        <!-- Clear button -->
+        <button class="btn" type="reset" id="new-video-form">New Video</button>
+        <button class="btn delete btn-danger hidden" id="delete-video">
+          Delete Video<!-- delete button -->
+        </button>
+      </form>
+    </div>
+    <div class="span5">
+      <select multiple="multiple" id="select-video" name="Videos" 
+        data-type="video">
+        {% for v in content_object.videos.all %}
+          <option id="{{ v.pk }}" value="{{ v.pk }}">{{ v.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span7">
+      <form id="link-form" class="form-horizontal" 
+        action="{{ form_action }}" method="POST" data-type="link">
+        {% csrf_token %}
+        <div id="form-div">
+          {% include "web/form_template.html" with form=empty_link_form %}
+        </div>
+        <input class="btn btn-primary" type="submit" name="submit-link" 
+          value="Submit Link" id="submit-form" /> <!-- submit button -->
+        <!-- Clear button -->
+        <button class="btn" type="reset" id="new-link-form">New Link</button>
+        <button class="btn delete btn-danger hidden" id="delete-link">
+          Delete Link<!-- delete button -->
+        </button>
+      </form>
+    </div>
+    <div class="span5">
+      <select multiple="multiple" id="select-link" name="Videos" 
+        data-type="link">
+        {% for l in content_object.links.all %}
+          <option id="{{ l.pk }}" value="{{ l.pk }}">{{ l.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span7">
+      <form id="file-form" enctype="multipart/form-data" data-type="file" 
+        class="form-horizontal"  action="{{ form_action }}" method="POST">
+        {% csrf_token %}
+        <div id="form-div">
+          {% include "web/form_template.html" with form=empty_file_form %}
+        </div>
+        <input class="btn btn-primary" type="submit" name="submit-file" 
+          value="Submit File" id="submit-form" /> <!-- submit button -->
+        <!-- Clear button -->
+        <button class="btn" type="reset" id="new-file-form">New File</button>
+        <button class="btn delete btn-danger hidden" id="delete-file">
+          Delete File<!-- delete button -->
+        </button>
+      </form>
+    </div>
+    <div class="span5">
+      <select multiple="multiple" id="select-file" name="Videos" 
+        data-type="file">
+        {% for f in content_object.files.all %}
+          <option id="{{ f.pk }}" value="{{ f.pk }}">{{ f.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+  {{ block.super }}
+  <script>
+  /**
+   * Sets the form action for every form.  Called after a new content object
+   *     is created, however, it is not when a content object is updated.  It
+   *     also shows all sub-content forms.
+   * @param {string} - The primary key of the content object.
+   */
+  function set_form_action(pk) {
+    $('form').each(function() {
+      $(this).attr('action', '{% url 'submit_content' %}' + pk + '/');
+    });
+    $('div#sub-forms').removeClass('hidden');
+    $('form#content-form').attr('data-pk', pk);
+    $('form#content-form button.delete').removeClass('hidden');
+  };
+  /**
+   * Performs an AJAX call to submit a form with the correct GET data.
+   * @ param {DOMElement} form - The form to submit.
+   * @param {string=} GET - The get data that the request needs to correctly
+   *     submit the form (optional).
+   * @return {$.Deffered} - The promise object that the ajax call returns.
+   */
+  function ajax(form, GET) {
+    /**
+     * Object to pass to AJAX call.
+     * @type {Object}
+     */
+    var ajax_obj = {
+      url: form.attr('action') + (GET || ""),
+      data: form.serialize(),
+      method: form.attr('method'),
+      statusCode: {
+        405: function() {
+          console.log('Bad request type!');
+        },
+      },
+    }
+    /**
+     * The AJAX promise object to return.
+     * @type {$.Deffered}
+     */
+    var promise = $.ajax(ajax_obj);
+    return promise;
+  };
+  /**
+   * Performs an AJAX GET call to get a form populated with an objects data.
+   *     Then it replaces the div it is passed with the new form html.
+   * @param {DOMElement} div - The div to replace with the new form.
+   * @param {!string} type - The type of the object (video, link, file).
+   * @param {!string} pk - The primary key of the object.
+   * @return {$.Deffered} The promise object from the AJAX call.
+   */
+  function get_form(div, type, pk) {
+    /**
+     * The url string including the GET data for the AJAX call.
+     * @const
+     * @type {string}
+     */
+    var url = '?type=' + type + '&pk=' + pk;
+    /**
+     * The AJAX promise object to return.
+     * @type {$.Deffered}
+     */
+    var promise = $.ajax({
+      url:url,
+      method:'GET',
+    }).done(function(data) {
+      /** Upon success replace the div. */
+      div.empty().append(data.form);
+    });
+    return promise;
+  };
+  /**
+   * Function that replaces the form div with a new one from the AJAX response
+   *     data property 'form_html'.  It requires the variable '$this' to be
+   *     set in the scope it is called from and should refer to a form submit
+   *     button.  It also adds the message to the messages div.
+   * @param {Object} - The AJAX response data.  It is required to have the
+   *     property 'form_html'.
+   */
+  function replace_form_div_and_add_message(div, data) {
+    div.empty().append(data.form_html);
+    $('div#form-messages').empty().append(data.message);
+  };
+
+  /**
+   * Called when the document is ready.  Hijacks form submission.
+   */
+  $(document).ready(function() {
+    if ("{{ pk }}" != "") {
+      set_form_action("{{ pk }}"); // Set the form action of all the forms
+    }
+    /** Handle all of the submit-form button clicks */
+    $('input#submit-form').click(function() {
+      /**
+       * Save $(this) in $this so that we can use it in the callback function.
+       * @type {DOMElement}
+       */
+      var $this = $(this);
+      /**
+       * Save the parent form to a variable.
+       * @type {DOMElement}
+       * @type const
+       */
+      var form = $this.parent();
+      /**
+       * The GET data for the AJAX request.
+       * @type {string}
+       */
+      var get;
+      if (form.attr('data-type') == 'content')
+      {
+        get = "";
+      }
+      else {
+        get = '?type=' + form.attr('data-type');
+        if (form.attr('data-pk')) {
+          get += '&pk=' + form.attr('data-pk');
+        }
+      }
+      // Disable the submit button.
+      $this.attr('disabled', true);
+      /**
+       * The object that will contain the promise from the ajax call.
+       * @type {$.Deffered}
+       */
+      var promise = ajax(form, get);
+      /** The same action happens on success and failure. */
+      promise.always(function(response, textStatus) {
+        if (textStatus == 'error') {
+          data = JSON.parse(response.responseText);
+        }
+        else {
+          data = response;
+        }
+        replace_form_div_and_add_message(form.find('div#form-div'), data);
+        $this.attr('disabled', false);
+      });
+      promise.done(function(data) {
+        if (form.attr('data-type') == 'content') {
+          if (!form.attr('data-pk')) {
+            set_form_action(data.pk);
+            form.attr('data-pk', data.pk);
+          }
+        }
+        else {
+          if (form.attr('data-pk')) {
+            $('select#select-' + form.attr('data-type') + 'option#' + 
+              form.attr('data-pk')).attr('selected', null).empty().
+              append(data.title);
+            form.attr('data-pk', null);
+            form.find('button.delete').addClass('hidden');
+          }
+          else {
+            $('select#select-' + form.attr('data-type')).append(
+              $('<option>').attr('value', data.pk).attr('id', data.pk).append(
+                data.title
+              )
+            );
+          }
+        }
+      });
+      return false;
+    });
+    
+    /* Get the form populated with data from the subcontent that was clicked */
+    $('select').on('dblclick', 'option', function() {
+      /**
+       * Save $(this) in $this so that we can use it in the callback function.
+       * @type {DOMElement}
+       */
+      var $this = $(this);
+      /**
+       * Save the related form to a variable.
+       * @type {DOMElement}
+       * @type const
+       */
+      var form = $('form#' + $this.parent().attr('data-type') + '-form');
+      /**
+       * The object that will contain the promise from the ajax call.  It will
+       *     already have some callbacks on it.
+       * @type {$.Deffered}
+       */
+      var promise = get_form(form.find('div#form-div'), 
+        form.attr('data-type'), $this.attr('value'));
+      promise.done(function(data) {
+        form.attr('data-pk', $this.attr('value'));
+        form.find('button.delete').removeClass('hidden');
+      });
+    });
+    
+    /** Delete button handling */
+    $('button.delete').click(function() {
+      /**
+       * Save $(this) in $this so that we can use it in the callback function.
+       * @type {DOMElement} - The delete button of a form.
+       */
+      var $this = $(this);
+      /**
+       * Saves the parent form data-type to a variable.
+       * @type {string}
+       * @const
+       */
+      var type = $this.parent().attr('data-type');
+      /**
+       * Saves the parent form data-pk to a variable.
+       * @type {string}
+       * @const
+       */
+      var pk = $this.parent().attr('data-pk');
+      /**
+       * Stores the users confirmation response.
+       * @const
+       * @type {boolean}
+       */
+      var go_on = confirm('Are you sure you want to delete this ' + type);
+      if (!go_on) {return false;};
+      $.ajax({
+        url: '{% url "delete_content" %}?type=' + type + '&pk=' + pk,
+        method: 'GET',
+      }).fail(function(response) {
+        data = JSON.parse(response.responseText)
+        $('div#form-messages').empty().append(data.message);
+      }).done(function(data) {
+        if (type == 'content'){
+          window.location = '{% url "submit_content" %}';
+        }
+        else {
+          $('div#form-messages').empty().append(data.message);
+          $('#new-' + type + '-form').click();
+          $('select#select-' + type + ' option#' + pk).remove();
+        }
+      });
+      return false;
+    });
+    
+    /** Replace the form html with an empty form. */
+    $('#new-video-form').click(function() {
+      /**
+       * Save the parent form to a variable.
+       * @type {DOMElement}
+       * @const
+       */
+      var form = $(this).parent();
+      form.find('div#form-div').empty().append(
+        '{% include "web/form_template.html" with form=empty_video_form  %}'
+      );
+      /** Reset global pk variable and deselect video if selected. */
+      if (form.attr('data-pk')) {
+        $('select#select-video option#'+form.attr('data-pk')).
+        attr('selected', null);
+        form.attr('data-pk', null);
+        form.find('button.delete').addClass('hidden');
+      }
+    });
+    /** Replace the form html with an empty form. */
+    $('#new-link-form').click(function() {
+      /**
+       * Save the parent form to a variable.
+       * @type {DOMElement}
+       */
+      var form = $(this).parent();
+      form.find('div#form-div').empty().append(
+        '{% include "web/form_template.html" with form=empty_link_form  %}'
+      );
+      /** Reset global pk variable and deselect link if selected. */
+      if (form.attr('data-pk')) {
+        $('select#select-link option#'+form.attr('data-pk')).
+        attr('selected', null);
+        form.attr('data-pk', null);
+        $('button#delete-link').addClass('hidden');
+      }
+      
+    });
+    /** Replace the form html with an empty form. */
+    $('#new-file-form').click(function() {
+      /**
+       * Save the parent form to a variable.
+       * @type {DOMElement}
+       */
+      var form = $(this).parent();
+      form.find('div#form-div').empty().append(
+        '{% include "web/form_template.html" with form=empty_file_form  %}'
+      );
+      /** Reset global pk variable and deselect file if selected. */
+      if (form.attr('data-pk')) {
+        $('select#select-file option#'+form.attr('data-pk')).
+        attr('selected', null);
+        form.attr('data-pk', null);
+        $('button#delete-file').addClass('hidden');
+      }
+      
+    });
+  });
+  </script>
+{% endblock javascript %}

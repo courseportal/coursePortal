@@ -1,3 +1,5 @@
+<div id="field-{{ field.name }}" class="control-group {% if field.errors %}error{% endif %}"><label class="control-label" for="{{ field.html_name }}">{{ field.label }}</label><div class="controls">{{ field }}<span id="help-inline-{{ field.name }}" class="help-inline">{{ field.errors }}</span>{% if not no_help_text %}{% if field.help_text %}<p class="help-block">{{ field.help_text }}</p>{% endif %}{% endif %}</div></div>{% comment %}
+<!-- This is the code with newlines.  I deleted newlines for javascript parsing -->
 <div id="field-{{ field.name }}" class="control-group {% if field.errors %}error{% endif %}">
 <label class="control-label" for="{{ field.html_name }}">{{ field.label }}</label>
 <div class="controls">
@@ -10,3 +12,4 @@
 {% endif %}
 </div>
 </div>
+{% endcomment %}

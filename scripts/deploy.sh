@@ -21,6 +21,9 @@ cd $PROJECT_ROOT
 # Delete .git* files and secret_key.py
 rm -rf .git .gitignore knoatom/settings/secret_key.py
 echo "Deleted unwanted files."
+# Upgrade python packages, does not include MySql-Python! Must have pip
+pip install ../dependencies.txt --upgrade
+echo "Installed and upgraded all dependencies."
 # collect static stuff
 python manage.py collectstatic --settings=$SETTINGS --noinput
 echo "Collected static files"

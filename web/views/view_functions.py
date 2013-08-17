@@ -2,7 +2,7 @@ r"""View helper functions."""
 from itertools import chain
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
-from web.models import Class, ClassCategory, BaseCategory, Atom, Video, Example, Exposition, Note
+from web.models import Class, ClassCategory, BaseCategory, Atom, Content
 
 # Dict to pass to the breadcrumb function to work with all of web.
 web_breadcrumb_dict = {
@@ -11,18 +11,17 @@ web_breadcrumb_dict = {
 	'category':		lambda pks: get_object_or_404(ClassCategory, pk=pks[0]),
 	'base-category':lambda pks: get_object_or_404(BaseCategory, pk=pks[0]),
 	'atom':			lambda pks: get_object_or_404(Atom, pk=pks[0]),
-	'video-submit':		lambda pks:	get_submit_url(pks, Video),
-	'exposition-submit':lambda pks:	get_submit_url(pks, Exposition),
-	'example-submit':	lambda pks:	get_submit_url(pks, Example),
-	'note-submit':		lambda pks:	get_submit_url(pks, Note),
+    'submit-content':   lambda pks: get_submit_url(pks, Content),
 	'create-class':	lambda pks: 'Create Class',
-	'edit-class':	lambda pks:	'Edit ' + str(get_object_or_404(Class, 										pk=pks[0])),
+	'edit-class':	lambda pks:	'Edit ' + str(get_object_or_404(Class, 									pk=pks[0])),
 	'account':		lambda pks: 'Account Management',
 	'forgot-password':	lambda pks: 'Forgot Password',
 	'login':		lambda pks: 'Login',
 	'register':		lambda pks: 'Register',
 	'batch-add':	lambda pks: 'Add Multiple Users',
-	'view-videos':	lambda pks: 'View All Videos',
+    'content':      lambda pks: (str(get_object_or_404(Content, pk=pks[0])) + 
+                                 ' Details')
+	#'view-videos':	lambda pks: 'View All Videos',
 }
 
 def get_submit_url(pks, ObjectClass):
@@ -75,14 +74,9 @@ def get_context_for_atom(atom_object=None):
 	
 	"""
 	if atom_object is None:
-		context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[]}
+		context = {'content_list':[]}
 	else:
-		context = {
-			'videos':atom_object.video_set.distinct(),
-			'expositions':atom_object.exposition_set.distinct(),
-			'notes':atom_object.note_set.distinct(),
-			'examples':atom_object.example_set.distinct()
-		}
+		context = {'content_list':atom_object.content_set.all()}
 	return context
 	
 def get_context_for_category(category_object, context=None):

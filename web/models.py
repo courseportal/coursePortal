@@ -34,11 +34,6 @@ class WebBaseModel(models.Model):
         default=datetime.now
     )
     
-    def clean(self):
-        super(WebBaseModel, self).clean()
-        if self.title == '':
-            raise ValidationError("'title' field cannot be empty.")
-    
     class Meta:
         abstract = True
         
@@ -73,82 +68,82 @@ class Atom(WebBaseModel):
         
     def countQuestions(self):
 		return self.related_questions.filter(isCopy=False).count()
-
-        
+    
+class Content(WebBaseModel):
+    LECTURE = "L"
+    EXAMPLE = "E"
+    READING = "R"
+    HOMEWORK = "H"
+    CONTENT_TYPES = (
+        (LECTURE, "Lectures"),
+        (EXAMPLE, "Examples"),
+        (READING, "Readings"),
+        (HOMEWORK, "Homework"),
+    )
+    
+    owner = models.ForeignKey(User, related_name="content_set")
+    summary = models.TextField(
+        verbose_name=_('Description'),
+        help_text=_('Enter a description of the content.  HTML tags are '
+            'allowed.'), # Change to markdown.
+        blank=True,
+    )
+    content_type = models.CharField(max_length="50", choices=CONTENT_TYPES)
+    atoms = models.ManyToManyField(Atom)
+    classes_stickied_in = models.ManyToManyField(
+        "Class",
+        blank=True,
+        related_name='stickied_content',
+        help_text=_('Please select the class(es) that you want this content '
+            'to be stickied in.'),
+    )
+    
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
     if not regex_vid_id.match(value):
         raise ValidationError('%s is not a valid YouTube video id.' % value)
     if len(value) > 11:
         raise ValidationError('%s is not a valid YouTube video id.' % value)
-        
-class Video(WebBaseModel):
-    owner = models.ForeignKey(User, related_name="video_owner")
-    content = models.TextField(default="-")
-    video = models.CharField(
-        max_length=400,
-        blank=True,
+    
+class YoutubeVideo(models.Model):
+    content = models.ForeignKey(Content, related_name="videos")
+    title = models.CharField(max_length=200)
+    video_id = models.CharField(
+        max_length=11,
+        verbose_name=_('Youtube Video Id'),
+        blank=False,
         help_text=_("Please enter an 11 character YouTube VIDEO_ID (e.g. "
-            "http://www.youtube.com/watch?v=VIDEO_ID)"),         
+            "http://www.youtube.com/watch?v=VIDEO_ID)"),
         validators=[validate_youtube_video_id],
     )
-    atoms = models.ManyToManyField(Atom, related_name="video_set")
-    classes_stickied_in = models.ManyToManyField(
-        "Class",
-        blank=True,
-        related_name='stickied_videos',
-        help_text=_('Please select the class(es) that you want this content '
-            'to be stickied in.')
-    )
     
-    class Meta:
-        ordering = ['title']
-        
-    def get_absolute_url(self):
-        r"""Returns the absolute url of an atom containing Video"""
-        if self.pk is None:
-            raise Http404
-        atoms = self.atoms.all()
-        if len(atoms) > 0:
-            return reverse('base_atom', args=[atoms[0].base_category.pk, 
-                atoms[0].pk])
-        raise Http404
-
-# Validator for expositions
+    def __unicode__(self):
+        return u"YouTube video"
+    
+# Validator for links
 def validate_link(value):
-    r"""Checks that exposition links begin with ``http://`` or ``https://``.  Any links that are ``https`` probably have cross site protection though."""
+    r"""Checks that exposition links begin with ``http://`` or ``https://``."""
     if not (re.match('^http://', value) or re.match('^https://', value)):
         raise ValidationError(u'The link must begin with http:// or https://.')
-
-class Exposition(WebBaseModel):
-    link = models.CharField(max_length=100, validators=[validate_link], default="http://")
-    atoms = models.ManyToManyField(Atom, related_name="exposition_set")
-    owner = models.ForeignKey(User, related_name="exposition_set")
-    classes_stickied_in = models.ManyToManyField(
-        "Class",
-        blank=True,
-        related_name='stickied_expositions',
-        help_text=_('Please select the class(es) that you want this content '
-            'to be stickied in.')
+    
+class Link(models.Model):
+    content = models.ForeignKey(Content, related_name="links")
+    title = models.CharField(max_length=200)
+    link = models.URLField(
+        verbose_name=_('URL'),
+        blank=False,
+        help_text=_("Enter a valid URL.")
+        #validators=[validate_link], 
+        #default="http://",
     )
     
-    class Meta:
-        ordering = ['title']
-        
-    def get_absolute_url(self):
-        r"""Returns the absolute url of an atom containing Exposition"""
-        if self.pk is None:
-            raise Http404
-        atoms = self.atoms.all()
-        if len(atoms) > 0:
-            return reverse('base_atom', args=[atoms[0].base_category.pk, 
-                atoms[0].pk])
-        raise Http404
-        
-# Validator for Note and Example
+    def __unicode__(self):
+        return u"link"
+    
+# Validator for uploaded files
 def validate_uploaded_file(value):
     r"""
-    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.settings.MAX_UPLOAD_SIZE".
+    Checks that the file is of an allowed type set in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENTIONS`` and file size to be under "settings.MAX_UPLOAD_SIZE".
     """
     if value.size > int(settings.MAX_UPLOAD_SIZE):
         raise ValidationError((u'Please keep filesize under {}. Current filesize {}').format(filesizeformat(settings.MAX_UPLOAD_SIZE), filesizeformat(value.size)))
@@ -158,63 +153,19 @@ def validate_uploaded_file(value):
             valid = True
     if not valid:
         raise ValidationError(u'Not valid file type, we only accept {} files'.format(settings.ALLOWED_FILE_EXTENSIONS))
-
-#Lecture Note
-class Note(WebBaseModel):
+    
+class UploadedFile(models.Model):
+    content = models.ForeignKey(Content, related_name="files")
+    title = models.CharField(max_length=200)
     file = models.FileField(
-        upload_to='notes/',
+        verbose_name=_('File'),
+        help_text=_('Please select a file to upload.'),
+        upload_to='files/',
         validators=[validate_uploaded_file]
     )
-    owner = models.ForeignKey(User, related_name="note_set")
-    atoms = models.ManyToManyField(Atom, related_name = "note_set")
-    classes_stickied_in = models.ManyToManyField(
-        "Class",
-        blank=True,
-        related_name='stickied_notes',
-        help_text=_('Please select the class(es) that you want this content '
-            'to be stickied in.')
-    )
     
-    class Meta:
-        ordering = ['title']
-        
-    def get_absolute_url(self):
-        r"""Returns the absolute url of an atom containing Note"""
-        if self.pk is None:
-            raise Http404
-        atoms = self.atoms.all()
-        if len(atoms) > 0:
-            return reverse('base_atom', args=[atoms[0].base_category.pk, 
-                atoms[0].pk])
-        raise Http404
-
-class Example(WebBaseModel):
-    file = models.FileField(
-        upload_to='examples/',
-        validators=[validate_uploaded_file]
-    )
-    owner = models.ForeignKey(User, related_name="example_set")
-    atoms = models.ManyToManyField(Atom, related_name = "example_set")
-    classes_stickied_in = models.ManyToManyField(
-        "Class",
-        blank=True,
-        related_name='stickied_examples',
-        help_text=_('Please select the class(es) that you want this content '
-            'to be stickied in.')
-    )
-    
-    class Meta:
-        ordering = ['title']
-        
-    def get_absolute_url(self):
-        r"""Returns the absolute url of an atom containing Example"""
-        if self.pk is None:
-            raise Http404
-        atoms = self.atoms.all()
-        if len(atoms) > 0:
-            return reverse('base_atom', args=[atoms[0].base_category.pk, 
-                atoms[0].pk])
-        raise Http404
+    def __unicode__(self):
+        return u"file"
 
 class Class(WebBaseModel):
     r"""
@@ -289,106 +240,25 @@ class ClassCategory(WebBaseModel):
     class Meta:
         ordering = ['title']
         verbose_name_plural = _("Categories")
-        
-@receiver(post_save, sender=Video)
-def add_submission_rate(sender, **kwargs):
-    if kwargs['created']:
-        user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-        user_rate.VideoRating += video_object_delta_rating()
-        user_rate.rating += video_object_delta_rating()
-        user_rate.save()
 
-
-@receiver(post_save, sender=Exposition)
-def add_expo_rate(sender, **kwargs):
-    if kwargs['created']:
-        user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-        user_rate.ExpoRating += expo_object_delta_rating()
-        user_rate.rating += expo_object_delta_rating()
-        user_rate.save()
-
-@receiver(post_save, sender=Note)
-def add_note_rate(sender, **kwargs):
-    if kwargs['created']:
-        user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-        user_rate.LecNoteRating += note_object_delta_rating()
-        user_rate.rating += note_object_delta_rating()
-        user_rate.save()
-
-@receiver(post_save, sender=Example)
+@receiver(post_save, sender=Content)
 def add_example_rate(sender, **kwargs):
     if kwargs['created']:
         user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-        user_rate.ExampleRating += example_object_delta_rating()
-        user_rate.rating += example_object_delta_rating()
+        user_rate.ContentRating += content_object_delta_rating()
+        user_rate.rating += content_object_delta_rating()
         user_rate.save()
 
-@receiver(pre_delete, sender=Video)
-def delete_video_rate(sender, **kwargs):
-    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.VideoRating -= video_object_delta_rating()
-    user_rate.rating -= video_object_delta_rating()
-    user_vote = Vote.objects.filter(video=kwargs['instance'])
-    for v in user_vote:
-        if v.vote > 0:
-            user_rate.VoteUp -= vote_up_delta_rating()
-            user_rate.rating -= vote_up_delta_rating()
-        elif v.vote < 0:
-            user_rate.VoteDown -= vote_down_delta_rating()
-            user_rate.rating -= vote_down_delta_rating()
-    user_rate.save()
-
-
-@receiver(pre_delete, sender=Exposition)
-def delete_exposition_rate(sender, **kwargs):
-    """
-    
-    """
-    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.ExpoRating -= expo_object_delta_rating()
-    user_rate.rating -= expo_object_delta_rating()
-    user_vote = Vote.objects.filter(exposition=kwargs['instance'])
-    for v in user_vote:
-        if v.vote > 0:
-            user_rate.VoteUp -= vote_up_delta_rating()
-            user_rate.rating -= vote_up_delta_rating()
-        elif v.vote < 0:
-            user_rate.VoteDown -= vote_down_delta_rating()
-            user_rate.rating -= vote_down_delta_rating()
-    user_rate.save()
-
-
-
-@receiver(pre_delete, sender=Note)
-def delete_note_rate(sender, **kwargs):
-    """
-    This adds the functionality to remove the file upon deletion.
-    """
-    kwargs['instance'].file.delete()
-    user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.LecNoteRating -= note_object_delta_rating()
-    user_rate.rating -= note_object_delta_rating()
-    user_vote = Vote.objects.filter(note=kwargs['instance'])
-    for v in user_vote:
-        if v.vote > 0:
-            user_rate.VoteUp -= vote_up_delta_rating()
-            user_rate.rating -= vote_up_delta_rating()
-        elif v.vote < 0:
-            user_rate.VoteDown -= vote_down_delta_rating()
-            user_rate.rating -= vote_down_delta_rating()
-    user_rate.save()
-
-
-@receiver(pre_delete, sender=Example)
+@receiver(pre_delete, sender=Content)
 def delete_example_rate(sender, **kwargs):
     """
     This adds the functionality to remove the file upon deletion.
     """
-    kwargs['instance'].file.delete()
+    #kwargs['instance'].file.delete()
     user_rate = UserRating.objects.get(user=kwargs['instance'].owner)
-    user_rate.ExampleRating -= example_object_delta_rating()
-    user_rate.rating -= example_object_delta_rating()
-    user_vote = Vote.objects.filter(example=kwargs['instance'])
+    user_rate.ContentRating -= content_object_delta_rating()
+    user_rate.rating -= content_object_delta_rating()
+    user_vote = Vote.objects.filter(content=kwargs['instance'])
     for v in user_vote:
         if v.vote > 0:
             user_rate.VoteUp -= vote_up_delta_rating()

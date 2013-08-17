@@ -15,14 +15,8 @@ import json
 def vote(request, atom_id, item, item_id, vote_type):
     r"""This voting system is a refactored version of the original voting system written by Taoran."""
     atom_object = get_object_or_404(Atom, id=atom_id)
-    if item == 'exposition':
+    if item == 'content':
         content_object = get_object_or_404(Exposition, id=item_id)
-    elif item == 'note':
-        content_object = get_object_or_404(Note, id=item_id)
-    elif item == 'example':
-        content_object = get_object_or_404(Example, id=item_id)
-    elif item == 'video':
-        content_object = get_object_or_404(Video, id=item_id)
     elif item == 'topic':
         content_object = get_object_or_404(Topic, id=item_id)
     else:

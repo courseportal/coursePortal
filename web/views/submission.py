@@ -1,196 +1,170 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import (HttpResponse, HttpResponseRedirect,   
+    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseForbidden)
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.template import RequestContext, loader
 
-
-from web.forms.submission import VideoForm, ExpositionForm, NoteForm, \
-    ExampleForm
-from web.models import Note, Video, Exposition, Example
-from knoatom.view_functions import get_breadcrumbs
+from web.forms.submission import (ContentForm, YoutubeVideoForm, LinkForm, 
+    UploadedFileForm)
+from knoatom.view_functions import get_breadcrumbs, render_to_json_response
 from web.views.view_functions import get_navbar_context, web_breadcrumb_dict
+from web.models import Content, YoutubeVideo, Link, UploadedFile
 
 @login_required()
-def video_submit(request, pk):
-    """
-    This is the view for video submission.
-        
-    """
-    success_url = request.GET.get('next', None) # Redirection URL
-    if 'add-another' in request.POST:
-        success_url = reverse('video_submit')
-    context = get_navbar_context()
-    context.update(
-        get_breadcrumbs(request.path, web_breadcrumb_dict)
-    )
-    form_kwargs = {'user': request.user}
-    if pk:
-        video =  get_object_or_404(Video, pk=pk)
-        form_kwargs.update({'instance':video})
+def delete_content(request):
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
+    content_type = request.GET.get('type', None)
+    pk = request.GET.get('pk', None)
+    type_dict = {'content':Content, 'video':YoutubeVideo, 'link':Link, 
+        'file':UploadedFile}
+    Model = type_dict.get(content_type, None)
+    if Model is None or pk is None:
+        return HttpResponseBadRequest()
+    obj = get_object_or_404(Model, pk=pk)
+    deleted = False
+    title = obj.title
+    if request.user.is_superuser:
+        obj.delete()
+        deleted = True
+    elif content_type == 'content':
+        if request.user == obj.owner:
+            obj.delete()
+            deleted = True
     else:
-        video = None
-    
-    if request.method == 'POST':
-        form = VideoForm(request.POST, **form_kwargs)
+        if request.user == obj.content.owner:
+            obj.delete()
+            deleted = True
+    if deleted:
+        context = {
+            'message':('<div class="alert alert-success">' + 
+                _('Successfully deleted {}.'.format(title)) +'</div>')
+        }
+        return render_to_json_response(context)
+    else:
+        context = {
+            'message':('<div class="alert alert-error">' + 
+                _('Failed to delete {}.'.format(title)) +'</div>')
+        }
+        return render_to_json_response(context, status=400)
         
+@login_required()
+def submit_content(request, pk=None):
+    r"""This is the main view for submitting content."""
+    if pk is None:
+        obj = None
+    else:
+        obj = get_object_or_404(Content, pk=pk)
+        if not (request.user.is_superuser or request.user == obj.owner):
+            return HttpResponseForbidden()
+    pk = request.GET.get('pk', None) # Resetting pk
+    if request.is_ajax():
+        content_type = request.GET.get('type', None)
+        if content_type is None:
+            return process_content(request, obj)
+        elif content_type == 'video':
+            return process_subcontent(request, obj, YoutubeVideo, 
+                YoutubeVideoForm, pk)
+        elif content_type == 'link':
+            return process_subcontent(request, obj, Link, LinkForm, pk)
+        elif content_type == 'file':
+            return process_subcontent(request, obj, UploadedFile, 
+                UploadedFileForm, pk)
+        return HttpResponseBadRequest()
+    else: # Not AJAX Request
+        if request.GET.get('type', None) is not None or pk is not None:
+            return HttpResponseBadRequest()
+        if request.method == 'GET':
+            form = ContentForm(instance=obj, user=request.user)
+            context = get_navbar_context()
+            context.update(
+                get_breadcrumbs(request.path, web_breadcrumb_dict)
+            )
+            context.update({
+                'content_object':obj,
+                'form':form,
+                'empty_video_form':YoutubeVideoForm(content=obj),
+                'empty_link_form':LinkForm(content=obj),
+                'empty_file_form':UploadedFileForm(content=obj),
+            })
+            if obj is not None:
+                context.update({'pk':obj.pk})
+            return render(request, 'web/content_form.html', context)
+        else:
+            return HttpResponseNotAllowed(['GET'])
+     
+def process_subcontent(request, content, Model, Form, pk):
+    if pk is not None:
+        obj = get_object_or_404(Model, pk=pk)
+    else:
+        obj = None
+    form_kwargs = {'instance':obj, 'content':content}
+    if request.method == 'POST':
+        form = Form(request.POST, request.FILES, **form_kwargs)
         if form.is_valid():
             obj = form.save()
-            messages.success(
-                request,
-                _('The video has been submitted correctly.')
-            )
-            if success_url is not None:
-                return HttpResponseRedirect(success_url)
-            else:
-                return HttpResponseRedirect(obj.get_absolute_url())
-        else:
-            messages.warning(request, _('Error submitting the video.'))
+            del form_kwargs['instance']
+            form = Form(**form_kwargs)
+            template = loader.get_template('web/form_template.html')
+            c = RequestContext(request, {'form':Form(**form_kwargs)})
+            context = {
+                'title':obj.title,
+                'pk':obj.pk,
+                'message':('<div class="alert alert-success">' + 
+                    _('Successfully saved {}.'.format(str(obj))) +'</div>'),
+                'form_html':template.render(c),
+            }
+            return render_to_json_response(context, status=201)
+        else: #Not valid
+            template = loader.get_template('web/form_template.html')
+            c = RequestContext(request, {'form':form})
+            context = {
+                'message':('<div class="alert alert-error">' + 
+                    _('Error saving object.') + m'</div>'),
+                'form_html':template.render(c),
+            }
+            return render_to_json_response(context, status=400)
+    elif request.method == 'GET':
+        template = loader.get_template('web/form_template.html')
+        c = RequestContext(request, {'form':Form(**form_kwargs)})
+        return render_to_json_response({'form':template.render(c)})
     else:
-        form = VideoForm(**form_kwargs)
-    
-    context.update({
-        'object':video,
-        'form':form,
-        'success_url':success_url
-    })
-
-    return render(request, 'web/home/video_submit.html', context)
-
-
-@login_required()
-def note_submit(request, pk):
-    r"""
-    This is the view for the lecture note submit feature.
-    """
-    success_url = request.GET.get('next', None)
-    if 'add-another' in request.POST:
-        success_url = reverse('note_submit')
-    context = get_navbar_context()
-    context.update(
-        get_breadcrumbs(request.path, web_breadcrumb_dict)
-    )
-    form_kwargs = {'user':request.user}
-    if pk:
-        note = get_object_or_404(Note, pk=pk)
-        form_kwargs.update({'instance':note})
-    else:
-        note = None
-
-    if request.method == 'POST': # If the form has been submitted...
-        form = NoteForm(request.POST, request.FILES, **form_kwargs)
-        if form.is_valid():    # All validation rules pass
-            obj = form.save()
-            messages.success(
-                request,
-                _('The note has been submitted correctly.')
-            )
-            if success_url is not None:
-                return HttpResponseRedirect(success_url)
-            else:
-                return HttpResponseRedirect(obj.get_absolute_url())
-            
-        else:
-            messages.warning(request, _('Error submitting the note.'))
-    else:
-        form = NoteForm(**form_kwargs)
+        data = json.dumps(_('Request type must be POST or GET'))
+        response_kwargs = {'content_type':'application/json'}
+        return HttpResponseNotAllowed(['POST', 'GET'], data, **response_kwargs)
         
-    context.update({
-        'object':note,
-        'form':form,
-        'success_url':success_url
-    })
-
-    return render(request, 'web/home/note_submit.html', context)
-    
-@login_required()
-def example_submit(request, pk):
-    r"""
-    This is the view for the example submit feature.
-    """
-    success_url = request.GET.get('next', None)
-    if 'add-another' in request.POST:
-        success_url = reverse('example_submit')
-    context = get_navbar_context()
-    context.update(
-        get_breadcrumbs(request.path, web_breadcrumb_dict)
-    )
-    form_kwargs = {'user':request.user}
-    if pk:
-        example = get_object_or_404(Example, pk=pk)
-        form_kwargs.update({'instance':example})
-    else:
-        example = None
-    
-    if request.method == 'POST': # If the form has been submitted...
-        form = ExampleForm(request.POST, request.FILES, **form_kwargs)
-        if form.is_valid():    # All validation rules pass
+def process_content(request, obj):
+    form_kwargs = {'instance':obj, 'user':request.user}
+    if request.method == 'POST':
+        form = ContentForm(request.POST, **form_kwargs)
+        if form.is_valid():
             obj = form.save()
-            messages.success(
-                request,
-                _('The example has been submitted correctly.')
-            )
-            if success_url is not None:
-                return HttpResponseRedirect(success_url)
-            else:
-                return HttpResponseRedirect(obj.get_absolute_url())
+            form_kwargs['instance'] = obj
+            template = loader.get_template('web/form_template.html')
+            c = RequestContext(request, {'form':ContentForm(**form_kwargs)})
+            context = {
+                'title':obj.title,
+                'pk':obj.pk,
+                'message':('<div class="alert alert-success">' + 
+                    _('Successfully saved content') +'</div>'),
+                'form_html':template.render(c),
+            }
+            return render_to_json_response(context, status=201) 
         else:
-            messages.warning(request, _('Error submitting the example.'))
-    else:
-        form = ExampleForm(**form_kwargs)
-        
-    context.update({
-        'object':example,
-        'form':form,
-        'success_url':success_url
-    })
-
-    return render(request, 'web/home/example_submit.html', context)
-
-
-@login_required()
-def exposition_submit(request, pk):
-    r"""
-    This is the view for the exposition submit feature.
-    """
-    success_url = request.GET.get('next', None)
-    if 'add-another' in request.POST:
-        success_url = reverse('expo_submit')
-    context = get_navbar_context()
-    context.update(
-        get_breadcrumbs(request.path, web_breadcrumb_dict)
-    )
-
-    form_kwargs = {'user':request.user}
-    if pk:
-        exposition = get_object_or_404(Exposition, pk=pk)
-        form_kwargs.update({'instance':exposition})
-    else:
-        exposition = None
-    
-    if request.method == 'POST': # If the form has been submitted...
-        form = ExpositionForm(request.POST, request.FILES, **form_kwargs)
-        if form.is_valid():    # All validation rules pass
-            obj = form.save()
-            messages.success(
-                request,
-                _('The exposition has been submitted correctly.')
-            )
-            if success_url is not None:
-                return HttpResponseRedirect(success_url)
-            else:
-                return HttpResponseRedirect(obj.get_absolute_url())
-            
-        else:
-            messages.warning(request, _('Error submitting the exposition.'))
-    else:
-        form = ExpositionForm(**form_kwargs)
-        
-    context.update({
-        'object':exposition,
-        'form':form,
-        'success_url':success_url
-    })
-    
-    return render(request, 'web/home/expo_submit.html', context)
+            template = loader.get_template('web/form_template.html')
+            c = RequestContext(request, {'form':form})
+            context = {
+                'message':('<div class="alert alert-error">' + 
+                    _('Error saving content.') + '</div>'),
+                'form_html':template.render(c),
+            }
+            return render_to_json_response(context, status=400)  
+    else: # Return a not allowed response.
+        data = json.dumps(_('The request type must be "POST"'))
+        response_kwargs = {'content_type':'application/json'}
+        return HttpResponseNotAllowed(['POST'], data, **response_kwargs)

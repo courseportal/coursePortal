@@ -15,67 +15,67 @@ from web.forms.edit_class import CategoryForm
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
-class ExpositionAdmin(admin.ModelAdmin):
-    exclude = ('owner',)
-    
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.owner = request.user
-            obj.save()
-        super(ExpositionAdmin, self).save_model(request, obj, form, change)
-
-
-class ExposInline(admin.StackedInline):
-    model = Exposition
-    exclude = ()
-    extra = 1
-    raw_id_fields = ("owner",)
-
-class LecNoteInline(admin.StackedInline):
-    model = Note
-    exclude = ()
-    extra = 1
-
-class ExampleInline(admin.StackedInline):
-    model = Example
-    exclude = ()
-    extra = 1
-    
-class FileUploadForm(forms.ModelForm):
-    r"""
-    Custom form for only allowing file types defined in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENSIONS``.
-    """
-    
-    def clean_file(self):
-        r"""
-        Cleans the file data to only allow certain file extensions.
-        """
-        
-        valid = False
-        for ext in ALLOWED_FILE_EXTENTIONS:
-            if self.cleaned_data['file'].name.endswith(ext):
-                valid = True
-        if not valid:
-            raise ValidationError(u'Not valid file type, only {} are accepted.'.format(ALLOWED_FILE_EXTENTIONS))
-        return self.cleaned_data['file']
-
-class NoteAdmin(admin.ModelAdmin):
-    exclude = ('owner',)
-    form = FileUploadForm
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.owner = request.user
-            obj.save()
-        super(NoteAdmin, self).save_model(request, obj, form, change)
-        
-class ExampleAdmin(admin.ModelAdmin):
-    exclude = ('owner',)
-    form = FileUploadForm
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.owner = request.user
-            obj.save()
-        super(ExampleAdmin, self).save_model(request, obj, form, change)
+# class ExpositionAdmin(admin.ModelAdmin):
+#     exclude = ('owner',)
+#     
+#     def save_model(self, request, obj, form, change):
+#         if not change:
+#             obj.owner = request.user
+#             obj.save()
+#         super(ExpositionAdmin, self).save_model(request, obj, form, change)
+# 
+# 
+# class ExposInline(admin.StackedInline):
+#     model = Exposition
+#     exclude = ()
+#     extra = 1
+#     raw_id_fields = ("owner",)
+# 
+# class LecNoteInline(admin.StackedInline):
+#     model = Note
+#     exclude = ()
+#     extra = 1
+# 
+# class ExampleInline(admin.StackedInline):
+#     model = Example
+#     exclude = ()
+#     extra = 1
+#     
+# class FileUploadForm(forms.ModelForm):
+#     r"""
+#     Custom form for only allowing file types defined in ``knoatom/settings.py`` as ``settings.ALLOWED_FILE_EXTENSIONS``.
+#     """
+#     
+#     def clean_file(self):
+#         r"""
+#         Cleans the file data to only allow certain file extensions.
+#         """
+#         
+#         valid = False
+#         for ext in ALLOWED_FILE_EXTENTIONS:
+#             if self.cleaned_data['file'].name.endswith(ext):
+#                 valid = True
+#         if not valid:
+#             raise ValidationError(u'Not valid file type, only {} are accepted.'.format(ALLOWED_FILE_EXTENTIONS))
+#         return self.cleaned_data['file']
+# 
+# class NoteAdmin(admin.ModelAdmin):
+#     exclude = ('owner',)
+#     form = FileUploadForm
+#     def save_model(self, request, obj, form, change):
+#         if not change:
+#             obj.owner = request.user
+#             obj.save()
+#         super(NoteAdmin, self).save_model(request, obj, form, change)
+#         
+# class ExampleAdmin(admin.ModelAdmin):
+#     exclude = ('owner',)
+#     form = FileUploadForm
+#     def save_model(self, request, obj, form, change):
+#         if not change:
+#             obj.owner = request.user
+#             obj.save()
+#         super(ExampleAdmin, self).save_model(request, obj, form, change)
 
 class AtomAdmin(admin.ModelAdmin):
     """
@@ -257,26 +257,22 @@ class ClassAdmin(admin.ModelAdmin):
             form.base_fields["instructors"].queryset=potential_user
         return form
 
-class VideoAdminForm(forms.ModelForm):
-    
-    def clean(self):
-        cleaned_data = super(VideoAdminForm, self).clean()
-        video = cleaned_data.get("video")
-        if not video.isalnum() or not len(video)==11:
-            raise forms.ValidationError("Something wrong with the 11 character VIDEO_ID!")
-        return cleaned_data
+# class VideoAdminForm(forms.ModelForm):
+#     
+#     def clean(self):
+#         cleaned_data = super(VideoAdminForm, self).clean()
+#         video = cleaned_data.get("video")
+#         if not video.isalnum() or not len(video)==11:
+#             raise forms.ValidationError("Something wrong with the 11 character VIDEO_ID!")
+#         return cleaned_data
 
-
-class VideoAdmin(admin.ModelAdmin):
-    form = VideoAdminForm
-    exclude = ()
-
-admin.site.register(Example, ExampleAdmin)
+#admin.site.register(Example, ExampleAdmin)
 admin.site.register(BaseCategory,BaseCategoryAdmin)
 admin.site.register(ClassCategory, ClassCategoryAdmin)
 admin.site.register(Atom, AtomAdmin)
-admin.site.register(Exposition, ExpositionAdmin)
-admin.site.register(Video, VideoAdmin)
+#admin.site.register(Exposition, ExpositionAdmin)
+#admin.site.register(Video, VideoAdmin)
 admin.site.register(Class, ClassAdmin)
-admin.site.register(Note, NoteAdmin)
+#admin.site.register(Note, NoteAdmin)
+admin.site.register(Content)
 
