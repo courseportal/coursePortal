@@ -34,3 +34,29 @@ def has_atom(qset, aid):
 		return qset.filter(id=aid).exists()
 	except:
 		return False
+
+@register.filter
+def total(value, atom=None):
+    return value.total(atom)
+
+@register.filter(name="totalUp")
+def totalUp(value, atom=None):
+    return value.totalUp(atom)
+
+@register.filter(name="totalDown")
+def totalDown(value, atom=None):
+    return value.totalDown(atom)
+
+@register.filter(name="totalUpPercentage")
+def totalUpPercentage(value, atom=None):
+    if (value.totalUp(atom)+value.totalDown(atom)):
+        return value.totalUp(atom)*100/(value.totalUp(atom)+value.totalDown(atom))
+    else:
+        return 50
+
+@register.filter(name="totalDownPercentage")
+def totalDownPercentage(value, atom=None):
+    if (value.totalUp(atom)+value.totalDown(atom)):
+        return value.totalDown(atom)*100/(value.totalUp(atom)+value.totalDown(atom))
+    else:
+        return 50

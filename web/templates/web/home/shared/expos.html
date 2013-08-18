@@ -13,10 +13,7 @@ OPTIONAL context:
 {% load staticfiles %}
 <!-- Should make this prettier -->
 <div id="report"> </div>
-<div class="sparkbar">
-<div class="sparkbar-likes" style="2px;width: 50%; background-color: #590;float: left;">Up</div>
-<div class="sparkbar-dislikes" style="width:50%; background-color: #ccc;float:right;">Down</div>
-</div>
+
 <table id="expos" class="tablesorter">
 	<thead>
 		<tr>
@@ -52,20 +49,49 @@ OPTIONAL context:
 					{{ expo.owner }}
 				</td>
 				<td>
-					<div id="votes-sum-exposition-{{ expo.id }}">
+					<div id="votes-sum-exposition-{{ expo.id }}" style="text-align: center">
   					{% if atom_object %}
                         {{ expo.vote_set|total:atom_object }}
                     {% else %}
                         {{ expo.vote_set|total }}
                     {% endif %}
                     </div>
-                    <div id="sparkbar-likes-exposition-{{ expo.id }}" style="width:50%; background-color: #590;float: left;">
-                        U
+                    <div class="progress">
+                    <div class="bar bar-success" id="sparkbar-likes-exposition-{{ expo.id }}" style="width:
+                        
+                        {% if atom_object %}
+                        {{ expo.vote_set|totalUpPercentage:atom_object }}%
+                        {% else %}
+                        {{ expo.vote_set|totalUpPercentage }}%
+                        {% endif %}
+                        
+                        ;">
+                        {% if atom_object %}
+                            {{ expo.vote_set|totalUp:atom_object }}
+                        {% else %}
+                            {{ expo.vote_set|totalUp }}
+                        {% endif %}
                     </div>
-                    <div id="sparkbar-dislikes-exposition-{{ expo.id }}" style="width:50%; background-color: #ccc;float:right;">
-                        D
+                    <div class="bar bar-danger" id="sparkbar-dislikes-exposition-{{ expo.id }}" style="width:
+    
+                        {% if atom_object %}
+                        {{ expo.vote_set|totalDownPercentage:atom_object }}%
+                        {% else %}
+                        {{ expo.vote_set|totalDownPercentage }}%
+                        {% endif %}
+                        
+                        ;">
+                        {% if atom_object %}
+                        {% if expo.vote_set|totalDown:atom_object > 0 %}
+                            {{ expo.vote_set|totalDown:atom_object }}
+                        {% endif %}
+                        {% else %}
+                        {% if expo.vote_set|totalDown > 0 %}
+                            {{ expo.vote_set|totalDown }}
+                        {% endif %}
+                        {% endif %}
                     </div>
-					
+				</div>
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
@@ -112,5 +138,3 @@ OPTIONAL context:
 </script>
 
 
-=======
->>>>>>> ebbeb6e34c81f3ca15ee6defa341b11a07f8e1db

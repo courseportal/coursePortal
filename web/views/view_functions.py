@@ -1,4 +1,5 @@
 r"""View helper functions."""
+from django.core.cache import cache
 from itertools import chain
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
@@ -68,47 +69,65 @@ def has_class_access(class_object, user):
 		 	class_object.instructors.filter(id=user.id).exists()))
 	
 def get_context_for_atom(atom_object=None):
-	r"""
-	This function returns the context dictionary containing the context specific to an atom.
-	
-	It takes in the atom you want the context for.  If no input is given it returns a list of the required keys with empty lists as their values.
-	
-	"""
-	if atom_object is None:
-		context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[]}
-	else:
-		context = {
-			'videos':atom_object.video_set.distinct(),
-			'expositions':atom_object.exposition_set.distinct(),
-			'notes':atom_object.note_set.distinct(),
-			'examples':atom_object.example_set.distinct()
+    r"""
+    This function returns the context dictionary containing the context specific to an atom.
+
+    It takes in the atom you want the context for.  If no input is given it returns a list of the required keys with empty lists as their values.
+
+    """
+    if atom_object is None:
+        context = {'videos':[], 'expositions':[], 'notes':[], 'examples':[]}
+    else:
+        videos_list = cache.get('videos_list')
+        expositions_list = cache.get('expositions_list')
+        notes_list = cache.get('notes_list')
+        examples_list = cache.get('examples_list')
+        if videos_list is None:
+            print("videos_list has not been found in cache.")
+            videos_list = atom_object.video_set.distinct()
+            cache.set('videos_list',videos_list , 30)
+        if expositions_list is None:
+            expositions_list = atom_object.exposition_set.distinct()
+            cache.set('expositions_list', expositions_list, 30)
+        if notes_list is None:
+            notes_list = atom_object.note_set.distinct()
+            cache.set('notes_list', notes_list, 30)
+        if examples_list is None:
+            examples_list = atom_object.example_set.distinct()
+            cache.set('examples_list', examples_list, 30)
+        
+        context = {
+			'videos': videos_list,
+			'expositions': expositions_list,
+			'notes': notes_list,
+			'examples': examples_list
 		}
-	return context
+    return context
 	
 def get_context_for_category(category_object, context=None):
-	"""
-	This function returns context for category views.  It adds ``'videos'``, ``'expositions'``, ``'notes'``, ``'examples'``, and ``'atoms'`` to the context.  It requires the category you want to get the context for as an input.  ``category_object`` can be either a BaseCategory or an ClassCategory.
+    """
+    This function returns context for category views.  It adds ``'videos'``, ``'expositions'``, ``'notes'``, ``'examples'``, and ``'atoms'`` to the context.  It requires the category you want to get the context for as an input.  ``category_object`` can be either a BaseCategory or an ClassCategory.
 	
-	"""
-	if context is None:
-		first_call_flag = True # We only convert to list and get the distinct elements once
-		context = get_context_for_atom() # Initialize context to dict of empty lists
-		context.update({'atoms':[]}) # Add 'atoms' to the context which has atom specific keys in it
-	else:
-		first_call_flag = False # If its not the first loop we don't want to convert to distinct list
-	temp = {'atoms':category_object.child_atoms.all()}
-	for atom in temp['atoms']: # Only hits dict once to get into loop
-		temp.update( # Get the context for 'atom'
-			get_context_for_atom(atom)
-		)
-		for key in context: # Chain the keys together, chain is faster than using loops b/c it is in C
+    """
+    if context is None:
+        first_call_flag = True # We only convert to list and get the distinct elements once
+        context = get_context_for_atom() # Initialize context to dict of empty lists
+        context.update({'atoms':[]}) # Add 'atoms' to the context which has atom specific keys in it
+    else:
+        first_call_flag = False # If its not the first loop we don't want to convert to distinct list
+    temp = {'atoms':category_object.child_atoms.all()}
+    for atom in temp['atoms']: # Only hits dict once to get into loop
+        temp.update( # Get the context for 'atom'
+            get_context_for_atom(atom)
+        )
+        for key in context: # Chain the keys together, chain is faster than using loops b/c it is in C
 			context[key] = chain(context[key],temp[key])
 	for child in category_object.child_categories.all(): # Get content for all child categories
 		get_context_for_category(child, context) #recurse
 	if first_call_flag: # Only do this on the top level of recursion
 		for key in context:
 			context[key] = list(set(context[key])) # Remove duplicates
-	return context # Return the context
+    return context # Return the context
 
 def get_parent_categories(category_object, class_object): # Look at for refactoring
 	"""

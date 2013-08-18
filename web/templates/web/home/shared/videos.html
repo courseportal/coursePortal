@@ -56,21 +56,53 @@ OPTIONAL context:
 				<p>{{ video.content }}</p>
 				{% endautoescape %}
 			</td>
-			<td>
+			<td style="width:50px">
 				{{ video.owner }}
 			</td>
 			<!-- Votes -->
-			<td style="width:75px">
-				<div id="votes-sum-video-{{video.id}}">
+			<td style="width:150px">
+				<div id="votes-sum-video-{{video.id}}" style="text-align: center">
 					{% if atom_object %}
             {{ video.vote_set|total:atom_object }}
           {% else %}
             {{ video.vote_set|total }}
           {% endif %}
 				</div>
+                <div class="progress">
+                    <div class="bar bar-success" id="sparkbar-likes-video-{{ video.id }}" style="width:
+                        
+                        {% if atom_object %}
+                        {{ video.vote_set|totalUpPercentage:atom_object }}%
+                        {% else %}
+                        {{ video.vote_set|totalUpPercentage }}%
+                        {% endif %}
+                        
+                        ;">
+                        {% if atom_object %}
+                        {{ video.vote_set|totalUp:atom_object }}
+                        {% else %}
+                        {{ video.vote_set|totalUp }}
+                        {% endif %}
+                    </div>
+                    <div class="bar bar-danger" id="sparkbar-dislikes-video-{{ video.id }}" style="width:
+                        
+                        {% if atom_object %}
+                        {{ video.vote_set|totalDownPercentage:atom_object }}%
+                        {% else %}
+                        {{ video.vote_set|totalDownPercentage }}%
+                        {% endif %}
+                        
+                        ;">
+                        {% if atom_object %}
+                        {{ video.vote_set|totalDown:atom_object }}
+                        {% else %}
+                        {{ video.vote_set|totalDown }}
+                        {% endif %}
+                    </div>
+				</div>
 			</td>
 			<!-- end Votes -->
-			<td>
+			<td style="width:50px">
 				<!-- Button to trigger modal -->
 				<a rel="tooltip" class="icon-flag" href="#myModalVideo{{video.id}}" data-toggle="modal" title="Report"></a>
 
@@ -127,7 +159,7 @@ $(document).ready(function() {
       );
       $('#global_modal').modal().css({
         'margin-top': function () {
-          return -($(this).height() / 2);
+          return -($(this).height() / 16);
         },
         width:'auto',
         'margin-left':function(){

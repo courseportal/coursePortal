@@ -33,6 +33,9 @@ BLOCKS(Including inherited blocks):
 {% extends "web/web_base.html" %}
 
 {% block content %}
+
+{% load i18n %}
+
 <h2>Login</h2>
 
 <form class="form-horizontal" action="{% url 'login' %}" method="post">

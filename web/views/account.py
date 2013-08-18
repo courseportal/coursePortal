@@ -266,41 +266,6 @@ def register(request):
     else: # Request is GET
         form = RegisterForm()
 	
-=======
-                )
-                user.first_name = form.cleaned_data['firstname']
-                user.last_name = form.cleaned_data['lastname']
-                user.is_active = False
-                user.save()
-                m = hashlib.md5()
-                m.update(str(user.email) + 
-                    str(user.date_joined).split('.')[0].split('+')[0])
-                send_mail(
-                    subject=_('KnoAtom Registration'), 
-                    message=(_('You have successfully registered at '
-                        'knoatom.eecs.umich.edu with the username ') + 
-                        user.username +
-                         _('. Please validate your account by going to ')+ 
-                         request.build_absolute_uri('validate')+'?email='+ 
-                         user.email + '&validation=' + m.hexdigest() + 
-                         _(' . If you did not process this registration, '
-                        'please contact us as soon as possible.\n\n-- The '
-                        'Management')
-                    ),
-                    from_email='knoatom-noreply@gmail.com', 
-                    recipient_list=[user.email, settings.EMAIL_HOST_USER], 
-                    fail_silently=False
-                )
-                messages.success(request, _('You have been registered. Please '
-                    'login to continue.')
-                )
-                return HttpResponseRedirect(reverse('login'))
-        
-        messages.warning(request, _('Could not register you. Try again.'))
-    else: # Request is GET
-        form = RegisterForm()
-    
->>>>>>> ebbeb6e34c81f3ca15ee6defa341b11a07f8e1db
     context = get_breadcrumbs(request.path, web_breadcrumb_dict)
     context.update({'register_form':form})
     return render(request, 'web/account/register.html', context)
