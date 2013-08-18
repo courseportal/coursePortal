@@ -81,6 +81,7 @@ def create(request):
 	data['code'] = request.POST['code']
 	if data['code'][0] == '\r':
 		data['code']=data['code'][2:]
+
 	data['solution'] = request.POST['answer']
 	data['text'] = request.POST['text']
 	data['question_type'] = request.POST['question_type']
@@ -106,9 +107,7 @@ def create(request):
 	q2.save()
 	for atom in q.atoms.all():
 		q2.atoms.add(atom)
-	context = get_breadcrumbs(request.path)
-	context['messages'] = ['Question sucessfully created']
-	return render(request, "assignment_nav.html", context)
+	return HttpResponse('Success!')
 
 def preview(request):
 	q=dict()

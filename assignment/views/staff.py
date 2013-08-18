@@ -51,15 +51,11 @@ def previewAssignment(request):
 		data['solution']= data['solution'].replace('<br>', '\n')
 		data['solution']= data['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 
-		try:
-			exec data['code']
-		except Exception as ex:
-			test += errorMsg(data['title'], ex, 'code')
-
+		exec data['code']
 		try:
 			data['solution']=eval(data['solution'])
-		except Exception as ex:
-			test += errorMsg(data['title'], ex, 'solution')
+		except:
+			pass		
 
 		#q text formatted here
 		local_dict = dict(locals())
@@ -72,10 +68,10 @@ def previewAssignment(request):
 		for choice in choices:
 			try:
 				answer = eval(choice)
-				data['choices'].append(answer)
-			except Exception as ex:
-				y = "Choice"+str(integer_index+1)
-				test += errorMsg(q.data['title'], ex, y)
+			except:
+				answer=choice
+			data['choices'].append(answer)
+
 		if len(data['choices']) > 0:
 			data['choices'].append(data['solution'])
 
@@ -182,7 +178,10 @@ def deleteA(request):
 		for entry in request.POST:
 			if entry =="csrfmiddlewaretoken":
 				continue
-			assignment = Assignment.objects.get(id=entry)
+			try:
+				assignment = Assignment.objects.get(id=entry)
+			except:
+				break
 			for question in assignment.questions.all():
 				#See if we need to remove ownership from a copy
 				if question.isCopy:
@@ -212,7 +211,10 @@ def deleteQ(request):
 		for entry in request.POST:
 			if entry =="csrfmiddlewaretoken":
 				continue
-			question = Question.objects.get(id=entry)
+			try:
+				question = Question.objects.get(id=entry)
+			except:
+				break
 			#Delete data entries in assignments
 			for a in question.assigned_to.all():
 				data = json.loads(a.data)
@@ -264,7 +266,6 @@ def editQ(request, id):
 	context['type_list'] = Variable.objects.all()
 	context['atom_list'] = web.models.Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
-
 
 def selectInstance(request, messages=[]):
 	context = get_breadcrumbs(request.path)

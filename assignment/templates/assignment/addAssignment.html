@@ -45,11 +45,11 @@ MathJax.Hub.Config({
 	<div class="row-fluid">
 		<div class="span5">
 			<h3>Assign date:</h3>
-			<input type="date" id="assigndate" {%if not isCopy%}value="{{assignment.start_date}}"{%endif%}></input>
+			<input type="date" id="assigndate" {%if not isCopy%}value="{{assignment.start_date|date:'Y-m-d'}}"{%endif%}></input>
 		</div>
 		<div class="span5">
 			<h3>Due date:</h3>
-			<input type="date" id="duedate" {%if not isCopy%}value="{{assignment.due_date}}"{%endif%}></input>
+			<input type="date" id="duedate" {%if not isCopy%}value="{{assignment.due_date|date:'Y-m-d'}}"{%endif%}></input>
 		</div>
 
 	</div>

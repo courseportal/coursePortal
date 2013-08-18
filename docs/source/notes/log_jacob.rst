@@ -133,3 +133,15 @@ name,type,default
 *Fixed bugs in the deletion of questions
 *Fixed bugs in creation of assignments
 *Assignments and questions can now be picked from a searchable/sortable table to edit
+
+8/13/2013:
+*Security updated:
+	*pysandbox is used to limit security of code being run:
+		*Import modules restricted to random and math
+		*Other features listed here: https://pypi.python.org/pypi/pysandbox
+	*Signal module is used to limit runtime of code to 5 seconds. After 5 seconds, SAGALRM is signalled
+	*resource module is used to limit memory consumption to 3mb on the stack and 3mb on the heap. MemoryError is thrown otherwise
+	TODO: Time and memory limits need to be tested on the server itself.
+8/15/2013:
+*Small improvements to question creation
+*introduction of ajax calls to protect against pages being refreshed in certain areas
