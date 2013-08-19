@@ -90,7 +90,9 @@ class ChangeUsernameForm(forms.Form):
     new_username = forms.CharField(
 		max_length=100,
 		required=True,
-		label=_('Display Name')
+		label=_('Display Name'),
+        validators=[validate_username],
+        help_text=_('Only numbers, letters and _ are accepted .')
 	)
     action = forms.CharField(widget=forms.HiddenInput(), initial='username')
 

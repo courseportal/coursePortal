@@ -25,6 +25,8 @@ def index(request):
     if request.method == 'POST':
         if request.POST.get('action') == 'password': # Password form processing
             password_form = ChangePasswordForm(request.POST)
+            username_form = ChangeUsernameForm()
+            delete_account_form = DeleteAccountForm()
             if (password_form.is_valid() and
                     password_form.cleaned_data['new_password'] == 
                     password_form.cleaned_data['new_password_confirm']):
@@ -55,6 +57,8 @@ def index(request):
                 )
         elif request.POST.get('action') == 'username':#Username form processing
             username_form = ChangeUsernameForm(request.POST)
+            password_form = ChangePasswordForm()
+            delete_account_form = DeleteAccountForm()
             if username_form.is_valid():
                 user = User.objects.get(pk=request.user.id)
                 list_with_username = User.objects.filter(
@@ -86,6 +90,8 @@ def index(request):
 
         elif request.POST.get('action') == 'delete_account':#delete form
             delete_account_form = DeleteAccountForm(request.POST)
+            password_form = ChangePasswordForm()
+            username_form = ChangeUsernameForm()
             if delete_account_form.is_valid():
                 user = User.objects.get(pk=request.user.id)
                 if (user and delete_account_form.cleaned_data['confirmation'] 
@@ -254,7 +260,7 @@ def register(request):
 						'Management')
 					),
 					from_email='knoatom-noreply@gmail.com', 
-					recipient_list=[user.email, EMAIL_HOST_USER], 
+					recipient_list=[user.email, settings.EMAIL_HOST_USER],
 					fail_silently=False
 				)
                 messages.success(request, _('You have been registered. Please '
