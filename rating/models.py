@@ -16,21 +16,7 @@ class Vote(models.Model):
     content = models.ForeignKey("web.Content", blank=True, null=True, 
         editable=False)
     # Must have only one of these fields
-    video = models.ForeignKey("web.YoutubeVideo", blank=True, null=True,
-         editable=False, related_name='vote_set')
-    link = models.ForeignKey("web.Link", blank=True, null=True,
-                             editable=False, related_name='vote_set')
-    file = models.ForeignKey("web.UploadedFile", blank=True, null=True,
-                             editable=False, related_name='vote_set')
-#     note = models.ForeignKey("web.Note", blank=True, null=True, 
-#         editable=False, related_name='vote_set'
-#     )
-#     exposition = models.ForeignKey("web.Exposition", blank=True, null=True, 
-#         editable=False, related_name='vote_set'
-#     )
-#     example = models.ForeignKey("web.Example", blank=True, null=True, 
-#         editable=False, related_name='vote_set'
-#     )
+
     topic = models.ForeignKey("pybb.Topic", blank=True, null=True, 
         editable=False, related_name='vote_set'
     )
