@@ -12,21 +12,20 @@ urlpatterns = patterns('',
 
 
     url(r'^batch-add/?$', 'web.views.admin.batch_add', name='batch_add'),
-    #url(r'^view-videos/?$', 'web.views.admin.list_videos', name='list_videos'),
 
-	#url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>[a-z]+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'), # CHANGE
-    #url(r'^ajax/delete/(?P<item>[a-z]+)/(?P<pk>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'), # CHANGE
 	url(r'^ajax/report/?$', 'web.views.home.report', name="report"),
 	                    
-    # url(r'^video-submit/(?P<pk>\d+)?/?$', 'web.views.submission.video_submit', name='video_submit'),
-#     url(r'^exposition-submit/(?P<pk>\d+)?/?$', 'web.views.submission.exposition_submit', name='expo_submit'),
-#     url(r'^note-submit/(?P<pk>\d+)?/?$', 'web.views.submission.note_submit', name='note_submit'),
-#     url(r'^example-submit/(?P<pk>\d+)?/?$', 'web.views.submission.example_submit', name='example_submit'),
     url(r'^submit-content/(?P<pk>\d+)?/?$', 
         'web.views.submission.submit_content', name="submit_content"),
     url(r'^delete-content/?$', 'web.views.submission.delete_content', 
         name="delete_content"),
-    # url(r'^post/(?P<sid>\d+)/?$', 'web.views.home.post', name='post'),
+    url(r'^content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', 
+        name="content_details"),
+#    url(r'^base-category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="cat_content_details"),
+#     url(r'^base-category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="atom_content_details"),
+#     url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="class_cat_content_details"),
+#     url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail',
+#         name="class_atom_content_details"),
 	 
 	# URLs for the class editing form
 	url(r'^create-class/?$', CreateClassView.as_view(), name='create_class'),
@@ -41,11 +40,6 @@ urlpatterns = patterns('',
     url(r'^class-index/?$', 'web.views.home.class_list', name='class_index'),
     url(r'^base-category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name='base_category'),
     url(r'^base-category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='base_atom'),
-    url(r'^base-category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="cat_content_details"),
-    url(r'^base-category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="atom_content_details"),
-    url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="class_cat_content_details"),
-    url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail',
-        name="class_atom_content_details"),
     url(r'^/?$', 'web.views.home.index', name='home'),
 
     url(r'^mu-25b8a55c-a9fee579-723dcc44-9782bfc2$', 'web.views.blitz.index'),
