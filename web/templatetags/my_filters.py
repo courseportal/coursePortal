@@ -38,3 +38,7 @@ def has_atom(qset, aid):
 	except:
 		return False
 
+@register.assignment_tag
+def in_type(qset, **kwargs):
+    return qset.filter(**kwargs)
+

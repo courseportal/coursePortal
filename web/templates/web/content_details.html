@@ -31,7 +31,7 @@
                       <th data-sorter="false"> </th>
                       <th>Video</th>
                       <th>Created By</th>
-                      <th>Votes</th>
+                      
                       <th data-sorter="false">Options</th>
                       <th style="display:none;">Is Stickied</th>
                   </tr>
@@ -42,9 +42,7 @@
                   
                   <tr id="row-video-{{ video.id }}">
                       <td style="vertical-align:middle">
-                          {% if atom_object %}
-                          {% include "rating/vote_arrows.html" with item='video' id=video.id atom_id=atom_object.id %}
-                          {% endif %}
+                          
                       </td>
                       
                       <td style="text-align:center">
@@ -68,15 +66,7 @@
                           {{ video.content.owner }}
                       </td>
                       <!-- Votes -->
-                      <td style="width:75px">
-                          <div id="votes-sum-video-{{ video.id }}" style="text-align: center">
-                                  {% if atom_object %}
-                                  {{ video.vote_set|total:atom_object }}
-                                  {% else %}
-                                  {{ video.vote_set|total }}
-                                  {% endif %}
-                          </div>
-                    </td>
+                      
                       <!-- end Votes -->
                       <td>
                           <!-- Button to trigger modal -->
@@ -118,7 +108,7 @@
                       <th data-sorter="false"> </th>
                       <th>Name</th>
                       <th>Created By</th>
-                      <th>Votes</th>
+                      
                       <th data-sorter="false">Options</th>
                       <th style="display:none;">Is Stickied</th>
                   </tr>
@@ -129,9 +119,7 @@
                   
                   <tr id="row-link-{{ link.id }}">
                       <td style="vertical-align:middle">
-                          {% if atom_object %}
-                          {% include "rating/vote_arrows.html" with item='link' id=link.id atom_id=atom_object.id %}
-                          {% endif %}
+                          
                       </td>
                       
                       <td>
@@ -144,13 +132,7 @@
                       </td>
                       <!-- Votes -->
                       <td style="width:75px">
-                          <div id="votes-sum-link-{{ link.id }}" style="text-align: center">
-                              {% if atom_object %}
-                              {{ link.vote_set|total:atom_object }}
-                              {% else %}
-                              {{ link.vote_set|total }}
-                              {% endif %}
-                          </div>
+                         
                       </td>
                       <!-- end Votes -->
                       <td>
@@ -192,7 +174,7 @@
                       <th data-sorter="false"> </th>
                       <th>Name</th>
                       <th>Created By</th>
-                      <th>Votes</th>
+                      
                       <th data-sorter="false">Options</th>
                       <th style="display:none;">Is Stickied</th>
                   </tr>
@@ -203,9 +185,7 @@
                   
                   <tr id="row-file-{{ file.id }}">
                       <td style="vertical-align:middle">
-                          {% if atom_object %}
-                          {% include "rating/vote_arrows.html" with item='file' id=file.id atom_id=atom_object.id %}
-                          {% endif %}
+                          
                       </td>
                       
                       <td>
@@ -218,13 +198,7 @@
                       </td>
                       <!-- Votes -->
                       <td style="width:75px">
-                          <div id="votes-sum-file-{{ file.id }}" style="text-align: center">
-                              {% if atom_object %}
-                              {{ file.vote_set|total:atom_object }}
-                              {% else %}
-                              {{ file.vote_set|total }}
-                              {% endif %}
-                          </div>
+                          
                       </td>
                       <!-- end Votes -->
                       <td>

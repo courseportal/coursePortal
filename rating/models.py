@@ -14,14 +14,14 @@ class Vote(models.Model):
     voteUp = models.IntegerField(default=0)
     voteDown = models.IntegerField(default=0)
     content = models.ForeignKey("web.Content", blank=True, null=True, 
-        editable=False)
+        editable=False, related_name='vote_set')
     # Must have only one of these fields
-    video = models.ForeignKey("web.YoutubeVideo", blank=True, null=True,
-         editable=False, related_name='vote_set')
-    link = models.ForeignKey("web.Link", blank=True, null=True,
-                             editable=False, related_name='vote_set')
-    file = models.ForeignKey("web.UploadedFile", blank=True, null=True,
-                             editable=False, related_name='vote_set')
+    #video = models.ForeignKey("web.YoutubeVideo", blank=True, null=True,
+    #     editable=False, related_name='vote_set')
+    #link = models.ForeignKey("web.Link", blank=True, null=True,
+    #                         editable=False, related_name='vote_set')
+    #file = models.ForeignKey("web.UploadedFile", blank=True, null=True,
+    #                         editable=False, related_name='vote_set')
 #     note = models.ForeignKey("web.Note", blank=True, null=True, 
 #         editable=False, related_name='vote_set'
 #     )
