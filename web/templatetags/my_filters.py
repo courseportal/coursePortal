@@ -6,7 +6,6 @@ register = template.Library()
 
 @register.simple_tag
 def get_content_url(content, class_, category, atom):
-    print('class: {}\ncategory: {}\natom: {}\n'.format(class_, category, atom))
     if class_ == "":
         class_ = None
     if category == "":
