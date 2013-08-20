@@ -1,8 +1,7 @@
 {% load vote_filter %}
 {% with obj=result.object %}
 
-
-{% if result.model_name == 'note' %}
+{% if result.model_name == 'link' %}
 <tr id="row-3-{{ result.object.file.id }}">
     <td style="width:50px">
         <a target="_blank" href="{{ result.object.file.url }}">
@@ -12,14 +11,11 @@
         </a>
     </td>
     <td>
-        {{ result.object.owner }}
+        {{ result.object.content.owner }}
     </td>
-    <td style="width:25px">
-        <div class="votes-sum-3-{{result.object.id}}">
-            {{ result.object.vote_set|total}}
-            
-        </div>
-    </td> 
+    <td style="width:70px">
+        {{ result.object.content.title }}
+    </td>
     <td style="width:70px">
         <div class="dateCreated-3-{{ result.object.id }}">
             {{result.object.date_created}}

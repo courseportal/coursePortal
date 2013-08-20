@@ -131,12 +131,14 @@ class SearchView(object):
         class_tab = False,
         atom_tab = False,
         base_category_tab = False,
-        forum_tab = False,
-        topic_tab = False,
-        post_tab = False,
-        note_tab = False,
-        example_tab = False,
-        expo_tab = False,
+        content_tab = False,
+        link_tab = False,
+        #forum_tab = False,
+        #topic_tab = False,
+        #post_tab = False,
+        #note_tab = False,
+        #example_tab = False,
+        #expo_tab = False,
         for result in page.object_list:
             if result.model_name == 'class':
                 class_tab = True
@@ -144,23 +146,28 @@ class SearchView(object):
                 atom_tab = True
             if result.model_name == 'basecategory':
                 base_category_tab = True
-            if result.model_name == 'forum':
-                forum_tab = True
-            if result.model_name == 'topic':
-                topic_tab = True
-            if result.model_name == 'post':
-                post_tab = True
-            if result.model_name == 'note':
-                note_tab = True
-            if result.model_name == 'example':
-                example_tab = True
-            if result.model_name == 'exposition':
-                expo_tab = True
+            if result.model_name == 'content':
+                content_tab = True
+            if result.model_name == 'link':
+                link_tab == True
+                    #if result.model_name == 'forum':
+                    #    forum_tab = True
+                    #if result.model_name == 'topic':
+                    #topic_tab = True
+                    #if result.model_name == 'post':
+                    #post_tab = True
+                    #if result.model_name == 'note':
+                    #note_tab = True
+                    #if result.model_name == 'example':
+                    #example_tab = True
+                    # if result.model_name == 'exposition':
+                    # expo_tab = True
 
         if page.object_list:
             active_tab = page.object_list[0].model_name
         else:
             active_tab = None
+        print(link_tab)
         context = {
             'query': self.query,
             'form': self.form,
@@ -170,12 +177,14 @@ class SearchView(object):
             'class_tab': class_tab,
             'atom_tab': atom_tab,
             'base_category_tab': base_category_tab,
-            'forum_tab': forum_tab,
-            'topic_tab': topic_tab,
-            'post_tab': post_tab,
-            'note_tab': note_tab,
-            'example_tab': example_tab,
-            'expo_tab': expo_tab,
+            'content_tab': content_tab,
+            'link_tab': link_tab,
+            #'forum_tab': forum_tab,
+            #'topic_tab': topic_tab,
+            #'post_tab': post_tab,
+            #'note_tab': note_tab,
+            #'example_tab': example_tab,
+            #'expo_tab': expo_tab,
             'active_tab': active_tab,
         }
 

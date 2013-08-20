@@ -1,4 +1,5 @@
 {# {% if query %} #}
+{% load vote_filter %}
 <!-- Begin faceting. -->
 <div class="row-fluid">
     <div class="span3">
@@ -40,12 +41,14 @@
                 {% if class_tab == True %}<li {%ifequal active_tab "class" %}class="active"{% endifequal %}><a href="#tab1" data-toggle="tab">Class</a></li>{% endif %}
                 {% if base_category_tab == True %}<li {%ifequal active_tab "basecategory" %}class="active"{% endifequal %}><a href="#tab2" data-toggle="tab">Base Category</a></li>{% endif %}
                 {% if atom_tab == True %}<li {%ifequal active_tab "atom" %}class="active"{% endifequal %}><a href="#tab3" data-toggle="tab">Atom</a></li>{% endif %}
-                {% if forum_tab == True %}<li {%ifequal active_tab "forum" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Forum</a></li>{% endif %}
+                {% if content_tab == True %}<li {%ifequal active_tab "content" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Content</a></li>{% endif %}
+                {% if link_tab == True %}<li {%ifequal active_tab "link" %}class="active"{% endifequal %}><a href="#tab5" data-toggle="tab">Link</a></li>{% endif %}
+                <!--{% if forum_tab == True %}<li {%ifequal active_tab "forum" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Forum</a></li>{% endif %}
                 {% if topic_tab == True %}<li {%ifequal active_tab "topic" %}class="active"{% endifequal %}><a href="#tab5" data-toggle="tab">Topic</a></li>{% endif %}
                 {% if post_tab == True %}<li {%ifequal active_tab "post" %}class="active"{% endifequal %}><a href="#tab6" data-toggle="tab">Post</a></li>{% endif %}
                 {% if note_tab == True %}<li {%ifequal active_tab "lecturenote" %}class="active"{% endifequal %}><a href="#tab7" data-toggle="tab">Note</a></li>{% endif %}
                 {% if example_tab == True %}<li {%ifequal active_tab "example" %}class="active"{% endifequal %}><a href="#tab8" data-toggle="tab">Example</a></li>{% endif %}
-                {% if expo_tab == True %}<li {%ifequal active_tab "expo" %}class="active"{% endifequal %}><a href="#tab9" data-toggle="tab">Exposition</a></li>{% endif %}
+                {% if expo_tab == True %}<li {%ifequal active_tab "expo" %}class="active"{% endifequal %}><a href="#tab9" data-toggle="tab">Exposition</a></li>{% endif %} -->
             </ul>
             <div class="tab-content">
                 {% if class_tab == True %}
@@ -85,7 +88,50 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-                {% if forum_tab == True %}
+                {% if content_tab == True %}
+                <div class="tab-pane {%ifequal active_tab "content" %}active{% endifequal %}" id="tab4">
+                    <p><b>Note:</b><br>Content results will always be returned with "table sort by scores" appended..</p>
+                    <table id="content" class="tablesorter">
+                        <thead>
+                            <th>Name</th>
+                            <th>Creater</th>
+                            <th>Created Date</th>
+                            <th>Content Type</th>
+                            <th>Votes<th>
+                            <th>Score</th>
+                        </thead>
+                        <tbody>
+                            {% for result in page.object_list %}
+                            {% if result.model_name == 'content' %}
+                            {% include 'search/result_content.html' %}
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% if link_tab == True %}
+                <div class="tab-pane {%ifequal active_tab "link" %}active{% endifequal %}" id="tab5">
+                    <p><b>Note:</b><br>Link results will always be returned with "table sort by scores" appended..</p>
+                    <table id="link" class="tablesorter">
+                        <thead>
+                            <th>Name</th>
+                            <th>Creater</th>
+                            <th>Created Date</th>
+                            <th>Content Belong</th>
+                            <th>Score</th>
+                        </thead>
+                        <tbody>
+                            {% for result in page.object_list %}
+                            {% if result.model_name == 'link' %}
+                            {% include 'search/result_link.html' %}
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                <!-- {% if forum_tab == True %}
                 <div class="tab-pane {%ifequal active_tab "forum" %}active{% endifequal %}" id="tab4">
                     <p>for Forum..</p>
                     {% for result in page.object_list %}
@@ -183,7 +229,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% endif %}
+                {% endif %} -->
 
             </div>
         </div>

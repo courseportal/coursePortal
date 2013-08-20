@@ -1,0 +1,36 @@
+{% load vote_filter %}
+
+{% with obj=result.object %}
+
+<tr id="row-3-{{ result.object.file.id }}">
+    <td style="width:50px">
+        <a target="_blank" href="{{ result.object.file.url }}">
+            <div class="name-3-{{ result.object.id }}">
+                {{ result.object.title }}
+            </div>
+        </a>
+    </td>
+    <td>
+        {{ result.object.owner }}
+    </td>
+    <td style="width:70px">
+        {{ result.object.content.content_type }}
+    </td>
+    <td style="width:70px">
+        <div class="dateCreated-3-{{ result.object.id }}">
+            {{result.object.date_created}}
+        </div>
+    </td>
+    <td style="width:25px">
+        <div class="votes-sum-3-{{result.object.id}}">
+            {{ result.object.vote_set|total}}
+        </div>
+    </td>
+    <td style="width:50px">
+        <div class="score-sum-3-{{result.object.id}}">
+            {{result.score}}
+        </div>
+    </td>
+</tr>
+
+{% endwith %}
