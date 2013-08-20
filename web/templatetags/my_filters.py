@@ -4,6 +4,17 @@ from django import template
 
 register = template.Library()
 
+@register.simple_tag
+def get_content_url(content, class_, category, atom):
+    print('class: {}\ncategory: {}\natom: {}\n'.format(class_, category, atom))
+    if class_ == "":
+        class_ = None
+    if category == "":
+        category = None
+    if atom == "":
+        atom = None
+    return content.get_absolute_url(class_, category, atom)
+
 @register.filter(name='in_dict')
 def check_in(dict, index):
     return index in dict
@@ -12,6 +23,12 @@ def check_in(dict, index):
 def lookup(dict, index):
     if str(index) in dict:
         return dict[str(index)]
+    return ''
+
+@register.filter(name='index')
+def index(l, index):
+    if len(l) > int(index):
+        return l[int(index)]
     return ''
 
 @register.filter
