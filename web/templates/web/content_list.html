@@ -1,12 +1,11 @@
 {% extends "web/home/home.html" %} {# change to base.html when flattened #}
 {% block content %}
-
 {% load my_filters %}
 {% load vote_filter %}
 <h2>{{ title }}</h2>
 {% if content_list %}
   <ul class="nav nav-tabs">
-    {% for type in content_list.0.CONTENT_TYPES %}
+    {% for type in content_types %}
     	<li class="{% if forloop.first %}active{% endif %}">
         <a href="#tab{{ type.0 }}" data-toggle="tab">
         {{ type.1 }}
@@ -15,142 +14,115 @@
     {% endfor %}
   </ul>
   <div class="tab-content">
-    {% for type in content_list.0.CONTENT_TYPES %}
-      <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
-         
-          <table id="content{{type.0}}" class="table content-table">
-              <thead>
-                <tr class="content-row head-row">
-                  <th data-sorter="false"> </th>
-                  <th>Name</th>
-                  <th>Created By</th>
-                  <th>Votes</th>
-                  <th>Modified Date</th>
-                  <th data-sorter="false">Options</th>
-                  <th style="display:none;">Is Stickied</th>
+    {% for type in content_types %}
+      {% with forloop.counter as i %}
+        <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
+          <table id="table-{{ type.0 }}" class="table">
+            <thead>
+              <tr class="head-row">
+                <th data-sorter="false">Arrows</th>
+                <th>Name</th>
+                <th>Created By</th>
+                <th>Votes</th>
+                <th data-sorter="false">Options</th>
+                <th style="display:none;">Is Stickied</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{content_list.i}}
+              {% for c in content_list|index:i %}
+                <tr id="row-content-{{ c.id }}">
+            			<td style="vertical-align:middle"> <!-- Vote arrows -->
+                    {% if atom_object %}
+            				  {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
+                    {% endif %}
+                  </td>
+                  <td> <!-- Name -->
+                    <a href="{% get_content_url c class_object category_object atom_object %}">
+                      <div class="name-content-{{ c.id }}">
+                          {{ c.title }}
+                          {% if class_object in c.classes_stickied_in.all %}
+                          [stickied]
+                          {% endif %}
+                      </div>
+                    </a>
+                  </td>
+                  <td> <!-- Owner -->
+                    {{ c.owner }}
+                  </td>
+                  <td> <!-- Votes -->
+                    <div id="votes-sum-content-{{ c.id }}" style="text-align: center">
+                      {% if atom_object %}
+                        {{ c.vote_set|total:atom_object }}
+                      {% else %}
+                        {{ c.vote_set|total }}
+                      {% endif %}
+                    </div>
+                    <div class="progress">
+                    <div class="bar bar-success" id="sparkbar-likes-content-{{ c.id }}" style="width:
+                        
+                      {% if atom_object %}
+                        {{ c.vote_set|totalUpPercentage:atom_object }}%
+                      {% else %}
+                        {{ c.vote_set|totalUpPercentage }}%
+                      {% endif %}
+                      
+                      ;">
+                      {% if atom_object %}
+                        {{ c.vote_set|totalUp:atom_object }}
+                      {% else %}
+                        {{ c.vote_set|totalUp }}
+                      {% endif %}
+                    </div>
+                    <div class="bar bar-danger" id="sparkbar-dislikes-content-{{ c.id }}" style="width:
+                      
+                      {% if atom_object %}
+                        {{ c.vote_set|totalDownPercentage:atom_object }}%
+                      {% else %}
+                        {{ c.vote_set|totalDownPercentage }}%
+                      {% endif %}
+                      
+                      ;">
+                      {% if atom_object %}
+                        {% if c.vote_set|totalDown:atom_object > 0 %}
+                          {{ c.vote_set|totalDown:atom_object }}
+                          {% endif %}
+                      {% else %}
+                        {% if c.vote_set|totalDown > 0 %}
+                          {{ c.vote_set|totalDown }}
+                          {% endif %}
+                      {% endif %}
+                    </div>
+                    </div>
+                  </td>
+                  <td><!-- Options -->
+                    <!-- Button to trigger modal -->
+                    <a rel="tooltip" class="icon-flag" href="#myModalcontent{{ c.id}}" data-toggle="modal" title="Report"></a>
+                    {% if user.is_superuser or c.owner == user %}
+                      <a rel="tooltip" class="icon-edit" href="{% url "submit_content" c.id %}?next={{request.path}}" title="Edit"></a>
+                       <a rel="tooltip" class="icon-remove" href="#deleteModal-content-{{ c.id }}" data-toggle="modal" title="Delete"></a>
+                      {% include "web/home/shared/sticky.html" with object=c type='content' %}
+                      {% include "web/home/shared/delete_modal.html" with object=c type='content' %}
+                    {% endif %}
+                  </td>
+                  <td style="display:none;">
+                    <div class="stickied-content-{{ c.id }}">
+                      {% if class_object in c.classes_stickied_in.all %}
+                        1
+                      {% else %}
+                        0
+                      {% endif %}
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                  {% if atom_object %}
-                  {% in_type content_list content_type=type.0 as content_in_type %}
-                  {% else %}
-                  {{content_list}}
-                  {% in_type content_list content_type=type.0 as content_in_type %}
-                  {% endif %}
-                  {% for c in content_in_type %}
-                  <tr id="row-content{{type.0}}-{{ c.id }}">
-                      <td style="vertical-align:middle">
-                          {% if atom_object %}
-                          {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
-                          {% endif %}
-                      </td>
-                      <td>
-                          {% if class_object and category_object and atom_object %}
-                          <a target="_blank" href="{% url 'class_atom_content_details' c.pk class_object.id category_object.id atom_object.id %}">
-                          {% else %}
-                              {% if class_object and category_object%}
-                              <a target="_blank" href="{% url 'class_cat_content_details' c.pk class_object.id category_object.id %}">
-                              {% else %}
-                                  {% if category_object and atom_object %}
-                                  <a target="_blank" href="{% url 'atom_content_details' c.pk  category_object.id atom_object.id %}">
-                                  {% else %}
-                                      {% if category_object %}
-                                  <a target="_blank" href="{% url 'cat_content_details' c.pk  category_object.id  %}">
-                                      {% endif %}
-                                  {% endif %}
-                              {% endif %}
-                          {% endif %}
-                              <div class="name-content-{{ c.id }}">
-                                  {{ c.title }}
-                                  {% if class_object in c.classes_stickied_in.all %}
-                                  [stickied]
-                                  {% endif %}
-                              </div>
-                          </a>
-                          
-                      </td>
-                      <td>
-                          {{ c.owner }}
-                      </td>
-                      <td>
-                          <div id="votes-sum-content-{{ c.id }}" style="text-align: center">
-                              {% if atom_object %}
-                              {{ c.vote_set|total:atom_object }}
-                              {% else %}
-                              {{ c.vote_set|total }}
-                              {% endif %}
-                          </div>
-                          <div class="progress">
-                          <div class="bar bar-success" id="sparkbar-likes-content-{{ c.id }}" style="width:
-                              
-                              {% if atom_object %}
-                              {{ c.vote_set|totalUpPercentage:atom_object }}%
-                              {% else %}
-                              {{ c.vote_set|totalUpPercentage }}%
-                              {% endif %}
-                              
-                              ;">
-                              {% if atom_object %}
-                              {{ c.vote_set|totalUp:atom_object }}
-                              {% else %}
-                              {{ c.vote_set|totalUp }}
-                              {% endif %}
-                          </div>
-                          <div class="bar bar-danger" id="sparkbar-dislikes-content-{{ c.id }}" style="width:
-                              
-                              {% if atom_object %}
-                              {{ c.vote_set|totalDownPercentage:atom_object }}%
-                              {% else %}
-                              {{ c.vote_set|totalDownPercentage }}%
-                              {% endif %}
-                              
-                              ;">
-                              {% if atom_object %}
-                              {% if c.vote_set|totalDown:atom_object > 0 %}
-                              {{ c.vote_set|totalDown:atom_object }}
-                              {% endif %}
-                              {% else %}
-                              {% if c.vote_set|totalDown > 0 %}
-                              {{ c.vote_set|totalDown }}
-                              {% endif %}
-                              {% endif %}
-                          </div>
-                          </div>
-                      </td>
-                      <td>
-                          {{ c.date_modified }}
-                      </td>
-                      <td>
-                          <!-- Button to trigger modal -->
-                          <a rel="tooltip" class="icon-flag" href="#myModalcontent{{ c.id}}" data-toggle="modal" title="Report"></a>
-                          {% include "web/home/shared/sticky.html" with object=c type='content' %}
-                          {% if user.is_superuser or c.owner == user %}
-                          <a rel="tooltip" class="icon-edit" href="{% url "submit_content" c.id %}?next={{request.path}}" title="Edit"></a>
-                          <a rel="tooltip" class="icon-remove" href="#deleteModal-content-{{ c.id }}" data-toggle="modal" title="Delete"></a>
-                          {# We only need to include this modal if the user is allowed to delete #}
-                          {% include "web/home/shared/delete_modal.html" with object=c type='content' %}
-                          {% endif %}
-                      </td>
-                      <td style="display:none;">
-                          <div class="stickied-content-{{ c.id }}">
-                              {% if class_object in c.classes_stickied_in.all %}
-                              1
-                              {% else %}
-                              0
-                              {% endif %}
-                          </div>
-                      </td>
-                  </tr>
-                  <!-- Modal -->
-                  {% include "web/home/shared/report_modal.html" with object=c type="content" %}
-                  <!--End of Modal-->
-                  {% endfor %}
-                  
-              </tbody>
+                <!-- Report Modal -->
+                {% include "web/home/shared/report_modal.html" with object=c type="content" %}
+                <!-- Sticky functionality -->
+              {% endfor %}
+            </tbody>
           </table>
-          
-          
-      </div>
+        </div>
+      {% endwith %}
     {% endfor %}
   </div>
 {% else %}
@@ -161,8 +133,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
     var disqus_shortname = 'cportalnt'; // required: replace example with your forum shortname
-    //var disqus_url = 'cportal-nt.eecs.umich.edu/content/{{ content_object.pk }}//';
-    var disqus_identifier = 'content-list-' + {% if atom_object %}'atom-{{ atom_object.pk }}';{% elif category_object %}'category-{{ category_object.pk }}';{% endif %}
+    var disqus_url = 'cportal-nt.eecs.umich.edu/content/{{ content_object.pk }}/';
+    var disqus_identifier = {% if class_object %}'class-{{ class_object.pk }}-' + {% endif %}'content-list-' + {% if atom_object %}'atom-{{ atom_object.pk }}';{% elif category_object %}'category-{{ category_object.pk }}';{% endif %}
 
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
@@ -179,13 +151,13 @@
 {% block javascript %}
 {{ block.super }}
 <script>
-    $(document).ready(function() {
-      $('#contentL').dataTable( {"sDom": '<"top"lf>rt<"bottom"p><"clear">'});
-      $('#contentE').dataTable( {"sDom": '<"top"lf>rt<"bottom"p><"clear">'});
-      $('#contentR').dataTable( {"sDom": '<"top"lf>rt<"bottom"p><"clear">'});
-      $('#contentH').dataTable( {"sDom": '<"top"lf>rt<"bottom"p><"clear">'});
-                      });
-    
+  $(document).ready(function() {
+    {% for type in content_types %}
+      $('table#table-{{ type.0 }}').dataTable( {
+        "sDom": '<"top"lf>rt<"bottom"p><"clear">'
+      });
+    {% endfor %}
 
+});
 </script>
 {% endblock javascript %}

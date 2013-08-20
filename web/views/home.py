@@ -84,11 +84,11 @@ def category(request, cat_id, class_id=None):
         get_context_for_category(category_object)
     )
     context.update({
+        'content_types':Content.CONTENT_TYPES,
         'title':category_object.title,
         'class_object':class_object,
         'category_object':category_object,
     })
-
     return render(request, template, context)
     
 
@@ -118,6 +118,7 @@ def atom(request, cat_id, atom_id, class_id=None):
         get_context_for_atom(atom_object)
     )
     context.update({
+        'content_types':Content.CONTENT_TYPES,
         'title': atom_object.title,
         'atom_object': atom_object,
         'category_object': category_object,
@@ -126,48 +127,51 @@ def atom(request, cat_id, atom_id, class_id=None):
     })
     return render(request, template, context)
 
-def content_detail(request, pk,atom_id=None, class_id=None, cat_id=None ):
+def content_detail(request, pk):
     r"""
     This is the view for the content detail view page.
     """
-    if class_id is not None:
-        template = 'web/content_details.html'
-        class_object = get_object_or_404(Class, id=class_id)
-        if cat_id is not None:
-            category_object = get_object_or_404(ClassCategory, id=cat_id)
+    # Custom breadcrumbs using GET data
+    class_pk = request.GET.get('class', None)
+    category_pk = request.GET.get('category', None)
+    atom_pk = request.GET.get('atom', None)
+    breadcrumbs = []
+    class_ = cat = atom = None # Set them all to None
+    if class_pk is not None:
+        class_ = get_object_or_404(Class, pk=class_pk)
+        breadcrumbs.append({'title':class_.title, 'url':reverse('classes', 
+            args=[class_.pk])})
+    if category_pk is not None:
+        if class_pk is not None:
+            cat = get_object_or_404(ClassCategory, pk=category_pk)
+            breadcrumbs.append({'title':cat.title, 'url':reverse('category', 
+                args=[class_.pk, cat.pk])})
         else:
-            category_object = None
-        if atom_id is not None:
-            atom_object = get_object_or_404(Atom, id=atom_id)
+            cat = get_object_or_404(BaseCategory, pk=category_pk)
+            breadcrumbs.append({'title':cat.title, 
+                'url':reverse('base_category', args=[cat.pk])})
+    if atom_pk is not None:
+        atom = get_object_or_404(Atom, pk=atom_pk)
+        if class_pk is not None:
+            breadcrumbs.append({'title':atom.title, 'url':reverse('atom', 
+                args=[class_.pk, cat.pk, atom.pk])})
         else:
-            atom_object = None
-        # Check if user is allowed to see this page
-        if has_class_access(class_object, request.user):
-            return HttpResponseRedirect(reverse('class_index')) # Redirect
-    else:
-        template = 'web/content_details.html'
-        class_object = None
-        if cat_id is not None:
-            category_object = get_object_or_404(BaseCategory, id=cat_id)
-        else:
-            category_object = None
-        if atom_id is not None:
-            atom_object = get_object_or_404(Atom, id=atom_id)
-        else:
-            atom_object = None
+            breadcrumbs.append({'title':atom.title, 'url':reverse('base_atom', 
+                args=[cat.pk, atom.pk])})
+    # End custom breadcrumbs
     
     obj = get_object_or_404(Content, pk=pk)
-    context = get_navbar_context()
-    context.update(
-        get_breadcrumbs(request.path, web_breadcrumb_dict)
-    )
+    breadcrumbs.append({'title':"{} Details".format(obj.title), 
+        'url':obj.get_absolute_url(class_, cat, atom)})
+    context = get_navbar_context(cat, class_)
     context.update({
-        'atom_object':atom_object,
-        'category_object':category_object,
-        'class_object':class_object,
-        'content_object':obj
+        'atom_object':atom,
+        'category_object':cat,
+        'class_object':class_,
+        'content_object':obj,
+        'breadcrumbs':breadcrumbs,
     })
-    return render(request, template, context)
+    return render(request, 'web/content_details.html', context)
 
 def classes(request, class_id):
     r"""

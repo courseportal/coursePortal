@@ -63,8 +63,8 @@ def submit_content(request, pk=None):
         if not (request.user.is_superuser or request.user == obj.owner):
             return HttpResponseForbidden()
     pk = request.GET.get('pk', None) # Resetting pk
+    content_type = request.GET.get('type', None)
     if request.is_ajax():
-        content_type = request.GET.get('type', None)
         if content_type is None:
             return process_content(request, obj)
         elif content_type == 'video':
@@ -75,28 +75,54 @@ def submit_content(request, pk=None):
         elif content_type == 'file':
             return process_subcontent(request, obj, UploadedFile, 
                 UploadedFileForm, pk)
+            return HttpResponseBadRequest()
         return HttpResponseBadRequest()
     else: # Not AJAX Request
-        if request.GET.get('type', None) is not None or pk is not None:
+        context = {};
+        if content_type == 'file':
+            context = process_file(request, obj, pk)
+        elif content_type is not None or pk is not None:
             return HttpResponseBadRequest()
-        if request.method == 'GET':
-            form = ContentForm(instance=obj, user=request.user)
-            context = get_navbar_context()
-            context.update(
-                get_breadcrumbs(request.path, web_breadcrumb_dict)
+
+        form = ContentForm(instance=obj, user=request.user)
+        context.update(
+            get_navbar_context()
+        )
+        context.update(
+            get_breadcrumbs(request.path, web_breadcrumb_dict)
+        )
+        context.update({
+            'content_object':obj,
+            'form':form,
+            'empty_video_form':YoutubeVideoForm(content=obj),
+            'empty_link_form':LinkForm(content=obj),
+            'empty_file_form':UploadedFileForm(content=obj),
+        })
+        if obj is not None:
+            context.update({'pk':obj.pk})
+        return render(request, 'web/content_form.html', context)
+            
+def process_file(request, content, pk):
+    context = {}
+    if pk is not None:
+        obj = get_object_or_404(UploadedFile, pk=pk)
+    else:
+        obj = None
+    form_kwargs = {'instance':obj, 'content':content}
+    if request.method == 'POST':
+        form = UploadedFileForm(request.POST, request.FILES, **form_kwargs)
+        if form.is_valid():
+            obj = form.save()
+            messages.success(request, 
+                "Successfully saved {}".format(obj.title)
             )
-            context.update({
-                'content_object':obj,
-                'form':form,
-                'empty_video_form':YoutubeVideoForm(content=obj),
-                'empty_link_form':LinkForm(content=obj),
-                'empty_file_form':UploadedFileForm(content=obj),
-            })
-            if obj is not None:
-                context.update({'pk':obj.pk})
-            return render(request, 'web/content_form.html', context)
-        else:
-            return HttpResponseNotAllowed(['GET'])
+        else: #Not valid
+            context['file_form'] = form
+            if pk is not None:
+                context['file_pk'] = pk
+            messages.error(request, "Error saving file.")
+    return context
+    
      
 def process_subcontent(request, content, Model, Form, pk):
     if pk is not None:
@@ -104,8 +130,8 @@ def process_subcontent(request, content, Model, Form, pk):
     else:
         obj = None
     form_kwargs = {'instance':obj, 'content':content}
-    if request.method == 'POST':
-        form = Form(request.POST, request.FILES, **form_kwargs)
+    if request.method == 'POST': # Files should not be POST'ed to here.
+        form = Form(request.POST, **form_kwargs)
         if form.is_valid():
             obj = form.save()
             del form_kwargs['instance']
@@ -129,7 +155,7 @@ def process_subcontent(request, content, Model, Form, pk):
                 'form_html':template.render(c),
             }
             return render_to_json_response(context, status=400)
-    elif request.method == 'GET':
+    elif request.method == 'GET': # GET is valid for files however.
         template = loader.get_template('web/form_template.html')
         c = RequestContext(request, {'form':Form(**form_kwargs)})
         return render_to_json_response({'form':template.render(c)})

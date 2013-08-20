@@ -98,6 +98,25 @@ class Content(WebBaseModel):
             'to be stickied in.'),
     )
     
+    def get_absolute_url(self, class_=None, category=None, atom=None):
+        r"""Returns the absolute url of the content object with the correct GET data for the breadcrumbs."""
+        if self.pk is not None:
+            url = reverse('content_details', args=[self.pk])
+            get = '?'
+            if class_ is not None:
+                get += 'class={}'.format(class_.pk)
+                if category is not None or atom is not None:
+                    get += '&'
+            if category is not None:
+                get += 'category={}'.format(category.pk)
+                if atom is not None:
+                    get += '&'
+            if atom is not None:
+                get += 'atom={}'.format(atom.pk)
+            return (url + get)
+        else:
+            raise Http404
+    
 def validate_youtube_video_id(value):
     regex_vid_id = re.compile('[A-Za-z0-9-_-]{11}')
     if not regex_vid_id.match(value):
