@@ -4,8 +4,8 @@
 {% if result.model_name == 'link' %}
 <tr id="row-3-{{ result.object.file.id }}">
     <td style="width:50px">
-        <a target="_blank" href="{{ result.object.file.url }}">
-            <div class="name-3-{{ result.object.id }}">
+        <a target="_blank" href="{{ result.object.link }}">
+            <div class="name-link-{{ result.object.id }}">
                 {{ result.object.title }}
             </div>
         </a>
@@ -13,80 +13,26 @@
     <td>
         {{ result.object.content.owner }}
     </td>
-    <td style="width:70px">
-        {{ result.object.content.title }}
-    </td>
-    <td style="width:70px">
-        <div class="dateCreated-3-{{ result.object.id }}">
-            {{result.object.date_created}}
+    <td >
+        <div class="dateCreated-link-{{ result.object.id }}">
+            {{result.object.content.date_created}}
         </div>
     </td>
-    <td style="width:50px">
-        <div class="score-sum-3-{{result.object.id}}">
+    <td >
+        <a target="_blank" href="{% url 'content_details' obj.content.id %}">
+            <div class="name-content-{{ result.object.content.id }}">
+                {{ result.object.content.title }}
+            </div>
+        </a>
+    </td>
+    <td >
+        <div class="score-link-{{result.object.id}}">
             {{result.score}}
         </div>
     </td>
 </tr>
 
-{% else %}
-    {% if result.model_name == 'example' %}
-<tr id="row-3-{{ result.object.file.id }}">
-    <td style="width:50px">
-        <a target="_blank" href="{{ result.object.file.url }}">
-            <div class="name-3-{{ result.object.id }}">
-                {{ result.object.title }}
-            </div>
-        </a>
-    </td>
-    <td>
-        {{ result.object.owner }}
-    </td>
-    <td style="width:25px">
-        <div class="votes-sum-3-{{result.object.id}}">
-            {{ result.object.vote_set|total}}
-        </div>
-    </td> 
-    <td style="width:70px">
-        <div class="dateCreated-3-{{ result.object.id }}">
-            {{result.object.date_created}}
-        </div>
-    </td>
-    <td style="width:50px">
-        <div class="score-sum-3-{{result.object.id}}">
-            {{result.score}}
-        </div>
-    </td>
-</tr>
-    {% else %}
-        {% if result.model_name == 'exposition' %}
-        <tr id="row-3-{{ result.object.id }}">
-            <td style="width:50px">
-                <a target="_blank" href="{{ result.object.link }}">
-                    <div class="name-3-{{ result.object.id }}">
-                        {{ result.object.title }}
-                    </div>
-                </a>
-            </td>
-            <td>
-                {{ result.object.owner }}
-            </td>
-            <td style="width:25px">
-                <div class="votes-sum-3-{{result.object.id}}">
-                    {{ result.object.vote_set|total}}
-                </div>
-            </td> 
-            <td style="width:70px">
-                <div class="dateCreated-3-{{ result.object.id }}">
-                    {{result.object.date_created}}
-                </div>
-            </td>
-            <td style="width:50px">
-                <div class="score-sum-3-{{result.object.id}}">
-                    {{result.score}}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
-    {% endif %}
 {% endif %}
 {% endwith %}
+
+

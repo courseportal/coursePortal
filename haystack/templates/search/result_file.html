@@ -1,0 +1,38 @@
+{% load vote_filter %}
+{% with obj=result.object %}
+
+
+{% if result.model_name == 'uploadedfile' %}
+<tr id="row-3-{{ result.object.file.id }}">
+    <td style="width:50px">
+        <a target="_blank" href="{{ result.object.file.url }}">
+            <div class="name-file-{{ result.object.id }}">
+                {{ result.object.title }}
+            </div>
+        </a>
+    </td>
+    <td>
+        {{ result.object.content.owner }}
+    </td>
+    <td>
+        <div class="dateCreated-file-{{ result.object.id }}">
+            {{result.object.content.date_created}}
+        </div>
+    </td>
+    <td>
+        <a target="_blank" href="{% url 'content_details' obj.content.id %}">
+            <div class="name-content-{{ result.object.content.id }}">
+                {{ result.object.content.title }}
+            </div>
+        </a>
+    </td>
+    
+    <td >
+        <div class="score-file-{{result.object.id}}">
+            {{result.score}}
+        </div>
+    </td>
+</tr>
+{% endif %}
+
+{% endwith %}

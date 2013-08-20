@@ -55,9 +55,19 @@ def vote(request, atom_id, item, item_id, vote_type):
         else:
             user_rating = UserRating.objects.get(user=content_object.user)
     
-    
-        user_rating.VoteUp += vote_up_delta_rating()
-        user_rating.VoteDown -= vote_down_delta_rating()
+        if vote_type == 'up':
+            if vote.vote != 0:
+                user_rating.VoteUp += vote_up_delta_rating()
+                user_rating.VoteDown += vote_down_delta_rating()
+            else:
+                user_rating.VoteUp += vote_up_delta_rating()
+        elif vote_type == 'down':
+            if vote.vote != 0:
+                user_rating.VoteUp -= vote_up_delta_rating()
+                user_rating.VoteDown -= vote_down_delta_rating()
+            else:
+                user_rating.VoteDown -= vote_down_delta_rating()
+
         user_rating.rating += delta
         user_rating.save()
         votes = [v.vote for v in content_object.vote_set.filter(atom=atom_object)]

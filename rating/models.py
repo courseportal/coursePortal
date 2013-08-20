@@ -32,7 +32,7 @@ class UserRating(models.Model):
     user = models.ForeignKey(User, related_name="rating_set")
     ContentRating = models.IntegerField(default=0)
     TopicRating = models.IntegerField(default=0)
-    VoteUp = models.IntegerField(default=0)
+    VoteUp = models.IntegerField(default=0)          
     VoteDown = models.IntegerField(default=0)
     rating = models.IntegerField(default=0)
     

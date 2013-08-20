@@ -4,127 +4,127 @@
 {% load vote_filter %}
 <h2>{{ title }}</h2>
 {% if content_list %}
-  <ul class="nav nav-tabs">
+<ul class="nav nav-tabs">
     {% for type in content_types %}
-    	<li class="{% if forloop.first %}active{% endif %}">
+    <li class="{% if forloop.first %}active{% endif %}">
         <a href="#tab{{ type.0 }}" data-toggle="tab">
-        {{ type.1 }}
+            {{ type.1 }}
         </a>
-      </li>
+    </li>
     {% endfor %}
-  </ul>
-  <div class="tab-content">
+</ul>
+<div class="tab-content">
     {% for type in content_types %}
-      {% with forloop.counter as i %}
-        <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
-          <table id="table-{{ type.0 }}" class="table">
+    {% with forloop.counter as i %}
+    <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
+        <table id="table-{{ type.0 }}" class="table">
             <thead>
-              <tr class="head-row">
-                <th data-sorter="false">Arrows</th>
-                  <th> {{content_list}}</th>
-                <th>Created By</th>
-                <th>Votes</th>
-                <th data-sorter="false">Options</th>
-                <th style="display:none;">Is Stickied</th>
-              </tr>
+                <tr class="head-row">
+                    <th data-sorter="false">Arrows</th>
+                    <th>Name</th>
+                    <th>Created By</th>
+                    <th>Votes</th>
+                    <th data-sorter="false">Options</th>
+                    <th style="display:none;">Is Stickied</th>
+                </tr>
             </thead>
             <tbody>
-              {{content_list.i}}
-              {% for c in content_list|index:i %}
+                {{content_list.i}}
+                {% for c in content_list|index:i %}
                 <tr id="row-content-{{ c.id }}">
-                  <td style="vertical-align:middle"> <!-- Vote arrows -->
-                      {% if atom_object %}
-                      {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
-                      {% endif %}
-                  </td>
-                  <td> <!-- Name -->
-                    <a href="{% get_content_url c class_object category_object atom_object %}">
-                      <div class="name-content-{{ c.id }}">
-                          {{ c.title }}
-                          {% if class_object in c.classes_stickied_in.all %}
-                          [stickied]
-                          {% endif %}
-                      </div>
-                    </a>
-                  </td>
-                  <td> <!-- Owner -->
-                    {{ c.owner }}
-                  </td>
-                  <td> <!-- Votes -->
-                    <div id="votes-sum-content-{{ c.id }}" style="text-align: center">
-                      {% if atom_object %}
-                        {{ c.vote_set|total:atom_object }}
-                      {% else %}
-                        {{ c.vote_set|total }}
-                      {% endif %}
-                    </div>
-                    <div class="progress">
-                    <div class="bar bar-success" id="sparkbar-likes-content-{{ c.id }}" style="width:
-                        
-                      {% if atom_object %}
-                        {{ c.vote_set|totalUpPercentage:atom_object }}%
-                      {% else %}
-                        {{ c.vote_set|totalUpPercentage }}%
-                      {% endif %}
-                      
-                      ;">
-                      {% if atom_object %}
-                        {{ c.vote_set|totalUp:atom_object }}
-                      {% else %}
-                        {{ c.vote_set|totalUp }}
-                      {% endif %}
-                    </div>
-                    <div class="bar bar-danger" id="sparkbar-dislikes-content-{{ c.id }}" style="width:
-                      
-                      {% if atom_object %}
-                        {{ c.vote_set|totalDownPercentage:atom_object }}%
-                      {% else %}
-                        {{ c.vote_set|totalDownPercentage }}%
-                      {% endif %}
-                      
-                      ;">
-                      {% if atom_object %}
-                        {% if c.vote_set|totalDown:atom_object > 0 %}
-                          {{ c.vote_set|totalDown:atom_object }}
-                          {% endif %}
-                      {% else %}
-                        {% if c.vote_set|totalDown > 0 %}
-                          {{ c.vote_set|totalDown }}
-                          {% endif %}
-                      {% endif %}
-                    </div>
-                    </div>
-                  </td>
-                  <td><!-- Options -->
-                    <!-- Button to trigger modal -->
-                    <a rel="tooltip" class="icon-flag" href="#myModalcontent{{ c.id}}" data-toggle="modal" title="Report"></a>
-                    {% if user.is_superuser or c.owner == user %}
-                      <a rel="tooltip" class="icon-edit" href="{% url "submit_content" c.id %}?next={{request.path}}" title="Edit"></a>
-                       <a rel="tooltip" class="icon-remove" href="#deleteModal-content-{{ c.id }}" data-toggle="modal" title="Delete"></a>
-                      {% include "web/home/shared/sticky.html" with object=c type='content' %}
-                      {% include "web/home/shared/delete_modal.html" with object=c type='content' %}
-                    {% endif %}
-                  </td>
-                  <td style="display:none;">
-                    <div class="stickied-content-{{ c.id }}">
-                      {% if class_object in c.classes_stickied_in.all %}
-                        1
-                      {% else %}
-                        0
-                      {% endif %}
-                    </div>
-                  </td>
+                    <td style="vertical-align:middle"> <!-- Vote arrows -->
+                        {% if atom_object %}
+                        {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
+                        {% endif %}
+                    </td>
+                    <td> <!-- Name -->
+                        <a href="{% get_content_url c class_object category_object atom_object %}">
+                            <div class="name-content-{{ c.id }}">
+                                {{ c.title }}
+                                {% if class_object in c.classes_stickied_in.all %}
+                                [stickied]
+                                {% endif %}
+                            </div>
+                        </a>
+                    </td>
+                    <td> <!-- Owner -->
+                        {{ c.owner }}
+                    </td>
+                    <td> <!-- Votes -->
+                        <div id="votes-sum-content-{{ c.id }}" style="text-align: center">
+                            {% if atom_object %}
+                            {{ c.vote_set|total:atom_object }}
+                            {% else %}
+                            {{ c.vote_set|total }}
+                            {% endif %}
+                        </div>
+                        <div class="progress">
+                            <div class="bar bar-success" id="sparkbar-likes-content-{{ c.id }}" style="width:
+                                
+                                {% if atom_object %}
+                                {{ c.vote_set|totalUpPercentage:atom_object }}%
+                                {% else %}
+                                {{ c.vote_set|totalUpPercentage }}%
+                                {% endif %}
+                                
+                                ;">
+                                {% if atom_object %}
+                                {{ c.vote_set|totalUp:atom_object }}
+                                {% else %}
+                                {{ c.vote_set|totalUp }}
+                                {% endif %}
+                            </div>
+                            <div class="bar bar-danger" id="sparkbar-dislikes-content-{{ c.id }}" style="width:
+                                
+                                {% if atom_object %}
+                                {{ c.vote_set|totalDownPercentage:atom_object }}%
+                                {% else %}
+                                {{ c.vote_set|totalDownPercentage }}%
+                                {% endif %}
+                                
+                                ;">
+                                {% if atom_object %}
+                                {% if c.vote_set|totalDown:atom_object > 0 %}
+                                {{ c.vote_set|totalDown:atom_object }}
+                                {% endif %}
+                                {% else %}
+                                {% if c.vote_set|totalDown > 0 %}
+                                {{ c.vote_set|totalDown }}
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td><!-- Options -->
+                        <!-- Button to trigger modal -->
+                        <a rel="tooltip" class="icon-flag" href="#myModalcontent{{ c.id}}" data-toggle="modal" title="Report"></a>
+                        {% if user.is_superuser or c.owner == user %}
+                        <a rel="tooltip" class="icon-edit" href="{% url "submit_content" c.id %}?next={{request.path}}" title="Edit"></a>
+                        <a rel="tooltip" class="icon-remove" href="#deleteModal-content-{{ c.id }}" data-toggle="modal" title="Delete"></a>
+                        {% include "web/home/shared/sticky.html" with object=c type='content' %}
+                        {% include "web/home/shared/delete_modal.html" with object=c type='content' %}
+                        {% endif %}
+                    </td>
+                    <td style="display:none;">
+                        <div class="stickied-content-{{ c.id }}">
+                            {% if class_object in c.classes_stickied_in.all %}
+                            1
+                            {% else %}
+                            0
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 <!-- Report Modal -->
                 {% include "web/home/shared/report_modal.html" with object=c type="content" %}
                 <!-- Sticky functionality -->
-              {% endfor %}
+                {% endfor %}
             </tbody>
-          </table>
-        </div>
-      {% endwith %}
+        </table>
+    </div>
+    {% endwith %}
     {% endfor %}
-  </div>
+</div>
 {% else %}
 <p>There is currently no content to list.  Feel free to submit some.</p>
 {% endif %}
@@ -135,14 +135,14 @@
     var disqus_shortname = 'cportalnt'; // required: replace example with your forum shortname
     var disqus_url = 'cportal-nt.eecs.umich.edu/content/{{ content_object.pk }}/';
     var disqus_identifier = {% if class_object %}'class-{{ class_object.pk }}-' + {% endif %}'content-list-' + {% if atom_object %}'atom-{{ atom_object.pk }}';{% elif category_object %}'category-{{ category_object.pk }}';{% endif %}
-
+    
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+    </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
@@ -151,13 +151,13 @@
 {% block javascript %}
 {{ block.super }}
 <script>
-  $(document).ready(function() {
-    {% for type in content_types %}
-      $('table#table-{{ type.0 }}').dataTable( {
-        "sDom": '<"top"lf>rt<"bottom"p><"clear">'
-      });
-    {% endfor %}
-
-});
-</script>
+    $(document).ready(function() {
+                      {% for type in content_types %}
+                      $('table#table-{{ type.0 }}').dataTable( {
+                                                              "sDom": '<"top"lf>rt<"bottom"p><"clear">'
+                                                              });
+                      {% endfor %}
+                      
+                      });
+    </script>
 {% endblock javascript %}
