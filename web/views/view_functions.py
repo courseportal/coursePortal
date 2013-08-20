@@ -115,7 +115,11 @@ def get_context_for_category(category_object, context=None):
         get_context_for_category(child, context) #recurse
     if first_call_flag: # Only do this on the top level of recursion
         for key in context:
-            context[key] = list(set(context[key])) # Remove duplicates
+            seq = context[key]
+            seen = set()
+            seen_add = seen.add
+            context[key]=[ x for x in seq if x not in seen and not seen_add(x)]
+            #context[key] = list(set(context[key])) # Remove duplicates
     return context # Return the context
 
 def get_parent_categories(category_object, class_object): # Look at for refactoring
