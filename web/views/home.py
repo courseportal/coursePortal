@@ -88,7 +88,6 @@ def category(request, cat_id, class_id=None):
         'class_object':class_object,
         'category_object':category_object,
     })
-    print "\n\n{}\n\n".format(context['content_list'])
     return render(request, template, context)
     
 
@@ -160,6 +159,8 @@ def content_detail(request, pk):
     # End custom breadcrumbs
     
     obj = get_object_or_404(Content, pk=pk)
+    breadcrumbs.append({'title':"{} Details".format(obj.title), 
+        'url':obj.get_absolute_url(class_, cat, atom)})
     context = get_navbar_context(cat, class_)
     context.update({
         'atom_object':atom,
