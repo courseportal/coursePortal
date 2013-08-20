@@ -60,24 +60,34 @@ init_sticking = function() {
 */
 init_delete_content = function() {
 	$('.delete-content').click(function() {
+    /**
+     * Stores the DOMElement in a variable so we can use in callbacks.
+     * @type {DOMElement}
+     */
+    $this = $(this)
 		$.ajax({
-			'url': '/ajax/delete/' + $(this).attr('item-type') + '/' + $(this).attr('item-id') + '/',
-			'context': this,
-			'statusCode' : {
-				200: function(data) {
-					console.log(data);
-					if (data.result == true) {
-						console.log(this);
-						var row = '#row-' + data.item + '-' + data.id;
-						$(row).remove();
-						$("table").trigger("update");
-						$('.cur-user-rate').text(data.user_rating);
-					}
-					else {
-						alert("Failed to delete object!")
-					}
-				}
-			},
+			url: '/delete-content/?type=' + $this.attr('item-type') + '&pk=' + $this.attr('item-id'),
+      method:'GET',
+		}).fail(function() {
+		  alert("Failed to delete object!");
+		}).done(function(data) {
+      /**
+       * Store the identifier for the row to delete.
+       * @type {string}
+       */
+		  var row = '#row-' + $this.attr('item-type') + '-' + $this.attr('item-id');
+      /**
+       * Store the table that the row is in.
+       * @type {DOMElement}
+       */
+      var table = $(row).parent().parent();
+      table.dataTable().fnDestroy();
+      $(row).remove();
+      //$(row).parent().parent().attr('style', 'width:100%')
+      table.dataTable({
+        "sDom": '<"top"lf>rt<"bottom"p><"clear">'
+      });
+      $('.cur-user-rate').text(data.user_rating);
 		});
 	});
 };

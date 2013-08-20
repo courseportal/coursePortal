@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "web/home/home.html" %}
 {% block content %}
 <div id="form-messages"></div> {#<!-- Div to put AJAX messages in. -->#}
 <form id="content-form" class="form-horizontal" action="{{ form_action }}" 
@@ -101,6 +101,9 @@
       <p>Double click on a file to edit it.</p>
     </div>
   </div>
+</div>
+<div class="form-actions">
+  <button id="done-button" class="btn btn-primary">Done</button>
 </div>
 <div id="help-text">
   <p>Once you create the content object by clicking the "Submit Content" button you will be shown more options for adding Youtube videos, links and files to your content.  Click on any submit button to submit the coorsponding part of the form.  Clicking on the Done button will bring you to the content details page for your content and you will lose all unsaved changes.</p>
@@ -406,6 +409,22 @@
         $('button#delete-file').addClass('hidden');
       }
       
+    });
+    
+    /** Done button click handler */
+    $('button#done-button').click(function() {
+      /**
+       * Store the users confirmation
+       * @type {boolean}
+       */
+      var cont = confirm('You will lose all unsaved changes, are you sure you want to continue?');
+      if (!cont) {return false;};
+      if ($('form#content-form').attr('data-pk')) {
+        window.location = '/content/' + $('form#content-form').attr('data-pk');
+      }
+      else {
+        window.location = '/';
+      }
     });
   });
   </script>

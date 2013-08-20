@@ -15,7 +15,7 @@
 </ul>
 <div class="tab-content">
     {% for type in content_types %}
-    {% with forloop.counter as i %}
+    {% with forloop.counter0 as i %}
     <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
         <table id="table-{{ type.0 }}" class="table">
             <thead>
@@ -32,11 +32,13 @@
                 {{content_list.i}}
                 {% for c in content_list|index:i %}
                 <tr id="row-content-{{ c.id }}">
+                    
                     <td style="vertical-align:middle"> <!-- Vote arrows -->
-                        {% if atom_object %}
+                        {% if atom_object %} <!-- Only vote in atoms -->
                         {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
-                        {% endif %}
+                        {% endif %} <!-- No arrows in category -->
                     </td>
+                    
                     <td> <!-- Name -->
                         <a href="{% get_content_url c class_object category_object atom_object %}">
                             <div class="name-content-{{ c.id }}">

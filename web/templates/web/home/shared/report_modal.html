@@ -25,8 +25,8 @@
 $(document).ready(function() {
 	$('button#submit-report').click(function() { // Listen for the submit button click
         
-		$('#id_contentType').val('{{e|to_class_name}}'); // Set the values of the hidden fields
-		$('#id_contentId').val('{{e.id}}');
+		$('#id_contentType').val('{{object|to_class_name}}'); // Set the values of the hidden fields
+		$('#id_contentId').val('{{object.id}}');
 		$(this).attr('disabled', true); // Disable the button
 		$('*[id^=field]').removeClass('error') // Remove the error class from all fields
 		$('*[id^=help-inline]').empty() // Remove the error text from all fields
@@ -37,7 +37,7 @@ $(document).ready(function() {
 		}).done(function(data) {
 			if (data.success)
 			{
-				$('#myModal{{ type }}{{ e.id }}').modal('hide')
+				$('#myModal{{ type }}{{ object.id }}').modal('hide');
 			}
 			else // The form is invalid
 			{

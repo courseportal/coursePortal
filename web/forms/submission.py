@@ -45,15 +45,16 @@ class ReportForm(forms.Form):
 	def submit(self, user):
 		r"""Submits the report to the knoatom email.  It takes in the request from the view it is submitted in."""
 		subject = ("[Community Guideline Violation Report]:  " + 
-			self.cleaned_data['subject'])
-		content = ("From \"" + user.username + 
+			str(self.cleaned_data['subject']))
+		content = ("From \"" + str(user.username) + 
 			"\" : \n\nCommunity Guideline Violation Report:\t\t" + 
-			self.cleaned_data['content'] + "\n\nContent Type:\t\t" + 
-			self.cleaned_data['contentType']+"\n\nContent Id:\t\t" +
-			self.cleaned_data['contentId'])
+			str(self.cleaned_data['content'] + "\n\nContent Type:\t\t") + 
+			str(self.cleaned_data['contentType']+"\n\nContent Id:\t\t") +
+			str(self.cleaned_data['contentId']))
 		send_mail(
-			subjet=_(subject),
-			message=_(content),
+			subject=subject,
+			message=content,
+            from_email='knoatom-noreply@umich.edu',
 			recipient_list=['knoatom.webmaster@gmail.com']
 		)
         
