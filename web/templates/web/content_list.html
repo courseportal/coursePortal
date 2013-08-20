@@ -21,7 +21,7 @@
             <thead>
               <tr class="head-row">
                 <th data-sorter="false">Arrows</th>
-                <th>Name</th>
+                  <th> {{content_list}}</th>
                 <th>Created By</th>
                 <th>Votes</th>
                 <th data-sorter="false">Options</th>
@@ -32,10 +32,10 @@
               {{content_list.i}}
               {% for c in content_list|index:i %}
                 <tr id="row-content-{{ c.id }}">
-            			<td style="vertical-align:middle"> <!-- Vote arrows -->
-                    {% if atom_object %}
-            				  {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
-                    {% endif %}
+                  <td style="vertical-align:middle"> <!-- Vote arrows -->
+                      {% if atom_object %}
+                      {% include "rating/vote_arrows.html" with item='content' id=c.id atom_id=atom_object.id %}
+                      {% endif %}
                   </td>
                   <td> <!-- Name -->
                     <a href="{% get_content_url c class_object category_object atom_object %}">
