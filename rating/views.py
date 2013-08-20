@@ -16,14 +16,8 @@ def vote(request, atom_id, item, item_id, vote_type):
     r"""This voting system is a refactored version of the original voting system written by Taoran."""
     atom_object = get_object_or_404(Atom, id=atom_id)
    
-    if item == 'video':
-        content_object = get_object_or_404(YoutubeVideo, id=item_id)
-    elif item == 'link':
-        content_object = get_object_or_404(Link, id=item_id)
-    elif item == 'file':
-        content_object = get_object_or_404(UploadedFile, id=item_id)
-    elif item == 'topic':
-        content_object = get_object_or_404(Topic, id=item_id)
+    if item == 'content':
+        content_object = get_object_or_404(Content, id=item_id)
     else:
         raise Http404
         
@@ -57,7 +51,7 @@ def vote(request, atom_id, item, item_id, vote_type):
         vote.vote += delta
         vote.save()
         if item != 'topic':
-            user_rating = UserRating.objects.get(user=content_object.content.owner)
+            user_rating = UserRating.objects.get(user=content_object.owner)
         else:
             user_rating = UserRating.objects.get(user=content_object.user)
     

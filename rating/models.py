@@ -14,9 +14,8 @@ class Vote(models.Model):
     voteUp = models.IntegerField(default=0)
     voteDown = models.IntegerField(default=0)
     content = models.ForeignKey("web.Content", blank=True, null=True, 
-        editable=False)
+        editable=False, related_name='vote_set')
     # Must have only one of these fields
-
     topic = models.ForeignKey("pybb.Topic", blank=True, null=True, 
         editable=False, related_name='vote_set'
     )

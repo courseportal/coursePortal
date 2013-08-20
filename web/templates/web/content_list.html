@@ -1,6 +1,7 @@
 {% extends "web/home/home.html" %} {# change to base.html when flattened #}
 {% block content %}
 {% load my_filters %}
+{% load vote_filter %}
 <h2>{{ title }}</h2>
 {% if content_list %}
   <ul class="nav nav-tabs">
@@ -38,14 +39,61 @@
                   </td>
                   <td> <!-- Name -->
                     <a href="{% get_content_url c class_object category_object atom_object %}">
-                      {{ c.title }}
+                      <div class="name-content-{{ c.id }}">
+                          {{ c.title }}
+                          {% if class_object in c.classes_stickied_in.all %}
+                          [stickied]
+                          {% endif %}
+                      </div>
                     </a>
                   </td>
                   <td> <!-- Owner -->
                     {{ c.owner }}
                   </td>
                   <td> <!-- Votes -->
-                    <!-- Votes here -->
+                    <div id="votes-sum-content-{{ c.id }}" style="text-align: center">
+                      {% if atom_object %}
+                        {{ c.vote_set|total:atom_object }}
+                      {% else %}
+                        {{ c.vote_set|total }}
+                      {% endif %}
+                    </div>
+                    <div class="progress">
+                    <div class="bar bar-success" id="sparkbar-likes-content-{{ c.id }}" style="width:
+                        
+                      {% if atom_object %}
+                        {{ c.vote_set|totalUpPercentage:atom_object }}%
+                      {% else %}
+                        {{ c.vote_set|totalUpPercentage }}%
+                      {% endif %}
+                      
+                      ;">
+                      {% if atom_object %}
+                        {{ c.vote_set|totalUp:atom_object }}
+                      {% else %}
+                        {{ c.vote_set|totalUp }}
+                      {% endif %}
+                    </div>
+                    <div class="bar bar-danger" id="sparkbar-dislikes-content-{{ c.id }}" style="width:
+                      
+                      {% if atom_object %}
+                        {{ c.vote_set|totalDownPercentage:atom_object }}%
+                      {% else %}
+                        {{ c.vote_set|totalDownPercentage }}%
+                      {% endif %}
+                      
+                      ;">
+                      {% if atom_object %}
+                        {% if c.vote_set|totalDown:atom_object > 0 %}
+                          {{ c.vote_set|totalDown:atom_object }}
+                          {% endif %}
+                      {% else %}
+                        {% if c.vote_set|totalDown > 0 %}
+                          {{ c.vote_set|totalDown }}
+                          {% endif %}
+                      {% endif %}
+                    </div>
+                    </div>
                   </td>
                   <td><!-- Options -->
                     <!-- Button to trigger modal -->
@@ -66,7 +114,6 @@
                       {% endif %}
                     </div>
                   </td>
-                  
                 </tr>
                 <!-- Report Modal -->
                 {% include "web/home/shared/report_modal.html" with object=c type="content" %}
@@ -106,7 +153,7 @@
 <script>
   $(document).ready(function() {
     {% for type in content_types %}
-      $('#table-{{ type.0 }}').dataTable( {
+      $('table#table-{{ type.0 }}').dataTable( {
         "sDom": '<"top"lf>rt<"bottom"p><"clear">'
       });
     {% endfor %}

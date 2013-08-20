@@ -135,59 +135,43 @@
     <dynamicField indexed="true" name="*_coordinate" stored="false" type="tdouble"/>
 
 
-    <field indexed="true" multiValued="false" name="text" stored="true" type="edge_ngram"/>
-
-    <field indexed="true" multiValued="false" name="AtomSum" stored="true" type="text_en"/>
-
-    <field indexed="false" multiValued="false" name="rendered" stored="true" type="string"/>
-
-    <field indexed="true" multiValued="false" name="AtomSuggestions" stored="true" type="string"/>
-
-    <field indexed="true" multiValued="false" name="AtomTitle" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="BaseCatSum" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="BaseCatSuggestions" stored="true" type="string"/>
-
-    <field indexed="true" multiValued="false" name="BaseCatTitle" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="CatTitle" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ClassTitle" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ClassAuthor_exact" stored="true" type="string"/>
+      <field name="text" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
       
-    <field name="ClassInstructors" type="text_en" indexed="true" stored="true" multiValued="false" />
+      <field name="AtomSum" type="text_en" indexed="true" stored="true" multiValued="false" />
       
-    <field name="ClassInstructors_exact" type="string" indexed="true" stored="true" multiValued="false" />
-
-    <field indexed="true" multiValued="false" name="ClassStatus_exact" stored="true" type="string"/>
-
-    <field indexed="true" multiValued="false" name="ClassAuthor" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ClassStatus" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ExampleName" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ExampleOwner" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ExpoOwner" stored="true" type="text_en"/>
+      <field name="rendered" type="string" indexed="false" stored="true" multiValued="false" />
       
-    <field indexed="true" multiValued="false" name="ExpoName" stored="true" type="text_en"/>
+      <field name="AtomSuggestions" type="string" indexed="true" stored="true" multiValued="false" />
       
-    <field indexed="true" multiValued="false" name="ForumTitle" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="ForumDescription" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="LecOwner" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="LecName" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="Message" stored="true" type="text_en"/>
-
-    <field indexed="true" multiValued="false" name="createTime" stored="true" type="date"/>
-
-    <field indexed="true" multiValued="false" name="TopicTitle" stored="true" type="text_en"/>
+      <field name="AtomTitle" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="BaseCatSum" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="BaseCatSuggestions" type="string" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="BaseCatTitle" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassTitle" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassAuthor_exact" type="string" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassInstructors" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassInstructors_exact" type="string" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassStatus_exact" type="string" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassAuthor" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ClassStatus" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ContentOwner" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ContentSum" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="ContentName" type="text_en" indexed="true" stored="true" multiValued="false" />
+      
+      <field name="LinkName" type="text_en" indexed="true" stored="true" multiValued="false" />
 
   <field indexed="true" name="_version_" stored="true" type="long"/></fields>
 
