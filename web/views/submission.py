@@ -124,8 +124,8 @@ def process_subcontent(request, content, Model, Form, pk):
             template = loader.get_template('web/form_template.html')
             c = RequestContext(request, {'form':form})
             context = {
-                'message':('<div class="alert alert-error">' + 
-                    _('Error saving object.') + m'</div>'),
+                'message':('<div class="alert alert-error">' +
+                           _('Error saving object.') + '</div>'),
                 'form_html':template.render(c),
             }
             return render_to_json_response(context, status=400)

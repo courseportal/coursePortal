@@ -108,8 +108,8 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 					{% block sidebar %} {% comment %}<!-- I don't intend on ever replacing the whole thing, but its good to have the option just incase -->{% endcomment %}
 						<ul class="nav nav-list" style="padding-left:0;padding-right:0;">
 							<!-- Default Navigation -->
-							<li class="nav-header">Navigation</li>
-							<li><a href="{% url "home" %}">Home</a></li>
+                            <li class="nav-header">Navigation</li>
+                            <li><a href="{% url "home" %}">Home</a></li>
 							<li><a href="{% url "class_index" %}">Class Index</a></li>
 							<li><a href="{% url "pybb:index" %}">Forums</a><li>
 							<li><a href="{% url "haystack_search" %}">Search</a></li>

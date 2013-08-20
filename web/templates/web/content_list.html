@@ -15,7 +15,88 @@
     {% for type in content_list.0.CONTENT_TYPES %}
       <div id="tab{{ type.0 }}"
         class="tab-pane {% if forloop.first %}active{% endif %}">
-        <ul></ul>
+         
+
+        {% load my_filters %}
+          
+          <table id="content" class="table content-table">
+              <thead>
+                <tr class="content-row head-row">
+                  <th data-sorter="false"> asd</th>
+                  <th>Name</th>
+                  <th>Created By</th>
+                  <th>Modified Date</th>
+                  <th data-sorter="false">Options</th>
+                  <th style="display:none;">Is Stickied</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for c in content_list %}
+                  <tr id="row-content-{{ c.id }}">
+                      <td>
+                          
+                      </td>
+                      <td>
+                          {% if class_object and category_object and atom_object %}
+                          <a target="_blank" href="{% url 'class_atom_content_details' c.pk class_object.id category_object.id atom_object.id %}">
+                          {% else %}
+                              {% if class_object and category_object%}
+                              <a target="_blank" href="{% url 'class_cat_content_details' c.pk class_object.id category_object.id %}">
+                              {% else %}
+                                  {% if category_object and atom_object %}
+                                  <a target="_blank" href="{% url 'atom_content_details' c.pk  category_object.id atom_object.id %}">
+                                  {% else %}
+                                      {% if category_object %}
+                                  <a target="_blank" href="{% url 'cat_content_details' c.pk  category_object.id  %}">
+                                      {% endif %}
+                                  {% endif %}
+                              {% endif %}
+                          {% endif %}
+                              <div class="name-content-{{ c.id }}">
+                                  {{ c.title }}
+                                  {% if class_object in c.classes_stickied_in.all %}
+                                  [stickied]
+                                  {% endif %}
+                              </div>
+                          </a>
+                          
+                      </td>
+                      <td>
+                          {{ c.owner }}
+                      </td>
+                      <td>
+                          {{ c.date_modified }}
+                      </td>
+                      <td>
+                          <!-- Button to trigger modal -->
+                          <a rel="tooltip" class="icon-flag" href="#myModalcontent{{ c.id}}" data-toggle="modal" title="Report"></a>
+                          {% include "web/home/shared/sticky.html" with object=c type='content' %}
+                          {% if user.is_superuser or c.owner == user %}
+                          <a rel="tooltip" class="icon-edit" href="{% url "submit_content" c.id %}?next={{request.path}}" title="Edit"></a>
+                          <a rel="tooltip" class="icon-remove" href="#deleteModal-content-{{ c.id }}" data-toggle="modal" title="Delete"></a>
+                          {# We only need to include this modal if the user is allowed to delete #}
+                          {% include "web/home/shared/delete_modal.html" with object=c type='content' %}
+                          {% endif %}
+                      </td>
+                      <td style="display:none;">
+                          <div class="stickied-content-{{ c.id }}">
+                              {% if class_object in c.classes_stickied_in.all %}
+                              1
+                              {% else %}
+                              0
+                              {% endif %}
+                          </div>
+                      </td>
+                  </tr>
+                  <!-- Modal -->
+                  {% include "web/home/shared/report_modal.html" with object=c type="content" %}
+                  <!--End of Modal-->
+                  {% endfor %}
+                  
+              </tbody>
+          </table>
+          
+          
       </div>
     {% endfor %}
   </div>
@@ -45,20 +126,12 @@
 {% block javascript %}
 {{ block.super }}
 <script>
-$(document).ready(function() {
-  /**
-   * Sorts the content into the correct list depending on its content_type.
-   */
-  {% for c in content_list %}
-  console.log($('div#tab{{ c.content_type }}'));
-    $('div#tab{{ c.content_type }} ul').append(
-      $('<li>').append(
-        $('<a>').attr('href', '{% url "content_details" c.pk %}').append(
-          '{{ c.title }}'
-        )
-      )
-    );
-  {% endfor %}
-});
+    $(document).ready(function() {
+                      var oTable = $('#content').dataTable( {
+                                                                  "sDom": '<"top"lf>rt<"bottom"p><"clear">'
+                                                                  });
+                      });
+    
+
 </script>
 {% endblock javascript %}

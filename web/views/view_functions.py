@@ -76,7 +76,9 @@ def get_context_for_atom(atom_object=None):
 	if atom_object is None:
 		context = {'content_list':[]}
 	else:
-		context = {'content_list':atom_object.content_set.all()}
+		context = {
+                'atom_object':atom_object,
+                'content_list':atom_object.content_set.all()}
 	return context
 	
 def get_context_for_category(category_object, context=None):

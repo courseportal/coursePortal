@@ -23,6 +23,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$('button#submit-report').click(function() { // Listen for the submit button click
+        
 		$('#id_contentType').val('{{e|to_class_name}}'); // Set the values of the hidden fields
 		$('#id_contentId').val('{{e.id}}');
 		$(this).attr('disabled', true); // Disable the button

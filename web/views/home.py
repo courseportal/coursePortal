@@ -75,6 +75,7 @@ def category(request, cat_id, class_id=None):
         category_object = get_object_or_404(BaseCategory, id=cat_id)
         class_object = None # We aren't in a class
     context = get_navbar_context(category_object, class_object)
+    
     context.update( # Add the breadrumbs to the context
         get_breadcrumbs(request.path, web_breadcrumb_dict)
     )
@@ -117,24 +118,54 @@ def atom(request, cat_id, atom_id, class_id=None):
     context.update({
         'title': atom_object.title,
         'atom_object': atom_object,
+        'category_object': category_object,
         'class_object':class_object,
         'forum': Forum.objects.get(atom=atom_object),
     })
     return render(request, template, context)
-    
-def content_detail(request, pk):
+
+def content_detail(request, pk,atom_id=None, class_id=None, cat_id=None ):
     r"""
     This is the view for the content detail view page.
     """
+    if class_id is not None:
+        template = 'web/content_details.html'
+        class_object = get_object_or_404(Class, id=class_id)
+        if cat_id is not None:
+            category_object = get_object_or_404(ClassCategory, id=cat_id)
+        else:
+            category_object = None
+        if atom_id is not None:
+            atom_object = get_object_or_404(Atom, id=atom_id)
+        else:
+            atom_object = None
+        # Check if user is allowed to see this page
+        if has_class_access(class_object, request.user):
+            return HttpResponseRedirect(reverse('class_index')) # Redirect
+    else:
+        template = 'web/content_details.html'
+        class_object = None
+        if cat_id is not None:
+            category_object = get_object_or_404(BaseCategory, id=cat_id)
+        else:
+            category_object = None
+        if atom_id is not None:
+            atom_object = get_object_or_404(Atom, id=atom_id)
+        else:
+            atom_object = None
+    
     obj = get_object_or_404(Content, pk=pk)
     context = get_navbar_context()
     context.update(
         get_breadcrumbs(request.path, web_breadcrumb_dict)
     )
     context.update({
+        'atom_object':atom_object,
+        'category_object':category_object,
+        'class_object':class_object,
         'content_object':obj
     })
-    return render(request, 'web/content_details.html', context)
+    return render(request, template, context)
 
 def classes(request, class_id):
     r"""

@@ -1,5 +1,8 @@
 from django.template.defaultfilters import register
 from django.utils import simplejson as json
+from django import template
+
+register = template.Library()
 
 @register.filter(name='in_dict')
 def check_in(dict, index):
@@ -34,3 +37,4 @@ def has_atom(qset, aid):
 		return qset.filter(id=aid).exists()
 	except:
 		return False
+

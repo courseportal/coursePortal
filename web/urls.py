@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     #url(r'^view-videos/?$', 'web.views.admin.list_videos', name='list_videos'),
 
 	#url(r'^ajax/sticking/(?P<class_id>\d+)/(?P<item>[a-z]+)/(?P<item_id>\d+)/?$', 'web.views.ajax.sticky_content', name='sticky'), # CHANGE
-	#url(r'^ajax/delete/(?P<item>[a-z]+)/(?P<pk>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'), # CHANGE
+    #url(r'^ajax/delete/(?P<item>[a-z]+)/(?P<pk>\d+)/?$', 'web.views.ajax.delete_content', name='delete_content'), # CHANGE
 	url(r'^ajax/report/?$', 'web.views.home.report', name="report"),
 	                    
     # url(r'^video-submit/(?P<pk>\d+)?/?$', 'web.views.submission.video_submit', name='video_submit'),
@@ -41,8 +41,11 @@ urlpatterns = patterns('',
     url(r'^class-index/?$', 'web.views.home.class_list', name='class_index'),
     url(r'^base-category/(?P<cat_id>\d+)/?$', 'web.views.home.category', name='base_category'),
     url(r'^base-category/(?P<cat_id>\d+)/atom/(?P<atom_id>\d+)/?$', 'web.views.home.atom', name='base_atom'),
-    url(r'^content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', 
-        name="content_details"),
+    url(r'^base-category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="cat_content_details"),
+    url(r'^base-category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="atom_content_details"),
+    url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail', name="class_cat_content_details"),
+    url(r'^class/(?P<class_id>\d+)?/category/(?P<cat_id>\d+)?/atom/(?P<atom_id>\d+)?/content/(?P<pk>\d+)/?$', 'web.views.home.content_detail',
+        name="class_atom_content_details"),
     url(r'^/?$', 'web.views.home.index', name='home'),
 
     url(r'^mu-25b8a55c-a9fee579-723dcc44-9782bfc2$', 'web.views.blitz.index'),
