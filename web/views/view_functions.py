@@ -74,7 +74,7 @@ def get_context_for_atom(atom_object=None):
     
     """
     if atom_object is None:
-        context = {'content_list':[]}
+        context = {'content_list':[(),(),(),()]}
     else:
         content = atom_object.content_set.all()
         content_list = []
@@ -104,21 +104,34 @@ def get_context_for_category(category_object, context=None):
         context.update({'atoms':[]}) # Add 'atoms' to the context which has atom specific keys in it
     else:
         first_call_flag = False # If its not the first loop we don't want to convert to distinct list
+
     temp = {'atoms':category_object.child_atoms.all()}
     for atom in temp['atoms']: # Only hits dict once to get into loop
         temp.update( # Get the context for 'atom'
             get_context_for_atom(atom)
         )
-        for key in context: # Chain the keys together, chain is faster than using loops b/c it is in C
-            context[key] = chain(context[key],temp[key])
+        context_list_new = []
+        atoms_list_new = []
+        for i in range(0,4):
+            context_tuple=tuple(context["content_list"])[i] + tuple(temp["content_list"])[i]
+            context_list_new.append(context_tuple)
+        context["atoms"] = chain(context["atoms"],temp["atoms"])
+        for i in context["atoms"]:
+            atoms_list_new.append(i)
+        context["content_list"] = context_list_new
+        context["atoms"] = atoms_list_new
+        
+        #for key in context:  # Chain the keys together, chain is faster than using loops b/c it is in C
+        #    context[key] = chain(context[key],temp[key])
+
     for child in category_object.child_categories.all(): # Get content for all child categories
         get_context_for_category(child, context) #recurse
-    if first_call_flag: # Only do this on the top level of recursion
-        for key in context:
-            seq = context[key]
-            seen = set()
-            seen_add = seen.add
-            context[key]=[ x for x in seq if x not in seen and not seen_add(x)]
+    #if first_call_flag: # Only do this on the top level of recursion
+    #    for key in context:
+    #        seq = context[key]
+    #        seen = set()
+    #        seen_add = seen.add
+    #        context[key]=[ x for x in seq if x not in seen and not seen_add(x)]
             #context[key] = list(set(context[key])) # Remove duplicates
     return context # Return the context
 

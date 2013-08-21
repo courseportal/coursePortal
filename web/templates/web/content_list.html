@@ -86,13 +86,9 @@
                                 
                                 ;">
                                 {% if atom_object %}
-                                {% if c.vote_set|totalDown:atom_object > 0 %}
                                 {{ c.vote_set|totalDown:atom_object }}
-                                {% endif %}
                                 {% else %}
-                                {% if c.vote_set|totalDown > 0 %}
                                 {{ c.vote_set|totalDown }}
-                                {% endif %}
                                 {% endif %}
                             </div>
                         </div>

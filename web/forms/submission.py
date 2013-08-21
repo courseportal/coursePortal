@@ -70,7 +70,7 @@ class ContentForm(forms.ModelForm):
             self.fields['classes_stickied_in'].queryset = (
                 Class.objects.filter(
                     Q(id__in=self.user.classes_authored.all()) | 
-                    Q(id__in=user.allowed_classes.all())
+                    Q(id__in=self.user.allowed_classes.all())
                 )
             )
         else: # If the field is empty hide the field unless user.is_superuser

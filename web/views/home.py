@@ -113,7 +113,7 @@ def atom(request, cat_id, atom_id, class_id=None):
     context.update( # Add the breadcrumbs to the context
         get_breadcrumbs(request.path, web_breadcrumb_dict)
     )
-    print(get_context_for_atom(atom_object))
+    #print(get_context_for_atom(atom_object))
     context.update( # Add the atom specific content to the context
         get_context_for_atom(atom_object)
     )
