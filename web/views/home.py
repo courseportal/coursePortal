@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Count
+from django.db.models import Sum, Count
 
 from pybb.models import Forum
 from web.models import BaseCategory, Atom, Video, Exposition, \
@@ -53,8 +53,10 @@ def index(request):
     context = get_navbar_context() # Add the initial navbar content.
     top_ranked_videos = cache.get('top_ranked_videos') # Load from cache
     if top_ranked_videos is None: # If there is no cached version
-        top_ranked_videos = Video.objects.all().annotate(votes=Count('vote')).order_by('-votes')[:5]
+        print("top_ranked_videos has not been found in cache.")
+        top_ranked_videos = Video.objects.all().annotate(votes=Count('vote')).order_by('-votes')[:8]
         cache.set('top_ranked_videos', top_ranked_videos, 60*10) # Set cache
+        
     context.update({ # Add 'top_ranked_videos' to context
         'top_ranked_videos': top_ranked_videos,
     })

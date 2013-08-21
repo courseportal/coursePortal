@@ -46,7 +46,7 @@ OPTIONAL context:
 					{{ example.owner }}
 				</td>
 				<td>
-					<div id="votes-sum-example-{{ example.id }}">
+					<div id="votes-sum-example-{{ example.id }}" style="text-align: center">
   					{% if atom_object %}
               {{ example.vote_set|total:atom_object }}
             {% else %}
@@ -54,6 +54,38 @@ OPTIONAL context:
             {% endif %}
 						
 					</div>
+                    <div class="progress">
+                        <div class="bar bar-success" id="sparkbar-likes-example-{{ example.id }}" style="width:
+                            
+                            {% if atom_object %}
+                            {{ example.vote_set|totalUpPercentage:atom_object }}%
+                            {% else %}
+                            {{ example.vote_set|totalUpPercentage }}%
+                            {% endif %}
+                            
+                            ;">
+                            {% if atom_object %}
+                            {{ example.vote_set|totalUp:atom_object }}
+                            {% else %}
+                            {{ example.vote_set|totalUp }}
+                            {% endif %}
+                        </div>
+                        <div class="bar bar-danger" id="sparkbar-dislikes-example-{{ example.id }}" style="width:
+                            
+                            {% if atom_object %}
+                            {{ example.vote_set|totalDownPercentage:atom_object }}%
+                            {% else %}
+                            {{ example.vote_set|totalDownPercentage }}%
+                            {% endif %}
+                            
+                            ;">
+                            {% if atom_object %}
+                            {{ example.vote_set|totalDown:atom_object }}
+                            {% else %}
+                            {{ example.vote_set|totalDown }}
+                            {% endif %}
+                        </div>
+                    </div>
 				</td>
 				<td>
 					<!-- Button to trigger modal -->

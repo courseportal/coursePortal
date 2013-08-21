@@ -43,7 +43,7 @@
                 {% if forum_tab == True %}<li {%ifequal active_tab "forum" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Forum</a></li>{% endif %}
                 {% if topic_tab == True %}<li {%ifequal active_tab "topic" %}class="active"{% endifequal %}><a href="#tab5" data-toggle="tab">Topic</a></li>{% endif %}
                 {% if post_tab == True %}<li {%ifequal active_tab "post" %}class="active"{% endifequal %}><a href="#tab6" data-toggle="tab">Post</a></li>{% endif %}
-                {% if note_tab == True %}<li {%ifequal active_tab "lecturenote" %}class="active"{% endifequal %}><a href="#tab7" data-toggle="tab">Note</a></li>{% endif %}
+                {% if note_tab == True %}<li {%ifequal active_tab "note" %}class="active"{% endifequal %}><a href="#tab7" data-toggle="tab">Note</a></li>{% endif %}
                 {% if example_tab == True %}<li {%ifequal active_tab "example" %}class="active"{% endifequal %}><a href="#tab8" data-toggle="tab">Example</a></li>{% endif %}
                 {% if expo_tab == True %}<li {%ifequal active_tab "expo" %}class="active"{% endifequal %}><a href="#tab9" data-toggle="tab">Exposition</a></li>{% endif %}
             </ul>
@@ -122,7 +122,7 @@
                 </div>
                 {% endif %}
                 {% if note_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "lecturenote" %}active{% endifequal %}" id="tab7">
+                <div class="tab-pane {%ifequal active_tab "note" %}active{% endifequal %}" id="tab7">
                     <p><b>Note:</b><br>Lecture Note results will always be returned with "table sort by scores" appended..</p>
                     <table id="notes" class="tablesorter">
                         <thead>

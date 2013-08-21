@@ -19,9 +19,34 @@ I list top_ranked_videos as required because without it this will display some n
 {% load my_filters %}
 
 <div class="tab-content">
-{% for video in top_ranked_videos %}
-<p><a class="view-video" data-sid="{{ video.id }}" data-vid="{{ video.video }}" id="{{ video.video }}" href="#">{{ video }}</a> <small>({{ video.votes }})</small></p>
-{% endfor %}
+    
+    <div class="row-fluid" >
+    {% for video in top_ranked_videos|slice:"0:3" %}
+    
+    <div class="span4">
+    <div id="Video" style="">
+        <a href="#" data-sid="{{ video.id }}" data-vid="{{ video.video }}"><img style="margin-bottom: 5px;display: block;
+            margin: 0 auto;" class="view-video" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="220" alt="Video Thumbnail" /></a>
+    </div>
+    <div style="text-align:center;">
+    <a class="view-video" data-sid="{{ video.id }}" data-vid="{{ video.video }}" id="{{ video.video }}" href="#" >{{ video }}</a> <small>({{ video.votes }})</small>
+    </div>
+    </div>
+    {% endfor %}
+        <div class="row-fluid" style="margin-top: 50px;">
+            {% for video in top_ranked_videos|slice:"3:6" %}
+            
+            <div class="span4" style="margin-top: 20px;">
+                <div id="Video" >
+                    <a href="#" data-sid="{{ video.id }}" data-vid="{{ video.video }}"><img style="margin-bottom: 5px;display: block;
+                        margin: 0 auto;" class="view-video" src="https://img.youtube.com/vi/{{ video.video }}/default.jpg" width="220" alt="Video Thumbnail" /></a>
+                </div>
+                <div style="text-align:center;">
+                    <a class="view-video" data-sid="{{ video.id }}" data-vid="{{ video.video }}" id="{{ video.video }}" href="#">{{ video }}</a> <small>({{ video.votes }})</small>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
 </div>
 <script>
 {% comment %}
@@ -49,7 +74,7 @@ $(document).ready(function() {
       );
       $('#global_modal').modal().css({
         'margin-top': function () {
-          return -($(this).height() / 2);
+          return -($(this).height() / 16);
         },
         width:'auto',
         'margin-left':function(){

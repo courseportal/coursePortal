@@ -11,3 +11,17 @@ class VoteManager(models.Manager):
         else:
             votes = self.all()
         return sum([v.vote for v in votes])
+
+    def totalUp(self,atom=None):
+        if atom is not None:
+            votesUp = self.filter(atom=atom)
+        else:
+            votesUp = self.all()
+        return sum([v.voteUp for v in votesUp])
+
+    def totalDown(self,atom=None):
+        if atom is not None:
+            votesDown = self.filter(atom=atom)
+        else:
+            votesDown = self.all()
+        return sum([v.voteDown for v in votesDown])

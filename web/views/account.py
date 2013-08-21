@@ -25,6 +25,8 @@ def index(request):
     if request.method == 'POST':
         if request.POST.get('action') == 'password': # Password form processing
             password_form = ChangePasswordForm(request.POST)
+            username_form = ChangeUsernameForm()
+            delete_account_form = DeleteAccountForm()
             if (password_form.is_valid() and
                     password_form.cleaned_data['new_password'] == 
                     password_form.cleaned_data['new_password_confirm']):
@@ -55,6 +57,8 @@ def index(request):
                 )
         elif request.POST.get('action') == 'username':#Username form processing
             username_form = ChangeUsernameForm(request.POST)
+            password_form = ChangePasswordForm()
+            delete_account_form = DeleteAccountForm()
             if username_form.is_valid():
                 user = User.objects.get(pk=request.user.id)
                 list_with_username = User.objects.filter(
@@ -86,6 +90,8 @@ def index(request):
 
         elif request.POST.get('action') == 'delete_account':#delete form
             delete_account_form = DeleteAccountForm(request.POST)
+            password_form = ChangePasswordForm()
+            username_form = ChangeUsernameForm()
             if delete_account_form.is_valid():
                 user = User.objects.get(pk=request.user.id)
                 if (user and delete_account_form.cleaned_data['confirmation'] 
@@ -222,50 +228,50 @@ def register(request):
             ).exists()
             if email_exists:
                 messages.warning(request, _('Could not register you. Email is '
-                    'already registered.')
-                )
-            if (form.cleaned_data['password'] != 
-                    form.cleaned_data['password_confirmation']):
-                messages.warning(request, _('Passwords did not match. Please '
-                    'try again.')
-                )
+					'already registered.')
+				)
+            if (form.cleaned_data['password'] !=
+					form.cleaned_data['password_confirmation']):
+				messages.warning(request, _('Passwords did not match. Please '
+					'try again.')
+				)
             elif not email_exists:
                 user = User.objects.create_user(
                     form.cleaned_data['email'], form.cleaned_data['email'],
                     form.cleaned_data['password']
-                )
+				)
                 user.first_name = form.cleaned_data['firstname']
                 user.last_name = form.cleaned_data['lastname']
+                user.username = form.cleaned_data['username']
                 user.is_active = False
                 user.save()
                 m = hashlib.md5()
-                m.update(str(user.email) + 
-                    str(user.date_joined).split('.')[0].split('+')[0])
+                m.update(user.email + str(user.date_joined).split('.')[0])
                 send_mail(
-                    subject=_('KnoAtom Registration'), 
-                    message=(_('You have successfully registered at '
-                        'knoatom.eecs.umich.edu with the username ') + 
-                        user.username +
-                         _('. Please validate your account by going to ')+ 
-                         request.build_absolute_uri('validate')+'?email='+ 
-                         user.email + '&validation=' + m.hexdigest() + 
-                         _(' . If you did not process this registration, '
-                        'please contact us as soon as possible.\n\n-- The '
-                        'Management')
-                    ),
-                    from_email='knoatom-noreply@gmail.com', 
-                    recipient_list=[user.email, settings.EMAIL_HOST_USER], 
-                    fail_silently=False
-                )
+					subject=_('KnoAtom Registration'), 
+					message=(_('You have successfully registered at '
+						'knoatom.eecs.umich.edu with the username ') + 
+						user.username +
+						 _('. Please validate your account by going to ')+ 
+					 	request.build_absolute_uri('validate')+'?email='+ 
+					 	user.email + '&validation=' + m.hexdigest() + 
+					 	_(' . If you did not process this registration, '
+						'please contact us as soon as possible.\n\n-- The '
+						'Management')
+					),
+					from_email='knoatom-noreply@gmail.com', 
+					recipient_list=[user.email, settings.EMAIL_HOST_USER],
+					fail_silently=False
+				)
                 messages.success(request, _('You have been registered. Please '
-                    'login to continue.')
-                )
+					'login to continue.')
+				)
                 return HttpResponseRedirect(reverse('login'))
-        
+		
         messages.warning(request, _('Could not register you. Try again.'))
     else: # Request is GET
         form = RegisterForm()
-    
+	
     context = get_breadcrumbs(request.path, web_breadcrumb_dict)
     context.update({'register_form':form})
     return render(request, 'web/account/register.html', context)

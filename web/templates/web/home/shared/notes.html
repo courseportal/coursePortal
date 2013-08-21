@@ -44,7 +44,7 @@ OPTIONAL context:
 					{{ note.owner }}
 				</td>
 				<td>
-					<div id="votes-sum-note-{{ note.id }}">
+					<div id="votes-sum-note-{{ note.id }}" style="text-align: center">
   					{% if atom_object %}
               {{ note.vote_set|total:atom_object }}
             {% else %}
@@ -52,6 +52,42 @@ OPTIONAL context:
             {% endif %}
 						
 					</div>
+                    <div class="progress">
+                        <div class="bar bar-success" id="sparkbar-likes-note-{{ note.id }}" style="width:
+                            
+                            {% if atom_object %}
+                            {{ note.vote_set|totalUpPercentage:atom_object }}%
+                            {% else %}
+                            {{ note.vote_set|totalUpPercentage }}%
+                            {% endif %}
+                            
+                            ;">
+                            {% if atom_object %}
+                            {{ note.vote_set|totalUp:atom_object }}
+                            {% else %}
+                            {{ note.vote_set|totalUp }}
+                            {% endif %}
+                        </div>
+                        <div class="bar bar-danger" id="sparkbar-dislikes-note-{{ note.id }}" style="width:
+                            
+                            {% if atom_object %}
+                            {{ note.vote_set|totalDownPercentage:atom_object }}%
+                            {% else %}
+                            {{ note.vote_set|totalDownPercentage }}%
+                            {% endif %}
+                            
+                            ;">
+                            {% if atom_object %}
+                            {% if note.vote_set|totalDown:atom_object > 0 %}
+                            {{ note.vote_set|totalDown:atom_object }}
+                            {% endif %}
+                            {% else %}
+                            {% if note.vote_set|totalDown > 0 %}
+                            {{ note.vote_set|totalDown }}
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
 				</td>
 				<td>
 					<!-- Button to trigger modal -->
