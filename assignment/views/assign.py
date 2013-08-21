@@ -70,7 +70,6 @@ def instantiate(request):
     except:
         pass
 
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     data=json.loads(assignment.data)
     for u in users:
         instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=assignment.start_date, due_date=assignment.due_date)

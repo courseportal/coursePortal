@@ -141,7 +141,13 @@ name,type,default
 		*Other features listed here: https://pypi.python.org/pypi/pysandbox
 	*Signal module is used to limit runtime of code to 5 seconds. After 5 seconds, SAGALRM is signalled
 	*resource module is used to limit memory consumption to 3mb on the stack and 3mb on the heap. MemoryError is thrown otherwise
-	TODO: Time and memory limits need to be tested on the server itself.
+
 8/15/2013:
 *Small improvements to question creation
 *introduction of ajax calls to protect against pages being refreshed in certain areas
+
+8/19/2013:
+*Various bugfixes
+
+8/20/2013:
+*Changed how questions are loaded

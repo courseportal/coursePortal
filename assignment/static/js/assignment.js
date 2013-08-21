@@ -62,6 +62,7 @@ function init(){
 	   },
 	});
 
+	$('.icon-eye-open').popover({trigger:'manual', placement:'left'});
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 }
@@ -176,17 +177,20 @@ function iframe_preview(qid){
   previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
   var ID="#";
   ID+=qid;
-  $(ID).attr("class", "icon-eye-close");
-  $(ID).attr("onclick", "iframe_close("+qid+")");
-  $(".preview-area").append(previewHTML)
+  $(ID).children('.icon-eye-open').data('popover').tip().find('.popover-content').empty().append(previewHTML);
+  $(ID).children('.icon-eye-open').popover('show');
+  $(ID).children('.icon-eye-open').attr("onclick", "iframe_close("+qid+")");
+  $(ID).children('.icon-eye-open').attr("class", "icon-eye-close");
+  //$(".preview-area").append(previewHTML);
 }
 
 function iframe_close(qid){
   var ID = "#";
   ID+=qid;
-  $("#iframepreview"+qid).remove();
-  $(ID).attr("class", "icon-eye-open");
-  $(ID).attr("onclick", "iframe_preview("+qid+")");
+  //$("#iframepreview"+qid).remove();
+  $(ID).children('.icon-eye-close').popover('hide');
+  $(ID).children('.icon-eye-close').attr("onclick", "iframe_preview("+qid+")");
+  $(ID).children('.icon-eye-close').attr("class", "icon-eye-open");
 }
 
 function loadExisting(){
@@ -194,17 +198,18 @@ function loadExisting(){
 	var questionHTML='';
 	//Close modal box
 	$('#loading-modal').modal('hide')
-	//Loop through selected elements
+	//Close any open previews
 	$('.icon-eye-close').each(function(){
+		iframe_close($(this).parent().attr("id"));
+	});	
+	//Loop through selected elements
+	$('.load-selector:checked').each(function(){
+		$(this).removeProp('checked');
 		ID='#';
-		ID+=$(this).attr("id");
-		//reset preview, eye
-		$(ID).attr("class", "icon-eye-open");
-  		$(ID).attr("onclick", "iframe_preview("+$(this).attr("id")+")")
-  		$("#iframepreview"+$(this).attr("id")).remove();
+		ID+=$(this).parent().attr("id");
 		//append question data to list
 		num = $('#questionsList').children().length+1;
-		questionHTML=questionstring(num, $(ID+"title").attr("value"), $(this).attr('id'));
+		questionHTML=questionstring(num, $(ID+"title").attr("value"), $(this).parent().attr('id'));
 		$('#questionsList').append(questionHTML);
 	});
 }

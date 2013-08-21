@@ -91,7 +91,7 @@ def choose_atom(request, messages=False):
 
 def practice(request, id):
     context = get_breadcrumbs(request.path)
-    question_list = Atom.objects.get(id=id).related_questions.all()
+    question_list = Atom.objects.get(id=id).related_questions.filter(isCopy=False)
     count = question_list.count()
     if count==0:
         messages = ['No Questions related to that atom!']

@@ -128,7 +128,7 @@ MathJax.Hub.Config({
 	</div>
 
 <!-- question load modal -->
-<div id="loading-modal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel">
+<div id="loading-modal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" style='Width:750px'>
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">x</button>
 		<h3 id="myModalLabel">Questions</h3>
@@ -148,7 +148,15 @@ MathJax.Hub.Config({
 	   			<td id="{{question.id}}title" value="{{ question.title }}">{{ question.title }}</td>
 				<td>{%for atom in question.get_atoms %}{{atom}},{%endfor%}</td>
 				<td>{{question.get_rating}}</td>
-				<td><i id="{{question.id}}" class="icon-eye-open" onclick="iframe_preview({{question.id}})"></i></a></td>
+				<td id="{{question.id}}">
+					<input type='checkbox' class='load-selector'></input>
+					<i 
+						class="icon-eye-open" 
+						onclick="iframe_preview({{question.id}})" 
+						rel="popover" 
+						data-original-title="{{question.title}}">
+					</i>
+				</td>
 			</tr>
 			{% endfor %}
 		</tbody>  

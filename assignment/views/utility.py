@@ -52,8 +52,8 @@ def validate(request):
 def validateFull(request):
 	#Limit runtime, feature only useable in unix environment
 	if not sys.platform.startswith('win'):
-		signal.signal(signal.SIGALRM, timehandler)
-		signal.alarm(5) #will signal SIGALRM in 5 seconds
+		#signal.signal(signal.SIGALRM, timehandler)
+		#signal.alarm(5) #will signal SIGALRM in 5 seconds
 		resource.setrlimit(resource.RLIMIT_STACK, (3145728, 3145728)) #limit stack to 3mb
 		resource.setrlimit(resource.RLIMIT_DATA, (3145728, 3145728)) #limit heap to 3mb
 	#Set sandbox environment

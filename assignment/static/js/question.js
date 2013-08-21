@@ -219,7 +219,6 @@ function validateAndSubmit(){
 		code:tempCode.replace(/\$/g,'')
 	}
 	var reply
-	//Ajax call to test full code
 	$.ajax('/assignment/utility/validateFull/', {
 		type: 'GET',
 		async: false,
@@ -359,8 +358,8 @@ function inputChange(questionType){
 	$('#choice_input').html('');
 	if(questionType == "True/False"){
 		html=
-			"<input type='radio' name='answer' id='tfTrue' value='true' checked>True</input>\
-			<input type='radio' name='answer' id='tfFalse' value='false'>False</input>";
+			"<input type='radio' name='answer' id='tfTrue' value='True' checked>True</input>\
+			<input type='radio' name='answer' id='tfFalse' value='False'>False</input>";
 		$('#answer_input').html(html);
 	}else if(questionType == "Short Answer"){
 		html=
@@ -384,7 +383,7 @@ function initialInput(type, solution, choices){
 	if(type != 'True/False'){
 		$('#answer_input').children('[name="answer"]').attr('value', solution);
 	}
-	else if(solution == 'true'){
+	else if(solution == 'True'){
 		$('#tfTrue').prop('checked', true);
 	}
 	else{
