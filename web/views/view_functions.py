@@ -111,6 +111,7 @@ def get_context_for_category(category_object, context=None):
             get_context_for_atom(atom)
         )
         context_list_new = []
+        content_list_final = []
         atoms_list_new = []
         for i in range(0,4):
             context_tuple=tuple(context["content_list"])[i] + tuple(temp["content_list"])[i]
@@ -118,9 +119,15 @@ def get_context_for_category(category_object, context=None):
         context["atoms"] = chain(context["atoms"],temp["atoms"])
         for i in context["atoms"]:
             atoms_list_new.append(i)
+
         context["content_list"] = context_list_new
         context["atoms"] = atoms_list_new
-        
+        for i in range(0,4):
+            content_list_set = set(tuple(context["content_list"])[i])
+            content_list_final.append(tuple(content_list_set))
+        context["content_list"] = content_list_final
+
+
         #for key in context:  # Chain the keys together, chain is faster than using loops b/c it is in C
         #    context[key] = chain(context[key],temp[key])
 
