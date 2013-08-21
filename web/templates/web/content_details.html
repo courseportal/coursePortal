@@ -5,7 +5,11 @@
 {% load my_filters %}
 {% load vote_filters %}
 
-<h2>{{ content_object.title }} Details<a href="{% url 'submit_content' content_object.id %}"><button class="btn" id="edit-content" style="float:right;">edit</button></a></h2>
+<h2>{{ content_object.title }} Details
+    {% if user.is_superuser or content_object.owner == user %}
+    <a href="{% url 'submit_content' content_object.id %}"><button class="btn" id="edit-content" style="float:right;">edit</button></a>
+    {% endif %}
+</h2>
 <h4>Compiled by {{ content_object.owner }}</h4>
 <br >
 <div class="tabbable">

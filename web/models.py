@@ -195,7 +195,8 @@ class Class(WebBaseModel):
         User,
         verbose_name=_('Instructors'),
         blank=True,
-        related_name='allowed_classes'
+        related_name='allowed_classes',
+        help_text=_('Creater of the class will be automatically added as instructor.'),
     )
     students = models.ManyToManyField(
         User,

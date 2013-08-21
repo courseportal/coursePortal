@@ -63,12 +63,11 @@ class ClassForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(ClassForm, self).__init__(*args, **kwargs)
         if self.instance.pk is None:
-            self.fields['instructors'].queryset = User.objects.exclude(
-                id=self.user.id)
+            self.fields['instructors'].queryset = User.objects.all()
+            #exclude(id=self.user.id)
         else:
-            self.fields['instructors'].queryset = User.objects.exclude(
-                pk=self.instance.owner.pk)
-        self.fields['instructors'].required = False
+            self.fields['instructors'].queryset = User.objects.all()
+            #self.fields['instructors'].required = False
 
     class Meta:
         r"""Set the model the form is attached to and select the fields."""
