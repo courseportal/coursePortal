@@ -10,7 +10,6 @@ urlpatterns = patterns('',
     url(r'^forgot-password/?$', 'web.views.account.forgot_password', name='forgot_password'),
     url(r'^account/?$', 'web.views.account.index', name='account'),
 
-
     url(r'^batch-add/?$', 'web.views.admin.batch_add', name='batch_add'),
 
 	url(r'^ajax/report/?$', 'web.views.home.report', name="report"),

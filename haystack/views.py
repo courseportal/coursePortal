@@ -149,7 +149,7 @@ class SearchView(object):
                 link_tab = True
             if result.model_name == 'uploadedfile':
                 file_tab = True
-        print(file_tab)
+
 
         if page.object_list:
             active_tab = page.object_list[0].model_name

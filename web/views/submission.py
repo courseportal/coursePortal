@@ -1,19 +1,125 @@
 import json
+import csv
+import os
+import hashlib
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import (HttpResponse, HttpResponseRedirect,   
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseForbidden)
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.template import RequestContext, loader
+
+from web.forms.edit_class import DataImportForm
+from knoatom.settings.development import MEDIA_ROOT
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from datetime import datetime
+from django.conf import settings
+from django.core.mail import send_mail, BadHeaderError
 
 from web.forms.submission import (ContentForm, YoutubeVideoForm, LinkForm, 
     UploadedFileForm)
 from knoatom.view_functions import get_breadcrumbs, render_to_json_response
 from web.views.view_functions import get_navbar_context, web_breadcrumb_dict
-from web.models import Content, YoutubeVideo, Link, UploadedFile
+from web.models import Content, YoutubeVideo, Link, UploadedFile, Class
+from django.contrib.auth.models import User
+
+def handle_uploaded_file(f, request, classId):
+    with open(f,'Ub') as csvfile:
+        datareader = csv.reader(csvfile, delimiter=',')
+        rownum = 0
+        for row in datareader:
+            if rownum == 0:
+                rownum +=1
+            else:
+                try:
+                    exist_user = User.objects.get(email__exact=row[3])
+                except User.DoesNotExist:
+                    exist_user = None
+                if not exist_user:
+                    password = User.objects.make_random_password()
+                    created_user = User.objects.create_user(
+                                                            row[3], row[3],
+                                                            password,
+                                                            )
+                    
+                    User.objects.filter(email=row[3]).update(first_name = row[0],last_name = row[1], username = row[2], is_active = False, date_joined=datetime.now())
+                    
+                    ClassIn = Class.objects.get(id=classId)
+                    created_user.enrolled_classes.add(ClassIn)
+                    
+                    m = hashlib.md5()
+                    m.update(created_user.email + str(created_user.date_joined).split('.')[0])
+                    send_mail(
+                                  subject=_('KnoAtom Registration and Class Enrollment for[' + ClassIn.title + ']'),
+                                  message=(_('You have successfully registered at '
+                                             'knoatom.eecs.umich.edu with the username: ') +
+                                           created_user.username + ' and default password: ' + password +
+                                           _('. Please validate your account by going to http://')+
+                                           request.META['HTTP_HOST']+'/validate?email='+
+                                           created_user.email + '&validation=' + m.hexdigest() +
+                                           _(' . If you did not process this registration, '
+                                             'please contact us as soon as possible.\n\n-- The '
+                                             'Management')
+                                           ),
+                                  from_email='knoatom-noreply@gmail.com',
+                              recipient_list=[created_user.email],     # settings.EMAIL_HOST_USER
+                                  fail_silently=False
+                                  )
+                else:
+                    ClassIn = Class.objects.get(pk=classId)
+                    try:
+                        exist_ClassIn = exist_user.enrolled_classes.get(pk=classId)
+                    except Class.DoesNotExist:
+                        exist_ClassIn = None
+                    if not exist_ClassIn:
+                        exist_user.enrolled_classes.add(ClassIn)
+                        send_mail(
+                                      subject=_('Class Enrolled'),
+                                      message=(_('You have successfully enrolled ' + ClassIn.title +
+                                                 'at knoatom.eecs.umich.edu with the username: ') +
+                                               exist_user.username +
+                                               _(' . If you have not enrolled in the class, '
+                                                 'please contact us as soon as possible.\n\n-- The '
+                                                 'Management')
+                                               ),
+                                      from_email='knoatom-noreply@gmail.com',
+                                      recipient_list=['tyan@umich.edu'],     # settings.EMAIL_HOST_USER
+                                      fail_silently=False
+                                      )
+                rownum += 1
+
+
+@login_required()
+def upload_file(request, classId):
+    if request.method == 'POST':
+        form = DataImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = request.FILES['file']
+            path = default_storage.save('tmp/data.csv', ContentFile(data.read()))
+            tmp_file = os.path.join(MEDIA_ROOT, path)
+            classId = request.POST['classId']
+            handle_uploaded_file(tmp_file, request, classId)
+            os.remove(tmp_file)
+            default_storage.delete(path)
+        #   messages.success(request,"Successfully uploaded.")
+        #context = {
+        #        'form': form,
+        #     }
+        #return render(request, 'web/upload.html', context)
+    #else:
+        #form = DataImportForm()
+        #context = {
+        #      'form': form,
+        #     }
+        #return render(request, 'web/upload.html', context)
+
+
+
+
 
 @login_required()
 def delete_content(request):

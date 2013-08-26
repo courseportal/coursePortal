@@ -5,6 +5,11 @@ from web.models import Class, ClassCategory, WebBaseModel
 from django.core.exceptions import ValidationError
 
 
+class DataImportForm(forms.Form):
+    file = forms.FileField()
+    classId = forms.IntegerField(widget=forms.widgets.HiddenInput,
+                                 required=False)
+
 class CategoryForm(forms.ModelForm):
     r"""
     Form for category editing or creation creation from within a class editing view.

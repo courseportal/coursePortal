@@ -26,8 +26,17 @@ BLOCKS(Including inherited blocks):
 
 -->
 {% endcomment %}
-{% block content %}
 
+{% block page_title %}
+<div class="page-header">
+    <span style="font-size: 200%;font-weight:bold;">Class List </span>
+    {% if user.is_staff or user.is_superuser %}
+    <span style="float:right"><a href="{% url 'admin:app_list' app_label='web' %}">[Log into Admin Site..]</a></span>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
 <div id="table">
 	<table class="tablesorter">{# The other classes are set in the tablesorter.settings.js file #}
 		<thead>

@@ -1,10 +1,10 @@
 import re
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
 import string
+from web.models import User
 
 def validate_umich_email(value):
     regex_umich_email = re.compile('\w*@umich.edu')
@@ -15,6 +15,9 @@ def validate_username(value):
     pattern = r'[^\_a-zA-Z0-9]'
     if re.search(pattern, value):
         raise ValidationError(u'%s is not valid username.' % value)
+
+
+
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(max_length=100, required=True)

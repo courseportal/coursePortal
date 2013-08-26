@@ -15,6 +15,7 @@ from web.forms.edit_class import CategoryForm
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
 
+
 # class ExpositionAdmin(admin.ModelAdmin):
 #     exclude = ('owner',)
 #     
@@ -265,6 +266,7 @@ class ClassAdmin(admin.ModelAdmin):
 #         if not video.isalnum() or not len(video)==11:
 #             raise forms.ValidationError("Something wrong with the 11 character VIDEO_ID!")
 #         return cleaned_data
+
 
 #admin.site.register(Example, ExampleAdmin)
 admin.site.register(BaseCategory,BaseCategoryAdmin)
