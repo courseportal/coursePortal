@@ -5,8 +5,9 @@
 <h2>{{ title }}</h2>
 {% if content_list %}
 <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab_atom_index" data-toggle="tab">Description</a></li>
     {% for type in content_types %}
-    <li class="{% if forloop.first %}active{% endif %}">
+    <li class="{#{% if forloop.first %}active{% endif %}#}">
         <a href="#tab{{ type.0 }}" data-toggle="tab">
             {{ type.1 }}
         </a>
@@ -14,9 +15,20 @@
     {% endfor %}
 </ul>
 <div class="tab-content">
+    <div id="tab_atom_index" class="tab-pane active">
+        {% if atom_object %}
+            {% autoescape off %}
+                {{ atom_object.summary }}
+            {% endautoescape %}
+        {% else %}
+            {% autoescape off %}
+                {{ category_object.summary }}
+            {% endautoescape %}
+        {% endif %}
+	</div>
     {% for type in content_types %}
     {% with forloop.counter0 as i %}
-    <div id="tab{{ type.0 }}" class="tab-pane {% if forloop.first %}active{% endif %}">
+    <div id="tab{{ type.0 }}" class="tab-pane {#{% if forloop.first %}active{% endif %}#}">
         <table id="table-{{ type.0 }}" class="table">
             <thead>
                 <tr class="head-row">
@@ -126,8 +138,11 @@
 {% else %}
 <p>There is currently no content to list.  Feel free to submit some.</p>
 {% endif %}
-
+<hr>
 <div id="disqus_thread"></div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
     var disqus_shortname = 'cportalnt'; // required: replace example with your forum shortname

@@ -36,7 +36,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         r"""Set the model it is attached to and select the fields."""
         model = ClassCategory
-        fields=('title', 'parent_categories', 'child_atoms')
+        fields=('title', 'parent_categories', 'child_atoms','summary')
         
     def clean_parent_categories(self):
         data = self.cleaned_data

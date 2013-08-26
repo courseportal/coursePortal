@@ -13,6 +13,7 @@ from knoatom.view_functions import get_breadcrumbs, render_to_json_response
 from web.views.view_functions import get_navbar_context, \
 get_context_for_category, web_breadcrumb_dict, get_parent_categories, \
 get_context_for_atom, has_class_access
+
     
 def report(request):
     r"""View for processing the report form. It only accepts AJAX requests."""
