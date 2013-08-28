@@ -42,18 +42,18 @@ MathJax.Hub.Config({
 <form action='{% url "create_question" %}' id="questionForm" method="POST">
 {% csrf_token %}
 	{% if question %}<input type="hidden" id='qid' name='qid' value="{{question.id}}"></input>{% endif %}
-	Title:<input type='text' name='question_title' value="{{question.title}}"></input>
+	Title:<input type='text' id='question_title' name='question_title' value="{{question.title}}"></input>
 	<textarea id="problemText" title="Problem text">{{qdata.text}}</textarea><br>
 	<div class="row-fluid">
 		<div id='left' class="span6">
 			<a href="#variable-zone" role="button" data-toggle="modal" class="btn">Variables</a><br>
-			Question Type:<select onchange="inputChange($(this).val());" name="question_type">
-				<option value="Short Answer" selected>Short Answer</option>
-				<option value="True/False">True/False</option>
-				<option value="Multiple Choice">Multiple Choice</option>
-			</select><br>
-			Answer:<br><div id='answer_input'><input type='text' name='answer' placeholder='answer'></input></div>
-			Choices:<br><div id='choice_input'></div>
+		    Question Type:<select onchange="inputChange($(this).val());" name="question_type">
+		      <option value="Short Answer" selected>Short Answer</option>
+		      <option value="True/False" {%ifequal "True/False" qdata.question_type%}selected{%endifequal%}>True/False</option>
+		      <option value="Multiple Choice"{%ifequal "Multiple Choice" qdata.question_type%}selected{%endifequal%}>Multiple Choice</option>
+		    </select><br>
+	    Answer:<br><div id='answer_input'><input type='text' name='answer' placeholder='answer'></input></div>
+	    Choices:<br><div id='choice_input'></div>
 		</div>
 		<div id="right" class="span6">
 			Custom code area:<br>

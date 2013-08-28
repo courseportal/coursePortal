@@ -5,6 +5,7 @@ from django.forms import ModelForm, Textarea
 from django.utils import simplejson as json
 from django.utils import timezone
 import web.models
+import signal
 
 class Question(models.Model):
     title = models.CharField(max_length=200)

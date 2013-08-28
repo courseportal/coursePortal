@@ -17,7 +17,7 @@
     <tbody>
    	{% for q in question_list %}
    		<tr class="assignment-row">
-   			<td><a href='{% url "edit_question" a.id%}'>{{ q.title }}</a></td>
+   			<td><a href='{% url "edit_question" q.id%}'>{{ q.title }}</a></td>
 			<td>{% for atom in q.get_atoms %}{{atom}}, {%endfor%}</td>
 			<td>{{q.instances.all.count}}</td>
 		</tr>
