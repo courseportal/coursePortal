@@ -535,14 +535,14 @@ def add_note_rate(sender, **kwargs):
 		user_rate.save()
 
 @receiver(pre_delete, sender=Topic)
-def delete_exposition_rate(sender, **kwargs):
+def delete_topic_rate(sender, **kwargs):
     """
         This adds the functionality to remove the file upon deletion.
-    """
+        """
     user_rate = UserRating.objects.get(user=kwargs['instance'].user)
     user_rate.TopicRating -= topic_object_delta_rating()
     user_rate.rating -= topic_object_delta_rating()
-    user_vote = VoteTopic.objects.filter(example=kwargs['instance'])
+    user_vote = Vote.objects.filter(topic=kwargs['instance'])
     for v in user_vote:
         if v.vote == vote_up_delta_rating():
             user_rate.VoteUp -= vote_up_delta_rating()

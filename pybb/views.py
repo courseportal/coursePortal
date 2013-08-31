@@ -448,6 +448,8 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
     
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
+        print("I am in PostView function in pybb.")
+        print(self.kwargs)
         if not perms.may_view_post(self.request.user, post):
             raise PermissionDenied
         count = post.topic.posts.filter(created__lt=post.created).count() + 1

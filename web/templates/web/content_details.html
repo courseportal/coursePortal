@@ -7,7 +7,7 @@
 
 <h2>{{ content_object.title }} Details
     {% if user.is_superuser or content_object.owner == user %}
-    <a href="{% url 'submit_content' content_object.id %}"><button class="btn" id="edit-content" style="float:right;">edit</button></a>
+    <a href="{% url 'submit_content' content_object.id %}"><button class="btn" id="edit-content" style="float:right;">Edit Content</button></a>
     {% endif %}
 </h2>
 <h4>Compiled by {{ content_object.owner }}</h4>

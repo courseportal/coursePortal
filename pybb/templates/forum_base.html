@@ -29,6 +29,7 @@ Base for the forums
 
 {% extends "base.html" %}
 
+
 {% block message %}
 	{% if messages %}
 		<ul class="messages">
@@ -38,3 +39,15 @@ Base for the forums
 		</ul>
 	{% endif %}
 {% endblock %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+{% block javascript %}
+{{ block.super }}
+<script>
+    $(document).ready(function() {
+                      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+                      });
+
+</script>
+{% endblock javascript %}

@@ -11,6 +11,7 @@ from django.conf import settings
 # Import ForumInlineAdmin
 from pybb.models import Forum, Category
 from web.forms.edit_class import CategoryForm
+import autocomplete_light
 
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
@@ -83,7 +84,6 @@ class AtomAdmin(admin.ModelAdmin):
         Admin for the Atom model, automatically creates/updates/deletes the coorsponding forum when the Atom gets created/updated/deleted.
     """
     #inlines = [ExposInline, LecNoteInline, ExampleInline]
-    
 
     def save_model(self, request, obj, form, change):
         """

@@ -89,7 +89,7 @@ class Content(WebBaseModel):
         blank=True,
     )
     content_type = models.CharField(max_length="50", choices=CONTENT_TYPES)
-    atoms = models.ManyToManyField(Atom)
+    atoms = models.ManyToManyField(Atom, blank=True)
     classes_stickied_in = models.ManyToManyField(
         "Class",
         blank=True,
