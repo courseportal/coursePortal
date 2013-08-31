@@ -43,7 +43,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% block navbar_content %}
 
-{% if user.is_staff %}
+{% if user.is_staff  or user.is_superuser %}
   <li class="nav-header">My Class</li>
   <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
   <li><a href='{%url "edit_assignment_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</a> 
@@ -71,7 +71,7 @@ I have changed this file a bit, you should use this as the template you extend. 
   <li class="divider"></li>
 {% endif %}
 
-{% if user.is_active %}
+{% if user.is_active or user.is_superuser %}
   <li class="nav-header">Student Affairs</li>
   <li class="{% if grade_check == 1 %}active{%endif%}">
   <a href="{% url "grades" %}">View grades</a></li>

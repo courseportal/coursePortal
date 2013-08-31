@@ -62,9 +62,7 @@ function init(){
 	   },
 	});
 
-	//initalize datepickers
-	$('#assigndate').datepicker({ dateFormat: "yy-mm-dd" });
-	$('#duedate').datepicker({ dateFormat: "yy-mm-dd" });
+	$('.icon-eye-open').popover({trigger:'manual', placement:'left'});
 	//Element attributes set
 	$( '#opener' ).attr('onclick', "load_question($('#questionsList').children().length+1)");
 }
@@ -78,8 +76,8 @@ function load_question(num){
 	$( '#dialog' ).modal('show');
 }
 
-function remove_question(num){
-	if(confirm('Are you sure you want to delete this question?'))
+function remove_question(num){	
+	if(confirm('Are you sure you want to remove this question?'))
 		$('#question'+num).remove()
 }
 
@@ -100,14 +98,14 @@ function save(){
 		else
 			$('#assigntitle').style="";
 
-		assignment.start = $('#assigndate').datepicker('getDate');
+		assignment.start = $('#assigndate').val();
 		if(assignment.start == null){
 			redo+="Assign date\n";
 		}
 		else
 			$('#assigndate').style="";
 
-		assignment.due = $('#duedate').datepicker('getDate');
+		assignment.due = $('#duedate').val();
 		if(assignment.due == null){
 			redo+="Due date\n";
 		}
@@ -133,7 +131,13 @@ function save(){
     });
 
 	$('#assignmentdata').val(JSON.stringify(assignment, undefined, 2));
-	$('#assignmentForm').submit();
+	$.ajax('/assignment/create/',{
+	    type:'POST',
+	    async:false,
+	    data:$('#assignmentForm').serialize()
+    });
+   //$('#assignmentForm').submit();
+   window.location = '/assignment/'
 }
 
 function previewA(){
@@ -173,17 +177,18 @@ function iframe_preview(qid){
   previewHTML='<iframe src="assignment/question/'+qid+'" id="iframepreview'+qid+'"></iframe>';
   var ID="#";
   ID+=qid;
-  $(ID).attr("class", "icon-eye-close");
-  $(ID).attr("onclick", "iframe_close("+qid+")");
-  $(".preview-area").append(previewHTML)
+  $(ID).children('.icon-eye-open').data('popover').tip().find('.popover-content').empty().append(previewHTML);
+  $(ID).children('.icon-eye-open').popover('show');
+  $(ID).children('.icon-eye-open').attr("onclick", "iframe_close("+qid+")");
+  $(ID).children('.icon-eye-open').attr("class", "icon-eye-close");
 }
 
 function iframe_close(qid){
   var ID = "#";
   ID+=qid;
-  $("#iframepreview"+qid).remove();
-  $(ID).attr("class", "icon-eye-open");
-  $(ID).attr("onclick", "iframe_preview("+qid+")");
+  $(ID).children('.icon-eye-close').popover('hide');
+  $(ID).children('.icon-eye-close').attr("onclick", "iframe_preview("+qid+")");
+  $(ID).children('.icon-eye-close').attr("class", "icon-eye-open");
 }
 
 function loadExisting(){
@@ -191,19 +196,20 @@ function loadExisting(){
 	var questionHTML='';
 	//Close modal box
 	$('#loading-modal').modal('hide')
-	//Loop through selected elements
 	$('.icon-eye-close').each(function(){
-		ID='#';
-		ID+=$(this).attr("id");
-		//reset preview, eye
-		$(ID).attr("class", "icon-eye-open");
-  		$(ID).attr("onclick", "iframe_preview("+$(this).attr("id")+")")
-  		$("#iframepreview"+$(this).attr("id")).remove();
-		//append question data to list
-		num = $('#questionsList').children().length+1;
-		questionHTML=questionstring(num, $(ID+"title").attr("value"), $(this).attr('id'));
-		$('#questionsList').append(questionHTML);
-	});
+	   iframe_close($(this).parent().attr("id"));
+    }); 
+	//Loop through selected elements
+    $('.load-selector:checked').each(function(){
+    	$(this).removeProp('checked');
+    	ID='#';
+    	ID+=$(this).parent().attr("id");
+    	//append question data to list
+     	num = $('#questionsList').children().length+1;
+     	questionHTML=questionstring(num, $(ID+"title").attr("value"), $(this).parent().attr('id'));
+     	$('#questionsList').append(questionHTML);
+    });
+
 }
 
 function questionstring(num, title, id){
