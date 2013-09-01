@@ -35,7 +35,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% block page_title %}
 	<div class="page-header">
-		<h1>KnoAtom</h1>
+		<h1>CPortal</h1>
 	</div>
 {% endblock %}
 
@@ -45,14 +45,12 @@ I have changed this file a bit, you should use this as the template you extend. 
 
 {% if user.is_staff  or user.is_superuser %}
   <li class="nav-header">Excercises</li>
-  <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
-  <li><a href='{%url "edit_assignment_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</a> 
+  <li><a href='{%url "assignment_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Assignments</a> 
   <ul class="nav nav-list">
   {%for t in user.owned_assignments.all%}
     <li><a href="{% url 'edit_assignment' t.id %}">{{t}}</a></li>
   {%endfor%}
   </ul>
-  <li><a href="{% url "delete_assignment" %}">Delete Assignment</a></li>
   <li><a href="{% url "add_question" %}">Add Question</a></li>
   <li><a href='{%url "edit_question_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Question</a>
   <ul class="nav nav-list">

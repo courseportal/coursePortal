@@ -110,7 +110,7 @@ def editA(request, id):
     context['assign_data']=json.loads(assignment.data)
     return render(request, 'assignment/addAssignment.html', context)
 
-def editAlist(request):
+def Alist(request):
     context = get_breadcrumbs(request.path)
     context['assignment_list'] = request.user.owned_assignments.filter(isCopy = False)
     return render(request, 'assignment/list.html', context)

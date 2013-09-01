@@ -122,11 +122,6 @@ def previewTemplate(request, a):
 	context['assignment']=assignment
 	return render(request, 'assignment/preview.html', context)
 
-def errorMsg(title, error, element):
-	x = "Question \""+title+"\" threw this error in element \""+element+"\":<br>"
-	x+= "&nbsp;&nbsp;&nbsp;&nbsp;"+str(error)+"<br>"
-	return x
-
 class AssignmentStats():
 	assignmentName=''
 	assignmentid=''
@@ -174,38 +169,29 @@ def metrics(request):
 	context["stat_set"]=stat_set
 	return render(request, 'assignment/metrics.html', context)
 
-def deleteA(request):
+def deleteA(request, id):
 	#Delete specified assignment
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				assignment = Assignment.objects.get(id=entry)
-			except:
-				break
-			for question in assignment.questions.all():
-				#See if we need to remove ownership from a copy
-				if question.isCopy:
-					removeOwner = True
-					for a in request.user.owned_assignments.all():
-						if a.id != assignment.id and a.questions.filter(id=question.id).exists():
-							removeOwner=False
-							break
-					#remove ownership of copy, see if copy should be deleted
-					if removeOwner:
-						question.owners.remove(request.owner)
-						#Copy has no owners and original has been changed
-						if question.owners.all.count() == 0 and question.original == None:
-							question.delete()
+	try:
+		assignment = Assignment.objects.get(id=id)
+	except:
+		return HttpResponse('Failure')
+	for question in assignment.questions.all():
+		#See if we need to remove ownership from a copy
+		if question.isCopy:
+			removeOwner = True
+			for a in request.user.owned_assignments.all():
+				if a.id != assignment.id and a.questions.filter(id=question.id).exists():
+					removeOwner=False
+					break
+			#remove ownership of copy, see if copy should be deleted
+			if removeOwner:
+				question.owners.remove(request.owner)
+				#Copy has no owners and original has been changed
+				if question.owners.all.count() == 0 and question.original == None:
+					question.delete()
+	assignment.delete() #deletes assigned instances as well
 
-			assignment.delete() #deletes assigned instances as well
-
-	context = get_breadcrumbs(request.path)
-	context['assignment_list'] = request.user.owned_assignments.all()
-	if request.method == "POST":
-		context['messages']=['Assignment(s) deleted']
-	return render(request, 'assignment/delete.html', context)
+	return HttpResponse('Success!')
 
 def deleteQ(request):
 	#Delete specified questions
