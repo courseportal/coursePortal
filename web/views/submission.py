@@ -2,6 +2,9 @@ import json
 import csv
 import os
 import hashlib
+import re
+import random
+import string
 
 from django.core import serializers
 from django.contrib import messages
@@ -28,12 +31,65 @@ from web.views.view_functions import get_navbar_context, web_breadcrumb_dict
 from web.models import Content, YoutubeVideo, Link, UploadedFile, Class, Atom
 from django.contrib.auth.models import User
 
+def validate_umich_email(value):
+    is_valid_email = True
+    regex_umich_email = re.compile('\w*@umich.edu')
+    if not regex_umich_email.match(value):
+        is_valid_email = False
+    return is_valid_email
+
+def validate_username(username, email):
+    is_valid_username = True
+    if (cmp(username, email.split('@')[0]) !=0):
+        is_valid_username = False
+    return is_valid_username
+
+def validate_full_name(first_name, last_name):
+    is_valid_full_name = True
+    if ((first_name.find('@') != -1) or (last_name.find('@') != -1)):
+        is_valid_full_name = False
+    return is_valid_full_name
+
+def validate_handle_uploaded_file(f, request, classId):
+    with open(f,'Ub') as csvfile:
+        datareader = csv.reader(csvfile, delimiter=',')
+        rownum = 0
+        
+        for row in datareader:
+            if rownum == 0:
+                
+                rownum +=1
+            else:
+                if( validate_umich_email(row[3]) == False):
+                    print("not valid email")
+                    return -1
+                else:
+                    print("valid email")
+                
+                if( validate_username(row[2], row[3]) == False):
+                    print("not valid username")
+                    return -1
+                else:
+                    print("valid username")
+                
+                if ( validate_full_name(row[0], row[1])== False):
+                    print("not valid name")
+                    return -1
+                else:
+                    print("valid name")
+            rownum += 1
+
+    csvfile.close()
+    return 1
+  
 def handle_uploaded_file(f, request, classId):
     with open(f,'Ub') as csvfile:
         datareader = csv.reader(csvfile, delimiter=',')
         rownum = 0
+                
         for row in datareader:
             if rownum == 0:
+
                 rownum +=1
             else:
                 try:
@@ -42,8 +98,9 @@ def handle_uploaded_file(f, request, classId):
                     exist_user = None
                 if not exist_user:
                     password = User.objects.make_random_password()
+
                     created_user = User.objects.create_user(
-                                                            row[3], row[3],
+                                                           row[2] , row[3],
                                                             password,
                                                             )
                     
@@ -67,7 +124,7 @@ def handle_uploaded_file(f, request, classId):
                                          'Management')
                                        ),
                               from_email='knoatom-noreply@gmail.com',
-                              recipient_list=[created_user.email, settings.EMAIL_HOST_USER],     #
+                              recipient_list=[created_user.email, settings.EMAIL_HOST_USER],     # 
                               fail_silently=False
                               )
                 else:
@@ -94,6 +151,8 @@ def handle_uploaded_file(f, request, classId):
                 rownum += 1
 
 
+
+
 @login_required()
 def upload_file(request, classId):
     if request.method == 'POST':
@@ -103,23 +162,16 @@ def upload_file(request, classId):
             path = default_storage.save('tmp/data.csv', ContentFile(data.read()))
             tmp_file = os.path.join(MEDIA_ROOT, path)
             classId = request.POST['classId']
-            handle_uploaded_file(tmp_file, request, classId)
+            is_valid_form = validate_handle_uploaded_file(tmp_file, request, classId)
+            if (is_valid_form == 1):
+                handle_uploaded_file(tmp_file, request, classId)
             os.remove(tmp_file)
             default_storage.delete(path)
-#   messages.success(request,"Successfully uploaded.")
-#context = {
-#        'form': form,
-#     }
-#return render(request, 'web/upload.html', context)
-#else:
-#form = DataImportForm()
-#context = {
-#      'form': form,
-#     }
-#return render(request, 'web/upload.html', context)
-
-
-
+            return is_valid_form
+        else:
+            return -1
+    else:
+        return 0
 
 
 @login_required()
@@ -302,8 +354,8 @@ def process_subcontent(request, content, Model, Form, pk):
         response_kwargs = {'content_type':'application/json'}
         return HttpResponseNotAllowed(['POST', 'GET'], data, **response_kwargs)
 
-def process_content(request, obj):
-    form_kwargs = { 'user':request.user, 'instance':obj }
+def process_content(request, obj, atom_id):
+    form_kwargs = { 'user':request.user, 'instance':obj, 'atom_id':atom_id }
     if request.method == 'POST':
         form = ContentForm(request.POST, **form_kwargs)
         if form.is_valid():
