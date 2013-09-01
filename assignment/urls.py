@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     url(r'qpreview/?$', 'assignment.views.staff.previewQuestion', name='preview_question'),
     url(r'preview/?$', 'assignment.views.staff.previewAssignment', name='preview_assignment'),
     url(r'preview/(?P<a>\d+)/?$', 'assignment.views.staff.previewTemplate', name='preview_assignment2'),
-    url(r'students/?$', 'assignment.views.staff.viewStudent', name='view_student'),
+    url(r'students/(?P<id>\d+)?$', 'assignment.views.staff.viewStudent', name='view_student'),
     url(r'evaluate/?$', 'assignment.views.staff.metrics', name='metrics'),
 
     url(r'eval/?$', 'assignment.views.student.eval', name='eval'),

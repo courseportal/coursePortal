@@ -1,8 +1,8 @@
 from haystack import indexes
 from haystack.backends.solr_backend import SolrSearchBackend
 from django.template import RequestContext, loader, Context
-from web.models import Atom, BaseCategory, Class, Content, Link
-from pybb.models import Category, Forum, Topic, Post
+from web.models import Atom, BaseCategory, Class, Content, Link, UploadedFile
+#from pybb.models import Category, Forum, Topic, Post
 
 class AtomIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
@@ -62,6 +62,35 @@ class LinkIndex(indexes.SearchIndex, indexes.Indexable):
     
     def get_model(self):
         return Link
+
+class UploadedFileIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+    FileName = indexes.CharField(model_attr='title')
+    
+    
+    def get_model(self):
+        return UploadedFile
+
+    def prepare(self, obj):
+        data = super(UploadedFileIndex, self).prepare(obj)
+        try:
+            if obj.file:
+                file_path = obj.file.path
+                file_obj = open(file_path, "r+")
+                extracted_data = self._get_backend(None).extract_file_contents(file_obj)
+
+     # Now we'll finally perform the template processing to render the
+     # text field with *all* of our metadata visible for templating:
+                t = loader.select_template(('search/indexes/web/file_text.txt', ))
+                data['text'] = t.render(Context({'object': obj,
+                                     'extracted': extracted_data}))
+            return data
+        except:
+            print("FileIndex: error accessing "+ obj.file.path+ " [Solr may not be open].")
+            return data
+
+
+
 
 #This is the category for forum. (NO USE!!!!)
 #class CategoryIndex(indexes.SearchIndex, indexes.Indexable):

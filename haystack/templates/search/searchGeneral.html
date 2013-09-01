@@ -1,4 +1,5 @@
 {# {% if query %} #}
+{% load vote_filter %}
 <!-- Begin faceting. -->
 <div class="row-fluid">
     <div class="span3">
@@ -40,12 +41,9 @@
                 {% if class_tab == True %}<li {%ifequal active_tab "class" %}class="active"{% endifequal %}><a href="#tab1" data-toggle="tab">Class</a></li>{% endif %}
                 {% if base_category_tab == True %}<li {%ifequal active_tab "basecategory" %}class="active"{% endifequal %}><a href="#tab2" data-toggle="tab">Base Category</a></li>{% endif %}
                 {% if atom_tab == True %}<li {%ifequal active_tab "atom" %}class="active"{% endifequal %}><a href="#tab3" data-toggle="tab">Atom</a></li>{% endif %}
-                {% if forum_tab == True %}<li {%ifequal active_tab "forum" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Forum</a></li>{% endif %}
-                {% if topic_tab == True %}<li {%ifequal active_tab "topic" %}class="active"{% endifequal %}><a href="#tab5" data-toggle="tab">Topic</a></li>{% endif %}
-                {% if post_tab == True %}<li {%ifequal active_tab "post" %}class="active"{% endifequal %}><a href="#tab6" data-toggle="tab">Post</a></li>{% endif %}
-                {% if note_tab == True %}<li {%ifequal active_tab "lecturenote" %}class="active"{% endifequal %}><a href="#tab7" data-toggle="tab">Note</a></li>{% endif %}
-                {% if example_tab == True %}<li {%ifequal active_tab "example" %}class="active"{% endifequal %}><a href="#tab8" data-toggle="tab">Example</a></li>{% endif %}
-                {% if expo_tab == True %}<li {%ifequal active_tab "expo" %}class="active"{% endifequal %}><a href="#tab9" data-toggle="tab">Exposition</a></li>{% endif %}
+                {% if content_tab == True %}<li {%ifequal active_tab "content" %}class="active"{% endifequal %}><a href="#tab4" data-toggle="tab">Content</a></li>{% endif %}
+                {% if link_tab == True %}<li {%ifequal active_tab "link" %}class="active"{% endifequal %}><a href="#tab5" data-toggle="tab">Link</a></li>{% endif %}
+                {% if file_tab == True %}<li {%ifequal active_tab "uploadedfile" %}class="active"{% endifequal %}><a href="#tab6" data-toggle="tab">File</a></li>{% endif %}
             </ul>
             <div class="tab-content">
                 {% if class_tab == True %}
@@ -85,106 +83,70 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-                {% if forum_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "forum" %}active{% endifequal %}" id="tab4">
-                    <p>for Forum..</p>
-                    {% for result in page.object_list %}
-                    {% if result.model_name == 'forum' %}
-                    {% include 'search/result_forum.html' %}
-                    {% endif %}
-                    {% empty %}
-                    <p>No class results found.</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% if topic_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "topic" %}active{% endifequal %}" id="tab5">
-                    <p>for Topic..</p>
-                    {% for result in page.object_list %}
-                    {% if result.model_name == 'topic' %}
-                    {% include 'search/result_forum.html' %}
-                    {% endif %}
-                    {% empty %}
-                    <p>No class results found.</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% if post_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "post" %}active{% endifequal %}" id="tab6">
-                    <p>for Post..</p>
-                    {% for result in page.object_list %}
-                    {% if result.model_name == 'post' %}
-                    {% include 'search/result_forum.html' %}
-                    {% endif %}
-                    {% empty %}
-                    <p>No class results found.</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% if note_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "lecturenote" %}active{% endifequal %}" id="tab7">
-                    <p><b>Note:</b><br>Lecture Note results will always be returned with "table sort by scores" appended..</p>
-                    <table id="notes" class="tablesorter">
+                {% if content_tab == True %}
+                <div class="tab-pane {%ifequal active_tab "content" %}active{% endifequal %}" id="tab4">
+                    <p><b>Note:</b><br>Content results will always be returned with "table sort by scores" appended..</p>
+                    <table id="content" class="tablesorter">
                         <thead>
                             <th>Name</th>
                             <th>Creater</th>
-                            <th>Total Votes</th>
                             <th>Created Date</th>
+                            <th>Type</th>
+                            <th>Votes</th>
                             <th>Score</th>
                         </thead>
                         <tbody>
                             {% for result in page.object_list %}
-                            {% if result.model_name == 'note' %}
-                            {% include 'search/result_note_example.html' %}
-                            {% endif %}
-                            {% endfor %}
-                        </tbody>
-                        </table>
-                </div>
-                {% endif %}
-                {% if example_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "example" %}active{% endifequal %}" id="tab8">
-                    <p><b>Note:</b><br>Example results will always be returned with "table sort by scores" appended..</p>
-                    <table id="examples" class="tablesorter">
-                        <thead>
-                            <th>Name</th>
-                            <th>Creater</th>
-                            <th>Total Votes</th>
-                            <th>Created Date</th>
-                            <th>Score</th>
-                        </thead>
-                        <tbody>
-                    {% for result in page.object_list %}
-                    {% if result.model_name == 'example' %}
-                    {% include 'search/result_note_example.html' %}
-                    {% endif %}
-                    {% endfor %}
-                    </tbody>
-                    </table>
-                </div>
-                {% endif %}
-                {% if expo_tab == True %}
-                <div class="tab-pane {%ifequal active_tab "exposition" %}active{% endifequal %}" id="tab9">
-                    <p><b>Note:</b><br>Expo results will always be returned with "table sort by scores" appended..</p>
-                    <table id="expos" class="tablesorter">
-                        <thead>
-                            <th>Name</th>
-                            <th>Creater</th>
-                            <th>Total Votes</th>
-                            <th>Created Date</th>
-                            <th>Score</th>
-                        </thead>
-                        <tbody>
-                            {% for result in page.object_list %}
-                            {% if result.model_name == 'exposition' %}
-                            {% include 'search/result_note_example.html' %}
+                            {% if result.model_name == 'content' %}
+                            {% include 'search/result_content.html' %}
                             {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% endif %}
-
+                {% if link_tab == True %}
+                <div class="tab-pane {%ifequal active_tab "link" %}active{% endifequal %}" id="tab5">
+                    <p><b>Note:</b><br>Link results will always be returned with "table sort by scores" appended..</p>
+                    <table id="link" class="tablesorter">
+                        <thead>
+                            <th>Name</th>
+                            <th>Creater</th>
+                            <th>Created Date</th>
+                            <th>Content Belong</th>
+                            <th>Score</th>
+                        </thead>
+                        <tbody>
+                            {% for result in page.object_list %}
+                            {% if result.model_name == 'link' %}
+                            {% include 'search/result_link.html' %}
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% if file_tab == True %}
+                <div class="tab-pane {%ifequal active_tab "uploadedfile" %}active{% endifequal %}" id="tab6">
+                    <p><b>Note:</b><br>File results will always be returned with "table sort by scores" appended..</p>
+                    <table id="file" class="tablesorter">
+                        <thead>
+                            <th>Name</th>
+                            <th>Creater</th>
+                            <th>Created Date</th>
+                            <th>Content Belong</th>
+                            <th>Score</th>
+                        </thead>
+                        <tbody>
+                            {% for result in page.object_list %}
+                            {% if result.model_name == 'uploadedfile' %}
+                            {% include 'search/result_file.html' %}
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -218,7 +180,49 @@
                    });
           
           // call the tablesorter plugin and apply the uitheme widget
-          $("#notes").tablesorter({
+          $("#content").tablesorter({
+                                 // this will apply the bootstrap theme if "uitheme" widget is included
+                                 // the widgetOptions.uitheme is no longer required to be set
+                                 theme : "bootstrap",
+                                 
+                                 widthFixed: true,
+                                 
+                                 headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+                                 
+                                 
+                                 sortAppend : [[3,1]],
+                                 
+                                 
+                                 
+                                 
+                                 // widget code contained in the jquery.tablesorter.widgets.js file
+                                 // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+                                 widgets : ["uitheme"] //,, "filter", "zebra" ],
+                                 
+                                 
+                                 })
+          $("#link").tablesorter({
+                                 // this will apply the bootstrap theme if "uitheme" widget is included
+                                 // the widgetOptions.uitheme is no longer required to be set
+                                 theme : "bootstrap",
+                                 
+                                 widthFixed: true,
+                                 
+                                 headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+                                 
+                                 
+                                 sortAppend : [[3,1]],
+                                 
+                                 
+                                 
+                                 
+                                 // widget code contained in the jquery.tablesorter.widgets.js file
+                                 // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+                                 widgets : ["uitheme"] //,, "filter", "zebra" ],
+                                 
+                                 
+                                 })
+          $("#file").tablesorter({
                                      // this will apply the bootstrap theme if "uitheme" widget is included
                                      // the widgetOptions.uitheme is no longer required to be set
                                      theme : "bootstrap",
@@ -230,48 +234,6 @@
 
                                      sortAppend : [[4,1]],
                                   
-                                     
-                                     
-                                     
-                                     // widget code contained in the jquery.tablesorter.widgets.js file
-                                     // use the zebra stripe widget if you plan on hiding any rows (filter widget)
-                                     widgets : ["uitheme"] //,, "filter", "zebra" ],
-                                     
-                                     
-                                     })
-          $("#examples").tablesorter({
-                                  // this will apply the bootstrap theme if "uitheme" widget is included
-                                  // the widgetOptions.uitheme is no longer required to be set
-                                  theme : "bootstrap",
-                                  
-                                  widthFixed: true,
-                                  
-                                  headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
-                                  
-                                  
-                                  sortAppend : [[3,1]],
-                                  
-                                  
-                                  
-                                  
-                                  // widget code contained in the jquery.tablesorter.widgets.js file
-                                  // use the zebra stripe widget if you plan on hiding any rows (filter widget)
-                                  widgets : ["uitheme"] //,, "filter", "zebra" ],
-                                  
-                                  
-                                  })
-          $("#expos").tablesorter({
-                                     // this will apply the bootstrap theme if "uitheme" widget is included
-                                     // the widgetOptions.uitheme is no longer required to be set
-                                     theme : "bootstrap",
-                                     
-                                     widthFixed: true,
-                                     
-                                     headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
-                                     
-                                     
-                                     sortAppend : [[3,1]],
-                                     
                                      
                                      
                                      

@@ -33,7 +33,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 {% block extra_style %}{% endblock %}
 	
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ title|default:"KnoAtom" }}</title>
+<title>{{ title|default:"CPortals" }}</title>
 
 {% block extra_head %}{% endblock %}
 
@@ -67,6 +67,8 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 <script type="text/javascript" src="{% static "js/voting.js" %}"></script>
 <script src="{% static "js/bootstrap.min.js" %}"></script>
 <script src="{% static "pybb/js/pybbjs.js" %}"></script>
+<script type="text/javascript"src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 {% endblock javascript %}
 <!-- Tablesorting -->
 <!-- bootstrap widget theme -->
@@ -87,7 +89,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 		{% block breadcrumb %}
 		<ul class="breadcrumb">
 		    <li>
-		    <a href="/">KnoAtom</a> |
+		    <a href="/">CPortals</a> |
 		    </li>
 		    {% for b in breadcrumbs %}
 		        <li class="{% if forloop.last %}active{% endif %}">
@@ -179,6 +181,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 			<div id="block-content">
   			{% block content %}
   				<!-- This block is the main content of the page -->
+                
   			{% endblock %}
       </div>
 		</div> <!-- end .span9 -->
@@ -188,7 +191,7 @@ This is the base html file.  ALL of the style and theme stuff should go here.  E
 		<div class="span12">
 			<div id="footer">
 				{% block footer %}
-					<p>Copyright &copy; 2012</p>
+					<p>Copyright &copy; 2013</p>
 				{% endblock %}
 			</div> <!-- end #footer -->
 		</div> <!-- end .span12 -->

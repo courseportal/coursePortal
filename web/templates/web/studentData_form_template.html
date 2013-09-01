@@ -1,0 +1,10 @@
+{% if form.non_field_errors %}
+<div class="alert alert-warning">{{ form.non_field_errors }}</div>
+{% endif %}
+{% for field in form.hidden_fields %}
+{{ field }}
+{% endfor %}
+
+<div class="row-fluid">
+	{% include "web/field_template.html" with field=form.visible_fields.0 id_insert='studentData' %}
+</div>

@@ -1,0 +1,54 @@
+{% load vote_filter %}
+
+{% with obj=result.object %}
+
+<tr id="row-3-{{ result.object.file.id }}">
+    <td style="width:130px">
+        <a target="_blank" href="{% url 'content_details' obj.id %}">
+            <div class="name-3-{{ result.object.id }}">
+                {{ result.object.title }}
+            </div>
+        </a>
+    </td>
+    <td style="width:10px">
+        {{ result.object.owner }}
+    </td>
+    
+    <td >
+        <div class="dateCreated-3-{{ result.object.id }}">
+            {{result.object.date_created}}
+        </div>
+    </td>
+    <td style="width:30px">
+        {% if result.object.content_type == "L" %}
+        Lecture
+        {% else %}
+        {% if result.object.content_type == "E" %}
+        Example
+        {% else %}
+        {% if result.object.content_type == "R" %}
+        Readings
+        {% else %}
+        {% if result.object.content_type == "H" %}
+        Homework
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+    </td>
+    
+    <td >
+        <div class="votes-sum-3-{{result.object.id}}">
+            {{ result.object.vote_set|total}}
+        </div>
+    </td>
+    
+    <td >
+        <div class="score-sum-3-{{result.object.id}}">
+            {{result.score}}
+        </div>
+    </td>
+    
+</tr>
+
+{% endwith %}

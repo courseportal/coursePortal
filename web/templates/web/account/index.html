@@ -32,7 +32,18 @@ BLOCKS(Including inherited blocks):
 
 -->
 
-{% extends "web/web_base.html" %}
+{# {% extends "web/web_base.html" %} #}
+
+{% extends "base.html" %} <!-- Include the base template -->
+
+{% block message %}
+<!-- This is the block for messages -->
+<div id="messages">
+    {% include "web/message.html" %}
+</div>
+{% endblock %}
+
+
 
 {% block content %}
 
@@ -115,10 +126,7 @@ BLOCKS(Including inherited blocks):
                 <table class="table table-bordered table-hover" >
                     <thead>
                         <th style="text-align: center">Register</th>
-                        <th style="text-align: center">Video</th>
-                        <th style="text-align: center">Exposition</th>
-                        <th style="text-align: center">Note</th>
-                        <th style="text-align: center">Example</th>
+                        <th style="text-align: center">Content</th>
                         <th style="text-align: center">Votes Up</th>
                         <th style="text-align: center">Votes Down</th>
                         <th style="text-align: center">Total</th>
@@ -133,22 +141,7 @@ BLOCKS(Including inherited blocks):
                             </td>
                             <td style="text-align: center">
                                 <div>
-                                    {{ user_rate.VideoRating }}
-                                </div>
-                            </td>
-                            <td style="text-align: center">
-                                <div>
-                                    {{ user_rate.ExpoRating }}
-                                </div>
-                            </td>
-                            <td style="text-align: center">
-                                <div>
-                                {{ user_rate.LecNoteRating }}
-                                </div>
-                            </td>
-                            <td style="text-align: center">
-                                <div>
-                                    {{ user_rate.ExampleRating }}
+                                    {{ user_rate.ContentRating }}
                                 </div>
                             </td>
                             <td style="text-align: center">

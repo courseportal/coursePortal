@@ -5,6 +5,11 @@ from web.models import Class, ClassCategory, WebBaseModel
 from django.core.exceptions import ValidationError
 
 
+class DataImportForm(forms.Form):
+    file = forms.FileField()
+    classId = forms.IntegerField(widget=forms.widgets.HiddenInput,
+                                 required=False)
+
 class CategoryForm(forms.ModelForm):
     r"""
     Form for category editing or creation creation from within a class editing view.
@@ -31,7 +36,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         r"""Set the model it is attached to and select the fields."""
         model = ClassCategory
-        fields=('title', 'parent_categories', 'child_atoms')
+        fields=('title', 'parent_categories', 'child_atoms','summary')
         
     def clean_parent_categories(self):
         data = self.cleaned_data
@@ -63,12 +68,11 @@ class ClassForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(ClassForm, self).__init__(*args, **kwargs)
         if self.instance.pk is None:
-            self.fields['instructors'].queryset = User.objects.exclude(
-                id=self.user.id)
+            self.fields['instructors'].queryset = User.objects.all()
+            #exclude(id=self.user.id)
         else:
-            self.fields['instructors'].queryset = User.objects.exclude(
-                pk=self.instance.owner.pk)
-        self.fields['instructors'].required = False
+            self.fields['instructors'].queryset = User.objects.all()
+            #self.fields['instructors'].required = False
 
     class Meta:
         r"""Set the model the form is attached to and select the fields."""

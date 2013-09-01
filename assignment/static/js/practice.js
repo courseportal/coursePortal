@@ -36,22 +36,20 @@ function evalPractice(){
 }
 
 function submitQbug(){
-	alert($('#qid').attr('value'));
 	if($('#problemText').val() == ''){
-		alert("No description provided");
+		alert("Please provide a description.");
 	}
 	else{
 		data = {
 			text: $('#problemText').val(),
 			id: $('#qid').attr('value'),
 		};
-		var overwrite;
 		$.ajax('/assignment/utility/reportQ/', {
 			type: 'GET',
-			async: false,
+			async: true,
 			data: data,
 		});
-		$('#submitreport').prop('disabled', true);
+		$('#submitreport').attr('onclick', "$('#reportform').modal('hide');");
 	}
 }
 

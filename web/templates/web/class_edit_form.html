@@ -60,6 +60,7 @@ $(document).ready(function() {
 		}
 	});
 	
+                  
 	// Get new category form when the button is pressed
 	$('#new-category-form').click(function() {
 		$('div#cat-header').empty().append('Add Category');
@@ -82,7 +83,8 @@ $(document).ready(function() {
 		// Disable buttons
 		form.find('#submit-form').attr('disabled', true);
 		form.find('#new-category-form').attr('disabled', true);
-    form.find('#delete-category').attr('disabled', true);
+        form.find('#delete-category').attr('disabled', true);
+
 		// Reset the error fields '*[id^="string"]' finds all elements with
 		// id starting in "string".
 		form.find('*[id^=field]').removeClass('error')
@@ -126,7 +128,7 @@ $(document).ready(function() {
 			// Enable the buttons again.
 			form.find('input#submit-form').attr('disabled', false);
 			form.find('input#new-category-form').attr('disabled', false);
-      form.find('#delete-category').attr('disabled', false);
+            form.find('#delete-category').attr('disabled', false);
 			}
 		);
 		return promise;
@@ -143,6 +145,13 @@ $(document).ready(function() {
       $("#messages").empty().append('<div class="alert alert-success">'+data.message+'</div>');
     }
 	};
+    var studentData_success_function = function(data)
+    {
+    if (data.pk)
+    {
+    $("#messages").empty().append('<div class="alert alert-success">'+data.message+'</div>');
+    }
+    };
 	var category_success_function = function(data)
 	{
 		if (data.message)
@@ -194,12 +203,20 @@ $(document).ready(function() {
 		promise.done(class_success_function);
 		return false;
 	});
+   
 	$('form#category-form #submit-form').click(function() {
 		var form = $('form#category-form');
 		var promise = ajax_submit(form);
 		promise.done(category_success_function);
 		return false;
 	});
+    
+    $('form#studentData-form #submit-form').click(function() {
+        var form = $('form#studentData-form');
+        var promise = ajax_submit(form);
+        promise.done(studentData_success_function);
+        return false;
+    });
 	
 	$('button#delete-category').click(function() {
 		$('button#delete-category').attr('disabled', true);
@@ -230,12 +247,18 @@ $(document).ready(function() {
 </script>
 <div class="container">
   <div id="messages"></div>
-  <h2>Edit Class</h2>
+  <h2>Edit Class
+  </h2>
+
   <form id="class-form" class="form-horizontal" 
       action="{{ form_action }}" method="POST">
     {% csrf_token %}
     <div id="class-form">
-      {% include "web/class_form_template.html" with form=class_form %}
+    {% if is_studentData_submit %}
+            {% include "web/class_form_template.html" with form=empty_class_form %}
+    {% else %}
+            {% include "web/class_form_template.html" with form=class_form %}
+    {% endif %}
     </div>
     <input type="hidden" name="class-form" /> <!-- form identifier -->
     <input class="btn btn-primary" type="submit" name="submit-class" 
@@ -243,11 +266,37 @@ $(document).ready(function() {
     <button class="btn btn-danger" name="delete-class" 
       id="delete-class">Delete Class</button> <!-- delete button -->
   </form>
+<hr>
+    <h2>Upload student data:</h2>
+    <form id="studentData-form" enctype="multipart/form-data" action="" method="POST"> 
+        {% csrf_token %}
+        <div id="dataUpload-form">
+        {% if is_studentData_submit %}
+            {% include "web/studentData_form_template.html" with form=empty_studentData_form %}
+        {% else %}
+            {% include "web/studentData_form_template.html" with form=studentData_form %}
+        {% endif %}
+        </div>
+        <input type="hidden" name="studentData-form" /><!-- form identifier -->
+        <input class="btn btn-primary" type="submit" name="submit-studentData" value="Submit" id="submit-studentData-form" />
+        <input class="btn" type="reset" value="Clear All" id="clear-class-form" />
+    </form>
+    
+    <h2>student_data_sample</h2>
+    {% load staticfiles %}
+    <img border="0" src="{% static "img/student_data_sample.png" %}" alt="student_data_sample" >
+<hr>
+    <h2>Edit Category
+    </h2>
   <form id="category-form" class="form-horizontal" 
       action="{{ form_action }}" method="POST">
     {% csrf_token %}
   	<div id="category-form">
+    {% if is_studentData_submit %}
+        {% include "web/category_form_template.html" with form=empty_category_form %}
+    {% else %}
   		{% include "web/category_form_template.html" with form=category_form %}
+    {% endif %}
   	</div>
     <input type="hidden" name="category-form" /><!-- form identifier -->
     <input class="btn btn-primary" type="submit" name="submit-category" value="Add Category" id="submit-form" /> <!-- submit button -->

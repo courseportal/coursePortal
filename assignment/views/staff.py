@@ -12,11 +12,13 @@ from math import *
 from random import *
 import web.models
 
-def viewStudent(request):
+def viewStudent(request, id):
+	selected_class = web.models.Class.objects.get(id=id) 
 	user = request.user
 	context = get_breadcrumbs(request.path)
-	context['class_list']=user.classes_authored.all() | user.allowed_classes.all()
+	context['user_list']=selected_class
 	context['user']=user
+	context['class']=selected_class
 	return render(request, 'assignment/students.html', context)
 
 def previewQuestion(request):
@@ -51,15 +53,12 @@ def previewAssignment(request):
 		data['solution']= data['solution'].replace('<br>', '\n')
 		data['solution']= data['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 
-		try:
-			exec data['code']
-		except Exception as ex:
-			test += errorMsg(data['title'], ex, 'code')
+		exec data['code']
 
 		try:
 			data['solution']=eval(data['solution'])
 		except Exception as ex:
-			test += errorMsg(data['title'], ex, 'solution')
+			pass
 
 		#q text formatted here
 		local_dict = dict(locals())
@@ -72,10 +71,9 @@ def previewAssignment(request):
 		for choice in choices:
 			try:
 				answer = eval(choice)
-				data['choices'].append(answer)
-			except Exception as ex:
-				y = "Choice"+str(integer_index+1)
-				test += errorMsg(q.data['title'], ex, y)
+			except:
+				answer=choice
+			data['choices'].append(answer)
 		if len(data['choices']) > 0:
 			data['choices'].append(data['solution'])
 
@@ -158,7 +156,7 @@ def metrics(request):
 			if maxPossible>0:
 				data.append((achieved/maxPossible)*100)
 		stats.data=data
-		if(stats.numinstances > 0):
+		if(len(data)>0):
 			#Calculate average
 			stats.average = np.average(stats.data)#can add weighting
 			#Calculate std deviation
@@ -182,7 +180,10 @@ def deleteA(request):
 		for entry in request.POST:
 			if entry =="csrfmiddlewaretoken":
 				continue
-			assignment = Assignment.objects.get(id=entry)
+			try:
+				assignment = Assignment.objects.get(id=entry)
+			except:
+				break
 			for question in assignment.questions.all():
 				#See if we need to remove ownership from a copy
 				if question.isCopy:
@@ -212,7 +213,10 @@ def deleteQ(request):
 		for entry in request.POST:
 			if entry =="csrfmiddlewaretoken":
 				continue
-			question = Question.objects.get(id=entry)
+			try:
+				question = Question.objects.get(id=entry)
+			except:
+				break
 			#Delete data entries in assignments
 			for a in question.assigned_to.all():
 				data = json.loads(a.data)

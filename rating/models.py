@@ -29,12 +29,12 @@ class Vote(models.Model):
             raise ValidationError("The vote can only have one of [content, topic] set and it cannot be changed once set.")
 
 class UserRating(models.Model):
-    user = models.ForeignKey(User, related_name="rating_set")
+    user = models.ForeignKey(User, related_name="rating_set")     #user
     ContentRating = models.IntegerField(default=0)
     TopicRating = models.IntegerField(default=0)
-    VoteUp = models.IntegerField(default=0)
-    VoteDown = models.IntegerField(default=0)
-    rating = models.IntegerField(default=0)
+    VoteUp = models.IntegerField(default=0)          
+    VoteDown = models.IntegerField(default=0)                    
+    rating = models.IntegerField(default=0)                      #user rating
     
 @receiver(post_save, sender=User)
 def create_uservotes(sender, **kwargs):

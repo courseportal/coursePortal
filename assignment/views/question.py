@@ -48,11 +48,10 @@ def detail(request, id, practice=False):
 	if not test=='':
 		return HttpResponse(test)
 
-	context = {
-		'text': text,
-		'answer': solution,
-		'choices': choices,
-	}
+	context = get_breadcrumbs(request.path)
+	context['text']=text
+	context['answer']=solution
+	context['choices']=choices
 	if practice:
 		return context
 	return render(request, 'question/detail.html', context)
@@ -86,7 +85,7 @@ def create(request):
 	data['question_type'] = request.POST['question_type']
 	choices = json.loads(request.POST['choices'])
 	if data['question_type'] == 'True/False':
-		if data['solution'] == 'True':
+		if data['solution'] == True:
 			choices.append('False')
 		else:
 			choices.append('True')
@@ -106,9 +105,7 @@ def create(request):
 	q2.save()
 	for atom in q.atoms.all():
 		q2.atoms.add(atom)
-	context = get_breadcrumbs(request.path)
-	context['messages'] = ['Question sucessfully created']
-	return render(request, "assignment_nav.html", context)
+	return HttpResponse('Success!')
 
 def preview(request):
 	q=dict()
@@ -153,18 +150,13 @@ def preview(request):
 def instanceDetail(request, pk, id):
 	assignmentInstance = request.user.assignmentInstances.get(pk=pk)
 	question = assignmentInstance.questions.get(pk=id)
-	breadcrumbs = [{'url': reverse('assignment'), 'title': 'assignment'}]
-	breadcrumbs.append({'url': reverse('assignment_detail', args=[assignmentInstance.id]), 'title': assignmentInstance})
-	breadcrumbs.append({'url': reverse('question_instance', args=[assignmentInstance.id, question.id]), 'title': question})
-	context = {
-		'user': request.user,
-		'question_selected': question,
-		'q':question,
-    	'assignment_selected': assignmentInstance,
-		'text': question.text,
-		'choices': question.choiceInstances.all(),
-		'breadcrumbs': breadcrumbs,
-	}
+	context = get_breadcrumbs(request.path)
+	context['user']=request.user
+	context['question_selected']=question
+	context['q']=question
+	context['assignment_selected']=assignmentInstance
+	context['text']=question.text
+	context['choices']=question.choiceInstances.all()
     
 	return render(request, 'question/instance.html', context)
 

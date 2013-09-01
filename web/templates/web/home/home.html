@@ -1,4 +1,20 @@
-{% extends "web/web_base.html" %} {% comment %}<!-- Include the base template --> {% endcomment %}
+{% extends "base.html" %} <!-- Include the base template -->
+
+{% block message %}
+<!-- This is the block for messages -->
+<div id="messages">
+    {% include "web/message.html" %}
+</div>
+{% endblock %}
+
+<!-- Default app specific content for the content page, will get overridden by other templates -->
+{% block content %}
+<h2>You are seeing this page in error, please contact the webmaster!</h2>
+{% endblock %}
+
+{# {% extends "web/web_base.html" %} #} {% comment %}<!-- Include the base template --> {% endcomment %}
+
+
 
 {% comment %}
 

@@ -1,3 +1,5 @@
+#import autocomplete_light
+
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -7,7 +9,9 @@ import re
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 from django.core.mail import send_mail
-from web.models import Class, Content, YoutubeVideo, Link, UploadedFile
+from web.models import Atom, Class, Content, YoutubeVideo, Link, UploadedFile
+from django.db import models
+
 
 def validate_umich_email(value):
 	regex_umich_email = re.compile('\w*@umich.edu')
@@ -57,12 +61,22 @@ class ReportForm(forms.Form):
             from_email='knoatom-noreply@umich.edu',
 			recipient_list=['knoatom.webmaster@gmail.com']
 		)
-        
+
+
 class ContentForm(forms.ModelForm):
     r"""Form for submitting content."""
+    summary = forms.CharField(Content, widget=forms.Textarea(attrs={'rows':'10'}))
+    atoms = forms.ModelMultipleChoiceField(Atom.objects.all(),widget = forms.SelectMultiple(attrs={'size':'10'}))
+        #atoms = forms.ModelMultipleChoiceField(Atom.objects.all(),widget = autocomplete_light.MultipleChoiceWidget('AtomAutocomplete',
+        #autocomplete_js_attributes={'minimum_characters': 1,'placeholder':'Atom Name ?',},
+        #))
+    
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
+        atom_id = kwargs.pop('atom_id')
+        print(atom_id)
         super(ContentForm, self).__init__(*args, **kwargs)
+        self.fields['atoms'] = forms.ModelMultipleChoiceField(Atom.objects.all(),widget = forms.SelectMultiple(attrs={'size':'10'}), initial={atom_id})
         if self.user.is_superuser:
             pass
         elif (self.user.classes_authored.exists() or 
@@ -70,13 +84,15 @@ class ContentForm(forms.ModelForm):
             self.fields['classes_stickied_in'].queryset = (
                 Class.objects.filter(
                     Q(id__in=self.user.classes_authored.all()) | 
-                    Q(id__in=user.allowed_classes.all())
+                    Q(id__in=self.user.allowed_classes.all())
                 )
             )
         else: # If the field is empty hide the field unless user.is_superuser
-            self.fields['classes_stickied_in'].widget = forms.HiddenInput()
+            print("I am inside of save() function in ContentForm.")
+            self.fields['classes_stickied_in'].widget = forms.MultipleHiddenInput()
     
     class Meta:
+        
         model = Content
         fields = ('title', 'content_type', 'summary', 'atoms', 
             'classes_stickied_in')
@@ -95,20 +111,21 @@ class ContentForm(forms.ModelForm):
 class YoutubeVideoForm(forms.ModelForm):
     r"""Form for submitting youtube videos."""
     def __init__(self, *args, **kwargs):
+        print(kwargs)
         self.content = kwargs.pop('content')
         super(YoutubeVideoForm, self).__init__(*args, **kwargs)
-        
+    
     class Meta:
         model = YoutubeVideo
         fields = ('title', 'video_id',)
-        
+    
     def save(self, commit=True):
         instance = super(YoutubeVideoForm, self).save(commit=False)
         instance.content = self.content
         if commit:
             instance.save()
         return instance
-        
+
 class LinkForm(forms.ModelForm):
     r"""Form for submitting youtube videos."""
     def __init__(self, *args, **kwargs):

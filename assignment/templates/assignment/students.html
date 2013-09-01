@@ -5,18 +5,16 @@
 <link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
 
 <div class="row">
-	<h1><div class="span3 offset3">Students Enrolled</div></h1>
+	<h1><div class="span7">Students Enrolled in {{class}}</div></h1>
 </div>
-{% for c in class_list %}
-	<h3>{{c}}:</h3>
-	<table class="table">
+<table class="table">
 	<thead>
 		<th>Student Name</th>
 		<th>Username</th>
 		<th>Performance</th>
 	</thead>
 	<tbody>
-	{% for s in c.students.all %}
+	{% for s in class.students.all %}
 		{% if s.is_active and not s.is_staff %}
 		<tr>
 			<td>{{s.first_name}} {{s.last_name}}</td>
@@ -26,6 +24,5 @@
 		{%endif%}
 	{%endfor%}
 	</tbody>
-	</table>
-{%endfor%}
+</table>
 {% endblock %}

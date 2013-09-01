@@ -20,7 +20,12 @@ def vote(request, atom_id, item, item_id, vote_type):
         content_object = get_object_or_404(Content, id=item_id)
     else:
         raise Http404
-        
+
+    if item != 'topic':
+        user_rating = UserRating.objects.get(user=content_object.owner)
+    else:
+        user_rating = UserRating.objects.get(user=content_object.user)
+
     vote = content_object.vote_set.get_or_create(atom=atom_object, user=request.user)[0]
     if (vote.vote > 0 and vote_type == 'up') or (vote.vote < 0
                                              and vote_type == 'down'):
@@ -33,8 +38,11 @@ def vote(request, atom_id, item, item_id, vote_type):
                 delta = -1*vote_down_delta_rating()
                 vote.voteUp += vote_up_delta_rating()
                 vote.voteDown += vote_down_delta_rating()
+                user_rating.VoteUp += vote_up_delta_rating()
+                user_rating.VoteDown -= vote_down_delta_rating()
             else:
                 vote.voteUp += vote_up_delta_rating()
+                user_rating.VoteUp += vote_up_delta_rating()
             delta += vote_up_delta_rating()
     
         elif vote_type == 'down':
@@ -42,24 +50,20 @@ def vote(request, atom_id, item, item_id, vote_type):
                 delta = -1*vote_up_delta_rating()
                 vote.voteDown -= vote_down_delta_rating()
                 vote.voteUp -= vote_up_delta_rating()
+                user_rating.VoteUp -= vote_up_delta_rating()
+                user_rating.VoteDown += vote_down_delta_rating()
             else:
                 vote.voteDown -= vote_down_delta_rating()
+                user_rating.VoteDown += vote_down_delta_rating()
             delta += vote_down_delta_rating()
     
         else:
             raise Http404
         vote.vote += delta
-        vote.save()
-        if item != 'topic':
-            user_rating = UserRating.objects.get(user=content_object.owner)
-        else:
-            user_rating = UserRating.objects.get(user=content_object.user)
-    
-    
-        user_rating.VoteUp += vote_up_delta_rating()
-        user_rating.VoteDown -= vote_down_delta_rating()
         user_rating.rating += delta
+        vote.save()
         user_rating.save()
+
         votes = [v.vote for v in content_object.vote_set.filter(atom=atom_object)]
         votesUp = [v.voteUp for v in content_object.vote_set.filter(atom=atom_object)]
         votesDown = [v.voteDown for v in content_object.vote_set.filter(atom=atom_object)]

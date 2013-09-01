@@ -1,3 +1,6 @@
+import autocomplete_light
+autocomplete_light.autodiscover()
+
 from django.conf.urls import patterns, include, url
 from django.conf import settings
 from django.conf.urls.static import static
@@ -16,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^assignment/', include(assignment_urls)),
     url(r'^search/', include(haystack_urls)),
+    url(r'autocomplete/', include('autocomplete_light.urls')),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^forum/', include('pybb.urls', namespace = 'pybb')),

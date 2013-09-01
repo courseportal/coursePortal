@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 from knoatom.view_functions import render_to_json_response, get_breadcrumbs
 from web.views.view_functions import get_navbar_context, web_breadcrumb_dict
+from web.forms.edit_class import DataImportForm
+from web.views.submission import upload_file, handle_uploaded_file
 
 
 class AjaxableResponseMixin(object):
@@ -78,13 +80,16 @@ def EditClassView(request, class_id, cat_id):
     class_object = get_object_or_404(Class, id=class_id) # The class instance
     class_form_kwargs = {'user':request.user, 'instance':class_object}
     category_form_kwargs = {'parent_class':class_object}
+    studentData_form_kwargs = {'classId':class_object.id}
     
     if cat_id: # If we are editing a category
         category_object = get_object_or_404(ClassCategory, pk=cat_id)
         category_form_kwargs.update({'instance':category_object})
         
     if request.method == 'POST':
+        print("This is a POST")
         if u'class-form' in request.POST: # class submit
+            print(request.POST)
             class_form = ClassForm(request.POST, **class_form_kwargs)
             context.update(
                 process_forms(
@@ -102,22 +107,37 @@ def EditClassView(request, class_id, cat_id):
                     category_form=category_form
                 )
             )
+        elif u'studentData-form' in request.POST: # studentData submit
+            print(request.POST)
+            studentData_form = DataImportForm(request.POST,request.FILES , initial=studentData_form_kwargs)
+            context.update(
+                process_forms(
+                    request=request,
+                    class_object=class_object,
+                    studentData_form = studentData_form
+                )
+            )
+
         else: # submit all
             class_form = ClassForm(request.POST, **class_form_kwargs)
             category_form = CategoryForm(request.POST, **category_form_kwargs)
+            studentData_form = DataImportForm(request.POST, request.FILES, initial=studentData_form_kwargs)
             context.update(
                 process_forms(
                     request=request,
                     class_object=class_object,
                     class_form=class_form,
-                    category_form=category_form
+                    category_form=category_form,
+                    studentData_form=studentData_form,
                 )
             )
+            #context.update(upload_file(request=request,classId = class_id))
         if request.is_ajax():
             return render_to_json_response(context) # Only need part of context
         elif cat_id is not None: # Non AJAX requests aren't allowed if cat_id
             return HttpResponseRedirect(reverse('edit_class', args=[class_id]))
     else: # GET
+        print("I am here")
         if request.is_ajax():
             category_form = CategoryForm(**category_form_kwargs) # Get form
             template = loader.get_template('web/category_form_template.html')
@@ -132,7 +152,8 @@ def EditClassView(request, class_id, cat_id):
             
         context.update({ # Add forms to context if not post
             'class_form':ClassForm(**class_form_kwargs),
-            'category_form':CategoryForm(**category_form_kwargs)
+            'category_form':CategoryForm(**category_form_kwargs),
+            'studentData_form': DataImportForm(initial=studentData_form_kwargs),
         })
     context.update(
         get_navbar_context()
@@ -142,13 +163,15 @@ def EditClassView(request, class_id, cat_id):
     )
     context.update({
         'pk':class_object.id,
+        'is_edit_class': True,
+        
     })
     return render(request, 'web/class_edit_form.html', context)
     
     
 
 # Helper functions for EditClassView
-def process_forms(request, class_object, class_form=None, category_form=None):
+def process_forms(request, class_object, class_form=None, category_form=None, studentData_form=None):
     r"""
     Handles the form processing for 'EditClassView'.  It returns a dictionary of the context.  It supports both forms submitted normally and through AJAX.
     
@@ -159,6 +182,7 @@ def process_forms(request, class_object, class_form=None, category_form=None):
     """
     class_form_kwargs = {'user':request.user, 'instance':class_object}
     category_form_kwargs = {'parent_class':class_object}
+    studentData_form_kwargs = {'classId':class_object.id}
     
     context = {}
     if class_form: # If we were passed an instane of class_form
@@ -200,13 +224,20 @@ def process_forms(request, class_object, class_form=None, category_form=None):
                     {'category_form':CategoryForm(**category_form_kwargs)}
                 )
                 messages.success(request, _('Successfully saved category.'))
-        else: # form is not valid
-            if request.is_ajax():
-                context.update(category_form.errors)
-                context.update({'message':_('Error saving category.')})
-            else:
-                context.update({'category_form':category_form})
-                messages.error(request, _('Error saving category.'))
+    if studentData_form:
+        if studentData_form.is_valid():
+            print("This is valid.")
+            upload_file(request=request,classId = class_object.id)
+            messages.success(request, _('Successfully uploaded.'))
+        else:
+            print("Not valid")
+        context.update({'pk':class_object.id})
+        context.update({
+            'is_studentData_submit': True,
+            'empty_class_form': ClassForm(**class_form_kwargs),
+            'empty_category_form' : CategoryForm(**category_form_kwargs),
+            'empty_studentData_form' : DataImportForm(request.POST, request.FILES, initial=studentData_form_kwargs)
+            }) # Dont change form
     return context
     
 def delete_class(request, pk):

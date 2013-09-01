@@ -52,7 +52,6 @@ def validate(request):
 def validateFull(request):
 	#Limit runtime, feature only useable in unix environment
 	if not sys.platform.startswith('win'):
-		signal.signal(signal.SIGALRM, timehandler)
 		signal.alarm(5) #will signal SIGALRM in 5 seconds
 		resource.setrlimit(resource.RLIMIT_STACK, (3145728, 3145728)) #limit stack to 3mb
 		resource.setrlimit(resource.RLIMIT_DATA, (3145728, 3145728)) #limit heap to 3mb
@@ -79,9 +78,9 @@ def practiceEval(request):
 
 def reportQ(request):
 	question = Question.objects.get(id=request.GET['id'])
-	subject = "Question Reported"
-	message = "Your question '"+question.title+"' has been reported as broken. Here is the message submitted by a student:\n"
+	message = "Your question '"+question.title+"' has been reported as broken by "+request.user.email+".\n"
+	message += "Here is the message that was submitted:\n"
 	message+= request.GET['text']
-	send_mail(subject, message, 'test-no-use@umich.edu', [question.owners.all()[0].email])
+	send_mail("Question Reported", message, 'test-no-use@umich.edu', [question.owners.all()[0].email])
 	return HttpResponse('Success')
 	

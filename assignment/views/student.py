@@ -29,14 +29,15 @@ def eval(request):
     assignment = AssignmentInstance.objects.get(pk=request.POST['assignment'])
     
     for question in assignment.questions.all():
-        try:
-            #Store student answer
-            answer = request.POST[str(question.id)+'choice']
+        
+        #Store student answer
+        answer = request.POST[str(question.id)+'choice']
+        if question.can_edit:
             question.can_edit=False
             question.student_answer=answer;
             question.save()
 
-            template = question
+            template = question.original
             if template.isCopy == True:
                 template = template.original
             if answer==question.solution:
@@ -48,8 +49,6 @@ def eval(request):
             elif not template == None:
                 template.numIncorrect+=1
                 template.save()
-        except:
-            continue
         
     if assdone(assignment):
         assignment.can_edit=False
@@ -84,7 +83,6 @@ def list(request):
     }
     return render(request, 'assignment/instancelist.html',context)
 
-
 def choose_atom(request, messages=False):
     context = get_breadcrumbs(request.path)
     context['atom_list'] = Atom.objects.all()
@@ -94,7 +92,7 @@ def choose_atom(request, messages=False):
 
 def practice(request, id):
     context = get_breadcrumbs(request.path)
-    question_list = Atom.objects.get(id=id).related_questions.all()
+    question_list = Atom.objects.get(id=id).related_questions.filter(isCopy=False)
     count = question_list.count()
     if count==0:
         messages = ['No Questions related to that atom!']

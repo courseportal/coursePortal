@@ -87,6 +87,8 @@ init_delete_content = function() {
       table.dataTable({
         "sDom": '<"top"lf>rt<"bottom"p><"clear">'
       });
+    $('table').width('100%');
+
       $('.cur-user-rate').text(data.user_rating);
 		});
 	});

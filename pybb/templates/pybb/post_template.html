@@ -19,7 +19,11 @@
         <td class="post-info">
             {% include "pybb/avatar.html" with user=post.user %}
 
-            <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
+            <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}">{{ post.user.username }}</a>
+            {% if post.user.is_staff %}
+                <a rel="tooltip" class="icon-user" title="Instructor"></a>
+            {% endif %}
+            </div>
             {% if post_user_profile.rank %}
                 <div class='rank'>
                     {% trans "Rank" %}: {{ post_user_profile.rank }}
@@ -53,8 +57,9 @@
             </div>
         </td>
         <td class="post-content">
-            {{ post.body_html|safe }}
-
+            {% autoescape off %}
+            {{ post.body }}
+            {% endautoescape %}
             {% if not user.is_authenticated or user_profile.show_signatures %}
                 {% if post_user_profile.signature %}
                     <div class="post-signature">

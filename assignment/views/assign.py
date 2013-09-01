@@ -70,7 +70,6 @@ def instantiate(request):
     except:
         pass
 
-    breadcrumbs = [{'url': reverse('assignment'), 'title': 'Assignment'}]
     data=json.loads(assignment.data)
     for u in users:
         instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=assignment.start_date, due_date=assignment.due_date)
@@ -180,7 +179,8 @@ def create(request):
     #Finish
     assignment.data=json.dumps(questions)
     assignment.save()
-    return main(request)
+    #return main(request)
+    return HttpResponse('Success!')
 
 def unassign(request, messages=[]):
     context=get_breadcrumbs(request.path)
@@ -191,18 +191,18 @@ def unassign(request, messages=[]):
     return render(request, 'assignment/unassign.html', context)
 
 def unmake(request):
-    try:
-        instances = request.POST
-        for i in instances:
-            if i=="csrfmiddlewaretoken":
-                continue
+    instances = request.POST
+    for i in instances:
+        if i=="csrfmiddlewaretoken":
+            continue
+        try:
             instance = AssignmentInstance.objects.get(id=request.POST[i])
-            for q in instance.questions.all():
-                for c in q.choiceInstances.all():
-                    c.delete()
-                q.delete()
-            instance.delete()
-    except:
-        pass
+        except:
+            break
+        for q in instance.questions.all():
+            for c in q.choiceInstances.all():
+                c.delete()
+            q.delete()
+        instance.delete()
     messages=["Assignment(s) succesfully unassigned!"]
     return unassign(request, messages)

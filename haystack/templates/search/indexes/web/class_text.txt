@@ -1,4 +1,0 @@
-{{object.title}}
-{{object.owner}}
-{{object.instructors}}
-{{object.status}}
