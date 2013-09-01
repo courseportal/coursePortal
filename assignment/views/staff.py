@@ -154,7 +154,7 @@ def metrics(request):
 			if maxPossible>0:
 				data.append((achieved/maxPossible)*100)
 		stats.data=data
-		if(stats.numinstances > 0):
+		if(len(data)>0):
 			#Calculate average
 			stats.average = np.average(stats.data)#can add weighting
 			#Calculate std deviation

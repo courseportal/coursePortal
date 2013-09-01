@@ -202,7 +202,7 @@ def unmake(request):
         for q in instance.questions.all():
             for c in q.choiceInstances.all():
                 c.delete()
-                q.delete()
-            instance.delete()
+            q.delete()
+        instance.delete()
     messages=["Assignment(s) succesfully unassigned!"]
     return unassign(request, messages)
