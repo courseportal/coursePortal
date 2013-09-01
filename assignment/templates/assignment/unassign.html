@@ -5,12 +5,13 @@
 
 <form method = "post" action = "{% url 'unmake' %}">
 {% csrf_token %}
+<input type='hidden' name='classid' value='{{class.id}}'>
 <table class="table" id="assigned">
 	<thead>
 		<th style="width:80px" class="sortable">Username</th>
 		<th style="width:100px" class="sortable">Name</th>
 		<th style="width:100px" class="sortable">Assignment</th>
-		<th style="width:100px" class="sortable">Subjects</th>
+		<th style="width:100px" class="sortable">Atoms</th>
 		<th style="width:10px">Select</th>
 	</thead>
 	<tbody>
@@ -20,16 +21,14 @@
 			<td></td>
 			<td></td>
 		</tr>
-		{% for a in assignments %}
-			{% for i in a.instances.all %}
-				<tr>
-					<td style="width:80px">{{i.user.username}}</td>
-					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
-					<td style="width:100px">{{i}}</td>
-					<td style="width:100px">{%for atom in a.get_atoms %}{{atom}},{%endfor%}</td>
-					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
-				</tr>
-			{% endfor %}
+		{% for i in class.assigned_instances.all %}
+			<tr>
+				<td style="width:80px">{{i.user.username}}</td>
+				<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
+				<td style="width:100px">{{i}}</td>
+				<td style="width:100px">{%for atom in a.get_atoms %}{{atom}},{%endfor%}</td>
+				<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
+			</tr>
 		{% endfor %}
 	</tbody>
 	<tfoot>

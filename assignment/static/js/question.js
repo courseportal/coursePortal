@@ -113,14 +113,11 @@ function addVar(varName){
 	});
 }
 
-function delVar(varName){
-	$('#'+varName).remove();
-}
 
 function rowString(varName){
 	rowHTML = 
 		"<tr id='"+varName+"'>\
-			<td>"+varName+"</td>\
+			<td><i class='icon-remove' onclick='$(this).parent().parent().remove();'></i>"+varName+"</td>\
 			<td class='typecell'></td>\
 			<td class='row-data'></td>\
 		</tr>";
@@ -354,7 +351,6 @@ function generate(row, tempCode){
 	tempCode = tempCode.concat('\n#var:',data.vartype,'_',row.attr('id'),'\n',genCode);
 	return tempCode;
 }
-
 
 function inputChange(questionType){
 	$('#choice_input').html('');

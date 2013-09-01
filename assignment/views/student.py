@@ -37,7 +37,7 @@ def eval(request):
             question.student_answer=answer;
             question.save()
 
-            template = question
+            template = question.original
             if template.isCopy == True:
                 template = template.original
             if answer==question.solution:

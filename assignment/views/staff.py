@@ -12,11 +12,13 @@ from math import *
 from random import *
 import web.models
 
-def viewStudent(request):
+def viewStudent(request, id):
+	selected_class = web.models.Class.objects.get(id=id) 
 	user = request.user
 	context = get_breadcrumbs(request.path)
-	context['class_list']=user.classes_authored.all() | user.allowed_classes.all()
+	context['user_list']=selected_class
 	context['user']=user
+	context['class']=selected_class
 	return render(request, 'assignment/students.html', context)
 
 def previewQuestion(request):
@@ -120,11 +122,6 @@ def previewTemplate(request, a):
 	context['assignment']=assignment
 	return render(request, 'assignment/preview.html', context)
 
-def errorMsg(title, error, element):
-	x = "Question \""+title+"\" threw this error in element \""+element+"\":<br>"
-	x+= "&nbsp;&nbsp;&nbsp;&nbsp;"+str(error)+"<br>"
-	return x
-
 class AssignmentStats():
 	assignmentName=''
 	assignmentid=''
@@ -154,7 +151,7 @@ def metrics(request):
 			if maxPossible>0:
 				data.append((achieved/maxPossible)*100)
 		stats.data=data
-		if(stats.numinstances > 0):
+		if(len(data)>0):
 			#Calculate average
 			stats.average = np.average(stats.data)#can add weighting
 			#Calculate std deviation
@@ -172,71 +169,54 @@ def metrics(request):
 	context["stat_set"]=stat_set
 	return render(request, 'assignment/metrics.html', context)
 
-def deleteA(request):
+def deleteA(request, id):
 	#Delete specified assignment
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				assignment = Assignment.objects.get(id=entry)
-			except:
-				break
-			for question in assignment.questions.all():
-				#See if we need to remove ownership from a copy
-				if question.isCopy:
-					removeOwner = True
-					for a in request.user.owned_assignments.all():
-						if a.id != assignment.id and a.questions.filter(id=question.id).exists():
-							removeOwner=False
-							break
-					#remove ownership of copy, see if copy should be deleted
-					if removeOwner:
-						question.owners.remove(request.owner)
-						#Copy has no owners and original has been changed
-						if question.owners.all.count() == 0 and question.original == None:
-							question.delete()
+	try:
+		assignment = Assignment.objects.get(id=id)
+	except:
+		return HttpResponse('Failure')
+	for question in assignment.questions.all():
+		#See if we need to remove ownership from a copy
+		if question.isCopy:
+			removeOwner = True
+			for a in request.user.owned_assignments.all():
+				if a.id != assignment.id and a.questions.filter(id=question.id).exists():
+					removeOwner=False
+					break
+			#remove ownership of copy, see if copy should be deleted
+			if removeOwner:
+				question.owners.remove(request.owner)
+				#Copy has no owners and original has been changed
+				if question.owners.all.count() == 0 and question.original == None:
+					question.delete()
+	assignment.delete() #deletes assigned instances as well
 
-			assignment.delete() #deletes assigned instances as well
+	return HttpResponse('Success!')
 
-	context = get_breadcrumbs(request.path)
-	context['assignment_list'] = request.user.owned_assignments.all()
-	if request.method == "POST":
-		context['messages']=['Assignment(s) deleted']
-	return render(request, 'assignment/delete.html', context)
-
-def deleteQ(request):
-	#Delete specified questions
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				question = Question.objects.get(id=entry)
-			except:
-				break
-			#Delete data entries in assignments
-			for a in question.assigned_to.all():
-				data = json.loads(a.data)
-				while str(question.id) in json.dumps(data):
-					for q in data:
-						if int(q['id']) == int(question.id):
-							data.remove(q)
-				a.data = json.dumps(data)
-				a.save()
-			copy = question.copy.all()[0]
-			if not copy.owners.all().exists():
-				copy.delete()
-			else:
-				copy.original = None
-				copy.save()
-			question.delete()
+def deleteQ(request, id):
+	#Delete specified question
+	try:
+		question = Question.objects.get(id=id)
+	except:
+		return HttpResponse('Failure!')
+	#Delete data entries in assignments
+	for a in question.assigned_to.all():
+		data = json.loads(a.data)
+		while str(question.id) in json.dumps(data):
+			for q in data:
+				if int(q['id']) == int(question.id):
+					data.remove(q)
+		a.data = json.dumps(data)
+		a.save()
+	copy = question.copy.all()[0]
+	if not copy.owners.all().exists():
+		copy.delete()
+	else:
+		copy.original = None
+		copy.save()
+	question.delete()
 			
-	context = get_breadcrumbs(request.path)
-	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
-	if request.method == "POST":
-		context['messages'] = ['Question(s) deleted']
-	return render(request, 'question/delete.html', context)
+	return HttpResponse('Success!')
 
 def editQ(request, id):
 	question = get_object_or_404(Question, id=id)
@@ -267,9 +247,9 @@ def editQ(request, id):
 	context['atom_list'] = web.models.Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-
-def selectInstance(request, messages=[]):
+def selectInstance(request, c, messages=[]):
 	context = get_breadcrumbs(request.path)
+	context['class'] = web.models.Class.objects.get(id=c)
 	context['assignments']=request.user.owned_assignments.all()
 	context['messages']=messages
 	return render(request, 'assignment/select.html', context)
@@ -278,10 +258,10 @@ def extend(request):
 	date=request.POST['duedate']
 	inputs = request.POST
 	for i in inputs:
-		if i=="csrfmiddlewaretoken" or i=="duedate":
+		if i=="csrfmiddlewaretoken" or i=="duedate" or i=="classid":
 			continue
 		instance = AssignmentInstance.objects.get(id=request.POST[i])
 		instance.due_date=date
 		instance.save()
 	messages=["Due dates extended"]
-	return selectInstance(request, messages)
+	return selectInstance(request, request.POST['classid'], messages)
