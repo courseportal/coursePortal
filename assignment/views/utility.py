@@ -78,9 +78,9 @@ def practiceEval(request):
 
 def reportQ(request):
 	question = Question.objects.get(id=request.GET['id'])
-	subject = "Question Reported"
-	message = "Your question '"+question.title+"' has been reported as broken. Here is the message submitted by a student:\n"
+	message = "Your question '"+question.title+"' has been reported as broken by "+request.user.email+".\n"
+	message += "Here is the message that was submitted:\n"
 	message+= request.GET['text']
-	send_mail(subject, message, 'test-no-use@umich.edu', [question.owners.all()[0].email])
+	send_mail("Question Reported", message, 'test-no-use@umich.edu', [question.owners.all()[0].email])
 	return HttpResponse('Success')
 	
