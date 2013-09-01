@@ -1,0 +1,3 @@
+{{object.title}}
+{{object.owner}}
+{{object.sumary}}
