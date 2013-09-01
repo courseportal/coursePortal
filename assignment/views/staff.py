@@ -12,11 +12,13 @@ from math import *
 from random import *
 import web.models
 
-def viewStudent(request):
+def viewStudent(request, id):
+	selected_class = web.models.Class.objects.get(id=id) 
 	user = request.user
 	context = get_breadcrumbs(request.path)
-	context['class_list']=user.classes_authored.all() | user.allowed_classes.all()
+	context['user_list']=selected_class
 	context['user']=user
+	context['class']=selected_class
 	return render(request, 'assignment/students.html', context)
 
 def previewQuestion(request):

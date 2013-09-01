@@ -44,7 +44,7 @@ I have changed this file a bit, you should use this as the template you extend. 
 {% block navbar_content %}
 
 {% if user.is_staff  or user.is_superuser %}
-  <li class="nav-header">My Class</li>
+  <li class="nav-header">Excercises</li>
   <li><a href="{% url "add_assignment" %}" >Add Assignment</a></li>
   <li><a href='{%url "edit_assignment_list"%}'><i class="sidebar-dropdown-toggle icon-minus"></i>Edit Assignments</a> 
   <ul class="nav nav-list">
@@ -63,12 +63,24 @@ I have changed this file a bit, you should use this as the template you extend. 
   {%endfor%}
   </ul>
   <li><a href="{% url 'delete_question' %}">Delete Question</a></li>
-  <li><a href="{% url "assign" %}">Assign</a></li>
-  <li><a href="{% url "unassign" %}">Unassign</a></li>
-  <li><a href="{% url "select" %}">Extend Due Date</a></li>
-  <li><a href="{% url "view_student" %}">View Students</a></li>
   <li><a href="{% url "metrics" %}">Performance</a></li>
   <li class="divider"></li>
+  {% for c in user.allowed_classes.all%}
+    <li class="nav-header">{{c}}</li>
+    <li><a href="{% url "assign"%}">Assign</a></li>
+    <li><a href="{% url "unassign"%}">Unassign</a></li>
+    <li><a href="{% url "select"%}">Extend Due Date</a></li>
+    <li><a href="{% url "view_student" c.id %}">View Students</a></li>
+    <li class="divider"></li>
+  {% endfor %}
+  <!-- {% for c in user.classes_authored.all %}
+    <li class="nav-header">{{c}}</li>
+    <li><a href="{% url "assign" %}">Assign</a></li>
+    <li><a href="{% url "unassign" %}">Unassign</a></li>
+    <li><a href="{% url "select" %}">Extend Due Date</a></li>
+    <li><a href="{% url "view_student" %}">View Students</a></li>
+    <li class="divider"></li>
+  {% endfor %} -->
 {% endif %}
 
 {% if user.is_active or user.is_superuser %}
