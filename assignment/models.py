@@ -59,6 +59,7 @@ class Assignment(models.Model):
 
 class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
+    assigned_class = models.ForeignKey("web.Class", related_name = 'assigned_instances')
     user = models.ForeignKey(User, related_name = 'assignmentInstances')
     template = models.ForeignKey(Assignment, related_name = 'instances')
     can_edit = models.BooleanField(default=True)
@@ -66,6 +67,7 @@ class AssignmentInstance(models.Model):
     due_date = models.DateTimeField()
     score = models.FloatField(default = 0.0)
     max_score = models.FloatField(default = 0.0)
+
     def __unicode__(self):
         return self.title
     def was_published(self):

@@ -20,6 +20,8 @@
 {% if assignments %}
 <form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">
 	{% csrf_token %}
+  <h1>{{class}}</h1>
+  <input type='hidden' name='classid' value='{{class.id}}'></input>
 	<strong>Assignment:</strong><br> 
 	<table class="table assignments" style="width:500px">  
     <thead>  
@@ -37,7 +39,7 @@
    	</tbody>  
    	</table>
    	<hr>
-	<br><strong>Assigned to:</strong><br>
+	<!--<br><strong>Assigned to:</strong><br>
 
 	<div class="row-fluid">
 		<div>
@@ -58,7 +60,7 @@
       {% endfor %}
       </tbody>  
       </table>
-    </div>
+    </div> 
     <div>
 		Users:
 		<table class="table students" style="width:500px">  
@@ -85,7 +87,7 @@
    		</table>
 		</div>
 		
-	</div>
+	</div>-->
 	<button type="submit" class="btn">Submit</button>
 <form>
 

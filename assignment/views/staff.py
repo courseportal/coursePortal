@@ -269,9 +269,9 @@ def editQ(request, id):
 	context['atom_list'] = web.models.Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-
-def selectInstance(request, messages=[]):
+def selectInstance(request, c, messages=[]):
 	context = get_breadcrumbs(request.path)
+	context['class'] = web.models.Class.objects.get(id=c)
 	context['assignments']=request.user.owned_assignments.all()
 	context['messages']=messages
 	return render(request, 'assignment/select.html', context)
@@ -280,10 +280,10 @@ def extend(request):
 	date=request.POST['duedate']
 	inputs = request.POST
 	for i in inputs:
-		if i=="csrfmiddlewaretoken" or i=="duedate":
+		if i=="csrfmiddlewaretoken" or i=="duedate" or i=="classid":
 			continue
 		instance = AssignmentInstance.objects.get(id=request.POST[i])
 		instance.due_date=date
 		instance.save()
 	messages=["Due dates extended"]
-	return selectInstance(request, messages)
+	return selectInstance(request, request.POST['classid'], messages)

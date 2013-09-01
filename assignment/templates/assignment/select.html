@@ -5,6 +5,8 @@
 
 <form method = "post" action = "{% url 'extend' %}">
 {% csrf_token %}
+<input type='hidden' name='classid' value='{{class.id}}'></input>
+<h1>{{c}}</h1>
 <div class="span4"><h3>Select Instances to Extend Deadline On</h3></div> 
 <table class="table" id="assigned">
 	<thead>
@@ -21,16 +23,14 @@
 			<td></td>
 			<td></td>
 		</tr>
-		{% for a in assignments %}
-			{% for i in a.instances.all %}
-				<tr>
-					<td style="width:80px">{{i.user.username}}</td>
-					<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
-					<td style="width:100px">{{i}}</td>
-					<td style="width:100px">{{i.due_date}}</td>
-					<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
-				</tr>
-			{% endfor %}
+		{% for i in class.assigned_instances.all %}
+			<tr>
+				<td style="width:80px">{{i.user.username}}</td>
+				<td style="width:100px">{{i.user.first_name}} {{i.user.last_name}}</td>
+				<td style="width:100px">{{i}}</td>
+				<td style="width:100px">{{i.due_date}}</td>
+				<td style="width:10px"><input type="checkbox" name="instance{{i.id}}" value="{{i.id}}"></input></td>
+			</tr>
 		{% endfor %}
 	</tbody>
 	<tfoot>

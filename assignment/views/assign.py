@@ -44,8 +44,9 @@ def detail(request, id):
     context['question_list']=question_list
     return render(request, 'assignment/detail.html', context)
 
-def assign(request, messages=[]):
+def assign(request, c, messages=[]):
     context = get_breadcrumbs(request.path)
+    context['class']=Class.objects.get(id=c)
     context['users']=User.objects.all()
     context['assignments']=request.user.owned_assignments.all()
     context['class_list']=request.user.allowed_classes.all() | request.user.classes_authored.all()
@@ -54,25 +55,13 @@ def assign(request, messages=[]):
 
 def instantiate(request):
     assignment = Assignment.objects.get(pk=request.POST['assignment'])
+    c = Class.objects.get(id = request.POST['classid'])
     #get list of users
-    users=[]
-    try:
-        for u in User.objects.all().filter(pk=request.POST['users']):
-            if users.count(u.id)==0:
-                users.append(u)
-    except:
-        pass
-    try:
-        for c in Class.objects.all().filter(pk=request.POST['class']):
-            for u in c.students.all():
-                if users.count(u.id)==0:
-                    users.append(u)
-    except:
-        pass
+    users=c.students.all()
 
     data=json.loads(assignment.data)
     for u in users:
-        instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=assignment.start_date, due_date=assignment.due_date)
+        instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, assigned_class=c, start_date=assignment.start_date, due_date=assignment.due_date)
         instance.save()
         for question in data:
             q=Question.objects.get(id=question['id']).data
@@ -101,7 +90,7 @@ def instantiate(request):
             instance.max_score+=question_instance.value
             instance.save()
     messages=["Assignment succesfully assigned!"]
-    return assign(request, messages)
+    return assign(request, c.id, messages)
 
 def addA(request):
     context=get_breadcrumbs(request.path)
@@ -182,8 +171,9 @@ def create(request):
     #return main(request)
     return HttpResponse('Success!')
 
-def unassign(request, messages=[]):
+def unassign(request, c, messages=[]):
     context=get_breadcrumbs(request.path)
+    context['class']=Class.objects.get(id=c)
     context['user']=request.user
     context['assignments']=request.user.owned_assignments.all()
     context['class_list']=request.user.allowed_classes.all() | request.user.classes_authored.all()
@@ -193,7 +183,7 @@ def unassign(request, messages=[]):
 def unmake(request):
     instances = request.POST
     for i in instances:
-        if i=="csrfmiddlewaretoken":
+        if i=="csrfmiddlewaretoken" or i=='classid':
             continue
         try:
             instance = AssignmentInstance.objects.get(id=request.POST[i])
@@ -205,4 +195,4 @@ def unmake(request):
             q.delete()
         instance.delete()
     messages=["Assignment(s) succesfully unassigned!"]
-    return unassign(request, messages)
+    return unassign(request, request.POST['classid'], messages)
