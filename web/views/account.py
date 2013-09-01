@@ -261,7 +261,7 @@ def register(request):
                                      'Management')
                                    ),
                           from_email='knoatom-noreply@gmail.com', 
-                          recipient_list=[user.email,],  # settings.EMAIL_HOST_USER
+                          recipient_list=[user.email,settings.EMAIL_HOST_USER],  #
                           fail_silently=False
                           )
                 messages.success(request, _('You have been registered. Please '

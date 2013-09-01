@@ -32,7 +32,18 @@ BLOCKS(Including inherited blocks):
 
 -->
 
-{% extends "web/web_base.html" %}
+{# {% extends "web/web_base.html" %} #}
+
+{% extends "base.html" %} <!-- Include the base template -->
+
+{% block message %}
+<!-- This is the block for messages -->
+<div id="messages">
+    {% include "web/message.html" %}
+</div>
+{% endblock %}
+
+
 
 {% block content %}
 

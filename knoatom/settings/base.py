@@ -13,6 +13,7 @@ def generate_secret_key(filename):
 ADMINS = (
     ('Nick Terrell', 'terrelln@umich.edu'),
     ('Jacob Texel', 'texel@umich.edu'),
+    ('Taoran Yan','tyan@umich.edu'),
 )
 
 MANAGERS = ADMINS
@@ -118,6 +119,7 @@ INSTALLED_APPS = (
     # For PYBBM
     'pybb',
     'sorl.thumbnail',
+    'autocomplete_light',
 )
 
 

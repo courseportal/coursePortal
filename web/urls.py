@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 
 	url(r'^ajax/report/?$', 'web.views.home.report', name="report"),
 	                    
-    url(r'^submit-content/(?P<pk>\d+)?/?$', 
+    url(r'^submit-content/(?P<pk>\d+)?/?$',                                  #/(?P<class_pk>\d+)?
         'web.views.submission.submit_content', name="submit_content"),
     url(r'^delete-content/?$', 'web.views.submission.delete_content', 
         name="delete_content"),
