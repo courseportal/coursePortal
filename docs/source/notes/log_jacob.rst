@@ -133,3 +133,7 @@ name,type,default
 *Fixed bugs in the deletion of questions
 *Fixed bugs in creation of assignments
 *Assignments and questions can now be picked from a searchable/sortable table to edit
+
+9/1/2013:
+*Placed delete functions for assignments/questions onto the list pages. Create functions link from there as well
+*Removed mathjax in favor of using their CDN
