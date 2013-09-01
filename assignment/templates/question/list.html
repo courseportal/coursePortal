@@ -16,18 +16,33 @@
     </thead>
     <tbody>
    	{% for q in question_list %}
-   		<tr class="assignment-row">
-   			<td><a href='{% url "edit_question" q.id%}'>{{ q.title }}</a></td>
-			<td>{% for atom in q.get_atoms %}{{atom}}, {%endfor%}</td>
-			<td>{{q.instances.all.count}}</td>
-		</tr>
-	{% endfor %}
+   		<tr class="assignment-row" id="{{q.id}}">
+   			<td><i class="icon-remove" onclick='deleteQ({{q.id}})'></i><a href='{% url "edit_question" q.id%}'>{{ q.title }}</a></td>
+        <td>{% for atom in q.get_atoms %}{{atom}}, {%endfor%}</td>
+        <td>{{q.instances.all.count}}</td>
+		  </tr>
+    {% endfor %}
    	</tbody>  
    	</table>  
 	</div>
+  <a href="{% url 'add_question' %}" class="btn">Create New Question</a>
 </div>
 
 <script>
+  function deleteQ(qid){
+    if(confirm("Warning, this will permanently delete this question!")){
+      //Ajax call to delete question
+      $.ajax('/assignment/question/delete/'+qid, {
+        type: 'GET',
+        async: false,
+      });
+      //Remove question from table
+      $('#'+qid).remove();  
+    }
+  }
+
+
+
     // tablesorter 2.10.8
     // Documentation found here:
     // http://mottie.github.io/tablesorter/docs/index.html

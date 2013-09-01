@@ -193,38 +193,30 @@ def deleteA(request, id):
 
 	return HttpResponse('Success!')
 
-def deleteQ(request):
-	#Delete specified questions
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				question = Question.objects.get(id=entry)
-			except:
-				break
-			#Delete data entries in assignments
-			for a in question.assigned_to.all():
-				data = json.loads(a.data)
-				while str(question.id) in json.dumps(data):
-					for q in data:
-						if int(q['id']) == int(question.id):
-							data.remove(q)
-				a.data = json.dumps(data)
-				a.save()
-			copy = question.copy.all()[0]
-			if not copy.owners.all().exists():
-				copy.delete()
-			else:
-				copy.original = None
-				copy.save()
-			question.delete()
+def deleteQ(request, id):
+	#Delete specified question
+	try:
+		question = Question.objects.get(id=id)
+	except:
+		return HttpResponse('Failure!')
+	#Delete data entries in assignments
+	for a in question.assigned_to.all():
+		data = json.loads(a.data)
+		while str(question.id) in json.dumps(data):
+			for q in data:
+				if int(q['id']) == int(question.id):
+					data.remove(q)
+		a.data = json.dumps(data)
+		a.save()
+	copy = question.copy.all()[0]
+	if not copy.owners.all().exists():
+		copy.delete()
+	else:
+		copy.original = None
+		copy.save()
+	question.delete()
 			
-	context = get_breadcrumbs(request.path)
-	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
-	if request.method == "POST":
-		context['messages'] = ['Question(s) deleted']
-	return render(request, 'question/delete.html', context)
+	return HttpResponse('Success!')
 
 def editQ(request, id):
 	question = get_object_or_404(Question, id=id)
