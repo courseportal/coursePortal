@@ -21,7 +21,7 @@ def main(request, messages = []):
     return render(request, 'assignment_nav.html', context)
 
 def index(request):
-    assignment_list = Assignment.objects.all()
+    assignment_list = request.user.owned_assignments.all() | Assignment.objects.filter(isCopy=False, is_private=False)
     context=get_breadcrumbs(request.path)
     context['user'] = request.user
     context['assignment_list']=assignment_list
@@ -95,16 +95,12 @@ def instantiate(request):
 def addA(request):
     context=get_breadcrumbs(request.path)
     context['isCopy']=False
-    context['question_list']=Question.objects.filter(isCopy=False)
+    context['question_list']=request.user.owned_questions.all() | Question.objects.filter(is_private=False, isCopy=False)
     return render(request, 'assignment/addAssignment.html', context)
 
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
     context = get_breadcrumbs(request.path)
-    if assignment.owners.filter(id=request.user.id).exists():
-        context['isCopy'] = False
-    else:
-        context['isCopy'] = True
     context['assignment']= assignment
     context['question_list']=Question.objects.filter(isCopy=False)
     context['assign_data']=json.loads(assignment.data)
@@ -112,7 +108,7 @@ def editA(request, id):
 
 def Alist(request):
     context = get_breadcrumbs(request.path)
-    context['assignment_list'] = request.user.owned_assignments.filter(isCopy = False)
+    context['assignment_list'] = request.user.owned_assignments.filter()
     return render(request, 'assignment/list.html', context)
 
 def create(request):
@@ -120,7 +116,7 @@ def create(request):
     isCopy = False
     if 'copystatus' in request.POST:
         isCopy = request.POST['copystatus']
-    
+
     #create new assignment/grab assignment to edit
     assignment = ''
     #Assignment came from editing and is owned by user
@@ -130,6 +126,12 @@ def create(request):
             assignment.owners.clear()
         else:
             assignment=''
+
+    #set privacy of question
+    if 'Make_A_Private' in request.POST:
+        assignment.is_private=True
+    else:
+        assignment.is_private=False
     #Assignment is either new or a copy of something unowned by user
     if assignment == '':
         assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')

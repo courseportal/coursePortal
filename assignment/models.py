@@ -15,6 +15,7 @@ class Question(models.Model):
     numCorrect = models.IntegerField(default = 0)
     numIncorrect = models.IntegerField(default = 0)
     isCopy = models.BooleanField(default = False)
+    is_private = models.BooleanField(default=False)
     original = models.ForeignKey('Question', blank=True, null=True, related_name = 'copy', on_delete = models.SET_NULL)
 
     def get_rating(self):
@@ -41,6 +42,7 @@ class Assignment(models.Model):
     due_date = models.DateTimeField()
     start_date = models.DateTimeField()
     isCopy = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
      #Stringified tuple of dictionaries, contains question id, point value, title
     data = models.TextField(default='', null=True, blank=True)
     questions = models.ManyToManyField(Question, related_name='assigned_to', blank=True, null=True)
@@ -95,7 +97,6 @@ class ChoiceInstance(models.Model):
     question = models.ForeignKey(QuestionInstance, related_name = 'choiceInstances')
     def __unicode__(self):
         return self.solution
-
 
 class Variable(models.Model):
     name = models.CharField(max_length=200)

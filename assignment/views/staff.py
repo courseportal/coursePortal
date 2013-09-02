@@ -287,7 +287,7 @@ def emailCSV(request, cid):
 	#send email
 	email = EmailMessage()
 	email.subject = 'Cportal Class Data'
-	email.body = 'Attached is the clas data for '+c.title
+	email.body = 'Attached is the class data for '+c.title
 	email.to = [request.user.email]
 	email.attach(str(c.title)+'.csv', csvfile.getvalue(), 'text/csv')
 	email.send()

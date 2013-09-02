@@ -73,6 +73,7 @@ MathJax.Hub.Config({
 		<a href="#preview-zone" role="button" onclick = "validateAndPreview()" class="span5 btn btn-large">Preview</a>
 		<div class="span5 btn btn-success btn-large" onclick="validateAndSubmit()">Create</div>
 	</div>
+	<input type='checkbox' {%if question.is_private%}checked{%endif%} name = 'Make_Q_Private'>Private?</input>
 
 
 	<!-- variable modal -->

@@ -137,3 +137,6 @@ name,type,default
 9/1/2013:
 *Placed delete functions for assignments/questions onto the list pages. Create functions link from there as well
 *Removed mathjax in favor of using their CDN
+
+9/2/2013:
+*Users can email csv of grades to themselves
