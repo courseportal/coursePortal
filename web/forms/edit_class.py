@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 
 
 class DataImportForm(forms.Form):
-    file = forms.FileField()
+    file = forms.FileField(
+            help_text=_('Attention: Only csv file is accepted; with firstname, lastname,uniqname and email [IN ORDER without blank spaces].'))
     classId = forms.IntegerField(widget=forms.widgets.HiddenInput,
                                  required=False)
 

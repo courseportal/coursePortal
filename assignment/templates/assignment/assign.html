@@ -20,6 +20,8 @@
 {% if assignments %}
 <form name="input" onsubmit="return validateAssign()" action="{% url 'instantiate'%}" method = "post">
 	{% csrf_token %}
+  <h1>{{class}}</h1>
+  <input type='hidden' name='classid' value='{{class.id}}'></input>
 	<strong>Assignment:</strong><br> 
 	<table class="table assignments" style="width:500px">  
     <thead>  
@@ -37,55 +39,6 @@
    	</tbody>  
    	</table>
    	<hr>
-	<br><strong>Assigned to:</strong><br>
-
-	<div class="row-fluid">
-		<div>
-    Classes:
-    <table style="width:500px" class="table classes">  
-        <thead>  
-            <tr>  
-            <th class="sortable">Class name</th>
-            <th></th>
-            </tr>  
-      </thead>
-      <tbody>
-        {% for c in class_list %}
-        <tr>
-          <td>{{c}}</td>
-        <td><input type="checkbox" name="class" value={{c.id}}></input></td>
-      </tr>
-      {% endfor %}
-      </tbody>  
-      </table>
-    </div>
-    <div>
-		Users:
-		<table class="table students" style="width:500px">  
-    		<thead>  
-      			<tr>  
-       			<th class="sortable">Username</th>
-       			<th class="sortable">Student Name</th>
-       			<th></th>
-      			</tr>  
-    	</thead>
-    	<tbody>
-    		<tr class = '.filter'>
-    			<td></td>
-    			<td></td>
-    		</tr>
-   			{% for u in users %}
-   			<tr>
-   				<td>{{u}}</td>
-   				<td>{{u.first_name}} {{u.last_name}}</td>
-				<td><input type="checkbox" name="users" value={{u.id}}></input></td>
-			</tr>
-			{% endfor %}
-   		</tbody>  
-   		</table>
-		</div>
-		
-	</div>
 	<button type="submit" class="btn">Submit</button>
 <form>
 

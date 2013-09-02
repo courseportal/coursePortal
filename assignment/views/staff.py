@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
+from django.core.mail import send_mail, EmailMessage
 from django.shortcuts import render, get_object_or_404
 from assignment.models import *
 from web.models import *
@@ -10,7 +11,7 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs
 from math import *
 from random import *
-import web.models
+import web.models, csv, StringIO
 
 def viewStudent(request, id):
 	selected_class = web.models.Class.objects.get(id=id) 
@@ -122,11 +123,6 @@ def previewTemplate(request, a):
 	context['assignment']=assignment
 	return render(request, 'assignment/preview.html', context)
 
-def errorMsg(title, error, element):
-	x = "Question \""+title+"\" threw this error in element \""+element+"\":<br>"
-	x+= "&nbsp;&nbsp;&nbsp;&nbsp;"+str(error)+"<br>"
-	return x
-
 class AssignmentStats():
 	assignmentName=''
 	assignmentid=''
@@ -174,71 +170,54 @@ def metrics(request):
 	context["stat_set"]=stat_set
 	return render(request, 'assignment/metrics.html', context)
 
-def deleteA(request):
+def deleteA(request, id):
 	#Delete specified assignment
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				assignment = Assignment.objects.get(id=entry)
-			except:
-				break
-			for question in assignment.questions.all():
-				#See if we need to remove ownership from a copy
-				if question.isCopy:
-					removeOwner = True
-					for a in request.user.owned_assignments.all():
-						if a.id != assignment.id and a.questions.filter(id=question.id).exists():
-							removeOwner=False
-							break
-					#remove ownership of copy, see if copy should be deleted
-					if removeOwner:
-						question.owners.remove(request.owner)
-						#Copy has no owners and original has been changed
-						if question.owners.all.count() == 0 and question.original == None:
-							question.delete()
+	try:
+		assignment = Assignment.objects.get(id=id)
+	except:
+		return HttpResponse('Failure')
+	for question in assignment.questions.all():
+		#See if we need to remove ownership from a copy
+		if question.isCopy:
+			removeOwner = True
+			for a in request.user.owned_assignments.all():
+				if a.id != assignment.id and a.questions.filter(id=question.id).exists():
+					removeOwner=False
+					break
+			#remove ownership of copy, see if copy should be deleted
+			if removeOwner:
+				question.owners.remove(request.owner)
+				#Copy has no owners and original has been changed
+				if question.owners.all.count() == 0 and question.original == None:
+					question.delete()
+	assignment.delete() #deletes assigned instances as well
 
-			assignment.delete() #deletes assigned instances as well
+	return HttpResponse('Success!')
 
-	context = get_breadcrumbs(request.path)
-	context['assignment_list'] = request.user.owned_assignments.all()
-	if request.method == "POST":
-		context['messages']=['Assignment(s) deleted']
-	return render(request, 'assignment/delete.html', context)
-
-def deleteQ(request):
-	#Delete specified questions
-	if request.method == "POST":
-		for entry in request.POST:
-			if entry =="csrfmiddlewaretoken":
-				continue
-			try:
-				question = Question.objects.get(id=entry)
-			except:
-				break
-			#Delete data entries in assignments
-			for a in question.assigned_to.all():
-				data = json.loads(a.data)
-				while str(question.id) in json.dumps(data):
-					for q in data:
-						if int(q['id']) == int(question.id):
-							data.remove(q)
-				a.data = json.dumps(data)
-				a.save()
-			copy = question.copy.all()[0]
-			if not copy.owners.all().exists():
-				copy.delete()
-			else:
-				copy.original = None
-				copy.save()
-			question.delete()
+def deleteQ(request, id):
+	#Delete specified question
+	try:
+		question = Question.objects.get(id=id)
+	except:
+		return HttpResponse('Failure!')
+	#Delete data entries in assignments
+	for a in question.assigned_to.all():
+		data = json.loads(a.data)
+		while str(question.id) in json.dumps(data):
+			for q in data:
+				if int(q['id']) == int(question.id):
+					data.remove(q)
+		a.data = json.dumps(data)
+		a.save()
+	copy = question.copy.all()[0]
+	if not copy.owners.all().exists():
+		copy.delete()
+	else:
+		copy.original = None
+		copy.save()
+	question.delete()
 			
-	context = get_breadcrumbs(request.path)
-	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
-	if request.method == "POST":
-		context['messages'] = ['Question(s) deleted']
-	return render(request, 'question/delete.html', context)
+	return HttpResponse('Success!')
 
 def editQ(request, id):
 	question = get_object_or_404(Question, id=id)
@@ -269,9 +248,9 @@ def editQ(request, id):
 	context['atom_list'] = web.models.Atom.objects.all()
 	return render(request, 'question/addQ.html', context)
 
-
-def selectInstance(request, messages=[]):
+def selectInstance(request, c, messages=[]):
 	context = get_breadcrumbs(request.path)
+	context['class'] = web.models.Class.objects.get(id=c)
 	context['assignments']=request.user.owned_assignments.all()
 	context['messages']=messages
 	return render(request, 'assignment/select.html', context)
@@ -280,10 +259,52 @@ def extend(request):
 	date=request.POST['duedate']
 	inputs = request.POST
 	for i in inputs:
-		if i=="csrfmiddlewaretoken" or i=="duedate":
+		if i=="csrfmiddlewaretoken" or i=="duedate" or i=="classid":
 			continue
 		instance = AssignmentInstance.objects.get(id=request.POST[i])
 		instance.due_date=date
 		instance.save()
 	messages=["Due dates extended"]
-	return selectInstance(request, messages)
+	return selectInstance(request, request.POST['classid'], messages)
+
+def csvList(request, cid, messages=[]):
+	context = get_breadcrumbs(request.path)
+	context['class'] = web.models.Class.objects.get(id=cid)
+	context['assignments']=request.user.owned_assignments.all()
+	context['messages']=messages
+	return render(request, 'assignment/selectCSV.html', context)
+
+def emailCSV(request, cid, aid):
+	c=web.models.Class.objects.get(id=cid)
+	template = Assignment.objects.get(id=aid)
+	csvfile=StringIO.StringIO()
+	csvwriter =csv.writer(csvfile)
+	#get instances to look at
+	instance_list = c.assigned_instances.filter(template=template)
+
+	if instance_list.count() == 0:
+		return csvList(request, cid, ['No data to report on that assignment'])
+
+	#go through each question of template
+	question_list = json.loads(template.data)
+	for x in range(0,len(question_list)):
+		#add header row
+		csvwriter.writerow(['uid', 'question', 'score.'+str(question_list[x]['points'])])
+		#Go through each question instance
+		for instance in instance_list:
+			#add data row
+			question = instance.questions.all()[x]
+			if question.student_answer == question.solution:
+				csvwriter.writerow([instance.user.email, question.title, question.value])
+			else:
+				csvwriter.writerow([instance.user.email, question.title, '0'])
+		csvwriter.writerow([])
+
+	#send email
+	email = EmailMessage()
+	email.subject = 'Cportal Class Data'
+	email.body = 'Attached is the class data for '+c.title+" assignment "+template.title
+	email.to = [request.user.email]
+	email.attach(str(c.title)+'_'+template.title+'.csv', csvfile.getvalue(), 'text/csv')
+	email.send()
+	return render(request, 'assignment_nav.html')

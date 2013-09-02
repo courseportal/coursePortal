@@ -50,6 +50,7 @@ function submitQbug(){
 			data: data,
 		});
 		$('#submitreport').attr('onclick', "$('#reportform').modal('hide');");
+		$('#reportform').modal('hide');
 	}
 }
 

@@ -45,6 +45,7 @@ MathJax.Hub.Config({
 	Title:<input type='text' id='question_title' name='question_title' value="{{question.title}}"></input>
 	<textarea id="problemText" title="Problem text">{{qdata.text}}</textarea><br>
 	<div class="row-fluid">
+		
 		<div id='left' class="span6">
 			<a href="#variable-zone" role="button" data-toggle="modal" class="btn">Variables</a><br>
 		    Question Type:<select onchange="inputChange($(this).val());" name="question_type">
@@ -55,6 +56,7 @@ MathJax.Hub.Config({
 	    Answer:<br><div id='answer_input'><input type='text' name='answer' placeholder='answer'></input></div>
 	    Choices:<br><div id='choice_input'></div>
 		</div>
+
 		<div id="right" class="span6">
 			Custom code area:<br>
 			<textarea name="code" id="code">{{code}}</textarea><br>
@@ -73,6 +75,7 @@ MathJax.Hub.Config({
 		<a href="#preview-zone" role="button" onclick = "validateAndPreview()" class="span5 btn btn-large">Preview</a>
 		<div class="span5 btn btn-success btn-large" onclick="validateAndSubmit()">Create</div>
 	</div>
+	<input type='checkbox' {%if question.is_private%}checked{%endif%} name = 'Make_Q_Private'>Private?</input>
 
 
 	<!-- variable modal -->
