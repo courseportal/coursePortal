@@ -98,13 +98,13 @@ def handle_uploaded_file(f, request, classId):
                     exist_user = None
                 if not exist_user:
                     password = User.objects.make_random_password()
-
+                    random_username = ''.join(row[2]).join(random.choice(string.ascii_uppercase) for x in range(2))
                     created_user = User.objects.create_user(
-                                                           row[2] , row[3],
+                                                           random_username , row[3],
                                                             password,
                                                             )
                     
-                    User.objects.filter(email=row[3]).update(first_name = row[0],last_name = row[1], username = row[2], is_active = False, date_joined=datetime.now())
+                    User.objects.filter(email=row[3]).update(first_name = row[0],last_name = row[1], username = random_username, is_active = False, date_joined=datetime.now())
                     
                     ClassIn = Class.objects.get(id=classId)
                     created_user.enrolled_classes.add(ClassIn)
@@ -116,7 +116,7 @@ def handle_uploaded_file(f, request, classId):
                               message=(_('You have successfully registered at '
                                          'knoatom.eecs.umich.edu with the username: ') +
                                        created_user.username + ' and default password: ' + password +
-                                       _('. Please validate your account by going to http://')+
+                                       _('. Please validate your account with your umich email address by going to http://')+
                                        request.META['HTTP_HOST']+'/validate?email='+
                                        created_user.email + '&validation=' + m.hexdigest() +
                                        _(' . If you did not process this registration, '
