@@ -11,7 +11,7 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs
 from math import *
 from random import *
-import web.models, os, csv, StringIO
+import web.models, csv, StringIO
 
 def viewStudent(request, id):
 	selected_class = web.models.Class.objects.get(id=id) 
@@ -267,28 +267,44 @@ def extend(request):
 	messages=["Due dates extended"]
 	return selectInstance(request, request.POST['classid'], messages)
 
-def emailCSV(request, cid):
-	c = web.models.Class.objects.get(id = cid)
-	#write csv data
+def csvList(request, cid, messages=[]):
+	context = get_breadcrumbs(request.path)
+	context['class'] = web.models.Class.objects.get(id=cid)
+	context['assignments']=request.user.owned_assignments.all()
+	context['messages']=messages
+	return render(request, 'assignment/selectCSV.html', context)
+
+def emailCSV(request, cid, aid):
+	c=web.models.Class.objects.get(id=cid)
+	template = Assignment.objects.get(id=aid)
 	csvfile=StringIO.StringIO()
 	csvwriter =csv.writer(csvfile)
-	for s in c.students.all():
-		csvwriter.writerow(['Student:',s.first_name, s.last_name])
-		for i in s.assignmentInstances.all():
-			if (not i.can_edit) or i.was_due():
-				csvwriter.writerow(['Assignment:',str(i.title), str(i.score)+'/'+str(i.max_score)])
-				for q in i.questions.all():
-					if q.student_answer == 	q.solution:
-						csvwriter.writerow(["  ","Question:",q,str(q.value)+"/"+str(q.value)])
-					else:
-						csvwriter.writerow(["  ","Question:",q,"0/"+str(q.value)])
+	#get instances to look at
+	instance_list = c.assigned_instances.filter(template=template)
+
+	if instance_list.count() == 0:
+		return csvList(request, cid, ['No data to report on that assignment'])
+
+	#go through each question of template
+	question_list = json.loads(template.data)
+	for x in range(0,len(question_list)):
+		#add header row
+		csvwriter.writerow(['uid', 'question', 'score.'+str(question_list[x]['points'])])
+		#Go through each question instance
+		for instance in instance_list:
+			#add data row
+			question = instance.questions.all()[x]
+			if question.student_answer == question.solution:
+				csvwriter.writerow([instance.user.email, question.title, question.value])
+			else:
+				csvwriter.writerow([instance.user.email, question.title, '0'])
 		csvwriter.writerow([])
 
 	#send email
 	email = EmailMessage()
 	email.subject = 'Cportal Class Data'
-	email.body = 'Attached is the class data for '+c.title
+	email.body = 'Attached is the class data for '+c.title+" assignment "+template.title
 	email.to = [request.user.email]
-	email.attach(str(c.title)+'.csv', csvfile.getvalue(), 'text/csv')
+	email.attach(str(c.title)+'_'+template.title+'.csv', csvfile.getvalue(), 'text/csv')
 	email.send()
 	return render(request, 'assignment_nav.html')

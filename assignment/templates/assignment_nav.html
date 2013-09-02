@@ -69,16 +69,9 @@ I have changed this file a bit, you should use this as the template you extend. 
     <li><a href="{% url "unassign" c.id%}">Unassign</a></li>
     <li><a href="{% url "select" c.id %}">Extend Due Date</a></li>
     <li><a href="{% url "view_student" c.id %}">View Students</a></li>
+    <li><a href="{% url 'csvList' c.id%}">Email Data</a></li>
     <li class="divider"></li>
   {% endfor %}
-  <!-- {% for c in user.classes_authored.all %}
-    <li class="nav-header">{{c}}</li>
-    <li><a href="{% url "assign" %}">Assign</a></li>
-    <li><a href="{% url "unassign" %}">Unassign</a></li>
-    <li><a href="{% url "select" %}">Extend Due Date</a></li>
-    <li><a href="{% url "view_student" %}">View Students</a></li>
-    <li class="divider"></li>
-  {% endfor %} -->
 {% endif %}
 
 {% if user.is_active or user.is_superuser %}
