@@ -140,3 +140,5 @@ name,type,default
 
 9/2/2013:
 *Users can email csv of grades to themselves
+*Stuff can be private
+*Small changes
