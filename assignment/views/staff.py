@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
+from django.core.mail import send_mail, EmailMessage
 from django.shortcuts import render, get_object_or_404
 from assignment.models import *
 from web.models import *
@@ -10,7 +11,7 @@ from string import Template
 from knoatom.view_functions import get_breadcrumbs
 from math import *
 from random import *
-import web.models
+import web.models, os, csv, StringIO
 
 def viewStudent(request, id):
 	selected_class = web.models.Class.objects.get(id=id) 
@@ -265,3 +266,29 @@ def extend(request):
 		instance.save()
 	messages=["Due dates extended"]
 	return selectInstance(request, request.POST['classid'], messages)
+
+def emailCSV(request, cid):
+	c = web.models.Class.objects.get(id = cid)
+	#write csv data
+	csvfile=StringIO.StringIO()
+	csvwriter =csv.writer(csvfile)
+	for s in c.students.all():
+		csvwriter.writerow(['Student:',s.first_name, s.last_name])
+		for i in s.assignmentInstances.all():
+			if (not i.can_edit) or i.was_due():
+				csvwriter.writerow(['Assignment:',str(i.title), str(i.score)+'/'+str(i.max_score)])
+				for q in i.questions.all():
+					if q.student_answer == 	q.solution:
+						csvwriter.writerow(["  ","Question:",q,str(q.value)+"/"+str(q.value)])
+					else:
+						csvwriter.writerow(["  ","Question:",q,"0/"+str(q.value)])
+		csvwriter.writerow([])
+
+	#send email
+	email = EmailMessage()
+	email.subject = 'Cportal Class Data'
+	email.body = 'Attached is the clas data for '+c.title
+	email.to = [request.user.email]
+	email.attach(str(c.title)+'.csv', csvfile.getvalue(), 'text/csv')
+	email.send()
+	return render(request, 'assignment_nav.html')

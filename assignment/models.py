@@ -56,7 +56,6 @@ class Assignment(models.Model):
         atoms.sort()
         return atoms
 
-
 class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
     assigned_class = models.ForeignKey("web.Class", related_name = 'assigned_instances')
@@ -74,7 +73,6 @@ class AssignmentInstance(models.Model):
         return self.start_date <= timezone.now()
     def was_due(self):
         return self.due_date <= timezone.now()
-
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)

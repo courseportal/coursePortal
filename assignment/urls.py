@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'preview/(?P<a>\d+)/?$', 'assignment.views.staff.previewTemplate', name='preview_assignment2'),
     url(r'students/(?P<id>\d+)?$', 'assignment.views.staff.viewStudent', name='view_student'),
     url(r'evaluate/?$', 'assignment.views.staff.metrics', name='metrics'),
+    url(r'emailCSV/(?P<cid>\d+)?$', 'assignment.views.staff.emailCSV', name='csv'),
 
     url(r'eval/?$', 'assignment.views.student.eval', name='eval'),
     url(r'save/?$', 'assignment.views.student.save', name='save'),
