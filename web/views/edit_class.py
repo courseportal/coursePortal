@@ -227,8 +227,13 @@ def process_forms(request, class_object, class_form=None, category_form=None, st
     if studentData_form:
         if studentData_form.is_valid():
             print("This is valid.")
-            upload_file(request=request,classId = class_object.id)
-            messages.success(request, _('Successfully uploaded.'))
+            is_valid_form = upload_file(request=request,classId = class_object.id)
+            if (is_valid_form == -1):
+                messages.error(request, _('Error uploading student data; format or data input is invalid. '))
+            elif (is_valid_form == 1):
+                messages.success(request, _('Successfully uploaded.'))
+            else:
+                print("nothing to do with student data upload form.")
         else:
             print("Not valid")
         context.update({'pk':class_object.id})
