@@ -178,6 +178,9 @@ function iframe_preview(qid){
   var ID="#";
   ID+=qid;
   $(ID).children('.icon-eye-open').data('popover').tip().find('.popover-content').empty().append(previewHTML);
+  MathJax.Hub.Queue(
+  	["Typeset",MathJax.Hub,ID]
+  );
   $(ID).children('.icon-eye-open').popover('show');
   $(ID).children('.icon-eye-open').attr("onclick", "iframe_close("+qid+")");
   $(ID).children('.icon-eye-open').attr("class", "icon-eye-close");
@@ -224,7 +227,7 @@ function questionstring(num, title, id){
 						<i class="icon-eye-open"> View</i>\
 					</div>\
 					<div class="span1 question-pts">\
-						<input type="text" class="input-fit" value="0"></input>\
+						<input type="text" class="input-fit" value="3"></input>\
 					</div>\
 					<button class="span1 question-remove btn" onclick="remove_question('+num+')">\
 						<i class="icon-remove-sign"></i>\

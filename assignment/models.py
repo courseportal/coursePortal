@@ -15,6 +15,7 @@ class Question(models.Model):
     numCorrect = models.IntegerField(default = 0)
     numIncorrect = models.IntegerField(default = 0)
     isCopy = models.BooleanField(default = False)
+    is_private = models.BooleanField(default=False)
     original = models.ForeignKey('Question', blank=True, null=True, related_name = 'copy', on_delete = models.SET_NULL)
 
     def get_rating(self):
@@ -41,6 +42,7 @@ class Assignment(models.Model):
     due_date = models.DateTimeField()
     start_date = models.DateTimeField()
     isCopy = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
      #Stringified tuple of dictionaries, contains question id, point value, title
     data = models.TextField(default='', null=True, blank=True)
     questions = models.ManyToManyField(Question, related_name='assigned_to', blank=True, null=True)
@@ -56,9 +58,9 @@ class Assignment(models.Model):
         atoms.sort()
         return atoms
 
-
 class AssignmentInstance(models.Model):
     title = models.CharField(max_length=100)
+    assigned_class = models.ForeignKey("web.Class", related_name = 'assigned_instances')
     user = models.ForeignKey(User, related_name = 'assignmentInstances')
     template = models.ForeignKey(Assignment, related_name = 'instances')
     can_edit = models.BooleanField(default=True)
@@ -66,13 +68,13 @@ class AssignmentInstance(models.Model):
     due_date = models.DateTimeField()
     score = models.FloatField(default = 0.0)
     max_score = models.FloatField(default = 0.0)
+
     def __unicode__(self):
         return self.title
     def was_published(self):
         return self.start_date <= timezone.now()
     def was_due(self):
         return self.due_date <= timezone.now()
-
 
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=200)
@@ -95,7 +97,6 @@ class ChoiceInstance(models.Model):
     question = models.ForeignKey(QuestionInstance, related_name = 'choiceInstances')
     def __unicode__(self):
         return self.solution
-
 
 class Variable(models.Model):
     name = models.CharField(max_length=200)

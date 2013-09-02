@@ -16,18 +16,34 @@
     </thead>
     <tbody>
    	{% for a in assignment_list %}
-   		<tr class="assignment-row">
-   			<td><a href='{% url "edit_assignment" a.id%}'>{{ a.title }}</a></td>
-			<td>{% for atom in a.get_atoms %}{{atom}}, {%endfor%}</td>
-			<td>{{a.instances.all.count}}</td>
+   	<tr class="assignment-row" id="{{a.id}}">
+   		 <td><i class="icon-remove" onclick="confirmAndDelete({{a.id}})"></i> <a href='{% url "edit_assignment" a.id%}'>{{ a.title }}</a></td>
+			 <td>{% for atom in a.get_atoms %}{{atom}}, {%endfor%}</td>
+			 <td>{{a.instances.all.count}}</td>
 		</tr>
-	{% endfor %}
+    {% endfor %}
    	</tbody>  
    	</table>  
 	</div>
+  <a href="{% url 'add_assignment' %}" class="btn">Add Assignment</a>
 </div>
 
 <script>
+
+  function confirmAndDelete(aid){
+    if(confirm("Careful, this will delete the assignment permanently!")){
+      //Make ajax call to delete assignment
+      $.ajax('/assignment/delete/'+aid, {
+        type: 'GET',
+        async: false,
+      });
+      //Remove assignment from table
+      $('#'+aid).remove();
+    }
+  }
+    
+
+
     // tablesorter 2.10.8
     // Documentation found here:
     // http://mottie.github.io/tablesorter/docs/index.html

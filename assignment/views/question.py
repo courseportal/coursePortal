@@ -63,6 +63,7 @@ def addQ(request):
 	return render(request, 'question/addQ.html', context)
 
 def create(request):
+	#Create or get question
 	q=''
 	if 'qid' in request.POST:
 		q = Question.objects.get(id=request.POST['qid'])
@@ -75,6 +76,10 @@ def create(request):
 			q.copy.all()[0].save()
 	else:
 		q = Question()
+
+	#Set privacy
+	if 'Make_Q_Private' in request.POST:
+		q.is_private = True
 	q.title = request.POST['question_title']
 	data=dict()
 	data['code'] = request.POST['code']
@@ -96,15 +101,16 @@ def create(request):
 	q.owners.add(request.user)
 	for atom in json.loads(request.POST['atoms']):
 		q.atoms.add(Atom.objects.get(id=atom))
-	#create copy
-	q2 = Question()
-	q2.title = q.title
-	q2.data = q.data
-	q2.isCopy = True
-	q2.original = q
-	q2.save()
-	for atom in q.atoms.all():
-		q2.atoms.add(atom)
+	#create copy if not private
+	if q.is_private == False:
+		q2 = Question()
+		q2.title = q.title
+		q2.data = q.data
+		q2.isCopy = True
+		q2.original = q
+		q2.save()
+		for atom in q.atoms.all():
+			q2.atoms.add(atom)
 	return HttpResponse('Success!')
 
 def preview(request):
@@ -160,7 +166,7 @@ def instanceDetail(request, pk, id):
     
 	return render(request, 'question/instance.html', context)
 
-def editQlist(request):
+def Qlist(request):
 	context = get_breadcrumbs(request.path)
 	context['question_list'] = request.user.owned_questions.filter(isCopy=False)
 	return render(request, 'question/list.html', context)

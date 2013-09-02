@@ -107,10 +107,13 @@ MathJax.Hub.Config({
 	{% csrf_token %}
 		{% if assignment %}
 			<input type='hidden' name='aid' value="{{assignment.id}}"></input>
-			<input type="hidden" name="copystatus" value="{{isCopy}}"></input>
+			<input type="hidden" name="copystatus" value="{{assignment.isCopy}}"></input>
 		{% endif %}
 		<input type="text" style="display:none" id="assignmentdata" name="assignmentdata"></input>
-		<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
+		<div class="row-fluid">
+			<button style="width:70px" type="button" class="btn btn-primary" onclick="save()">submit</button>
+			<input type='checkbox' {%if assignment.is_private%}checked{%endif%} name = 'Make_A_Private'>Private?</input>
+		</div>
 	</form>
 	<button  style="width:70px" class="btn" onclick="previewA()">Preview</button>
 

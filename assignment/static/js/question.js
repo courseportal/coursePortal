@@ -154,12 +154,7 @@ function validateAndPreview(){
 	pdata.code = tempCode+"\n"+pdata.code;
 	//Add choices
 	$('#choice_input').children().each(function(){
-		if($(this).attr('class') == 'row-fluid'){
-			pdata.choices.push($(this).children().first().val());
-		}
-		else{
-			pdata.choices.push($(this).val());
-		}
+		pdata.choices.push($(this).children().first().val());
 	});
 	pdata.choices = JSON.stringify(pdata.choices);
 	
@@ -400,7 +395,7 @@ function initialInput(type, solution, choices){
 
 function addChoice(){
 	html=
-		"<input type='text' placeholder='choice'></input>";
+		"<div><input type='text' placeholder='choice'></input><i class='icon-remove' onclick='$(this).parent().remove()'></i></div>";
 	$('#choice_input').append(html);
 }
 

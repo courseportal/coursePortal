@@ -1,0 +1,12 @@
+{% extends "assignment_nav.html" %}
+{% block content %}
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
+<div><h2>Select An Assignment to Retrieve Data on:</h2></div><br>
+<ul>
+{% for a in assignments %}
+	<li><h3><a href="{% url 'csv' class.id a.id%}">{{a}}</a></h3></li>
+{%endfor%}
+
+
+{% endblock %}

@@ -21,7 +21,7 @@ def main(request, messages = []):
     return render(request, 'assignment_nav.html', context)
 
 def index(request):
-    assignment_list = Assignment.objects.all()
+    assignment_list = request.user.owned_assignments.all() | Assignment.objects.filter(isCopy=False, is_private=False)
     context=get_breadcrumbs(request.path)
     context['user'] = request.user
     context['assignment_list']=assignment_list
@@ -44,8 +44,9 @@ def detail(request, id):
     context['question_list']=question_list
     return render(request, 'assignment/detail.html', context)
 
-def assign(request, messages=[]):
+def assign(request, c, messages=[]):
     context = get_breadcrumbs(request.path)
+    context['class']=Class.objects.get(id=c)
     context['users']=User.objects.all()
     context['assignments']=request.user.owned_assignments.all()
     context['class_list']=request.user.allowed_classes.all() | request.user.classes_authored.all()
@@ -54,25 +55,13 @@ def assign(request, messages=[]):
 
 def instantiate(request):
     assignment = Assignment.objects.get(pk=request.POST['assignment'])
+    c = Class.objects.get(id = request.POST['classid'])
     #get list of users
-    users=[]
-    try:
-        for u in User.objects.all().filter(pk=request.POST['users']):
-            if users.count(u.id)==0:
-                users.append(u)
-    except:
-        pass
-    try:
-        for c in Class.objects.all().filter(pk=request.POST['class']):
-            for u in c.students.all():
-                if users.count(u.id)==0:
-                    users.append(u)
-    except:
-        pass
+    users=c.students.all()
 
     data=json.loads(assignment.data)
     for u in users:
-        instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, start_date=assignment.start_date, due_date=assignment.due_date)
+        instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, assigned_class=c, start_date=assignment.start_date, due_date=assignment.due_date)
         instance.save()
         for question in data:
             q=Question.objects.get(id=question['id']).data
@@ -101,29 +90,25 @@ def instantiate(request):
             instance.max_score+=question_instance.value
             instance.save()
     messages=["Assignment succesfully assigned!"]
-    return assign(request, messages)
+    return assign(request, c.id, messages)
 
 def addA(request):
     context=get_breadcrumbs(request.path)
     context['isCopy']=False
-    context['question_list']=Question.objects.filter(isCopy=False)
+    context['question_list']=request.user.owned_questions.all() | Question.objects.filter(is_private=False, isCopy=False)
     return render(request, 'assignment/addAssignment.html', context)
 
 def editA(request, id):
     assignment = Assignment.objects.get(pk=id)
     context = get_breadcrumbs(request.path)
-    if assignment.owners.filter(id=request.user.id).exists():
-        context['isCopy'] = False
-    else:
-        context['isCopy'] = True
     context['assignment']= assignment
     context['question_list']=Question.objects.filter(isCopy=False)
     context['assign_data']=json.loads(assignment.data)
     return render(request, 'assignment/addAssignment.html', context)
 
-def editAlist(request):
+def Alist(request):
     context = get_breadcrumbs(request.path)
-    context['assignment_list'] = request.user.owned_assignments.filter(isCopy = False)
+    context['assignment_list'] = request.user.owned_assignments.filter()
     return render(request, 'assignment/list.html', context)
 
 def create(request):
@@ -131,7 +116,7 @@ def create(request):
     isCopy = False
     if 'copystatus' in request.POST:
         isCopy = request.POST['copystatus']
-    
+
     #create new assignment/grab assignment to edit
     assignment = ''
     #Assignment came from editing and is owned by user
@@ -141,6 +126,12 @@ def create(request):
             assignment.owners.clear()
         else:
             assignment=''
+
+    #set privacy of question
+    if 'Make_A_Private' in request.POST:
+        assignment.is_private=True
+    else:
+        assignment.is_private=False
     #Assignment is either new or a copy of something unowned by user
     if assignment == '':
         assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
@@ -182,8 +173,9 @@ def create(request):
     #return main(request)
     return HttpResponse('Success!')
 
-def unassign(request, messages=[]):
+def unassign(request, c, messages=[]):
     context=get_breadcrumbs(request.path)
+    context['class']=Class.objects.get(id=c)
     context['user']=request.user
     context['assignments']=request.user.owned_assignments.all()
     context['class_list']=request.user.allowed_classes.all() | request.user.classes_authored.all()
@@ -193,7 +185,7 @@ def unassign(request, messages=[]):
 def unmake(request):
     instances = request.POST
     for i in instances:
-        if i=="csrfmiddlewaretoken":
+        if i=="csrfmiddlewaretoken" or i=='classid':
             continue
         try:
             instance = AssignmentInstance.objects.get(id=request.POST[i])
@@ -205,4 +197,4 @@ def unmake(request):
             q.delete()
         instance.delete()
     messages=["Assignment(s) succesfully unassigned!"]
-    return unassign(request, messages)
+    return unassign(request, request.POST['classid'], messages)

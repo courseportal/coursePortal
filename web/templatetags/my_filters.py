@@ -1,6 +1,7 @@
 from django.template.defaultfilters import register
 from django.utils import simplejson as json
 from django import template
+from web.models import Class
 
 register = template.Library()
 
@@ -35,17 +36,18 @@ def to_class_name(value):
     return value.__class__.__name__
 
 @register.filter(name="student_performance")
-def performance(student):
-	achieved=0.0
-	possible=0.0
-	for i in student.assignmentInstances.all():
-		achieved+=i.score
-		possible+=i.max_score
-	if possible == 0.0:
-		return "No Assignments"
-	value = float((achieved/possible)*100)
-	performance=str(value)+'%'
-	return performance
+def performance(student, classid):
+    achieved=0.0
+    possible=0.0
+    c = Class.objects.get(id=classid)
+    for i in c.assigned_instances.filter(user=student):
+        achieved+=i.score
+        possible+=i.max_score
+    if possible == 0.0:
+        return "No Assignments"
+    value = float((achieved/possible)*100)
+    performance=str(value)+'%'
+    return performance
 
 @register.filter(name="has_atom")
 def has_atom(qset, aid):
