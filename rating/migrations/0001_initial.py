@@ -14,10 +14,9 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('atom', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['web.Atom'])),
             ('vote', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('video', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['web.Video'], null=True, blank=True)),
-            ('note', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='vote_set', null=True, to=orm['web.Note'])),
-            ('exposition', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='vote_set', null=True, to=orm['web.Exposition'])),
-            ('example', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='vote_set', null=True, to=orm['web.Example'])),
+            ('voteUp', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('voteDown', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('content', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='vote_set', null=True, to=orm['web.Content'])),
             ('topic', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='vote_set', null=True, to=orm['pybb.Topic'])),
         ))
         db.send_create_signal(u'rating', ['Vote'])
@@ -26,10 +25,7 @@ class Migration(SchemaMigration):
         db.create_table(u'rating_userrating', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='rating_set', to=orm['auth.User'])),
-            ('ExpoRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('LecNoteRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('ExampleRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('VideoRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('ContentRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('TopicRating', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('VoteUp', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('VoteDown', self.gf('django.db.models.fields.IntegerField')(default=0)),
@@ -162,12 +158,9 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'rating.userrating': {
-            'ExampleRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'ExpoRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'LecNoteRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'ContentRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'Meta': {'object_name': 'UserRating'},
             'TopicRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'VideoRating': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'VoteDown': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'VoteUp': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -177,14 +170,13 @@ class Migration(SchemaMigration):
         u'rating.vote': {
             'Meta': {'object_name': 'Vote'},
             'atom': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['web.Atom']"}),
-            'example': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'vote_set'", 'null': 'True', 'to': u"orm['web.Example']"}),
-            'exposition': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'vote_set'", 'null': 'True', 'to': u"orm['web.Exposition']"}),
+            'content': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'vote_set'", 'null': 'True', 'to': u"orm['web.Content']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'note': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'vote_set'", 'null': 'True', 'to': u"orm['web.Note']"}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'vote_set'", 'null': 'True', 'to': u"orm['pybb.Topic']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['web.Video']", 'null': 'True', 'blank': 'True'}),
-            'vote': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'vote': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'voteDown': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'voteUp': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         u'web.atom': {
             'Meta': {'ordering': "['title']", 'object_name': 'Atom'},
@@ -217,50 +209,17 @@ class Migration(SchemaMigration):
             'summary': ('django.db.models.fields.TextField', [], {'default': "u'There is currently no summary.'"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
-        u'web.example': {
-            'Meta': {'ordering': "['title']", 'object_name': 'Example'},
-            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'example_set'", 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
-            'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_examples'", 'blank': 'True', 'to': u"orm['web.Class']"}),
+        u'web.content': {
+            'Meta': {'object_name': 'Content'},
+            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['web.Atom']", 'symmetrical': 'False', 'blank': 'True'}),
+            'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_content'", 'blank': 'True', 'to': u"orm['web.Class']"}),
+            'content_type': ('django.db.models.fields.CharField', [], {'max_length': "'50'"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
             'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'example_set'", 'to': u"orm['auth.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'content_set'", 'to': u"orm['auth.User']"}),
+            'summary': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'web.exposition': {
-            'Meta': {'ordering': "['title']", 'object_name': 'Exposition'},
-            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'exposition_set'", 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
-            'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_expositions'", 'blank': 'True', 'to': u"orm['web.Class']"}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'link': ('django.db.models.fields.CharField', [], {'default': "'http://'", 'max_length': '100'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'exposition_set'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'web.note': {
-            'Meta': {'ordering': "['title']", 'object_name': 'Note'},
-            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'note_set'", 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
-            'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_notes'", 'blank': 'True', 'to': u"orm['web.Class']"}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'note_set'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'web.video': {
-            'Meta': {'ordering': "['title']", 'object_name': 'Video'},
-            'atoms': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'video_set'", 'symmetrical': 'False', 'to': u"orm['web.Atom']"}),
-            'classes_stickied_in': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'stickied_videos'", 'blank': 'True', 'to': u"orm['web.Class']"}),
-            'content': ('django.db.models.fields.TextField', [], {'default': "'-'"}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'video_owner'", 'to': u"orm['auth.User']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'video': ('django.db.models.fields.CharField', [], {'max_length': '400', 'blank': 'True'})
         }
     }
 

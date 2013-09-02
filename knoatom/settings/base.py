@@ -119,7 +119,6 @@ INSTALLED_APPS = (
     # For PYBBM
     'pybb',
     'sorl.thumbnail',
-    'autocomplete_light',
 )
 
 
