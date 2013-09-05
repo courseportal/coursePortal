@@ -25,6 +25,8 @@ ALLOWED_HOSTS = [
     'localhost',
     'knoatom.eecs.umich.edu',
     'cportal-nt.eecs.umich.edu',
+    'cportals.eecs.umich.edu',
+    '141.213.4.93',
     '127.0.0.1',
     '141.213.4.210'
 ]
