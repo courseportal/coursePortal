@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PROJECT_ROOT="/var/www/knoatom-web/"
+PROJECT_ROOT="/var/www/live/"
 APACHE2_DIR="/etc/apache2/"
-BACKUP_ROOT="/var/www/knoatom-web-backup/"
+BACKUP_ROOT="/var/www/backup/"
 SETTINGS="knoatom.settings.production"
 APPS=( "knoatom" "web" "assignment" "rating" "pybb" "haystack" )
 echo "Variables set"
