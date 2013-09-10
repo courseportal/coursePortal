@@ -75,10 +75,10 @@ class Content(WebBaseModel):
     READING = "R"
     HOMEWORK = "H"
     CONTENT_TYPES = (
-        (LECTURE, "Lectures"),
+        (LECTURE, "Presentations"),
         (EXAMPLE, "Examples"),
-        (READING, "Readings"),
-        (HOMEWORK, "Homework"),
+        (READING, "Expositions"),
+        (HOMEWORK, "Problems"),
     )
     
     owner = models.ForeignKey(User, related_name="content_set")
