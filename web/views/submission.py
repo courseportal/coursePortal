@@ -17,7 +17,6 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext, loader
 
 from web.forms.edit_class import DataImportForm
-from knoatom.settings.development import MEDIA_ROOT
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime
@@ -160,7 +159,7 @@ def upload_file(request, classId):
         if form.is_valid():
             data = request.FILES['file']
             path = default_storage.save('tmp/data.csv', ContentFile(data.read()))
-            tmp_file = os.path.join(MEDIA_ROOT, path)
+            tmp_file = os.path.join(settings.MEDIA_ROOT, path)
             classId = request.POST['classId']
             is_valid_form = validate_handle_uploaded_file(tmp_file, request, classId)
             if (is_valid_form == 1):
