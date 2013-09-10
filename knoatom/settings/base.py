@@ -11,9 +11,10 @@ def generate_secret_key(filename):
     secret_key_file.close()
 
 ADMINS = (
-    ('Nick Terrell', 'terrelln@umich.edu'),
-    ('Jacob Texel', 'texel@umich.edu'),
-    ('Taoran Yan','tyan@umich.edu'),
+#    ('Nick Terrell', 'terrelln@umich.edu'),
+#    ('Jacob Texel', 'texel@umich.edu'),
+#    ('Taoran Yan','tyan@umich.edu'),
+    ('Knoatom Webmaster', 'knoatom.webmaster@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -33,7 +34,8 @@ ALLOWED_FILE_EXTENSIONS = ['.pdf']
 # 250MB - 214958080
 # 500MB - 429916160
 MAX_UPLOAD_SIZE = "5242880"
-
+ # read/write permissions for owner, read for everyone else.
+FILE_UPLOAD_PERMISSIONS = 0644
 
 FILE_UPLOAD_HANDLERS= ("django.core.files.uploadhandler.MemoryFileUploadHandler",
                        "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
