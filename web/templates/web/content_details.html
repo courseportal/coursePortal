@@ -3,7 +3,7 @@
 {% block content %}
 
 {% load my_filters %}
-{% load vote_filters %}
+{% load vote_filter %}
 
 <h2>{{ content_object.title }} Details
     {% if user.is_superuser or content_object.owner == user %}
