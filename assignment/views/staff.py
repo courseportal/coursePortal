@@ -101,14 +101,20 @@ def previewTemplate(request, a):
 		q=json.loads(question.data)
 		q['choices']=json.loads(q['choices'])
 		exec question.code
-		solution=eval(q['solution'])
+		try:
+			solution=eval(q['solution'])
+		except:
+			solution = q['solution']
 		#q text formatted here
 		local_dict = dict(locals())
 		qdat['text'] = Template(question.text).substitute(local_dict)
 
 		qdat['choices'] = []
 		for choice in q['choices']:
-			answer = eval(choice)
+			try:
+				answer = eval(choice)
+			except:
+				answer = choice
 			qdat['choices'].append(answer)
 		if len(q['choices']) > 0:
 			qdat['choices'].append(solution)

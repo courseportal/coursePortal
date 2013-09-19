@@ -11,7 +11,7 @@ from django.conf import settings
 # Import ForumInlineAdmin
 from pybb.models import Forum, Category
 from web.forms.edit_class import CategoryForm
-#import autocomplete_light
+import autocomplete_light
 
 for m in get_models():
     exec "from %s import %s" % (m.__module__, m.__name__)
