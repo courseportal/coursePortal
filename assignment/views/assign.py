@@ -63,18 +63,21 @@ def instantiate(request):
     for u in users:
         instance=AssignmentInstance(title=assignment.title, user=u, template=assignment, assigned_class=c, start_date=assignment.start_date, due_date=assignment.due_date)
         instance.save()
-        for question in data:
-            q=Question.objects.get(id=question['id']).data
-            q=json.loads(q)
+        for entry in data:
+            question=Question.objects.get(id=entry['id'])
+            q=json.loads(question.data)
             q['choices']=json.loads(q['choices'])
-            exec q['code']
-            solution=eval(q['solution'])
+            exec question.code
+            try:
+                solution=eval(q['solution'])
+            except:
+                solution=q['solution']
             #q text formatted here
-            text = q['text']
+            text = question.text
 
             local_dict = dict(locals())
             text = string.Template(text).substitute(local_dict)
-            question_instance = QuestionInstance(title=question['title'], solution=solution, text=text, value=float(question['points']), assignmentInstance=instance, template=Question.objects.get(id=question['id']))
+            question_instance = QuestionInstance(title=entry['title'], solution=solution, text=text, value=float(entry['points']), assignmentInstance=instance, template=question)
             question_instance.save()
 
             choices = []
@@ -127,14 +130,15 @@ def create(request):
         else:
             assignment=''
 
+    #Assignment is either new or a copy of something unowned by user
+    if assignment == '':
+        assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
+
     #set privacy of question
     if 'Make_A_Private' in request.POST:
         assignment.is_private=True
     else:
         assignment.is_private=False
-    #Assignment is either new or a copy of something unowned by user
-    if assignment == '':
-        assignment = Assignment(title = a["title"],due_date = a['due'],start_date = a['start'], data='')
 
     assignment.isCopy = isCopy
     assignment.save()

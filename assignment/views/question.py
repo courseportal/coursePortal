@@ -13,11 +13,11 @@ from knoatom.view_functions import get_breadcrumbs
 import sys
 
 def detail(request, id, practice=False):
-	q=Question.objects.get(id=id)
-	data=json.loads(q.data)
+	question=Question.objects.get(id=id)
+	data=json.loads(question.data)
 	test = ''
 	try:
-		exec data['code']
+		exec question.code
 	except Exception as ex:
 		test += "Error in code section:<br>"+str(ex)+"<br>"
 
@@ -26,11 +26,11 @@ def detail(request, id, practice=False):
 	except:
 		solution = data['solution']
 
-	text = data['text']
+	text = question.text
 	local_dict = dict(locals())
 	text = Template(text).safe_substitute(local_dict)
 	
-	# #choices formatted here
+	#choices formatted here
 	choices = []
 	for choice in json.loads(data['choices']):
 		choice = Template(choice).safe_substitute(local_dict)
@@ -82,11 +82,10 @@ def create(request):
 		q.is_private = True
 	q.title = request.POST['question_title']
 	data=dict()
-	data['code'] = request.POST['code']
-	if data['code'][0] == '\r':
-		data['code']=data['code'][2:]
+	code = request.POST['code']
+	if code[0] == '\r':
+		code=code[2:]
 	data['solution'] = request.POST['answer']
-	data['text'] = request.POST['text']
 	data['question_type'] = request.POST['question_type']
 	choices = json.loads(request.POST['choices'])
 	if data['question_type'] == 'True/False':
@@ -96,6 +95,8 @@ def create(request):
 			choices.append('True')
 	data['choices']=json.dumps(choices)
 	q.data=json.dumps(data)
+	q.code=code
+	q.text=request.POST['text']
 	q.original = None
 	q.save()
 	q.owners.add(request.user)
@@ -106,6 +107,8 @@ def create(request):
 		q2 = Question()
 		q2.title = q.title
 		q2.data = q.data
+		q2.code = q.code
+		q2.text = q.text
 		q2.isCopy = True
 		q2.original = q
 		q2.save()
@@ -114,24 +117,21 @@ def create(request):
 	return HttpResponse('Success!')
 
 def preview(request):
+	code = request.POST['code']
+	text = request.POST['text']
 	q=dict()
-	q['code'] = request.POST['code']
-	q['text'] = request.POST['text']
 	q['solution'] = request.POST['answer']
 	q['choices'] = json.loads(request.POST['choices'])
-	test = ''
 	try:
-		exec q['code']
-
+		exec code
 	except Exception as ex:
-		test += "Error in code section:<br>"+str(ex)+"<br>"
+		return HttpRespons("Error in code section:<br>"+str(ex)+"<br>")
 
 	try:
 		solution = eval(q['solution'])
 	except Exception as ex:
 		solution = q['solution']
 
-	text = q['text']
 	local_dict = dict(locals())
 	text = Template(text).safe_substitute(local_dict)
 
@@ -142,9 +142,6 @@ def preview(request):
 			choices.append(eval(choice))
 		except Exception as ex:
 			choices.append(choice)
-
-	if not test=='':
-		return HttpResponse(test)
 
 	context = {
 		'text': text,

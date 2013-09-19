@@ -43,7 +43,7 @@ MathJax.Hub.Config({
 {% csrf_token %}
 	{% if question %}<input type="hidden" id='qid' name='qid' value="{{question.id}}"></input>{% endif %}
 	Title:<input type='text' id='question_title' name='question_title' value="{{question.title}}"></input>
-	<textarea id="problemText" title="Problem text">{{qdata.text}}</textarea><br>
+	<textarea id="problemText" title="Problem text">{{text}}</textarea><br>
 	<div class="row-fluid">
 		
 		<div id='left' class="span6">

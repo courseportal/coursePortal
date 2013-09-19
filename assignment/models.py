@@ -12,6 +12,8 @@ class Question(models.Model):
     owners = models.ManyToManyField(User, related_name='owned_questions', blank=True, null=True)
     atoms = models.ManyToManyField("web.Atom", related_name='related_questions', blank=True, null=True)
     data = models.TextField()
+    code = models.TextField()
+    text = models.TextField()
     numCorrect = models.IntegerField(default = 0)
     numIncorrect = models.IntegerField(default = 0)
     isCopy = models.BooleanField(default = False)

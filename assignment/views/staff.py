@@ -45,16 +45,16 @@ def previewQuestion(request):
 def previewAssignment(request):
 	assignment = json.loads(request.POST['previewdata'])
 	question_list=[]
-	test = ''
-	for question in assignment['questions']:
+	for entry in assignment['questions']:
 		
-		q=Question.objects.get(id=question)
+		question=Question.objects.get(id=entry)
 
-		data = json.loads(q.data)
+		data = json.loads(question.data)
+		data['text'] = question.text
 		data['solution']= data['solution'].replace('<br>', '\n')
 		data['solution']= data['solution'].replace('&nbsp;&nbsp;&nbsp;&nbsp;', '\t')
 
-		exec data['code']
+		exec question.code
 
 		try:
 			data['solution']=eval(data['solution'])
@@ -78,11 +78,8 @@ def previewAssignment(request):
 		if len(data['choices']) > 0:
 			data['choices'].append(data['solution'])
 
-		data['title']=q.title
+		data['title']=question.title
 		question_list.append(data)
-
-	if test!='':
-		return HttpResponse(test)
 
 	context = get_breadcrumbs(request.path)
 	context['question_list']=question_list
@@ -93,21 +90,21 @@ def previewTemplate(request, a):
 	assignment = Assignment.objects.get(pk=a)
 	question_list=[]
 	data = json.loads(assignment.data)
-	for question in data:
+	for entry in data:
 		qdat = {
 			'title': '',
 			'text':'',
 			'choices': '',
 		}
-		qdat['title'] = question['title']
-		q=Question.objects.get(id=question['id']).data
-		q=json.loads(q)
+		qdat['title'] = entry['title']
+		question=Question.objects.get(id=entry['id'])
+		q=json.loads(question.data)
 		q['choices']=json.loads(q['choices'])
-		exec q['code']
+		exec question.code
 		solution=eval(q['solution'])
 		#q text formatted here
 		local_dict = dict(locals())
-		qdat['text'] = Template(q['text']).substitute(local_dict)
+		qdat['text'] = Template(question.text).substitute(local_dict)
 
 		qdat['choices'] = []
 		for choice in q['choices']:
@@ -223,7 +220,7 @@ def editQ(request, id):
 	question = get_object_or_404(Question, id=id)
 	#Generate list of variables
 	variable_list = []
-	varCode = json.loads(question.data)['code'].split('#CUSTOM')[0].replace('\r\n', '\n')
+	varCode = question.code.split('#CUSTOM')[0].replace('\r\n', '\n')
 	if varCode.find('#var:') >= 0:
 		for content in varCode.split('#var')[1:]:
 			variable={
@@ -237,11 +234,12 @@ def editQ(request, id):
 				variable['vardata'][line.split('=')[0]] = line.split('=')[1]
 			variable_list.append(variable)
 	#Get code
-	code = json.loads(question.data)['code'].split('#CUSTOM')[1]
+	code = question.code.split('#CUSTOM')[1]
 
 	context=get_breadcrumbs(request.path)
 	context['qdata'] = json.loads(question.data)
 	context['code'] = code
+	context['text'] = question.text
 	context['variable_list'] = variable_list
 	context['question'] = question
 	context['type_list'] = Variable.objects.all()
